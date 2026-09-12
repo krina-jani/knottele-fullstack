@@ -3,7 +3,15 @@
  * Provides seamless connection between Next.js frontend and Laravel backend.
  */
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:8000/api";
+const getApiBaseUrl = () => {
+  if (process.env.NEXT_PUBLIC_API_URL) {
+    return process.env.NEXT_PUBLIC_API_URL;
+  }
+  if (typeof window !== "undefined") {
+    return "/api";
+  }
+  return "http://127.0.0.1:8000/api";
+};
 
 export interface ContactFormData {
   name: string;
@@ -56,7 +64,7 @@ export interface ApiProduct {
 
 export async function submitContactForm(data: ContactFormData): Promise<{ success: boolean; message: string }> {
   try {
-    const response = await fetch(`${API_BASE_URL}/customer/contact`, {
+    const response = await fetch(`${getApiBaseUrl()}/customer/contact`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -84,7 +92,7 @@ export async function submitContactForm(data: ContactFormData): Promise<{ succes
 
 export async function fetchCategories(): Promise<ApiCategory[]> {
   try {
-    const response = await fetch(`${API_BASE_URL}/customer/categories`, {
+    const response = await fetch(`${getApiBaseUrl()}/customer/categories`, {
       headers: { "Accept": "application/json" },
       next: { revalidate: 60 },
     });
@@ -101,7 +109,7 @@ export async function fetchCategories(): Promise<ApiCategory[]> {
 
 export async function fetchProducts(): Promise<ApiProduct[]> {
   try {
-    const response = await fetch(`${API_BASE_URL}/customer/products`, {
+    const response = await fetch(`${getApiBaseUrl()}/customer/products`, {
       headers: { "Accept": "application/json" },
       next: { revalidate: 60 },
     });
@@ -118,7 +126,7 @@ export async function fetchProducts(): Promise<ApiProduct[]> {
 
 export async function submitOrder(orderPayload: Record<string, unknown>): Promise<{ success: boolean; orderId?: string; orderNumber?: string; message?: string }> {
   try {
-    const response = await fetch(`${API_BASE_URL}/customer/orders`, {
+    const response = await fetch(`${getApiBaseUrl()}/customer/orders`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",

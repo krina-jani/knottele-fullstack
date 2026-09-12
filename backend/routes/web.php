@@ -332,9 +332,34 @@ Route::get('/check-contact-messages', function () {
 
 /*
 |--------------------------------------------------------------------------
-| REACT SPA CATCH-ALL
+| CUSTOMER FRONTEND (NEXT.JS UNIFIED SERVING)
 |--------------------------------------------------------------------------
 */
-Route::get('/{any}', function () {
+Route::get('/', function () {
+    $indexPath = public_path('index.html');
+    if (file_exists($indexPath)) {
+        return response()->file($indexPath);
+    }
+    return view('welcome');
+});
+
+Route::get('/{any}', function ($any = '') {
+    $path = trim($any, '/');
+
+    // 1. Direct match with subfolder index.html (e.g. /shop -> public/shop/index.html)
+    if ($path && file_exists(public_path($path . '/index.html'))) {
+        return response()->file(public_path($path . '/index.html'));
+    }
+
+    // 2. Direct match with .html file (e.g. /shop -> public/shop.html)
+    if ($path && file_exists(public_path($path . '.html'))) {
+        return response()->file(public_path($path . '.html'));
+    }
+
+    // 3. Fallback to main index.html for client-side routing
+    if (file_exists(public_path('index.html'))) {
+        return response()->file(public_path('index.html'));
+    }
+
     return view('app');
-})->where('any', '.*');
+})->where('any', '^(?!admin|api).*$');
