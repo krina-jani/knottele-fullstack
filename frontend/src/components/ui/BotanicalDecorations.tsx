@@ -1,0 +1,347 @@
+import React from "react";
+import Image from "next/image";
+
+export function KnotelleCrownLogo({ className = "h-14 w-auto" }: { className?: string }) {
+  return (
+    <div className={`relative inline-flex items-center justify-center shrink-0 ${className}`}>
+      <Image
+        src="/knotelle/images/logo/Logo_1.png"
+        alt="KNOTELLE — Handmade Crochet Creations"
+        width={360}
+        height={420}
+        priority
+        className="object-contain w-auto h-full max-h-full drop-shadow-xs transition-transform duration-300 group-hover:scale-105"
+      />
+    </div>
+  );
+}
+
+
+export function BotanicalFlourish({ className = "w-24 h-6 text-[#E7D1CC]" }: { className?: string }) {
+  return (
+    <svg
+      viewBox="0 0 120 28"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+      className={className}
+      aria-hidden="true"
+    >
+      <path
+        d="M60 14C45 14 35 7 20 7C10 7 2 12 2 14C2 16 10 21 20 21C35 21 45 14 60 14Z"
+        stroke="currentColor"
+        strokeWidth="1.2"
+        strokeLinecap="round"
+      />
+      <path
+        d="M60 14C75 14 85 7 100 7C110 7 118 12 118 14C118 16 110 21 100 21C85 21 75 14 60 14Z"
+        stroke="currentColor"
+        strokeWidth="1.2"
+        strokeLinecap="round"
+      />
+      <circle cx="60" cy="14" r="3" fill="currentColor" />
+      <circle cx="35" cy="11" r="1.5" fill="currentColor" />
+      <circle cx="85" cy="11" r="1.5" fill="currentColor" />
+    </svg>
+  );
+}
+
+export function FlowerIcon({ className = "w-5 h-5 text-[#913638]" }: { className?: string }) {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+      className={className}
+      aria-hidden="true"
+    >
+      <circle cx="12" cy="7" r="3.5" fill="currentColor" fillOpacity="0.3" stroke="currentColor" strokeWidth="1.2" />
+      <circle cx="16.5" cy="10.5" r="3.5" fill="currentColor" fillOpacity="0.3" stroke="currentColor" strokeWidth="1.2" />
+      <circle cx="15" cy="16" r="3.5" fill="currentColor" fillOpacity="0.3" stroke="currentColor" strokeWidth="1.2" />
+      <circle cx="9" cy="16" r="3.5" fill="currentColor" fillOpacity="0.3" stroke="currentColor" strokeWidth="1.2" />
+      <circle cx="7.5" cy="10.5" r="3.5" fill="currentColor" fillOpacity="0.3" stroke="currentColor" strokeWidth="1.2" />
+      <circle cx="12" cy="12" r="2.5" fill="#C89B61" />
+    </svg>
+  );
+}
+
+export function StitchDivider({ className = "my-8" }: { className?: string }) {
+  return (
+    <div className={`flex items-center justify-center gap-4 ${className}`}>
+      <div className="h-px flex-1 bg-gradient-to-r from-transparent to-[#E7D1CC]" />
+      <div className="flex items-center gap-2 text-[#913638]">
+        <span className="text-xs">✦</span>
+        <FlowerIcon className="w-4 h-4" />
+        <span className="text-xs">✦</span>
+      </div>
+      <div className="h-px flex-1 bg-gradient-to-l from-transparent to-[#E7D1CC]" />
+    </div>
+  );
+}
+
+export function YarnBallDecor({ className = "w-6 h-6 text-[#913638]" }: { className?: string }) {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+      className={className}
+      aria-hidden="true"
+    >
+      <circle cx="12" cy="12" r="9" stroke="currentColor" strokeWidth="1.2" />
+      <path
+        d="M6 8C9 10 15 10 18 8"
+        stroke="currentColor"
+        strokeWidth="1.2"
+        strokeLinecap="round"
+      />
+      <path
+        d="M5 14C8 16 16 16 19 14"
+        stroke="currentColor"
+        strokeWidth="1.2"
+        strokeLinecap="round"
+      />
+      <path
+        d="M8 5C10 8 10 16 8 19"
+        stroke="currentColor"
+        strokeWidth="1.2"
+        strokeLinecap="round"
+      />
+      <path
+        d="M16 5C14 8 14 16 16 19"
+        stroke="currentColor"
+        strokeWidth="1.2"
+        strokeLinecap="round"
+      />
+      <path
+        d="M19 18C21 20 22 22 23 22"
+        stroke="currentColor"
+        strokeWidth="1.2"
+        strokeLinecap="round"
+      />
+    </svg>
+  );
+}
+
+export function BotanicalCornerFlourish({ className = "w-24 h-24 text-[#EFB8B0]" }: { className?: string }) {
+  return (
+    <svg
+      viewBox="0 0 100 100"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+      className={className}
+      aria-hidden="true"
+    >
+      <path
+        d="M10 90C10 50 50 10 90 10"
+        stroke="currentColor"
+        strokeWidth="1.2"
+        strokeLinecap="round"
+        strokeDasharray="2 3"
+      />
+      <path
+        d="M20 90C20 60 60 20 90 20"
+        stroke="currentColor"
+        strokeWidth="0.8"
+        strokeLinecap="round"
+      />
+      <circle cx="90" cy="10" r="3" fill="currentColor" fillOpacity="0.4" stroke="currentColor" strokeWidth="1" />
+      <circle cx="70" cy="25" r="2.5" fill="currentColor" fillOpacity="0.4" stroke="currentColor" strokeWidth="1" />
+      <circle cx="25" cy="70" r="2.5" fill="currentColor" fillOpacity="0.4" stroke="currentColor" strokeWidth="1" />
+      <circle cx="10" cy="90" r="3" fill="currentColor" fillOpacity="0.4" stroke="currentColor" strokeWidth="1" />
+    </svg>
+  );
+}
+
+export function CategoryHeaderDivider({ className = "my-3" }: { className?: string }) {
+  return (
+    <div className={`flex items-center justify-center gap-3 ${className}`}>
+      <span className="h-px w-10 bg-[#E7D1CC]" />
+      <span className="text-sm text-[#913638]">🌸</span>
+      <span className="h-px w-10 bg-[#E7D1CC]" />
+    </div>
+  );
+}
+
+export function HandmadePaperTag({
+  text = "Good Things Are Handmade",
+  className = "",
+}: {
+  text?: string;
+  className?: string;
+}) {
+  return (
+    <div
+      className={`relative bg-[#FFF9F6] border border-[#E7D1CC] rounded-xl p-3 shadow-md text-center max-w-[150px] rotate-2 ${className}`}
+    >
+      <div className="absolute -top-3 left-1/2 -translate-x-1/2 flex flex-col items-center">
+        <div className="w-1.5 h-3 bg-[#C89B61]/80 rounded-t" />
+        <div className="w-2.5 h-2.5 rounded-full bg-white border border-[#E7D1CC]" />
+      </div>
+
+      <div className="pt-1">
+        <p className="font-script-boutique text-base sm:text-lg font-bold text-[#2E211E] leading-tight">
+          {text}
+        </p>
+        <span className="text-xs text-[#913638] block mt-0.5">♡</span>
+      </div>
+    </div>
+  );
+}
+
+export function YarnHeartArt({ className = "w-16 h-16 text-[#EFB8B0]" }: { className?: string }) {
+  return (
+    <svg
+      viewBox="0 0 64 64"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+      className={className}
+      aria-hidden="true"
+    >
+      <path
+        d="M32 54C32 54 10 40 10 24C10 16 16 10 24 10C28.5 10 31.5 13 32 14C32.5 13 35.5 10 40 10C48 10 54 16 54 24C54 40 32 54 32 54Z"
+        stroke="currentColor"
+        strokeWidth="1.5"
+        strokeLinecap="round"
+      />
+      <path
+        d="M16 22C24 26 40 26 48 22"
+        stroke="currentColor"
+        strokeWidth="1.2"
+        strokeLinecap="round"
+      />
+      <path
+        d="M14 30C26 36 38 36 50 30"
+        stroke="currentColor"
+        strokeWidth="1.2"
+        strokeLinecap="round"
+      />
+      <path
+        d="M20 40C28 44 36 44 44 40"
+        stroke="currentColor"
+        strokeWidth="1.2"
+        strokeLinecap="round"
+      />
+    </svg>
+  );
+}
+
+export function WhatsAppIcon({ className = "w-4 h-4" }: { className?: string }) {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      className={className}
+      aria-hidden="true"
+    >
+      <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z" />
+    </svg>
+  );
+}
+
+export function YouTubeIcon({ className = "w-5 h-5" }: { className?: string }) {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      fill="currentColor"
+      className={className}
+      aria-hidden="true"
+    >
+      <path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z" />
+    </svg>
+  );
+}
+
+export function PinterestIcon({ className = "w-5 h-5" }: { className?: string }) {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      fill="currentColor"
+      className={className}
+      aria-hidden="true"
+    >
+      <path d="M12 0C5.373 0 0 5.372 0 12c0 5.084 3.163 9.426 7.627 11.174-.105-.949-.2-2.405.042-3.441.218-.937 1.407-5.965 1.407-5.965s-.359-.719-.359-1.782c0-1.668.967-2.914 2.171-2.914 1.023 0 1.518.769 1.518 1.69 0 1.029-.655 2.568-.994 3.995-.283 1.194.599 2.169 1.777 2.169 2.133 0 3.772-2.249 3.772-5.495 0-2.873-2.064-4.882-5.012-4.882-3.414 0-5.418 2.561-5.418 5.207 0 1.031.397 2.138.893 2.738.098.119.112.224.083.345-.09.375-.293 1.199-.334 1.363-.053.225-.172.271-.401.165-1.495-.69-2.433-2.878-2.433-4.646 0-3.776 2.748-7.252 7.92-7.252 4.158 0 7.392 2.967 7.392 6.923 0 4.135-2.607 7.462-6.233 7.462-1.214 0-2.354-.629-2.758-1.379l-.749 2.848c-.269 1.045-1.004 2.352-1.498 3.146 1.123.345 2.306.535 3.55.535 6.627 0 12-5.373 12-12 0-6.628-5.373-12-12-12z" />
+    </svg>
+  );
+}
+
+export function InstagramIcon({ className = "w-5 h-5" }: { className?: string }) {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      fill="currentColor"
+      className={className}
+      aria-hidden="true"
+    >
+      <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z" />
+    </svg>
+  );
+}
+
+export function FacebookIcon({ className = "w-5 h-5" }: { className?: string }) {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      fill="currentColor"
+      className={className}
+      aria-hidden="true"
+    >
+      <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z" />
+    </svg>
+  );
+}
+
+export function BotanicalSideBranch({ className = "w-24 h-48 text-[#EFB8B0]" }: { className?: string }) {
+  return (
+    <svg
+      viewBox="0 0 80 180"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+      className={className}
+      aria-hidden="true"
+    >
+      {/* Main curved branch stem */}
+      <path
+        d="M20 175C25 140 35 100 45 60C50 40 55 20 60 5"
+        stroke="currentColor"
+        strokeWidth="1.2"
+        strokeLinecap="round"
+      />
+      {/* Lower leaves & blossoms */}
+      <path
+        d="M23 155C12 150 5 140 8 130C15 130 25 140 27 150"
+        stroke="currentColor"
+        strokeWidth="1"
+        strokeLinecap="round"
+      />
+      <path
+        d="M27 140C38 135 48 132 45 120C38 120 30 128 29 135"
+        stroke="currentColor"
+        strokeWidth="1"
+        strokeLinecap="round"
+      />
+      {/* Mid flower buds */}
+      <path
+        d="M33 115C20 108 15 95 20 85C28 88 33 98 36 108"
+        stroke="currentColor"
+        strokeWidth="1"
+        strokeLinecap="round"
+      />
+      <path
+        d="M38 95C50 88 58 80 54 68C46 70 40 80 39 90"
+        stroke="currentColor"
+        strokeWidth="1"
+        strokeLinecap="round"
+      />
+      {/* Delicate floral petals */}
+      <circle cx="12" cy="132" r="5" stroke="currentColor" strokeWidth="0.8" fill="currentColor" fillOpacity="0.15" />
+      <circle cx="22" cy="88" r="6" stroke="currentColor" strokeWidth="0.8" fill="currentColor" fillOpacity="0.15" />
+      <circle cx="56" cy="70" r="5.5" stroke="currentColor" strokeWidth="0.8" fill="currentColor" fillOpacity="0.15" />
+      <circle cx="62" cy="8" r="4.5" stroke="currentColor" strokeWidth="0.8" fill="currentColor" fillOpacity="0.2" />
+    </svg>
+  );
+}
+

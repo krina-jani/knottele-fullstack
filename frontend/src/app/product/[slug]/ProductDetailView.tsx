@@ -1,0 +1,566 @@
+"use client";
+
+import React, { useState } from "react";
+import Image from "next/image";
+import Link from "next/link";
+import { notFound, useRouter } from "next/navigation";
+import {
+  Heart,
+  ShoppingBag,
+  Sparkles,
+  Truck,
+  ShieldCheck,
+  RotateCcw,
+  Check,
+  Plus,
+  Minus,
+  ArrowRight,
+  Share2,
+  Ruler,
+} from "lucide-react";
+import { PRODUCTS } from "@/data/products";
+import { ProductColor } from "@/types/product";
+import { useCart } from "@/context/CartContext";
+import { useWishlist } from "@/context/WishlistContext";
+import { useToast } from "@/context/ToastContext";
+import { StarRating } from "@/components/ui/StarRating";
+import { Badge } from "@/components/ui/Badge";
+import { Breadcrumbs } from "@/components/ui/Breadcrumbs";
+import { ProductCard } from "@/components/ui/ProductCard";
+import { BotanicalFlourish, FlowerIcon } from "@/components/ui/BotanicalDecorations";
+
+interface ProductDetailViewProps {
+  slug: string;
+}
+
+export default function ProductDetailView({ slug }: ProductDetailViewProps) {
+  const router = useRouter();
+  const product = PRODUCTS.find((p) => p.slug === slug);
+
+  if (!product) {
+    notFound();
+  }
+
+  const { addItem, setIsCartOpen } = useCart();
+  const { toggleWishlist, isInWishlist } = useWishlist();
+  const { showToast } = useToast();
+
+  const [selectedImageIndex, setSelectedImageIndex] = useState(0);
+  const [selectedColor, setSelectedColor] = useState<ProductColor>(
+    product.colors[0] || { name: "Default", hex: "#FFF" }
+  );
+  const [selectedSize, setSelectedSize] = useState<string>(
+    product.sizes?.[0] || "Standard"
+  );
+  const [customText, setCustomText] = useState("");
+  const [quantity, setQuantity] = useState(1);
+  const [activeTab, setActiveTab] = useState<"desc" | "specs" | "reviews">("desc");
+
+  const isWishlisted = isInWishlist(product.id);
+  const relatedProducts = PRODUCTS.filter(
+    (p) => p.categorySlug === product.categorySlug && p.id !== product.id
+  ).slice(0, 4);
+
+  const handleAddToCart = () => {
+    addItem(product, quantity, {
+      color: selectedColor,
+      size: selectedSize,
+      customText: customText.trim() || undefined,
+    });
+    setIsCartOpen(true);
+  };
+
+  const handleBuyNow = () => {
+    addItem(product, quantity, {
+      color: selectedColor,
+      size: selectedSize,
+      customText: customText.trim() || undefined,
+    });
+    router.push("/checkout");
+  };
+
+  const handleShare = () => {
+    if (typeof navigator !== "undefined" && navigator.share) {
+      navigator.share({
+        title: product.name,
+        text: product.shortDescription,
+        url: window.location.href,
+      }).catch(() => {});
+    } else if (typeof navigator !== "undefined") {
+      navigator.clipboard.writeText(window.location.href);
+      showToast("Link Copied 📋", "Product link copied to your clipboard.", "info");
+    }
+  };
+
+  return (
+    <div className="bg-[#FFF9F6] min-h-screen py-8 lg:py-12">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        
+        {/* Breadcrumbs */}
+        <Breadcrumbs
+          items={[
+            { label: "Shop", href: "/shop" },
+            { label: product.category, href: `/category/${product.categorySlug}` },
+            { label: product.name },
+          ]}
+          className="mb-8"
+        />
+
+        {/* Product Showcase: Left Gallery, Right Details */}
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-14 bg-white rounded-3xl border border-[#E7D1CC] p-6 sm:p-10 shadow-boutique mb-16">
+          
+          {/* Left Gallery (Spans 6 cols on lg) */}
+          <div className="lg:col-span-6 space-y-4">
+            {/* Main Stage Image with Zoom feel */}
+            <div className="relative aspect-[4/4.5] w-full rounded-2xl overflow-hidden bg-[#FFF9F6] border border-[#E7D1CC]">
+              <Image
+                src={product.images[selectedImageIndex] || product.images[0]}
+                alt={product.name}
+                fill
+                priority
+                sizes="(max-width: 1024px) 100vw, 50vw"
+                className="object-cover object-center"
+              />
+
+              {/* Wishlist Button */}
+              <button
+                onClick={() => toggleWishlist(product)}
+                aria-label={isWishlisted ? "Remove from wishlist" : "Add to wishlist"}
+                className="absolute top-4 right-4 z-10 w-11 h-11 rounded-full bg-white/90 backdrop-blur-md border border-[#E7D1CC] flex items-center justify-center text-[#786864] hover:text-[#913638] hover:bg-white transition-all shadow-md active:scale-95 cursor-pointer"
+              >
+                <Heart
+                  className={`w-5 h-5 transition-all ${
+                    isWishlisted ? "fill-[#913638] text-[#913638] scale-110" : ""
+                  }`}
+                />
+              </button>
+
+              {/* Badge */}
+              <div className="absolute top-4 left-4 flex flex-col gap-1.5">
+                {product.isBestSeller && <Badge variant="rose">Best Seller</Badge>}
+                {product.isNew && <Badge variant="pink">New In</Badge>}
+                {product.isCustomizable && (
+                  <Badge variant="gold" className="flex items-center gap-1">
+                    <Sparkles className="w-2.5 h-2.5" />
+                    Customizable
+                  </Badge>
+                )}
+              </div>
+            </div>
+
+            {/* Thumbnails */}
+            {product.images.length > 1 && (
+              <div className="flex items-center gap-3 overflow-x-auto pb-2">
+                {product.images.map((img, idx) => (
+                  <button
+                    key={idx}
+                    onClick={() => setSelectedImageIndex(idx)}
+                    className={`relative w-20 h-20 rounded-xl overflow-hidden bg-[#FFF9F6] shrink-0 border-2 transition-all cursor-pointer ${
+                      selectedImageIndex === idx
+                        ? "border-[#913638] ring-2 ring-[#913638]/20"
+                        : "border-[#E7D1CC] opacity-70 hover:opacity-100"
+                    }`}
+                  >
+                    <Image
+                      src={img}
+                      alt={`${product.name} preview ${idx + 1}`}
+                      fill
+                      sizes="80px"
+                      className="object-cover"
+                    />
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
+
+          {/* Right Product Info (Spans 6 cols on lg) */}
+          <div className="lg:col-span-6 flex flex-col justify-between space-y-6">
+            <div className="space-y-4">
+              
+              {/* Category & Rating */}
+              <div className="flex items-center justify-between gap-4">
+                <Link
+                  href={`/category/${product.categorySlug}`}
+                  className="text-xs uppercase tracking-widest text-[#913638] font-semibold hover:underline"
+                >
+                  {product.category}
+                </Link>
+                <button
+                  onClick={handleShare}
+                  className="text-[#786864] hover:text-[#913638] flex items-center gap-1 text-xs transition-colors cursor-pointer"
+                >
+                  <Share2 className="w-4 h-4" />
+                  <span>Share</span>
+                </button>
+              </div>
+
+              {/* Product Title */}
+              <h1 className="font-serif-luxury text-2xl sm:text-3xl lg:text-4xl font-bold text-[#2E211E]">
+                {product.name}
+              </h1>
+
+              {/* Star Rating & Review count */}
+              <div className="flex items-center gap-3">
+                <StarRating rating={product.rating} size="md" showNumber reviewCount={product.reviewCount} />
+                <span className="text-xs text-emerald-800 bg-emerald-50 px-2.5 py-0.5 rounded-full font-medium border border-emerald-200">
+                  {product.stock > 0 ? "In Stock & Ready to Ship" : "Made to Order"}
+                </span>
+              </div>
+
+              {/* Price */}
+              <div className="flex items-baseline gap-3 pt-1">
+                <span className="text-2xl sm:text-3xl font-bold text-[#913638]">
+                  ₹{product.price.toLocaleString("en-IN")}
+                </span>
+                {product.comparePrice && (
+                  <span className="text-base text-[#786864] line-through">
+                    ₹{product.comparePrice.toLocaleString("en-IN")}
+                  </span>
+                )}
+                <span className="text-xs text-[#786864]">
+                  (Inclusive of all taxes & handmade fees)
+                </span>
+              </div>
+
+              {/* Short Description */}
+              <p className="text-sm text-[#786864] leading-relaxed">
+                {product.description}
+              </p>
+
+              {/* Color Selection */}
+              {product.colors && product.colors.length > 0 && (
+                <div className="space-y-2 pt-2 border-t border-[#E7D1CC]">
+                  <div className="flex items-center justify-between text-xs">
+                    <span className="font-semibold text-[#2E211E]">
+                      Yarn Color:{" "}
+                      <strong className="text-[#913638]">{selectedColor.name}</strong>
+                    </span>
+                    <Link
+                      href="/custom-order"
+                      className="text-[11px] text-[#913638] hover:underline"
+                    >
+                      Want custom colors? →
+                    </Link>
+                  </div>
+                  <div className="flex flex-wrap gap-2.5">
+                    {product.colors.map((color) => (
+                      <button
+                        key={color.name}
+                        onClick={() => setSelectedColor(color)}
+                        className={`flex items-center gap-2 px-3 py-1.5 rounded-full border text-xs font-medium transition-all active:scale-[0.98] cursor-pointer ${
+                          selectedColor.name === color.name
+                            ? "border-[#913638] bg-[#FCE9E5] text-[#913638] ring-1 ring-[#913638]"
+                            : "border-[#E7D1CC] bg-white hover:bg-[#FFF9F6] text-[#2E211E]"
+                        }`}
+                      >
+                        <span
+                          className="w-3.5 h-3.5 rounded-full border border-black/10 shrink-0"
+                          style={{ backgroundColor: color.hex }}
+                        />
+                        <span>{color.name}</span>
+                        {selectedColor.name === color.name && (
+                          <Check className="w-3 h-3 text-[#913638]" />
+                        )}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Size Selection (if available) */}
+              {product.sizes && product.sizes.length > 0 && (
+                <div className="space-y-2 pt-2">
+                  <span className="text-xs font-semibold text-[#2E211E] block">
+                    Size / Variant:
+                  </span>
+                  <div className="flex flex-wrap gap-2">
+                    {product.sizes.map((size) => (
+                      <button
+                        key={size}
+                        onClick={() => setSelectedSize(size)}
+                        className={`px-3.5 py-1.5 rounded-full border text-xs font-medium transition-all active:scale-[0.98] cursor-pointer ${
+                          selectedSize === size
+                            ? "border-[#913638] bg-[#913638] text-white shadow-xs"
+                            : "border-[#E7D1CC] bg-white hover:bg-[#FCE9E5] hover:text-[#913638] text-[#2E211E]"
+                        }`}
+                      >
+                        {size}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Custom Personalization Input (Optional) */}
+              {product.isCustomizable && (
+                <div className="p-4 rounded-2xl bg-[#FFF9F6] border border-[#E7D1CC] space-y-2">
+                  <div className="flex items-center justify-between">
+                    <label className="text-xs font-semibold text-[#2E211E] flex items-center gap-1.5">
+                      <Sparkles className="w-3.5 h-3.5 text-[#C69A5A]" />
+                      <span>Add Name / Initials / Gift Tag Note (Free):</span>
+                    </label>
+                  </div>
+                  <input
+                    type="text"
+                    maxLength={50}
+                    value={customText}
+                    onChange={(e) => setCustomText(e.target.value)}
+                    placeholder="e.g. 'For Rhea 🌸' or 'Initials: A.S.'"
+                    className="w-full px-3.5 py-2 rounded-xl bg-white border border-[#E7D1CC] text-xs text-[#2E211E] placeholder-[#786864]/60 focus:outline-none focus:border-[#913638]"
+                  />
+                  <p className="text-[10px] text-[#786864]">
+                    Our artisan will stitch or write your customized message on the boutique tag.
+                  </p>
+                </div>
+              )}
+
+              {/* Quantity Selector & Action Buttons */}
+              <div className="space-y-3 pt-2">
+                <div className="flex items-center gap-3">
+                  <span className="text-xs font-semibold text-[#2E211E]">Quantity:</span>
+                  <div className="flex items-center border border-[#E7D1CC] rounded-full bg-white overflow-hidden shadow-xs">
+                    <button
+                      onClick={() => setQuantity(Math.max(1, quantity - 1))}
+                      className="px-3 py-1.5 text-[#786864] hover:text-[#2E211E] hover:bg-[#FCE9E5] transition-colors cursor-pointer"
+                      aria-label="Decrease quantity"
+                    >
+                      <Minus className="w-3.5 h-3.5" />
+                    </button>
+                    <span className="px-3 text-xs font-bold text-[#2E211E] min-w-[24px] text-center">
+                      {quantity}
+                    </span>
+                    <button
+                      onClick={() => setQuantity(quantity + 1)}
+                      className="px-3 py-1.5 text-[#786864] hover:text-[#2E211E] hover:bg-[#FCE9E5] transition-colors cursor-pointer"
+                      aria-label="Increase quantity"
+                    >
+                      <Plus className="w-3.5 h-3.5" />
+                    </button>
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
+                  <button
+                    onClick={handleAddToCart}
+                    className="w-full py-3.5 px-6 rounded-full bg-[#913638] text-white text-xs sm:text-sm font-semibold hover:bg-[#74292B] active:scale-[0.98] shadow-xs hover:shadow-md transition-all flex items-center justify-center gap-2 cursor-pointer"
+                  >
+                    <ShoppingBag className="w-4 h-4" />
+                    <span>Add to Cart</span>
+                  </button>
+                  <button
+                    onClick={handleBuyNow}
+                    className="w-full py-3.5 px-6 rounded-full bg-white text-[#2E211E] hover:bg-[#FCE9E5] hover:text-[#913638] border border-[#E7D1CC] hover:border-[#EFB8B0] text-xs sm:text-sm font-semibold active:scale-[0.98] shadow-xs transition-all flex items-center justify-center gap-2 cursor-pointer"
+                  >
+                    <span>Buy Now</span>
+                    <ArrowRight className="w-4 h-4" />
+                  </button>
+                </div>
+              </div>
+
+              {/* Guarantees */}
+              <div className="grid grid-cols-3 gap-2 pt-4 border-t border-[#E7D1CC] text-[11px] text-[#786864]">
+                <div className="flex items-center gap-1.5">
+                  <Truck className="w-4 h-4 text-[#913638] shrink-0" />
+                  <span>Pan India Delivery</span>
+                </div>
+                <div className="flex items-center gap-1.5">
+                  <ShieldCheck className="w-4 h-4 text-[#913638] shrink-0" />
+                  <span>Handmade Guarantee</span>
+                </div>
+                <div className="flex items-center gap-1.5">
+                  <RotateCcw className="w-4 h-4 text-[#913638] shrink-0" />
+                  <span>Safe Packaging</span>
+                </div>
+              </div>
+
+            </div>
+          </div>
+
+        </div>
+
+        {/* Tabbed Product Details */}
+        <div className="bg-white rounded-3xl border border-[#E7D1CC] p-6 sm:p-10 shadow-boutique mb-16">
+          <div className="flex items-center gap-4 sm:gap-8 border-b border-[#E7D1CC] pb-4 mb-6 overflow-x-auto no-scrollbar">
+            <button
+              onClick={() => setActiveTab("desc")}
+              className={`font-serif-luxury text-base sm:text-lg font-bold pb-2 transition-all whitespace-nowrap relative cursor-pointer ${
+                activeTab === "desc"
+                  ? "text-[#913638]"
+                  : "text-[#786864] hover:text-[#2E211E]"
+              }`}
+            >
+              <span>Product Description</span>
+              {activeTab === "desc" && (
+                <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-[#913638] rounded-full" />
+              )}
+            </button>
+
+            <button
+              onClick={() => setActiveTab("specs")}
+              className={`font-serif-luxury text-base sm:text-lg font-bold pb-2 transition-all whitespace-nowrap relative cursor-pointer ${
+                activeTab === "specs"
+                  ? "text-[#913638]"
+                  : "text-[#786864] hover:text-[#2E211E]"
+              }`}
+            >
+              <span>Crafting & Specifications</span>
+              {activeTab === "specs" && (
+                <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-[#913638] rounded-full" />
+              )}
+            </button>
+
+            <button
+              onClick={() => setActiveTab("reviews")}
+              className={`font-serif-luxury text-base sm:text-lg font-bold pb-2 transition-all whitespace-nowrap relative cursor-pointer ${
+                activeTab === "reviews"
+                  ? "text-[#913638]"
+                  : "text-[#786864] hover:text-[#2E211E]"
+              }`}
+            >
+              <span>Artisan Reviews ({product.reviewCount})</span>
+              {activeTab === "reviews" && (
+                <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-[#913638] rounded-full" />
+              )}
+            </button>
+          </div>
+
+          {/* Tab 1: Description */}
+          {activeTab === "desc" && (
+            <div className="space-y-4 text-sm text-[#786864] leading-relaxed max-w-3xl">
+              <p>{product.description}</p>
+              <p>
+                Each stitch is tightly looped by hand to ensure longevity, color fastness, and structure retention. Unlike factory machine-made knits, our artisanal crochet possesses unmistakable warmth, depth, and personality.
+              </p>
+              <div className="p-4 rounded-2xl bg-[#FFF9F6] border border-[#E7D1CC] flex items-center gap-3 text-xs text-[#2E211E]">
+                <FlowerIcon className="w-5 h-5 text-[#913638] shrink-0" />
+                <span>
+                  Every creation comes nestled in our signature KNOTELLE recycled boutique box, tied with satin ribbon and sprinkled with dried lavender buds.
+                </span>
+              </div>
+            </div>
+          )}
+
+          {/* Tab 2: Specifications */}
+          {activeTab === "specs" && (
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 max-w-3xl text-sm">
+              <div className="space-y-3">
+                <h4 className="font-bold text-[#2E211E] flex items-center gap-2">
+                  <FlowerIcon className="w-4 h-4 text-[#913638]" />
+                  <span>Materials Used</span>
+                </h4>
+                <ul className="space-y-1 text-[#786864] text-xs">
+                  {product.materials?.map((mat, i) => (
+                    <li key={i} className="flex items-center gap-2">
+                      <span className="w-1.5 h-1.5 rounded-full bg-[#913638]" />
+                      <span>{mat}</span>
+                    </li>
+                  )) || <li>100% Premium Milk Cotton Yarn</li>}
+                </ul>
+              </div>
+
+              <div className="space-y-3">
+                <h4 className="font-bold text-[#2E211E] flex items-center gap-2">
+                  <Ruler className="w-4 h-4 text-[#913638]" />
+                  <span>Dimensions & Time</span>
+                </h4>
+                <div className="space-y-1 text-[#786864] text-xs">
+                  <p>Dimensions: {product.dimensions || "Standard Boutique Sizing"}</p>
+                  <p>Handcrafting Time: {product.craftTime || "4-6 hours"}</p>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Tab 3: Reviews */}
+          {activeTab === "reviews" && (
+            <div className="space-y-6 max-w-3xl">
+              <div className="flex items-center gap-4 p-4 rounded-2xl bg-[#FFF9F6] border border-[#E7D1CC]">
+                <div className="text-center pr-4 border-r border-[#E7D1CC]">
+                  <span className="font-serif-luxury text-3xl font-bold text-[#913638]">
+                    {product.rating.toFixed(1)}
+                  </span>
+                  <p className="text-[10px] text-[#786864]">out of 5.0</p>
+                </div>
+                <div>
+                  <StarRating rating={product.rating} size="md" />
+                  <p className="text-xs text-[#786864] mt-1">
+                    Based on {product.reviewCount} verified purchases
+                  </p>
+                </div>
+              </div>
+
+              {product.reviews && product.reviews.length > 0 ? (
+                <div className="space-y-4">
+                  {product.reviews.map((rev) => (
+                    <div key={rev.id} className="p-4 rounded-2xl bg-[#FFF9F6] border border-[#E7D1CC] space-y-2">
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-2">
+                          <span className="text-xs font-bold text-[#2E211E]">{rev.userName}</span>
+                          {rev.verified && (
+                            <span className="text-[10px] text-emerald-800 bg-emerald-100 px-2 py-0.5 rounded-full font-medium">
+                              Verified Buyer
+                            </span>
+                          )}
+                        </div>
+                        <span className="text-[10px] text-[#786864]">{rev.date}</span>
+                      </div>
+                      <StarRating rating={rev.rating} size="sm" />
+                      <p className="text-xs text-[#786864] leading-relaxed">{rev.comment}</p>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <p className="text-xs text-[#786864]">
+                  Be the first to leave a review after your handmade creation arrives!
+                </p>
+              )}
+            </div>
+          )}
+        </div>
+
+        {/* Custom Order Request Promotional Banner */}
+        <div className="rounded-3xl bg-gradient-to-r from-[#FCE9E5] via-[#FFF9F6] to-[#FCE9E5] border border-[#E7D1CC] p-8 sm:p-10 mb-16 flex flex-col sm:flex-row items-center justify-between gap-6 shadow-boutique">
+          <div className="space-y-1 text-center sm:text-left">
+            <h3 className="font-serif-luxury text-xl sm:text-2xl font-bold text-[#2E211E]">
+              Want a different color, size, or custom design?
+            </h3>
+            <p className="text-xs sm:text-sm text-[#786864]">
+              We craft bespoke pieces from your reference images and ideas.
+            </p>
+          </div>
+          <Link
+            href="/custom-order"
+            className="px-7 py-3 rounded-full bg-[#913638] text-white text-xs font-semibold hover:bg-[#74292B] active:scale-[0.98] shadow-xs hover:shadow-md transition-all flex items-center gap-2 shrink-0 cursor-pointer"
+          >
+            <span>Request Custom Order</span>
+            <Sparkles className="w-3.5 h-3.5" />
+          </Link>
+        </div>
+
+        {/* Related Products */}
+        {relatedProducts.length > 0 && (
+          <div>
+            <div className="flex items-center justify-between mb-8">
+              <h2 className="font-serif-luxury text-2xl sm:text-3xl font-bold text-[#2E211E]">
+                You May Also Adore
+              </h2>
+              <Link
+                href={`/category/${product.categorySlug}`}
+                className="text-xs font-semibold text-[#913638] hover:underline"
+              >
+                More in {product.category} →
+              </Link>
+            </div>
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6">
+              {relatedProducts.map((rel) => (
+                <ProductCard key={rel.id} product={rel} />
+              ))}
+            </div>
+          </div>
+        )}
+
+      </div>
+    </div>
+  );
+}
