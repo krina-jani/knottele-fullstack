@@ -707,33 +707,86 @@ class KnotelleStoreSeeder extends Seeder
 
     private function seedMedia(): void
     {
-        $products = DB::table('products')->get()->keyBy('product_code');
+        // 1. Seed Logo
+        $logoMediaId = DB::table('media')->insertGetId([
+            'file_name' => 'Logo_1.png',
+            'file_path' => 'images/logo/Logo_1.png',
+            'disk' => 'local',
+            'mime_type' => 'image/png',
+            'file_type' => 'image',
+            'file_size' => 26405,
+            'alt_text' => 'KNOTELLE Official Brand Logo',
+            'uploaded_by' => 1,
+            'uploader_type' => 'admin',
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+        DB::table('brands')->where('slug', 'knotelle')->update(['logo_id' => $logoMediaId]);
 
-        $imageMap = [
-            'prod-1' => 'products/bunny-keychain.jpg',
-            'prod-2' => 'products/sunflower-stem.jpg',
-            'prod-3' => 'products/rose-bouquet.jpg',
-            'prod-4' => 'products/teddy-bear.jpg',
-            'prod-5' => 'products/daisy-phone-cover.jpg',
-            'prod-6' => 'products/granny-square-bag.jpg',
-            'prod-7' => 'products/strawberry-coin-purse.jpg',
-            'prod-8' => 'products/tulip-mug-cozy.jpg',
-            'prod-9' => 'products/sprout-bookmark.jpg',
-            'prod-10' => 'products/floral-scrunchies.jpg',
-            'prod-11' => 'products/crochet-vest.jpg',
-            'prod-12' => 'products/potted-tulips.jpg',
+        // 2. Seed Category Images
+        $categoryImageMap = [
+            'keychain' => 'images/categories/keychain.jpg',
+            'flower' => 'images/categories/flower.jpg',
+            'bouquet' => 'images/categories/bouquet.jpg',
+            'soft-toys' => 'images/categories/soft-toys.jpg',
+            'bags' => 'images/categories/bags.jpg',
+            'coin-purse' => 'images/categories/coin-purse.jpg',
+            'phone-cover' => 'images/categories/phone-cover.jpg',
+            'cup-tea-coffee' => 'images/categories/cup-tea-coffee.jpg',
+            'bookmark' => 'images/categories/bookmark.jpg',
+            'hair-accessories' => 'images/categories/hair-accessories.jpg',
+            'clothing' => 'images/categories/clothing.jpg',
         ];
 
-        foreach ($imageMap as $productCode => $relPath) {
+        foreach ($categoryImageMap as $catSlug => $relPath) {
+            $catMediaId = DB::table('media')->insertGetId([
+                'file_name' => basename($relPath),
+                'file_path' => $relPath,
+                'disk' => 'local',
+                'mime_type' => 'image/jpeg',
+                'file_type' => 'image',
+                'alt_text' => ucwords(str_replace('-', ' ', $catSlug)) . ' Category',
+                'uploaded_by' => 1,
+                'uploader_type' => 'admin',
+                'created_at' => now(),
+                'updated_at' => now(),
+            ]);
+
+            DB::table('categories')->where('slug', $catSlug)->update(['image_id' => $catMediaId]);
+        }
+
+        // 3. Seed Product Images
+        $products = DB::table('products')->get()->keyBy('product_code');
+
+        $productImageMap = [
+            'prod-1' => 'images/products/bunny-keychain.jpg',
+            'prod-2' => 'images/products/sunflower-stem.jpg',
+            'prod-3' => 'images/products/rose-bouquet.jpg',
+            'prod-4' => 'images/products/teddy-bear.jpg',
+            'prod-5' => 'images/products/daisy-phone-cover.jpg',
+            'prod-6' => 'images/products/granny-square-bag.jpg',
+            'prod-7' => 'images/products/strawberry-coin-purse.jpg',
+            'prod-8' => 'images/products/tulip-mug-cozy.jpg',
+            'prod-9' => 'images/products/sprout-bookmark.jpg',
+            'prod-10' => 'images/products/floral-scrunchies.jpg',
+            'prod-11' => 'images/products/crochet-vest.jpg',
+            'prod-12' => 'images/products/potted-tulips.jpg',
+        ];
+
+        foreach ($productImageMap as $productCode => $relPath) {
+            if (!isset($products[$productCode])) continue;
             $product = $products[$productCode];
             $variants = DB::table('product_variants')->where('product_id', $product->id)->get();
 
             $mediaId = DB::table('media')->insertGetId([
                 'file_name' => basename($relPath),
-                'file_path' => 'images/' . $relPath,
-                'disk' => 'public',
+                'file_path' => $relPath,
+                'disk' => 'local',
                 'mime_type' => 'image/jpeg',
                 'file_type' => 'image',
+                'alt_text' => $product->name,
+                'uploaded_by' => 1,
+                'uploader_type' => 'admin',
                 'created_at' => now(),
                 'updated_at' => now(),
             ]);
@@ -748,6 +801,30 @@ class KnotelleStoreSeeder extends Seeder
                     'updated_at' => now(),
                 ]);
             }
+        }
+
+        // 4. Seed Hero & Homepage media
+        $extraImages = [
+            'images/hero/hero-enhanced.jpg' => 'Hero Banner Bouquet',
+            'images/hero/2image.png' => 'Hero Showcase 2',
+            'images/hero/3image.png' => 'Hero Showcase 3',
+            'images/hero/4image.png' => 'Hero Showcase 4',
+            'images/homepage/middleimg.png' => 'Craft Studio Middle Image',
+        ];
+
+        foreach ($extraImages as $relPath => $label) {
+            DB::table('media')->insert([
+                'file_name' => basename($relPath),
+                'file_path' => $relPath,
+                'disk' => 'local',
+                'mime_type' => str_ends_with($relPath, '.png') ? 'image/png' : 'image/jpeg',
+                'file_type' => 'image',
+                'alt_text' => $label,
+                'uploaded_by' => 1,
+                'uploader_type' => 'admin',
+                'created_at' => now(),
+                'updated_at' => now(),
+            ]);
         }
     }
 

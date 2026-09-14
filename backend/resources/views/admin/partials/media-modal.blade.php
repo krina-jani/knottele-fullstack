@@ -89,6 +89,25 @@
         }
     }
 
+    function sanitizeImageUrl(rawUrl) {
+        if (!rawUrl) return '/images/logo/Logo_1.png';
+        let url = String(rawUrl).trim();
+        url = url.replace(/^https?:\/\/[^\/]+/, '');
+        if (url.startsWith('/storage/images/')) {
+            url = url.replace('/storage/images/', '/images/');
+        } else if (url.startsWith('storage/images/')) {
+            url = url.replace('storage/images/', '/images/');
+        } else if (url.startsWith('/storage/')) {
+            url = url.replace('/storage/', '/images/');
+        } else if (url.startsWith('storage/')) {
+            url = url.replace('storage/', '/images/');
+        }
+        if (!url.startsWith('http://') && !url.startsWith('https://') && !url.startsWith('/')) {
+            url = '/' + url;
+        }
+        return url;
+    }
+
     function renderMediaGrid(media) {
         const grid = document.getElementById('media-grid');
         if (!media || media.length === 0) {
@@ -98,11 +117,14 @@
 
         grid.innerHTML = media.map(item => {
             const isSelected = selectedImages.some(img => img.id === item.id);
+            const rawUrl = item.thumb_url || item.thumbnail_url || item.url || item.full_url || item.file_path || item.path;
+            const url = sanitizeImageUrl(rawUrl);
+            const name = item.file_name || item.name || item.filename || 'Image';
             return `
                 <div class="relative border rounded-lg overflow-hidden cursor-pointer group hover:shadow-md transition ${isSelected ? 'ring-2 ring-indigo-500' : ''}"
-                     onclick="toggleImageSelection(${item.id}, '${item.url || item.path}')">
-                    <img src="${item.url || item.path}" class="w-full h-32 object-cover">
-                    <div class="p-2 text-xs truncate bg-white border-t">${item.file_name || item.name}</div>
+                     onclick="toggleImageSelection(${item.id}, '${url}')">
+                    <img src="${url}" class="w-full h-32 object-cover bg-stone-100" onerror="this.onerror=null;this.src='/images/logo/Logo_1.png'">
+                    <div class="p-2 text-xs truncate bg-white border-t font-medium text-stone-700">${name}</div>
                     ${isSelected ? '<div class="absolute top-2 right-2 bg-indigo-600 text-white rounded-full w-5 h-5 flex items-center justify-center text-[10px]">✓</div>' : ''}
                 </div>
             `;

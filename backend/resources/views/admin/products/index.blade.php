@@ -61,9 +61,9 @@
                         <div class="flex items-center">
                             <div class="h-12 w-12 flex-shrink-0">
                                 @if($product->main_image)
-                                    <img src="{{ asset('storage/' . $product->main_image) }}" alt="{{ $product->name }}" class="h-12 w-12 object-cover rounded-lg shadow-sm border border-stone-200">
+                                    <img src="{{ $product->main_image }}" alt="{{ $product->name }}" class="h-12 w-12 object-cover rounded-lg shadow-sm border border-stone-200" onerror="this.onerror=null;this.src='/images/logo/Logo_1.png'">
                                 @else
-                                    <div class="h-12 w-12 bg-stone-100 rounded-lg flex items-center justify-center text-stone-400 text-[10px] shadow-sm border border-stone-200 font-medium">NO IMG</div>
+                                    <img src="/images/logo/Logo_1.png" alt="{{ $product->name }}" class="h-12 w-12 object-contain p-1 rounded-lg shadow-sm border border-stone-200 bg-stone-50">
                                 @endif
                             </div>
                             <div class="ml-4">

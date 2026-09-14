@@ -214,23 +214,19 @@ class Product extends Model
     // Helper to get Main Image from Default Variant's Primary Image
     public function getMainImageAttribute()
     {
-        // Check if default variant exists and has images
-        // We need to load 'images' relation on variant via eager loading usually
-        // But for accessor, we try to access it if loaded
-        
         $variant = $this->defaultVariant;
         if (!$variant) return null;
 
-        // Assuming Variant has 'images' relation to Media via VariantImage
-        // Since we didn't see Variant model, we assume it has a relationship to media 
-        // Or we can check the pivot table 'variant_images'
-        
-        $primaryImage = $variant->images->where('pivot.is_primary', 1)->first();
-        if ($primaryImage) {
-            return $primaryImage->file_path; // or whatever the URL attribute is
-        }
-        
-        return $variant->images->first()?->file_path ?? null;
+        $images = $variant->images;
+        if ($images->isEmpty()) return null;
+
+        $primaryImage = $images->where('pivot.is_primary', 1)->first() ?: $images->first();
+        return $primaryImage ? $primaryImage->url : null;
+    }
+
+    public function getMainImageUrlAttribute()
+    {
+        return $this->getMainImageAttribute() ?: '/images/logo/Logo_1.png';
     }
 
     public function getMainImageIdAttribute()

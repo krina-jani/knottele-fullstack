@@ -5,184 +5,232 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Media;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
-use Intervention\Image\ImageManager;
-use Intervention\Image\Drivers\Gd\Driver;
 
 class MediaController extends Controller
 {
-    private ?ImageManager $imageManager = null;
-
-    public function __construct()
-    {
-         if (class_exists(Driver::class) && extension_loaded('gd')) {
-            $this->imageManager = new ImageManager(new Driver());
-        }
-    }
-
     public function index()
     {
         return view('admin.media.index');
     }
 
     /**
-     * Get Media Data for Modals/AJAX
+     * Get Media Data for Modals/AJAX (directly from MySQL Database)
      */
     public function getData(Request $request)
     {
-        $directory = public_path('images');
-        $files = \Illuminate\Support\Facades\File::files($directory);
-        
-        $mediaList = [];
-        $idCounter = 1;
-        
-        foreach ($files as $file) {
-            $fileName = $file->getFilename();
-            $mimeType = mime_content_type($file->getPathname()) ?: 'application/octet-stream';
-            $size = $file->getSize();
-            $url = asset('images/' . $fileName);
-
-            // Format size for humans
-            $units = ['B', 'KB', 'MB', 'GB'];
-            $pow = $size > 0 ? floor(log($size, 1024)) : 0;
-            $formattedSize = round($size / (1024 ** $pow), 2) . ' ' . $units[$pow];
-            
-            // Format date
-            $createdAtFormatted = date('M d, Y H:i', filectime($file->getPathname()));
-
-            $mediaList[] = [
-                'id' => $idCounter++,
-                'url' => $url,
-                'thumbnail_url' => $url, // Expected by index.blade.php
-                'thumb_url' => $url,     // Expected by create.blade.php
-                'path' => 'images/' . $fileName,
-                'file_path' => 'images/' . $fileName,
-                'file_name' => $fileName,
-                'filename' => $fileName,
-                'name' => $fileName,
-                'mime_type' => $mimeType,
-                'size' => $size, 
-                'size_formatted' => $formattedSize, 
-                'is_image' => str_starts_with($mimeType, 'image/'),
-                'created_at' => date('c', filectime($file->getPathname())), 
-                'created_at_formatted' => $createdAtFormatted, 
-                'alt_text' => null
-            ];
+        // Auto-seed if media table is empty
+        if (Media::count() === 0) {
+            $this->syncLocalImagesToDatabase();
         }
 
-        // Apply search filter if requested
+        $query = Media::query()->latest('id');
+
+        // Search filter
         if ($request->filled('search')) {
             $search = strtolower($request->search);
-            $mediaList = array_filter($mediaList, function($item) use ($search) {
-                return str_contains(strtolower($item['file_name']), $search);
+            $query->where(function ($q) use ($search) {
+                $q->where('file_name', 'like', "%{$search}%")
+                  ->orWhere('alt_text', 'like', "%{$search}%")
+                  ->orWhere('file_path', 'like', "%{$search}%");
             });
-            $mediaList = array_values($mediaList);
         }
 
-        // Mock pagination structure
-        $perPage = 12;
-        $page = (int) $request->input('page', 1);
-        $total = count($mediaList);
-        $totalPages = ceil($total / $perPage);
-        
-        $paginatedItems = array_slice($mediaList, ($page - 1) * $perPage, $perPage);
+        if ($request->filled('type') && $request->type !== 'all') {
+            $query->where('file_type', $request->type);
+        }
+
+        $perPage = (int) $request->input('per_page', 24);
+        $mediaPaginated = $query->paginate($perPage);
+
+        $data = $mediaPaginated->getCollection()->map(function ($item) {
+            return [
+                'id' => $item->id,
+                'url' => $item->url,
+                'thumbnail_url' => $item->thumb_url,
+                'thumb_url' => $item->thumb_url,
+                'full_url' => $item->full_url,
+                'file_path' => $item->file_path,
+                'file_name' => $item->file_name,
+                'filename' => $item->file_name,
+                'name' => $item->file_name,
+                'mime_type' => $item->mime_type ?: 'image/jpeg',
+                'size' => $item->file_size ?: 0,
+                'size_formatted' => $this->formatSize($item->file_size ?: 0),
+                'is_image' => str_starts_with($item->mime_type ?? 'image/', 'image/'),
+                'created_at' => $item->created_at ? $item->created_at->toIso8601String() : now()->toIso8601String(),
+                'created_at_formatted' => $item->created_at ? $item->created_at->format('M d, Y') : '',
+                'alt_text' => $item->alt_text,
+            ];
+        });
 
         return response()->json([
-            'current_page' => $page,
-            'data' => $paginatedItems,
-            'last_page' => $totalPages,
-            'total' => $total,
-            'per_page' => $perPage,
-            'to' => count($paginatedItems) > 0 ? ($page - 1) * $perPage + count($paginatedItems) : 0
+            'current_page' => $mediaPaginated->currentPage(),
+            'data' => $data,
+            'last_page' => $mediaPaginated->lastPage(),
+            'total' => $mediaPaginated->total(),
+            'per_page' => $mediaPaginated->perPage(),
+            'from' => $mediaPaginated->firstItem(),
+            'to' => $mediaPaginated->lastItem(),
+            'prev_page_url' => $mediaPaginated->previousPageUrl(),
+            'next_page_url' => $mediaPaginated->nextPageUrl(),
+            'links' => $mediaPaginated->linkCollection()->toArray(),
         ]);
     }
 
+    /**
+     * Upload Media from Desktop/Mobile Gallery
+     */
     public function upload(Request $request)
     {
         $request->validate([
-             'files.*' => 'required|file|max:10240', // 10MB max per file
+            'files' => 'nullable|array',
+            'files.*' => 'file|max:20480', // 20MB max
+            'file' => 'nullable|file|max:20480',
         ]);
 
-        if (!$request->hasFile('files')) {
-            return response()->json(['success' => false, 'message' => 'No files uploaded'], 400);
+        $files = [];
+        if ($request->hasFile('files')) {
+            $files = $request->file('files');
+        } elseif ($request->hasFile('file')) {
+            $files = [$request->file('file')];
+        }
+
+        if (empty($files)) {
+            return response()->json(['success' => false, 'message' => 'No files were uploaded.'], 400);
         }
 
         $uploadedMedia = [];
         $errors = [];
 
-        foreach ($request->file('files') as $file) {
+        $targetDirectory = public_path('images/products');
+        if (!File::isDirectory($targetDirectory)) {
+            File::makeDirectory($targetDirectory, 0755, true, true);
+        }
+
+        foreach ($files as $file) {
             try {
                 $originalName = $file->getClientOriginalName();
-                $extension = $file->getClientOriginalExtension();
-                $fileName = pathinfo($originalName, PATHINFO_FILENAME);
-                $uniqueName = Str::slug($fileName) . '_' . time() . '_' . Str::random(5) . '.' . $extension;
-                
-                $storagePath = 'products/media/' . date('Y/m');
-                $fullPath = $storagePath . '/' . $uniqueName;
-                
-                Storage::disk('public')->putFileAs($storagePath, $file, $uniqueName);
-                
-                // Create thumbnails if image
-                $thumbnails = [];
-                if (str_starts_with($file->getMimeType(), 'image/') && isset($this->imageManager)) {
-                    $thumbnails = $this->createThumbnails($file, $storagePath, $uniqueName);
-                }
+                $extension = strtolower($file->getClientOriginalExtension() ?: $file->guessExtension() ?: 'jpg');
+                $rawName = pathinfo($originalName, PATHINFO_FILENAME);
+                $cleanSlug = Str::slug($rawName);
+                $uniqueName = ($cleanSlug ?: 'knotelle-product') . '_' . time() . '_' . Str::random(4) . '.' . $extension;
+
+                $file->move($targetDirectory, $uniqueName);
+                $relPath = 'images/products/' . $uniqueName;
+                $fullDiskPath = $targetDirectory . DIRECTORY_SEPARATOR . $uniqueName;
+                $fileSize = file_exists($fullDiskPath) ? filesize($fullDiskPath) : 0;
 
                 $media = Media::create([
                     'file_name' => $originalName,
-                    'file_path' => $fullPath,
-                    'disk' => 'public',
-                    'mime_type' => $file->getMimeType(),
-                    'file_type' => str_starts_with($file->getMimeType(), 'image/') ? 'image' : 'document',
-                    'file_size' => $file->getSize(),
-                    'thumbnails' => $thumbnails ?: null,
-                    'metadata' => [
-                        'original_name' => $originalName,
-                        'extension' => $extension,
-                    ],
-                    'uploaded_by' => auth()->id(), 
+                    'file_path' => $relPath,
+                    'disk' => 'local',
+                    'mime_type' => 'image/' . ($extension === 'png' ? 'png' : ($extension === 'webp' ? 'webp' : 'jpeg')),
+                    'file_type' => 'image',
+                    'file_size' => $fileSize,
+                    'alt_text' => $rawName,
+                    'uploaded_by' => auth()->id() ?: 1,
                     'uploader_type' => 'admin',
                 ]);
 
                 $uploadedMedia[] = [
                     'id' => $media->id,
-                    'url' => asset(Storage::url($fullPath)),
-                    'file_name' => $originalName
+                    'url' => $media->url,
+                    'thumb_url' => $media->thumb_url,
+                    'thumbnail_url' => $media->thumbnail_url,
+                    'full_url' => $media->full_url,
+                    'file_name' => $originalName,
+                    'size_formatted' => $this->formatSize($fileSize),
                 ];
-
             } catch (\Exception $e) {
                 $errors[] = "Failed to upload {$file->getClientOriginalName()}: " . $e->getMessage();
             }
         }
 
+        $success = count($uploadedMedia) > 0;
+
         return response()->json([
-            'success' => count($errors) === 0,
-            'data' => count($uploadedMedia) > 0 ? $uploadedMedia[0] : null, // Backwards compatibility for single select UI
+            'success' => $success,
+            'message' => $success ? 'Files uploaded successfully!' : 'Failed to upload files',
+            'data' => $success ? $uploadedMedia[0] : null,
             'all_uploaded' => $uploadedMedia,
-            'errors' => $errors
+            'errors' => $errors,
         ]);
     }
 
-    private function createThumbnails($file, $storagePath, $fileName)
+    /**
+     * Delete Media
+     */
+    public function destroy($id)
     {
-        $thumbnails = [];
-        try {
-             $image = $this->imageManager->read($file->getRealPath());
-             $originalName = pathinfo($fileName, PATHINFO_FILENAME);
-             $extension = pathinfo($fileName, PATHINFO_EXTENSION);
+        $media = Media::findOrFail($id);
 
-             // Small
-             $smallName = $originalName . '_small.' . $extension;
-             $smallImage = clone $image;
-             $smallImage->cover(150, 150);
-             Storage::disk('public')->put($storagePath . '/' . $smallName, (string) $smallImage->encodeByExtension($extension));
-             $thumbnails['small'] = $storagePath . '/' . $smallName;
-
-        } catch(\Exception $e) {
-            // Squelch image error to ensure primary upload succeeds
+        // Delete physical file if inside public/images/products
+        if (str_starts_with($media->file_path, 'images/products/')) {
+            $path = public_path($media->file_path);
+            if (file_exists($path)) {
+                @unlink($path);
+            }
         }
-        
-        return $thumbnails;
+
+        $media->delete();
+
+        return response()->json(['success' => true, 'message' => 'Media deleted successfully']);
+    }
+
+    /**
+     * Helper to auto-sync local Knotelle directory images into database
+     */
+    public function syncLocalImagesToDatabase(): void
+    {
+        $folders = [
+            'images/products' => 'product',
+            'images/categories' => 'category',
+            'images/logo' => 'logo',
+            'images/hero' => 'hero',
+            'images/homepage' => 'homepage',
+        ];
+
+        foreach ($folders as $relFolder => $group) {
+            $absPath = public_path($relFolder);
+            if (!File::isDirectory($absPath)) {
+                continue;
+            }
+
+            $files = File::files($absPath);
+            foreach ($files as $file) {
+                $fileName = $file->getFilename();
+                $filePath = $relFolder . '/' . $fileName;
+
+                // Check if already in Media table
+                $exists = Media::where('file_path', $filePath)->first();
+                if (!$exists) {
+                    $ext = strtolower($file->getExtension());
+                    $mime = ($ext === 'png') ? 'image/png' : (($ext === 'webp') ? 'image/webp' : 'image/jpeg');
+
+                    Media::create([
+                        'file_name' => $fileName,
+                        'file_path' => $filePath,
+                        'disk' => 'local',
+                        'mime_type' => $mime,
+                        'file_type' => 'image',
+                        'file_size' => $file->getSize(),
+                        'alt_text' => pathinfo($fileName, PATHINFO_FILENAME),
+                        'uploaded_by' => 1,
+                        'uploader_type' => 'admin',
+                    ]);
+                }
+            }
+        }
+    }
+
+    private function formatSize(int $bytes): string
+    {
+        if ($bytes <= 0) return '0 B';
+        $units = ['B', 'KB', 'MB', 'GB'];
+        $pow = floor(log($bytes, 1024));
+        return round($bytes / (1024 ** $pow), 1) . ' ' . $units[$pow];
     }
 }

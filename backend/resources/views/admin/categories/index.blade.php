@@ -1378,6 +1378,25 @@
             document.getElementById('categoryModal').classList.add('hidden');
         }
 
+        function sanitizeImageUrl(rawUrl) {
+            if (!rawUrl) return '/images/logo/Logo_1.png';
+            let url = String(rawUrl).trim();
+            url = url.replace(/^https?:\/\/[^\/]+/, '');
+            if (url.startsWith('/storage/images/')) {
+                url = url.replace('/storage/images/', '/images/');
+            } else if (url.startsWith('storage/images/')) {
+                url = url.replace('storage/images/', '/images/');
+            } else if (url.startsWith('/storage/')) {
+                url = url.replace('/storage/', '/images/');
+            } else if (url.startsWith('storage/')) {
+                url = url.replace('storage/', '/images/');
+            }
+            if (!url.startsWith('http://') && !url.startsWith('https://') && !url.startsWith('/')) {
+                url = '/' + url;
+            }
+            return url;
+        }
+
         // Open media library
         async function openMediaLibrary() {
             try {
@@ -1394,7 +1413,8 @@
                     mediaGrid.innerHTML = '';
 
                     mediaItems.forEach(media => {
-                        const mediaUrl = media.url || media.full_url || media.thumb_url;
+                        const rawUrl = media.thumb_url || media.thumbnail_url || media.url || media.full_url || media.file_path || media.path;
+                        const mediaUrl = sanitizeImageUrl(rawUrl);
                         if (!mediaUrl) return;
 
                         const mediaItem = document.createElement('div');
@@ -1405,8 +1425,9 @@
                         mediaItem.innerHTML = `
                 <div class="relative overflow-hidden rounded-lg border-2 border-transparent group-hover:border-indigo-500 transition-colors">
                     <img src="${mediaUrl}"
-                         alt="${media.name || 'Image'}"
-                         class="w-full h-32 object-cover">
+                         alt="${media.name || media.file_name || 'Image'}"
+                         class="w-full h-32 object-cover bg-stone-100"
+                         onerror="this.onerror=null;this.src='/images/logo/Logo_1.png'">
                     <div class="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-20 transition-opacity"></div>
                     <div class="absolute top-2 right-2 hidden group-hover:block">
                         <div class="w-6 h-6 bg-indigo-500 rounded-full flex items-center justify-center">
@@ -1414,7 +1435,7 @@
                         </div>
                     </div>
                 </div>
-                <p class="mt-2 text-xs text-gray-600 truncate">${media.name || 'Untitled'}</p>
+                <p class="mt-2 text-xs text-gray-600 truncate">${media.name || media.file_name || 'Untitled'}</p>
             `;
 
                         mediaItem.addEventListener('click', function() {

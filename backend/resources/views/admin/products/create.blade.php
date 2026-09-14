@@ -83,30 +83,37 @@
 
                 <!-- Main Image -->
                 <div class="mb-6">
-                    <label class="block text-sm font-medium text-stone-700 mb-2">Main Image</label>
+                    <label class="block text-sm font-medium text-stone-700 mb-2">Main Image <span class="text-stone-400 font-normal">(Primary display photo)</span></label>
                     <input type="hidden" name="main_image_id" id="main_image_id" value="{{ old('main_image_id') }}">
 
                     <div id="main-image-preview" class="mb-3">
                         @if(old('main_image_url'))
-                            <img src="{{ old('main_image_url') }}" class="h-32 object-cover rounded border">
+                            <img src="{{ old('main_image_url') }}" class="h-32 object-cover rounded-xl border border-stone-200 shadow-sm">
                         @endif
                     </div>
 
-                    <button type="button" onclick="openMediaModal('main')"
-                        class="bg-red-50 text-red-600 px-4 py-2 rounded-lg border border-red-200 hover:bg-red-100 transition flex items-center">
-                        <i class="fas fa-image mr-2"></i>
-                        Select Main Image
-                    </button>
-                    @error('main_image_id') <p class="text-rose-500 text-xs mt-1">{{ $message }}</p> @enderror
+                    <div class="flex flex-wrap items-center gap-3">
+                        <button type="button" onclick="openMediaModal('main')"
+                            class="bg-red-50 text-red-600 hover:bg-red-100 px-4 py-2.5 rounded-xl border border-red-200 transition-all flex items-center font-medium shadow-sm">
+                            <i class="fas fa-images mr-2"></i>
+                            Select from Media Library
+                        </button>
+                        <label class="cursor-pointer bg-stone-100 hover:bg-stone-200 text-stone-700 px-4 py-2.5 rounded-xl border border-stone-200 transition-all flex items-center font-medium shadow-sm">
+                            <i class="fas fa-cloud-upload-alt mr-2 text-stone-500"></i>
+                            <span>Upload from Phone / Desktop</span>
+                            <input type="file" accept="image/*" class="hidden" onchange="handleDirectMainUpload(event)">
+                        </label>
+                    </div>
+                    @error('main_image_id') <p class="text-rose-500 text-xs mt-1 font-medium">{{ $message }}</p> @enderror
                 </div>
 
                 <!-- Gallery Images -->
                 <div>
-                     <label class="block text-sm font-medium text-gray-700 mb-2">Gallery Images</label>
+                     <label class="block text-sm font-medium text-stone-700 mb-2">Gallery Images <span class="text-stone-400 font-normal">(Additional angles / colors)</span></label>
                      <div id="gallery-container" class="grid grid-cols-3 md:grid-cols-5 gap-4 mb-3">
                          @if(old('gallery_image_urls'))
                              @foreach(old('gallery_image_urls') as $index => $url)
-                                 <div class="relative group border rounded-lg overflow-hidden h-24 cursor-move gallery-item" data-id="{{ old('gallery_image_ids')[$index] }}">
+                                 <div class="relative group border rounded-xl overflow-hidden h-24 cursor-move gallery-item shadow-sm" data-id="{{ old('gallery_image_ids')[$index] }}">
                                      <img src="{{ $url }}" class="w-full h-full object-cover">
                                      <input type="hidden" name="gallery_image_ids[]" value="{{ old('gallery_image_ids')[$index] }}">
                                      <div class="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition flex items-center justify-center">
@@ -119,11 +126,18 @@
                              @endforeach
                          @endif
                      </div>
-                     <button type="button" onclick="openMediaModal('gallery')"
-                        class="bg-stone-50 text-stone-600 px-4 py-2 rounded-lg border border-stone-200 hover:bg-stone-100 transition flex items-center font-medium">
-                        <i class="fas fa-plus mr-2 text-xs"></i>
-                        Add Images
-                    </button>
+                     <div class="flex flex-wrap items-center gap-3">
+                         <button type="button" onclick="openMediaModal('gallery')"
+                            class="bg-stone-50 text-stone-700 hover:bg-stone-100 px-4 py-2.5 rounded-xl border border-stone-200 transition-all flex items-center font-medium shadow-sm">
+                            <i class="fas fa-plus mr-2 text-xs"></i>
+                            Add from Library
+                        </button>
+                        <label class="cursor-pointer bg-stone-100 hover:bg-stone-200 text-stone-700 px-4 py-2.5 rounded-xl border border-stone-200 transition-all flex items-center font-medium shadow-sm">
+                            <i class="fas fa-cloud-upload-alt mr-2 text-stone-500"></i>
+                            <span>Upload Multiple from Phone / Desktop</span>
+                            <input type="file" accept="image/*" multiple class="hidden" onchange="handleDirectGalleryUpload(event)">
+                        </label>
+                    </div>
                 </div>
             </div>
 
@@ -469,10 +483,10 @@
                         <i class="fas fa-search absolute left-4 top-3.5 text-stone-400"></i>
                     </div>
                      <div class="flex items-center space-x-3">
-                        <label class="cursor-pointer btn-primary shadow-lg shadow-red-100 flex items-center">
-                            <i class="fas fa-upload mr-2"></i>
-                            <span>Upload New</span>
-                            <input type="file" id="media-upload" class="hidden" multiple>
+                        <label class="cursor-pointer bg-red-600 hover:bg-red-700 text-white font-medium px-4 py-2.5 rounded-xl shadow-lg shadow-red-100 flex items-center transition-all">
+                            <i class="fas fa-cloud-upload-alt mr-2"></i>
+                            <span id="modal-upload-btn-text">Upload from Device</span>
+                            <input type="file" id="media-upload" class="hidden" multiple accept="image/*" onchange="handleFileUpload(event)">
                         </label>
                     </div>
                 </div>
@@ -1058,6 +1072,25 @@
         }
     }
 
+    function sanitizeImageUrl(rawUrl) {
+        if (!rawUrl) return '/images/logo/Logo_1.png';
+        let url = String(rawUrl).trim();
+        url = url.replace(/^https?:\/\/[^\/]+/, '');
+        if (url.startsWith('/storage/images/')) {
+            url = url.replace('/storage/images/', '/images/');
+        } else if (url.startsWith('storage/images/')) {
+            url = url.replace('storage/images/', '/images/');
+        } else if (url.startsWith('/storage/')) {
+            url = url.replace('/storage/', '/images/');
+        } else if (url.startsWith('storage/')) {
+            url = url.replace('storage/', '/images/');
+        }
+        if (!url.startsWith('http://') && !url.startsWith('https://') && !url.startsWith('/')) {
+            url = '/' + url;
+        }
+        return url;
+    }
+
     function renderMediaGrid(media) {
         const grid = document.getElementById('media-grid');
 
@@ -1069,14 +1102,18 @@
         let html = '';
         media.forEach(item => {
             const isSelected = selectedImages.some(img => img.id === item.id);
+            const rawUrl = item.thumb_url || item.thumbnail_url || item.url || item.full_url || item.file_path || item.path;
+            const url = sanitizeImageUrl(rawUrl);
+            const name = item.file_name || item.name || item.filename || 'Image';
+
             html += `
-            <div class="relative border rounded-lg overflow-hidden cursor-pointer group ${isSelected ? 'ring-2 ring-red-500' : ''}"
-                 onclick="toggleImageSelection(${item.id}, '${item.url}')" data-media='${JSON.stringify(item)}'>
-                <img src="${item.thumb_url}" class="w-full h-32 object-cover">
-                <div class="p-2 text-xs truncate">${item.file_name}</div>
+            <div class="relative border rounded-lg overflow-hidden cursor-pointer group hover:shadow-md transition ${isSelected ? 'ring-2 ring-red-500' : ''}"
+                 onclick="toggleImageSelection(${item.id}, '${url}')">
+                <img src="${url}" class="w-full h-32 object-cover bg-stone-100" onerror="this.onerror=null;this.src='/images/logo/Logo_1.png'">
+                <div class="p-2 text-xs truncate font-medium text-stone-700 bg-white border-t">${name}</div>
                 <div class="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-20 transition"></div>
                 ${isSelected ?
-                    '<div class="absolute top-2 right-2 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center">✓</div>'
+                    '<div class="absolute top-2 right-2 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center font-bold text-xs shadow">✓</div>'
                     : ''}
             </div>
             `;
@@ -1265,9 +1302,87 @@
 
     // =============== FILE UPLOAD FUNCTIONS ===============
 
+    async function handleDirectMainUpload(event) {
+        const file = event.target.files[0];
+        if (!file) return;
+
+        const formData = new FormData();
+        formData.append('files[]', file);
+
+        const preview = document.getElementById('main-image-preview');
+        preview.innerHTML = '<div class="text-sm text-stone-500 py-3 flex items-center"><i class="fas fa-spinner fa-spin mr-2 text-red-500"></i> Uploading & attaching photo...</div>';
+
+        try {
+            const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
+            const response = await axios.post('{{ route("admin.media.upload") }}', formData, {
+                headers: { 
+                    'Content-Type': 'multipart/form-data',
+                    'X-CSRF-TOKEN': csrfToken
+                }
+            });
+
+            if (response.data && response.data.success && response.data.data) {
+                const media = response.data.data;
+                document.getElementById('main_image_id').value = media.id;
+                preview.innerHTML = `<img src="${media.url}" class="h-32 object-cover rounded-xl border border-stone-200 shadow-sm">`;
+                toastr.success('Main image uploaded & selected!');
+            } else {
+                toastr.error(response.data.message || 'Failed to upload image.');
+                preview.innerHTML = '';
+            }
+        } catch (error) {
+            console.error('Upload error:', error);
+            const msg = error.response?.data?.message || 'Failed to upload image.';
+            toastr.error(msg);
+            preview.innerHTML = '';
+        } finally {
+            event.target.value = '';
+        }
+    }
+
+    async function handleDirectGalleryUpload(event) {
+        const files = event.target.files;
+        if (!files || !files.length) return;
+
+        const formData = new FormData();
+        for (let i = 0; i < files.length; i++) {
+            formData.append('files[]', files[i]);
+        }
+
+        toastr.info(`Uploading ${files.length} gallery image(s)...`);
+
+        try {
+            const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
+            const response = await axios.post('{{ route("admin.media.upload") }}', formData, {
+                headers: { 
+                    'Content-Type': 'multipart/form-data',
+                    'X-CSRF-TOKEN': csrfToken
+                }
+            });
+
+            if (response.data && response.data.success && response.data.all_uploaded) {
+                response.data.all_uploaded.forEach(media => {
+                    addGalleryImage(media.id, media.url);
+                });
+                toastr.success('Gallery image(s) uploaded successfully!');
+            } else {
+                toastr.error('Failed to upload gallery images.');
+            }
+        } catch (error) {
+            console.error('Gallery upload error:', error);
+            toastr.error('Failed to upload gallery images.');
+        } finally {
+            event.target.value = '';
+        }
+    }
+
     async function handleFileUpload(event) {
         const files = event.target.files;
-        if (!files.length) return;
+        if (!files || !files.length) return;
+
+        const uploadBtnText = document.getElementById('modal-upload-btn-text');
+        const origBtnText = uploadBtnText ? uploadBtnText.innerHTML : 'Upload from Device';
+        if (uploadBtnText) uploadBtnText.innerHTML = '<i class="fas fa-spinner fa-spin mr-1"></i> Uploading...';
 
         const formData = new FormData();
         for (let i = 0; i < files.length; i++) {
@@ -1275,16 +1390,41 @@
         }
 
         try {
+            const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
             const response = await axios.post('{{ route("admin.media.upload") }}', formData, {
-                headers: { 'Content-Type': 'multipart/form-data' }
+                headers: { 
+                    'Content-Type': 'multipart/form-data',
+                    'X-CSRF-TOKEN': csrfToken
+                }
             });
 
-            toastr.success('Files uploaded successfully');
-            loadMedia(1); // Reload media grid
-            event.target.value = ''; // Reset file input
+            if (response.data && response.data.success) {
+                toastr.success(response.data.message || 'Files uploaded successfully');
+
+                if (response.data.all_uploaded && response.data.all_uploaded.length > 0) {
+                    if (currentMode === 'main' || currentMode === 'variant-main') {
+                        const first = response.data.all_uploaded[0];
+                        selectedImages = [{ id: first.id, url: first.url }];
+                    } else {
+                        response.data.all_uploaded.forEach(item => {
+                            if (!selectedImages.some(img => img.id === item.id)) {
+                                selectedImages.push({ id: item.id, url: item.url });
+                            }
+                        });
+                    }
+                }
+
+                await loadMedia(1);
+            } else {
+                toastr.error(response.data.message || 'Failed to upload files');
+            }
         } catch (error) {
             console.error('Upload error:', error);
-            toastr.error('Failed to upload files');
+            const msg = error.response?.data?.message || 'Failed to upload files';
+            toastr.error(msg);
+        } finally {
+            if (uploadBtnText) uploadBtnText.innerHTML = origBtnText;
+            event.target.value = '';
         }
     }
 

@@ -35,6 +35,46 @@ class Media extends Model
         'file_size' => 'integer',
     ];
 
+    protected $appends = ['url', 'thumb_url', 'thumbnail_url', 'full_url'];
+
+    public function getUrlAttribute(): string
+    {
+        if (empty($this->file_path)) {
+            return '/images/logo/Logo_1.png';
+        }
+
+        if (str_starts_with($this->file_path, 'http://') || str_starts_with($this->file_path, 'https://')) {
+            return $this->file_path;
+        }
+
+        $cleanPath = ltrim($this->file_path, '/');
+
+        if (str_starts_with($cleanPath, 'images/')) {
+            return '/' . $cleanPath;
+        }
+
+        if (str_starts_with($cleanPath, 'storage/')) {
+            return '/' . $cleanPath;
+        }
+
+        return '/images/' . $cleanPath;
+    }
+
+    public function getThumbUrlAttribute(): string
+    {
+        return $this->getUrlAttribute();
+    }
+
+    public function getThumbnailUrlAttribute(): string
+    {
+        return $this->getUrlAttribute();
+    }
+
+    public function getFullUrlAttribute(): string
+    {
+        return $this->getUrlAttribute();
+    }
+
     // Relationships
     public function uploader(): MorphTo
     {

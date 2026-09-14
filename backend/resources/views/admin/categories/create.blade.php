@@ -226,8 +226,12 @@
                                 <button type="button" onclick="openMediaLibrary()" class="btn-secondary">
                                     <i class="fas fa-images mr-2"></i>Select from Media Library
                                 </button>
+                                <label for="directCategoryUpload" class="btn-secondary bg-stone-100 text-stone-700 hover:bg-stone-200 cursor-pointer text-center">
+                                    <i class="fas fa-upload mr-2"></i>Upload from Phone / Desktop
+                                </label>
+                                <input type="file" id="directCategoryUpload" class="hidden" accept="image/*" onchange="handleDirectCategoryUpload(event)">
                                 <button type="button" onclick="clearImage()"
-                                    class="btn-secondary bg-gray-100 text-gray-700 hover:bg-gray-200">
+                                    class="btn-secondary bg-rose-50 text-rose-600 hover:bg-rose-100">
                                     <i class="fas fa-times mr-2"></i>Remove Image
                                 </button>
                             </div>
@@ -716,6 +720,57 @@
             selectedImages = [];
         }
 
+        function sanitizeImageUrl(rawUrl) {
+            if (!rawUrl) return '/images/logo/Logo_1.png';
+            let url = String(rawUrl).trim();
+            url = url.replace(/^https?:\/\/[^\/]+/, '');
+            if (url.startsWith('/storage/images/')) {
+                url = url.replace('/storage/images/', '/images/');
+            } else if (url.startsWith('storage/images/')) {
+                url = url.replace('storage/images/', '/images/');
+            } else if (url.startsWith('/storage/')) {
+                url = url.replace('/storage/', '/images/');
+            } else if (url.startsWith('storage/')) {
+                url = url.replace('storage/', '/images/');
+            }
+            if (!url.startsWith('http://') && !url.startsWith('https://') && !url.startsWith('/')) {
+                url = '/' + url;
+            }
+            return url;
+        }
+
+        async function handleDirectCategoryUpload(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const formData = new FormData();
+            formData.append('files[]', file);
+
+            try {
+                toastr.info('Uploading image...');
+                const response = await axiosInstance.post('/media/upload', formData, {
+                    headers: { 'Content-Type': 'multipart/form-data' }
+                });
+
+                if (response.data.success && response.data.data && response.data.data.uploaded && response.data.data.uploaded.length > 0) {
+                    const uploaded = response.data.data.uploaded[0];
+                    const cleanUrl = sanitizeImageUrl(uploaded.url);
+                    document.getElementById('image_id').value = uploaded.id;
+                    document.getElementById('imagePreview').innerHTML = `
+                        <div class="w-full h-64 rounded-lg overflow-hidden border">
+                            <img src="${cleanUrl}" class="w-full h-full object-cover" onerror="this.onerror=null;this.src='/images/logo/Logo_1.png'">
+                        </div>
+                    `;
+                    toastr.success('Category image uploaded and selected');
+                } else {
+                    toastr.error('Upload failed. Please try again.');
+                }
+            } catch (error) {
+                console.error('Direct upload error:', error);
+                toastr.error('Failed to upload image');
+            }
+        }
+
         async function loadMedia(page = 1, search = '') {
             const grid = document.getElementById('media-grid');
             const pagination = document.getElementById('media-pagination');
@@ -723,20 +778,17 @@
             grid.innerHTML = '<div class="col-span-full text-center py-10 text-gray-500">Loading media...</div>';
 
             try {
-                // Use the same route as product create
                 const response = await axiosInstance.get('/media', {
                     params: { page, search, type: 'image' }
                 });
 
-                // Standardize response structure handling
                 let mediaData = response.data;
-                // If wrapped in success/data
                 if (mediaData.success && mediaData.data) {
                     mediaData = mediaData.data;
                 }
                 
                 currentMediaData = mediaData;
-                renderMediaGrid(mediaData.data || mediaData); // Handle if paginated or direct array
+                renderMediaGrid(mediaData.data || mediaData);
                 renderPagination(mediaData);
             } catch (error) {
                 console.error('Media load error:', error);
@@ -756,17 +808,18 @@
             let html = '';
             media.forEach(item => {
                 const isSelected = selectedImages.some(img => img.id === item.id);
-                const url = item.thumbnail_url || item.url || item.full_url || item.path;
-                const name = item.file_name || item.name || item.filename;
+                const rawUrl = item.thumb_url || item.thumbnail_url || item.url || item.full_url || item.file_path || item.path;
+                const url = sanitizeImageUrl(rawUrl);
+                const name = item.file_name || item.name || item.filename || 'Image';
 
                 html += `
-                <div class="relative border rounded-lg overflow-hidden cursor-pointer group ${isSelected ? 'ring-2 ring-red-500' : ''}" 
-                     onclick="toggleImageSelection(${item.id}, '${url}')" data-media='${JSON.stringify(item)}'>
-                    <img src="${url}" class="w-full h-32 object-cover">
-                    <div class="p-2 text-xs truncate">${name}</div>
+                <div class="relative border rounded-lg overflow-hidden cursor-pointer group hover:shadow-md transition ${isSelected ? 'ring-2 ring-red-500' : ''}" 
+                     onclick="toggleImageSelection(${item.id}, '${url}')">
+                    <img src="${url}" class="w-full h-32 object-cover bg-stone-100" onerror="this.onerror=null;this.src='/images/logo/Logo_1.png'">
+                    <div class="p-2 text-xs truncate font-medium text-stone-700 bg-white border-t">${name}</div>
                     <div class="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-20 transition"></div>
                     ${isSelected ? 
-                        '<div class="absolute top-2 right-2 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center">✓</div>' 
+                        '<div class="absolute top-2 right-2 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center font-bold text-xs shadow">✓</div>' 
                         : ''}
                 </div>
                 `;
@@ -787,13 +840,12 @@
             data.links.forEach(link => {
                 if (link.url) {
                     const active = link.active ? 'bg-red-500 text-white' : 'bg-gray-100 text-gray-700';
-                    // Extract page number from URL
                     let page = 1;
                     try {
-                        const urlObj = new URL(link.url);
-                        page = urlObj.searchParams.get('page');
+                        const urlObj = new URL(link.url, window.location.origin);
+                        page = urlObj.searchParams.get('page') || 1;
                     } catch(e) {
-                         // fallback for relative urls if needed
+                         page = 1;
                     }
                     
                     html += `
@@ -810,10 +862,7 @@
         }
 
         function toggleImageSelection(id, url) {
-            // For category image, we only need single selection
             selectedImages = [{ id, url }];
-            
-            // Re-render grid to show selection
             const mediaData = currentMediaData.data || currentMediaData;
             renderMediaGrid(mediaData);
         }
@@ -822,12 +871,12 @@
             if (selectedImages.length > 0) {
                 const image = selectedImages[0];
                 document.getElementById('image_id').value = image.id;
+                const cleanUrl = sanitizeImageUrl(image.url);
                 
-                // Update Preview
                 const preview = document.getElementById('imagePreview');
-                 preview.innerHTML = `
+                preview.innerHTML = `
                     <div class="w-full h-64 rounded-lg overflow-hidden border">
-                        <img src="${image.url}" class="w-full h-full object-cover">
+                        <img src="${cleanUrl}" class="w-full h-full object-cover" onerror="this.onerror=null;this.src='/images/logo/Logo_1.png'">
                     </div>
                 `;
                 
@@ -845,7 +894,7 @@
              }, 500);
         });
         
-        // Handle file upload
+        // Handle file upload inside modal
         document.getElementById('media-upload').addEventListener('change', async function(e) {
             const files = e.target.files;
             if (!files.length) return;
@@ -856,7 +905,7 @@
             }
 
             try {
-                // Using route consistent with product page
+                toastr.info('Uploading media...');
                 await axiosInstance.post('/media/upload', formData, {
                     headers: { 'Content-Type': 'multipart/form-data' }
                 });

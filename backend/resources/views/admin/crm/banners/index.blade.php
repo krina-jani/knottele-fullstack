@@ -23,9 +23,10 @@
     @forelse($banners as $banner)
     <div class="bg-white rounded-xl shadow-sm overflow-hidden border border-gray-100 group">
         <div class="relative h-48 overflow-hidden">
-            <img src="{{ Str::startsWith($banner->image, 'http') ? $banner->image : asset('storage/' . $banner->image) }}" 
+            <img src="{{ Str::startsWith($banner->image, 'http') || Str::startsWith($banner->image, '/') ? $banner->image : '/' . ltrim($banner->image, '/') }}" 
                  alt="{{ $banner->title }}" 
-                 class="w-full h-full object-cover group-hover:scale-105 transition duration-300">
+                 class="w-full h-full object-cover group-hover:scale-105 transition duration-300"
+                 onerror="this.onerror=null;this.src='/images/logo/Logo_1.png'">
             <div class="absolute top-2 right-2">
                 <span class="px-2 py-1 rounded text-xs font-bold {{ $banner->status ? 'bg-red-500 text-white' : 'bg-gray-500 text-white' }}">
                     {{ $banner->status ? 'Active' : 'Inactive' }}

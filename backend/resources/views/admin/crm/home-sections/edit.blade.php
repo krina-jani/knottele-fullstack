@@ -104,7 +104,7 @@
                         <!-- Selected items will appear here -->
                         @forelse($selectedProducts ?? [] as $p)
                         <div class="relative group bg-gray-50 rounded-lg p-2 border border-gray-200" id="prod-card-{{ $p->id }}">
-                            <img src="{{ asset('storage/' . $p->main_image) }}" class="w-full h-24 object-cover rounded mb-2">
+                            <img src="{{ $p->main_image ?? '/images/logo/Logo_1.png' }}" class="w-full h-24 object-cover rounded mb-2" onerror="this.onerror=null;this.src='/images/logo/Logo_1.png'">
                             <div class="text-[10px] font-bold text-gray-800 truncate" title="{{ $p->name }}">{{ $p->name }}</div>
                             <input type="hidden" name="product_ids[]" value="{{ $p->id }}">
                             <button type="button" onclick="removeProduct({{ $p->id }})" 
@@ -164,11 +164,10 @@ function toggleTypeFields() {
 
 // Product Search & Selection Logic
 let selectedProducts = @json($selectedProducts ?? []);
-// Map to a simpler format for JS if needed, but here we just need to handle new selections
 selectedProducts = selectedProducts.map(p => ({
     id: p.id,
     name: p.name,
-    image: `{{ asset('storage') }}/${p.main_image}`
+    image: p.main_image || '/images/logo/Logo_1.png'
 }));
 
 const searchInput = document.getElementById('product-search');

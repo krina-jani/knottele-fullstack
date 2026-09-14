@@ -96,15 +96,17 @@ class MediaController extends Controller
                     'id' => $item->id,
                     'file_name' => $item->file_name,
                     'file_path' => $item->file_path,
-                    'url' => asset(Storage::url($item->file_path)),
-                    'thumbnail_url' => $item->thumbnails ? asset(Storage::url($item->thumbnails['small'] ?? $item->file_path)) : asset(Storage::url($item->file_path)),
+                    'url' => $item->url,
+                    'thumbnail_url' => $item->thumb_url,
+                    'thumb_url' => $item->thumb_url,
+                    'full_url' => $item->full_url,
                     'mime_type' => $item->mime_type,
                     'file_type' => $item->file_type,
                     'file_size' => $item->file_size,
-                    'size_formatted' => $this->formatBytes($item->file_size),
+                    'size_formatted' => $this->formatBytes($item->file_size ?: 0),
                     'alt_text' => $item->alt_text,
                     'created_at' => $item->created_at,
-                    'created_at_formatted' => $item->created_at->format('M d, Y H:i'),
+                    'created_at_formatted' => $item->created_at ? $item->created_at->format('M d, Y H:i') : '',
                     'updated_at' => $item->updated_at,
                     'uploaded_by' => auth('admin_api')->id() ?? 0,
                     'metadata' => $item->metadata,
@@ -152,52 +154,49 @@ class MediaController extends Controller
                     $fileName = pathinfo($originalName, PATHINFO_FILENAME);
                     $uniqueName = Str::slug($fileName) . '_' . time() . '_' . Str::random(5) . '.' . $extension;
 
-                    // Define storage path
-                    $storagePath = 'products/media/' . date('Y/m');
-                    $fullPath = $storagePath . '/' . $uniqueName;
-
-                    // Store file
-                    Storage::disk('public')->putFileAs($storagePath, $file, $uniqueName);
-
-                    // Create thumbnails for images
-                    $thumbnails = [];
-                    if (in_array($extension, ['jpg', 'jpeg', 'png', 'gif', 'webp'])) {
-                        $thumbnails = $this->createThumbnails($file, $storagePath, $uniqueName);
+                    // Define path in public/images/products
+                    $targetDirectory = public_path('images/products');
+                    if (!\Illuminate\Support\Facades\File::isDirectory($targetDirectory)) {
+                        \Illuminate\Support\Facades\File::makeDirectory($targetDirectory, 0755, true, true);
                     }
 
+                    $file->move($targetDirectory, $uniqueName);
+                    $fullPath = 'images/products/' . $uniqueName;
+
                     // Get file info
-                    $mimeType = $file->getMimeType();
-                    $fileSize = $file->getSize();
+                    $mimeType = $file->getClientMimeType() ?: 'image/jpeg';
+                    $fullDiskPath = $targetDirectory . DIRECTORY_SEPARATOR . $uniqueName;
+                    $fileSize = file_exists($fullDiskPath) ? filesize($fullDiskPath) : 0;
 
                     // Determine file type
                     $fileType = 'image';
-                    if (str_starts_with($mimeType, 'image/')) {
-                        $fileType = 'image';
-                    }
 
                     // Create media record
                     $media = Media::create([
                         'file_name' => $originalName,
                         'file_path' => $fullPath,
-                        'disk' => 'public',
+                        'disk' => 'local',
                         'mime_type' => $mimeType,
                         'file_type' => $fileType,
                         'file_size' => $fileSize,
-                        'thumbnails' => $thumbnails ?: null,
+                        'thumbnails' => null,
                         'metadata' => [
                             'original_name' => $originalName,
                             'extension' => $extension,
                             'dimensions' => $this->getImageDimensions($file),
                         ],
                         'alt_text' => $request->input('alt_text', pathinfo($originalName, PATHINFO_FILENAME)),
-                        'uploaded_by' => auth('admin_api')->id(),
+                        'uploaded_by' => auth('admin_api')->id() ?? 1,
                         'uploader_type' => 'admin',
                     ]);
 
                     $uploadedFiles[] = [
                         'id' => $media->id,
                         'name' => $originalName,
-                        'url' => asset(Storage::url($fullPath)),
+                        'url' => $media->url,
+                        'thumbnail_url' => $media->thumb_url,
+                        'thumb_url' => $media->thumb_url,
+                        'full_url' => $media->full_url,
                         'size' => $this->formatBytes($fileSize),
                     ];
 
@@ -400,7 +399,7 @@ class MediaController extends Controller
                     return [
                         'id' => $item->id,
                         'name' => $item->file_name,
-                        'url' => asset(Storage::url($item->file_path)),
+                        'url' => $item->url,
                         'created_at' => $item->created_at->format('Y-m-d H:i:s'),
                     ];
                 });

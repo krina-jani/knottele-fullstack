@@ -727,7 +727,7 @@
                         <div class="flex items-center space-x-3">
                             <div class="w-10 h-10 bg-gray-100 rounded-lg flex items-center justify-center overflow-hidden flex-shrink-0">
                                 ${data.logo ?
-                                    `<img src="${data.logo}" alt="${data.name}" class="w-full h-full object-cover">` :
+                                    `<img src="${data.logo}" alt="${data.name}" class="w-full h-full object-cover" onerror="this.onerror=null;this.src='/images/logo/Logo_1.png'">` :
                                     `<i class="fas fa-tag text-gray-400"></i>`
                                 }
                             </div>

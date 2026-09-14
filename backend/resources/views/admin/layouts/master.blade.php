@@ -88,6 +88,15 @@
     <script src="{{ asset('js/admin/custom.js') }}?v={{ filemtime(public_path('js/admin/custom.js')) }}"></script>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.5.0/axios.min.js"></script>
+    <script>
+        if (window.axios) {
+            window.axios.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest';
+            const csrfMeta = document.querySelector('meta[name="csrf-token"]');
+            if (csrfMeta) {
+                window.axios.defaults.headers.common['X-CSRF-TOKEN'] = csrfMeta.getAttribute('content');
+            }
+        }
+    </script>
 
 
 

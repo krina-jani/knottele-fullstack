@@ -32,8 +32,8 @@
                 <div class="md:col-span-2">
                     <label class="block text-sm font-medium text-gray-700 mb-2">Banner Image <span class="text-rose-500">*</span></label>
                     <div class="flex items-start space-x-6">
-                        <div id="image-preview" class="w-full h-48 md:w-64 bg-gray-50 rounded-lg border-2 border-dashed border-gray-300 flex items-center justify-center overflow-hidden">
-                            <img src="{{ Str::startsWith($banner->image, 'http') ? $banner->image : asset('storage/' . $banner->image) }}" class="w-full h-full object-cover">
+                        <div id="image-preview" class="w-full h-48 md:w-64 bg-gray-50 rounded-lg border border-gray-300 flex items-center justify-center overflow-hidden">
+                            <img src="{{ Str::startsWith($banner->image, 'http') || Str::startsWith($banner->image, '/') ? $banner->image : '/' . ltrim($banner->image, '/') }}" class="w-full h-full object-cover" onerror="this.onerror=null;this.src='/images/logo/Logo_1.png'">
                         </div>
                         <div class="flex-1">
                             <input type="hidden" name="image" id="image-url" value="{{ old('image', $banner->image) }}">
