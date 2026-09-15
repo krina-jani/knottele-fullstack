@@ -174,6 +174,65 @@ Route::prefix('admin')->group(function () {
             Route::post('/video-reel/toggle-status/{id}', [AdminMedia::class, 'toggleVideoReelStatus']);
             Route::post('/blog-reels-settings', [AdminMedia::class, 'updateBlogReelsSettings'])->name('admin.media.blog-reels-settings');
             Route::post('/blog-reels/settings', [AdminMedia::class, 'updateBlogReelsSettings']);
+            
+            // Custom Crochet Banner (Homepage)
+            Route::post('/homepage/custom-crochet', [AdminMedia::class, 'saveCustomCrochet'])->name('admin.media.homepage.custom-crochet.save');
+            Route::get('/homepage/custom-crochet', [AdminMedia::class, 'getCustomCrochet'])->name('admin.media.homepage.custom-crochet.get');
+
+            // About Page Routes
+            Route::post('/about/story', [AdminMedia::class, 'saveAboutStory'])->name('admin.media.about.story.save');
+            Route::get('/about/story', [AdminMedia::class, 'getAboutStory'])->name('admin.media.about.story.get');
+            Route::post('/about/craft-pillars/header', [AdminMedia::class, 'saveCraftPillarsHeader'])->name('admin.media.about.craft-pillars.header');
+            Route::post('/about/craft-pillars', [AdminMedia::class, 'addCraftPillar'])->name('admin.media.about.craft-pillars.add');
+            Route::get('/about/craft-pillars/{id}', [AdminMedia::class, 'getCraftPillar'])->name('admin.media.about.craft-pillars.get');
+            Route::post('/about/craft-pillars/{id}', [AdminMedia::class, 'updateCraftPillar'])->name('admin.media.about.craft-pillars.update');
+            Route::delete('/about/craft-pillars/{id}', [AdminMedia::class, 'deleteCraftPillar'])->name('admin.media.about.craft-pillars.delete');
+            Route::post('/about/craft-pillars/{id}/toggle', [AdminMedia::class, 'toggleCraftPillar'])->name('admin.media.about.craft-pillars.toggle');
+            Route::post('/about/craft-pillars/reorder', [AdminMedia::class, 'reorderCraftPillars'])->name('admin.media.about.craft-pillars.reorder');
+
+            // Contact Page Routes
+            Route::post('/contact/intro', [AdminMedia::class, 'saveContactIntro'])->name('admin.media.contact.intro.save');
+            Route::get('/contact/intro', [AdminMedia::class, 'getContactIntro'])->name('admin.media.contact.intro.get');
+
+            Route::get('/contact/info/header', [AdminMedia::class, 'getContactInfoHeader'])->name('admin.media.contact.info.header.get');
+            Route::post('/contact/info/header', [AdminMedia::class, 'saveContactInfoHeader'])->name('admin.media.contact.info.header');
+            Route::post('/contact/info', [AdminMedia::class, 'addContactInfoItem'])->name('admin.media.contact.info.add');
+            Route::post('/contact/info/items', [AdminMedia::class, 'addContactInfoItem'])->name('admin.media.contact.info.items.add');
+            Route::get('/contact/info/{id}', [AdminMedia::class, 'getContactInfoItem'])->name('admin.media.contact.info.get');
+            Route::get('/contact/info/items/{id}', [AdminMedia::class, 'getContactInfoItem'])->name('admin.media.contact.info.items.get');
+            Route::post('/contact/info/{id}', [AdminMedia::class, 'updateContactInfoItem'])->name('admin.media.contact.info.update');
+            Route::post('/contact/info/items/{id}', [AdminMedia::class, 'updateContactInfoItem'])->name('admin.media.contact.info.items.update');
+            Route::delete('/contact/info/{id}', [AdminMedia::class, 'deleteContactInfoItem'])->name('admin.media.contact.info.delete');
+            Route::delete('/contact/info/items/{id}', [AdminMedia::class, 'deleteContactInfoItem'])->name('admin.media.contact.info.items.delete');
+            Route::post('/contact/info/{id}/toggle', [AdminMedia::class, 'toggleContactInfoItem'])->name('admin.media.contact.info.toggle');
+            Route::post('/contact/info/items/{id}/toggle', [AdminMedia::class, 'toggleContactInfoItem'])->name('admin.media.contact.info.items.toggle');
+            Route::post('/contact/info/reorder', [AdminMedia::class, 'reorderContactInfoItems'])->name('admin.media.contact.info.reorder');
+
+            Route::post('/contact/form', [AdminMedia::class, 'saveContactFormSettings'])->name('admin.media.contact.form.save');
+            Route::get('/contact/form', [AdminMedia::class, 'getContactFormSettings'])->name('admin.media.contact.form.get');
+
+            Route::get('/contact/faqs/header', [AdminMedia::class, 'getContactFaqsHeader'])->name('admin.media.contact.faqs.header.get');
+            Route::post('/contact/faqs/header', [AdminMedia::class, 'saveContactFaqsHeader'])->name('admin.media.contact.faqs.header');
+            Route::post('/contact/faqs', [AdminMedia::class, 'addContactFaq'])->name('admin.media.contact.faqs.add');
+            Route::post('/contact/faqs/items', [AdminMedia::class, 'addContactFaq'])->name('admin.media.contact.faqs.items.add');
+            Route::get('/contact/faqs/{id}', [AdminMedia::class, 'getContactFaq'])->name('admin.media.contact.faqs.get');
+            Route::get('/contact/faqs/items/{id}', [AdminMedia::class, 'getContactFaq'])->name('admin.media.contact.faqs.items.get');
+            Route::post('/contact/faqs/{id}', [AdminMedia::class, 'updateContactFaq'])->name('admin.media.contact.faqs.update');
+            Route::post('/contact/faqs/items/{id}', [AdminMedia::class, 'updateContactFaq'])->name('admin.media.contact.faqs.items.update');
+            Route::delete('/contact/faqs/{id}', [AdminMedia::class, 'deleteContactFaq'])->name('admin.media.contact.faqs.delete');
+            Route::delete('/contact/faqs/items/{id}', [AdminMedia::class, 'deleteContactFaq'])->name('admin.media.contact.faqs.items.delete');
+            Route::post('/contact/faqs/{id}/toggle', [AdminMedia::class, 'toggleContactFaq'])->name('admin.media.contact.faqs.toggle');
+            Route::post('/contact/faqs/items/{id}/toggle', [AdminMedia::class, 'toggleContactFaq'])->name('admin.media.contact.faqs.items.toggle');
+            Route::post('/contact/faqs/reorder', [AdminMedia::class, 'reorderContactFaqs'])->name('admin.media.contact.faqs.reorder');
+            
+            // Footer Settings Routes
+            Route::get('/footer/settings', [AdminMedia::class, 'getFooterSettings'])->name('admin.media.footer.settings.get');
+            Route::post('/footer/settings', [AdminMedia::class, 'saveFooterSettings'])->name('admin.media.footer.settings.save');
+
+            // Navbar Settings Routes
+            Route::get('/navbar/settings', [AdminMedia::class, 'getNavbarSettings'])->name('admin.media.navbar.settings.get');
+            Route::post('/navbar/settings', [AdminMedia::class, 'saveNavbarSettings'])->name('admin.media.navbar.settings.save');
+
             Route::delete('/{id}', [AdminMedia::class, 'destroy'])->name('admin.media.destroy');
         });
 

@@ -9,6 +9,8 @@ Route::prefix('customer')->group(function () {
     // Public routes
     Route::get('home', [\App\Http\Controllers\Api\Customer\HomeController::class, 'index']);
     Route::get('media', [\App\Http\Controllers\Api\Customer\MediaController::class, 'index']);
+    Route::get('about', [\App\Http\Controllers\Api\Customer\MediaController::class, 'getAboutPage']);
+    Route::get('contact', [\App\Http\Controllers\Api\Customer\MediaController::class, 'getContactPage']);
     Route::get('homepage/media', [\App\Http\Controllers\Api\Customer\MediaController::class, 'index']);
     Route::post('media/video/{id}/view', [\App\Http\Controllers\Api\Customer\MediaController::class, 'incrementView']);
     Route::post('login', [CustomerApiAuthController::class, 'login']);

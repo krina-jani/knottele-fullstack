@@ -20,10 +20,57 @@ export function Footer() {
   const [footerBg, setFooterBg] = useState(DEFAULT_FOOTER_BG);
 
   useEffect(() => {
-    if (media?.footer?.bg) {
-      setFooterBg(media.footer.bg);
+    const bg = media?.footer?.bg || media?.footer?.image;
+    if (bg) {
+      setFooterBg(bg);
     }
-  }, [media?.footer?.bg]);
+  }, [media?.footer?.bg, media?.footer?.image]);
+
+  const f = media?.footer;
+
+  // Social Links
+  const instagram = f?.social?.instagram || { url: "https://instagram.com/knotelleindia", is_active: true };
+  const facebook = f?.social?.facebook || { url: "https://facebook.com/knotelleindia", is_active: true };
+  const pinterest = f?.social?.pinterest || { url: "https://pinterest.com/knotelleindia", is_active: true };
+  const youtube = f?.social?.youtube || { url: "https://youtube.com/@knotelleindia", is_active: true };
+
+  // Columns & Links
+  const col1Title = f?.column_1?.title || "Quick Links";
+  const col1Links = (f?.column_1?.links && f.column_1.links.length > 0)
+    ? f.column_1.links.filter((l) => l.is_active !== false)
+    : [
+        { label: "Home", url: "/" },
+        { label: "Shop", url: "/shop" },
+        { label: "Custom Order", url: "/custom-order" },
+        { label: "About", url: "/about" },
+        { label: "Contact", url: "/contact" },
+      ];
+
+  const col2Title = f?.column_2?.title || "Help";
+  const col2Links = (f?.column_2?.links && f.column_2.links.length > 0)
+    ? f.column_2.links.filter((l) => l.is_active !== false)
+    : [
+        { label: "Shipping Policy", url: "/contact" },
+        { label: "Return & Refund", url: "/contact" },
+        { label: "FAQ", url: "/contact" },
+        { label: "Track Order", url: "/account/orders" },
+      ];
+
+  const col3Title = f?.column_3?.title || "Contact";
+  const contactPhone = f?.column_3?.phone || "+91 97730 39243";
+  const contactPhoneLink = f?.column_3?.phone_link || `tel:${contactPhone.replace(/\s+/g, "")}`;
+  const contactEmail = f?.column_3?.email || "support@knotelle.in";
+  const contactEmailLink = f?.column_3?.email_link || `mailto:${contactEmail}`;
+  const contactAddress = f?.column_3?.address || "India";
+
+  // Bottom Bar
+  const currentYear = new Date().getFullYear();
+  const rawCopyright = f?.copyright_text || "© {year} Knotelle. All rights reserved.";
+  const copyrightText = rawCopyright.includes("{year}")
+    ? rawCopyright.replace("{year}", currentYear.toString())
+    : rawCopyright;
+
+  const heartTagline = f?.heart_tagline || "Made with ♡ for a kinder, cozier world.";
 
   return (
     <footer className="relative w-full overflow-hidden bg-[#FFF9F6] border-t border-[#E7D1CC]/70 pt-12 sm:pt-16 pb-8 text-[#2E211E]">
@@ -56,42 +103,50 @@ export function Footer() {
 
             {/* Social Media Icons Row */}
             <div className="flex items-center gap-2.5 pt-1.5 text-[#2E211E]">
-              <a
-                href="https://instagram.com/knotelleindia"
-                target="_blank"
-                rel="noopener noreferrer"
-                aria-label="Instagram"
-                className="w-8.5 h-8.5 rounded-full bg-white/85 backdrop-blur-xs border border-[#E7D1CC] shadow-xs flex items-center justify-center text-[#2E211E] hover:bg-[#913638] hover:text-white hover:border-[#913638] hover:scale-108 transition-all active:scale-95"
-              >
-                <InstagramIcon className="w-4.5 h-4.5" />
-              </a>
-              <a
-                href="https://facebook.com/knotelleindia"
-                target="_blank"
-                rel="noopener noreferrer"
-                aria-label="Facebook"
-                className="w-8.5 h-8.5 rounded-full bg-white/85 backdrop-blur-xs border border-[#E7D1CC] shadow-xs flex items-center justify-center text-[#2E211E] hover:bg-[#913638] hover:text-white hover:border-[#913638] hover:scale-108 transition-all active:scale-95"
-              >
-                <FacebookIcon className="w-4.5 h-4.5" />
-              </a>
-              <a
-                href="https://pinterest.com/knotelleindia"
-                target="_blank"
-                rel="noopener noreferrer"
-                aria-label="Pinterest"
-                className="w-8.5 h-8.5 rounded-full bg-white/85 backdrop-blur-xs border border-[#E7D1CC] shadow-xs flex items-center justify-center text-[#2E211E] hover:bg-[#913638] hover:text-white hover:border-[#913638] hover:scale-108 transition-all active:scale-95"
-              >
-                <PinterestIcon className="w-4.5 h-4.5" />
-              </a>
-              <a
-                href="https://youtube.com/@knotelleindia"
-                target="_blank"
-                rel="noopener noreferrer"
-                aria-label="YouTube"
-                className="w-8.5 h-8.5 rounded-full bg-white/85 backdrop-blur-xs border border-[#E7D1CC] shadow-xs flex items-center justify-center text-[#2E211E] hover:bg-[#913638] hover:text-white hover:border-[#913638] hover:scale-108 transition-all active:scale-95"
-              >
-                <YouTubeIcon className="w-4.5 h-4.5" />
-              </a>
+              {instagram.is_active !== false && instagram.url && (
+                <a
+                  href={instagram.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label="Instagram"
+                  className="w-8.5 h-8.5 rounded-full bg-white/85 backdrop-blur-xs border border-[#E7D1CC] shadow-xs flex items-center justify-center text-[#2E211E] hover:bg-[#913638] hover:text-white hover:border-[#913638] hover:scale-108 transition-all active:scale-95"
+                >
+                  <InstagramIcon className="w-4.5 h-4.5" />
+                </a>
+              )}
+              {facebook.is_active !== false && facebook.url && (
+                <a
+                  href={facebook.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label="Facebook"
+                  className="w-8.5 h-8.5 rounded-full bg-white/85 backdrop-blur-xs border border-[#E7D1CC] shadow-xs flex items-center justify-center text-[#2E211E] hover:bg-[#913638] hover:text-white hover:border-[#913638] hover:scale-108 transition-all active:scale-95"
+                >
+                  <FacebookIcon className="w-4.5 h-4.5" />
+                </a>
+              )}
+              {pinterest.is_active !== false && pinterest.url && (
+                <a
+                  href={pinterest.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label="Pinterest"
+                  className="w-8.5 h-8.5 rounded-full bg-white/85 backdrop-blur-xs border border-[#E7D1CC] shadow-xs flex items-center justify-center text-[#2E211E] hover:bg-[#913638] hover:text-white hover:border-[#913638] hover:scale-108 transition-all active:scale-95"
+                >
+                  <PinterestIcon className="w-4.5 h-4.5" />
+                </a>
+              )}
+              {youtube.is_active !== false && youtube.url && (
+                <a
+                  href={youtube.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label="YouTube"
+                  className="w-8.5 h-8.5 rounded-full bg-white/85 backdrop-blur-xs border border-[#E7D1CC] shadow-xs flex items-center justify-center text-[#2E211E] hover:bg-[#913638] hover:text-white hover:border-[#913638] hover:scale-108 transition-all active:scale-95"
+                >
+                  <YouTubeIcon className="w-4.5 h-4.5" />
+                </a>
+              )}
             </div>
           </div>
 
@@ -102,35 +157,21 @@ export function Footer() {
             <div className="space-y-3.5">
               <h4 className="font-bold text-sm text-[#2E211E]">
                 <span className="border-b-2 border-[#913638] pb-1 inline-block">
-                  Quick Links
+                  {col1Title}
                 </span>
               </h4>
               <ul className="space-y-2 text-xs sm:text-sm text-[#5C4D49] font-medium pt-1">
-                <li>
-                  <Link href="/" className="hover:text-[#913638] transition-colors">
-                    Home
-                  </Link>
-                </li>
-                <li>
-                  <Link href="/shop" className="hover:text-[#913638] transition-colors">
-                    Shop
-                  </Link>
-                </li>
-                <li>
-                  <Link href="/custom-order" className="hover:text-[#913638] transition-colors">
-                    Custom Order
-                  </Link>
-                </li>
-                <li>
-                  <Link href="/about" className="hover:text-[#913638] transition-colors">
-                    About
-                  </Link>
-                </li>
-                <li>
-                  <Link href="/contact" className="hover:text-[#913638] transition-colors">
-                    Contact
-                  </Link>
-                </li>
+                {col1Links.map((link, idx) => {
+                  const href = link.url || link.href || "/";
+                  const label = link.label || link.name || "Link";
+                  return (
+                    <li key={idx}>
+                      <Link href={href} className="hover:text-[#913638] transition-colors">
+                        {label}
+                      </Link>
+                    </li>
+                  );
+                })}
               </ul>
             </div>
 
@@ -138,30 +179,21 @@ export function Footer() {
             <div className="space-y-3.5">
               <h4 className="font-bold text-sm text-[#2E211E]">
                 <span className="border-b-2 border-[#913638] pb-1 inline-block">
-                  Help
+                  {col2Title}
                 </span>
               </h4>
               <ul className="space-y-2 text-xs sm:text-sm text-[#5C4D49] font-medium pt-1">
-                <li>
-                  <Link href="/contact" className="hover:text-[#913638] transition-colors">
-                    Shipping Policy
-                  </Link>
-                </li>
-                <li>
-                  <Link href="/contact" className="hover:text-[#913638] transition-colors">
-                    Return & Refund
-                  </Link>
-                </li>
-                <li>
-                  <Link href="/contact" className="hover:text-[#913638] transition-colors">
-                    FAQ
-                  </Link>
-                </li>
-                <li>
-                  <Link href="/account/orders" className="hover:text-[#913638] transition-colors">
-                    Track Order
-                  </Link>
-                </li>
+                {col2Links.map((link, idx) => {
+                  const href = link.url || link.href || "/contact";
+                  const label = link.label || link.name || "Help";
+                  return (
+                    <li key={idx}>
+                      <Link href={href} className="hover:text-[#913638] transition-colors">
+                        {label}
+                      </Link>
+                    </li>
+                  );
+                })}
               </ul>
             </div>
 
@@ -169,25 +201,25 @@ export function Footer() {
             <div className="space-y-3.5">
               <h4 className="font-bold text-sm text-[#2E211E]">
                 <span className="border-b-2 border-[#913638] pb-1 inline-block">
-                  Contact
+                  {col3Title}
                 </span>
               </h4>
               <div className="space-y-3 text-xs sm:text-sm text-[#5C4D49] font-medium pt-1">
                 <p className="flex items-center gap-2.5">
                   <Phone className="w-4 h-4 text-[#2E211E] shrink-0" />
-                  <a href="tel:+919773039243" className="hover:text-[#913638] transition-colors font-semibold text-[#2E211E]">
-                    +91 97730 39243
+                  <a href={contactPhoneLink} className="hover:text-[#913638] transition-colors font-semibold text-[#2E211E]">
+                    {contactPhone}
                   </a>
                 </p>
                 <p className="flex items-center gap-2.5">
                   <Mail className="w-4 h-4 text-[#2E211E] shrink-0" />
-                  <a href="mailto:support@knotelle.in" className="hover:text-[#913638] transition-colors font-semibold text-[#2E211E]">
-                    support@knotelle.in
+                  <a href={contactEmailLink} className="hover:text-[#913638] transition-colors font-semibold text-[#2E211E]">
+                    {contactEmail}
                   </a>
                 </p>
                 <p className="flex items-center gap-2.5">
                   <MapPin className="w-4 h-4 text-[#2E211E] shrink-0" />
-                  <span className="font-semibold text-[#2E211E]">India</span>
+                  <span className="font-semibold text-[#2E211E]">{contactAddress}</span>
                 </p>
               </div>
             </div>
@@ -196,14 +228,12 @@ export function Footer() {
 
         </div>
 
-        {/* Bottom Bar matching screenshot */}
+        {/* Bottom Bar */}
         <div className="pt-6 border-t border-[#E7D1CC]/80 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-[#5C4D49] font-medium">
-          <p>© 2024 Knotelle. All rights reserved.</p>
+          <p>{copyrightText}</p>
 
           <p className="flex items-center gap-1.5">
-            <span>Made with</span>
-            <span className="text-[#913638] text-sm">♡</span>
-            <span>for a kinder, cozier world.</span>
+            <span>{heartTagline}</span>
           </p>
         </div>
 

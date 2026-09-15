@@ -15,44 +15,55 @@ class ReviewSeeder extends Seeder
     {
         $products = Product::all();
 
-        // Indian customer names
-        $names = [
-            'Anjali Patel',
-            'Riya Shah',
-            'Neha Mehta',
-            'Pooja Vora',
-            'Kajal Desai',
-            'Sneha Joshi',
-            'Bhavika Parmar',
-            'Nidhi Trivedi',
-            'Mitali Thakkar',
-            'Komal Dave',
-        ];
-
-        // Beauty & skincare focused reviews
-        $reviews = [
-            'I can see visible improvement in my skin within a few weeks. Very gentle and effective.',
-            'The texture is lightweight and suits my sensitive skin perfectly.',
-            'Clinically formulated and it actually works. Highly recommended.',
-            'My acne has reduced and skin feels much healthier now.',
-            'Excellent product quality. No irritation and great results.',
-            'Hair feels stronger and smoother after regular use.',
-            'Perfect for daily use. You can feel the clinical quality.',
-            'Very satisfied with the results. Will definitely repurchase.',
+        $curatedReviews = [
+            [
+                'user_name' => 'Aanya Verma',
+                'rating' => 5.0,
+                'review' => 'The stitchwork is unbelievably neat and tight! Arrived in a lovely gift box with dried lavender petals. My sister loved it.'
+            ],
+            [
+                'user_name' => 'Rhea Mukherjee',
+                'rating' => 5.0,
+                'review' => '100% pure milk cotton yarn, feels super soft and premium. Exactly as shown in the boutique photos!'
+            ],
+            [
+                'user_name' => 'Tanvi Deshmukh',
+                'rating' => 4.8,
+                'review' => 'I keep this on my study desk and it brings warmth to my workspace every single day. Everlasting blossoms are pure magic.'
+            ],
+            [
+                'user_name' => 'Isha Kapoor',
+                'rating' => 5.0,
+                'review' => 'Such a thoughtful handcrafted piece. The attention to detail in every single petal and loop is breathtaking.'
+            ],
+            [
+                'user_name' => 'Pooja Vora',
+                'rating' => 4.9,
+                'review' => 'The color harmony is aesthetic and cottagecore. Sturdy craftsmanship with no loose yarn ends anywhere.'
+            ],
+            [
+                'user_name' => 'Sneha Joshi',
+                'rating' => 5.0,
+                'review' => 'Came with a sweet handwritten care card. You can truly feel the love and time poured into every stitch. Highly recommend KNOTELLE!'
+            ],
         ];
 
         foreach ($products as $product) {
-
-            // Create exactly 3 reviews per product
-            for ($i = 0; $i < 3; $i++) {
-                Review::create([
-                    'product_id' => $product->id,
-                    'user_name' => $names[array_rand($names)],
-                    'user_icon' => null,
-                    'rating' => rand(4, 5), // Ensures avg rating ≥ 4
-                    'review' => $reviews[array_rand($reviews)],
-                    'status' => true,
-                ]);
+            // Seed 2 curated reviews per product if none exist
+            $sampleReviews = array_slice($curatedReviews, ($product->id % 3), 2);
+            foreach ($sampleReviews as $item) {
+                Review::updateOrCreate(
+                    [
+                        'product_id' => $product->id,
+                        'user_name' => $item['user_name'],
+                    ],
+                    [
+                        'rating' => $item['rating'],
+                        'review' => $item['review'],
+                        'user_icon' => null,
+                        'status' => true,
+                    ]
+                );
             }
         }
     }

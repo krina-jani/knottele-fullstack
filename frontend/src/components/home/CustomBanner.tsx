@@ -19,6 +19,8 @@ export function CustomBanner() {
   const [ctaText, setCtaText] = useState("Request Your Custom Order");
   const [ctaLink, setCtaLink] = useState("/custom-order");
   const [tagText, setTagText] = useState("Turn Your Ideas Into Handmade Reality");
+  const [tagActive, setTagActive] = useState(true);
+  const [altText, setAltText] = useState("Custom Crochet Banner");
   const [isActive, setIsActive] = useState(true);
 
   useEffect(() => {
@@ -37,6 +39,8 @@ export function CustomBanner() {
     if (cc.cta_text) setCtaText(cc.cta_text);
     if (cc.cta_link) setCtaLink(cc.cta_link);
     if (cc.tag_text) setTagText(cc.tag_text);
+    if (cc.tag_active !== undefined) setTagActive(cc.tag_active !== false);
+    if (cc.alt_text) setAltText(cc.alt_text);
   }, [media?.customCrochet]);
 
   if (!isActive) return null;
@@ -53,9 +57,11 @@ export function CustomBanner() {
               
               <h2 className="font-serif-luxury text-3xl sm:text-4xl lg:text-5xl font-bold text-[#2E211E] tracking-tight leading-[1.15]">
                 {title} <br />
-                <span className="text-[#913638] italic font-serif font-normal">
-                  {subtitle}
-                </span>
+                {subtitle && (
+                  <span className="text-[#913638] italic font-serif font-normal">
+                    {subtitle}
+                  </span>
+                )}
               </h2>
 
               <p className="text-xs sm:text-sm text-[#786864] max-w-md leading-relaxed whitespace-pre-line">
@@ -84,7 +90,7 @@ export function CustomBanner() {
                   )}
                   <Image
                     src={bannerImg}
-                    alt={`${title} - ${subtitle}`}
+                    alt={altText || `${title} - ${subtitle}`}
                     fill
                     sizes="(max-width: 1024px) 80vw, 35vw"
                     className="object-cover"
@@ -92,7 +98,7 @@ export function CustomBanner() {
                 </picture>
 
                 {/* Hanging Tag */}
-                {tagText && (
+                {tagActive && tagText && (
                   <div className="absolute bottom-2 right-2 z-10">
                     <HandmadePaperTag text={tagText} />
                   </div>

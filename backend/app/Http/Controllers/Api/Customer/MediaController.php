@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Media;
 use App\Models\Category;
 use App\Models\Testimonial;
+use App\Models\Setting;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
@@ -93,17 +94,29 @@ class MediaController extends Controller
         $customCrochetMedia = Media::where('page', 'homepage')
             ->where('section', 'custom_crochet')
             ->where('is_active', true)
+            ->orderBy('updated_at', 'desc')
             ->first();
 
+        if (!$customCrochetMedia) {
+            $customCrochetMedia = Media::where('page', 'homepage')
+                ->where('section', 'custom_crochet')
+                ->orderBy('updated_at', 'desc')
+                ->first();
+        }
+
+        $ccMeta = $customCrochetMedia && $customCrochetMedia->metadata ? $customCrochetMedia->metadata : [];
+
         $customCrochet = [
-            'desktop' => $customCrochetMedia ? $customCrochetMedia->url : asset('images/homepage/middleimg.png'),
-            'mobile' => $customCrochetMedia ? $customCrochetMedia->url : asset('images/homepage/middleimg.png'),
+            'desktop' => $customCrochetMedia ? ($customCrochetMedia->desktop_image_url ?: $customCrochetMedia->url) : asset('images/homepage/middleimg.png'),
+            'mobile' => $customCrochetMedia ? ($customCrochetMedia->mobile_image_url ?: ($customCrochetMedia->desktop_image_url ?: $customCrochetMedia->url)) : asset('images/homepage/middleimg.png'),
             'title' => $customCrochetMedia && $customCrochetMedia->title ? $customCrochetMedia->title : 'Custom Crochet',
             'subtitle' => $customCrochetMedia && $customCrochetMedia->subtitle ? $customCrochetMedia->subtitle : 'Just for You',
             'description' => $customCrochetMedia && $customCrochetMedia->description ? $customCrochetMedia->description : "Your imagination, our yarn. Let's create something special together.",
             'cta_text' => $customCrochetMedia && $customCrochetMedia->cta_text ? $customCrochetMedia->cta_text : 'Request Your Custom Order',
             'cta_link' => $customCrochetMedia && $customCrochetMedia->cta_link ? $customCrochetMedia->cta_link : '/custom-order',
             'tag_text' => $customCrochetMedia && $customCrochetMedia->tag_text ? $customCrochetMedia->tag_text : 'Turn Your Ideas Into Handmade Reality',
+            'tag_active' => isset($ccMeta['tag_active']) ? (bool)$ccMeta['tag_active'] : true,
+            'alt_text' => $customCrochetMedia && $customCrochetMedia->alt_text ? $customCrochetMedia->alt_text : 'Custom Crochet Banner',
             'is_active' => $customCrochetMedia ? (bool)$customCrochetMedia->is_active : true,
         ];
 
@@ -160,30 +173,80 @@ class MediaController extends Controller
             'is_active' => $newsletterMedia ? (bool)$newsletterMedia->is_active : true,
         ];
 
-        // 6. Footer Artwork
-        $footerBgMedia = Media::where('section', 'footer')
-            ->where('is_active', true)
-            ->where(function ($q) {
-                $q->where('slot', 'footer_bg')
-                  ->orWhere('slot', 'footer_artwork')
-                  ->orWhere('slot', 'footer_left')
-                  ->orWhereNull('slot');
-            })
+        // 6. Footer Dynamic Configuration & Artwork
+        $footerMedia = Media::where('section', 'footer')
+            ->where('slot', 'section_settings')
             ->first();
-
-        if (!$footerBgMedia) {
-            $footerBgMedia = Media::where('section', 'footer')->where('is_active', true)->first();
+        if (!$footerMedia) {
+            $footerMedia = Media::where('section', 'footer')->first();
         }
 
+        $footerMeta = $footerMedia && $footerMedia->metadata ? $footerMedia->metadata : [];
+        $footerBgMedia = Media::where('section', 'footer')
+            ->where('slot', 'footer_bg')
+            ->where('is_active', true)
+            ->first() ?: $footerMedia;
+
+        $footerBg = $footerBgMedia ? ($footerBgMedia->desktop_image_url ?: $footerBgMedia->url) : asset('images/categories/footer.png');
+
         $footer = [
-            'bg' => $footerBgMedia ? ($footerBgMedia->desktop_image_url ?: $footerBgMedia->url) : asset('images/footer/footer.png'),
-            'left' => null,
-            'right' => null,
-            'title' => $footerBgMedia && $footerBgMedia->title ? $footerBgMedia->title : 'Knotelle Handmade Boutique',
-            'subtitle' => $footerBgMedia && $footerBgMedia->subtitle ? $footerBgMedia->subtitle : 'Made with ♡ for a kinder, cozier world.',
+            'bg' => $footerBg,
+            'image' => $footerBg,
+            'title' => $footerMedia && $footerMedia->title ? $footerMedia->title : 'KNOTELLE',
+            'subtitle' => $footerMedia && $footerMedia->subtitle ? $footerMedia->subtitle : 'Made with ♡ for a kinder, cozier world.',
+            'tagline' => $footerMedia && $footerMedia->subtitle ? $footerMedia->subtitle : 'Made with ♡ for a kinder, cozier world.',
+            'copyright_text' => $footerMeta['copyright_text'] ?? '© ' . date('Y') . ' Knotelle. All rights reserved.',
+            'heart_tagline' => $footerMeta['heart_tagline'] ?? 'Made with ♡ for a kinder, cozier world.',
+            'social' => [
+                'instagram' => [
+                    'url' => $footerMeta['instagram_url'] ?? (Setting::where('key', 'social_instagram')->value('value') ?: 'https://instagram.com/knotelleindia'),
+                    'is_active' => isset($footerMeta['instagram_active']) ? (bool)$footerMeta['instagram_active'] : true,
+                ],
+                'facebook' => [
+                    'url' => $footerMeta['facebook_url'] ?? (Setting::where('key', 'social_facebook')->value('value') ?: 'https://facebook.com/knotelleindia'),
+                    'is_active' => isset($footerMeta['facebook_active']) ? (bool)$footerMeta['facebook_active'] : true,
+                ],
+                'pinterest' => [
+                    'url' => $footerMeta['pinterest_url'] ?? 'https://pinterest.com/knotelleindia',
+                    'is_active' => isset($footerMeta['pinterest_active']) ? (bool)$footerMeta['pinterest_active'] : true,
+                ],
+                'youtube' => [
+                    'url' => $footerMeta['youtube_url'] ?? 'https://youtube.com/@knotelleindia',
+                    'is_active' => isset($footerMeta['youtube_active']) ? (bool)$footerMeta['youtube_active'] : true,
+                ],
+            ],
+            'column_1' => [
+                'title' => $footerMeta['col1_title'] ?? 'Quick Links',
+                'links' => $footerMeta['col1_links'] ?? [
+                    ['label' => 'Home', 'url' => '/', 'is_active' => true],
+                    ['label' => 'Shop', 'url' => '/shop', 'is_active' => true],
+                    ['label' => 'Custom Order', 'url' => '/custom-order', 'is_active' => true],
+                    ['label' => 'About', 'url' => '/about', 'is_active' => true],
+                    ['label' => 'Contact', 'url' => '/contact', 'is_active' => true],
+                ],
+            ],
+            'column_2' => [
+                'title' => $footerMeta['col2_title'] ?? 'Help',
+                'links' => $footerMeta['col2_links'] ?? [
+                    ['label' => 'Shipping Policy', 'url' => '/contact', 'is_active' => true],
+                    ['label' => 'Return & Refund', 'url' => '/contact', 'is_active' => true],
+                    ['label' => 'FAQ', 'url' => '/contact', 'is_active' => true],
+                    ['label' => 'Track Order', 'url' => '/account/orders', 'is_active' => true],
+                ],
+            ],
+            'column_3' => [
+                'title' => $footerMeta['col3_title'] ?? 'Contact',
+                'phone' => $footerMeta['contact_phone'] ?? (Setting::where('key', 'store_phone')->value('value') ?: '+91 97730 39243'),
+                'phone_link' => $footerMeta['contact_phone_link'] ?? 'tel:+919773039243',
+                'email' => $footerMeta['contact_email'] ?? (Setting::where('key', 'store_email')->value('value') ?: 'support@knotelle.in'),
+                'email_link' => $footerMeta['contact_email_link'] ?? 'mailto:support@knotelle.in',
+                'address' => $footerMeta['contact_address'] ?? 'India',
+                'address_link' => $footerMeta['contact_address_link'] ?? '',
+            ],
+            'is_active' => $footerMedia ? (bool)$footerMedia->is_active : true,
         ];
 
-        // 7. Global Site Assets
+        // 7. Global Site Assets & Navbar
         $logoMedia = Media::where('page', 'global')
             ->where('section', 'global_assets')
             ->where('slot', 'main_logo')
@@ -191,6 +254,36 @@ class MediaController extends Controller
             ->first();
 
         $mainLogo = $logoMedia ? $logoMedia->url : asset('images/logo/Logo_1.png');
+
+        $navbarMedia = Media::where('page', 'global')
+            ->where('section', 'navbar')
+            ->where('slot', 'navbar_settings')
+            ->first();
+
+        $navbarMeta = $navbarMedia && $navbarMedia->metadata ? $navbarMedia->metadata : [];
+
+        $navbar = [
+            'logo' => $mainLogo,
+            'announcement' => [
+                'text' => $navbarMeta['announcement_text'] ?? '✨ Free Pan-India Delivery on all Orders above ₹999',
+                'link' => $navbarMeta['announcement_link'] ?? '/shop',
+                'is_active' => isset($navbarMeta['announcement_active']) ? (bool)$navbarMeta['announcement_active'] : false,
+            ],
+            'nav_links' => $navbarMeta['nav_links'] ?? [
+                ['name' => 'Home', 'href' => '/', 'is_highlighted' => false, 'is_active' => true],
+                ['name' => 'Shop', 'href' => '/shop', 'is_highlighted' => false, 'is_active' => true],
+                ['name' => 'Custom Order', 'href' => '/custom-order', 'is_highlighted' => true, 'is_active' => true],
+                ['name' => 'About', 'href' => '/about', 'is_highlighted' => false, 'is_active' => true],
+                ['name' => 'Contact', 'href' => '/contact', 'is_highlighted' => false, 'is_active' => true],
+            ],
+            'actions' => [
+                'show_search' => isset($navbarMeta['show_search']) ? (bool)$navbarMeta['show_search'] : true,
+                'show_wishlist' => isset($navbarMeta['show_wishlist']) ? (bool)$navbarMeta['show_wishlist'] : true,
+                'show_account' => isset($navbarMeta['show_account']) ? (bool)$navbarMeta['show_account'] : true,
+                'show_cart' => isset($navbarMeta['show_cart']) ? (bool)$navbarMeta['show_cart'] : true,
+            ],
+            'is_active' => $navbarMedia ? (bool)$navbarMedia->is_active : true,
+        ];
 
         // 7. Categories for Homepage Grid
         $categories = Category::where('status', 1)
@@ -250,45 +343,129 @@ class MediaController extends Controller
             ]
         ];
 
-        // 9. About Page Media
-        $aboutHeroMedia = Media::where('page', 'about')->where('section', 'about_story')->where('slot', 'about_hero_image')->where('is_active', true)->first();
-        $aboutStudioMedia = Media::where('page', 'about')->where('section', 'about_story')->where('slot', 'about_studio_image')->where('is_active', true)->first();
+        // 9. About Page Dynamic Media & Content
+        $aboutStoryMedia = Media::where('page', 'about')
+            ->where('section', 'about_story')
+            ->where('is_active', true)
+            ->first();
+
+        $storyMeta = $aboutStoryMedia && $aboutStoryMedia->metadata ? $aboutStoryMedia->metadata : [];
+
+        $aboutStory = [
+            'id' => $aboutStoryMedia ? $aboutStoryMedia->id : null,
+            'badge' => $aboutStoryMedia && $aboutStoryMedia->tag_text ? $aboutStoryMedia->tag_text : ($aboutStoryMedia && $aboutStoryMedia->subtitle ? $aboutStoryMedia->subtitle : 'The KNOTELLE Story'),
+            'title' => $aboutStoryMedia && $aboutStoryMedia->title ? $aboutStoryMedia->title : 'Every Loop Tells a Story',
+            'tagline' => $aboutStoryMedia && $aboutStoryMedia->subtitle ? $aboutStoryMedia->subtitle : '',
+            'description' => $aboutStoryMedia && $aboutStoryMedia->description ? $aboutStoryMedia->description : 'In a world flooded with disposable factory goods, KNOTELLE was born from a yearning for slow-made warmth. What began as a tiny home workshop in Bengaluru has grown into a vibrant collective of women artisans who share a deep love for yarn, color harmony, and delicate floral silhouettes.',
+            'secondary_description' => $storyMeta['paragraph_2'] ?? 'When you order a bouquet of crochet roses, a customized bunny keychain, or a granny square tote, you are not simply purchasing an object. You are welcoming hours of human patience, intention, and joy into your home.',
+            'paragraph_1' => $aboutStoryMedia && $aboutStoryMedia->description ? $aboutStoryMedia->description : 'In a world flooded with disposable factory goods, KNOTELLE was born from a yearning for slow-made warmth. What began as a tiny home workshop in Bengaluru has grown into a vibrant collective of women artisans who share a deep love for yarn, color harmony, and delicate floral silhouettes.',
+            'paragraph_2' => $storyMeta['paragraph_2'] ?? 'When you order a bouquet of crochet roses, a customized bunny keychain, or a granny square tote, you are not simply purchasing an object. You are welcoming hours of human patience, intention, and joy into your home.',
+            'desktop_image' => $aboutStoryMedia ? ($aboutStoryMedia->desktop_image_url ?: $aboutStoryMedia->url) : 'https://images.unsplash.com/photo-1544816155-12df9643f363?q=80&w=1000&auto=format&fit=crop',
+            'image' => $aboutStoryMedia ? ($aboutStoryMedia->desktop_image_url ?: $aboutStoryMedia->url) : 'https://images.unsplash.com/photo-1544816155-12df9643f363?q=80&w=1000&auto=format&fit=crop',
+            'mobile_image' => $aboutStoryMedia ? ($aboutStoryMedia->mobile_image_url ?: $aboutStoryMedia->url) : null,
+            'alt_text' => $aboutStoryMedia && $aboutStoryMedia->alt_text ? $aboutStoryMedia->alt_text : 'Artisan stitching crochet with wooden hook',
+            'floating_badge' => [
+                'title' => $storyMeta['floating_badge_title'] ?? '100% Handcrafted',
+                'subtitle' => $storyMeta['floating_badge_subtitle'] ?? 'Never mass machine produced',
+                'icon' => $storyMeta['floating_badge_icon'] ?? 'Heart',
+                'is_active' => isset($storyMeta['floating_badge_active']) ? (bool)$storyMeta['floating_badge_active'] : true,
+            ],
+            'cta' => [
+                'text' => $aboutStoryMedia && $aboutStoryMedia->cta_text ? $aboutStoryMedia->cta_text : 'Request a Custom Creation',
+                'url' => $aboutStoryMedia && $aboutStoryMedia->cta_link ? $aboutStoryMedia->cta_link : '/custom-order',
+                'link' => $aboutStoryMedia && $aboutStoryMedia->cta_link ? $aboutStoryMedia->cta_link : '/custom-order',
+                'is_active' => isset($storyMeta['cta_visible']) ? (bool)$storyMeta['cta_visible'] : true,
+            ],
+            'cta_text' => $aboutStoryMedia && $aboutStoryMedia->cta_text ? $aboutStoryMedia->cta_text : 'Request a Custom Creation',
+            'cta_link' => $aboutStoryMedia && $aboutStoryMedia->cta_link ? $aboutStoryMedia->cta_link : '/custom-order',
+            'is_active' => $aboutStoryMedia ? (bool)$aboutStoryMedia->is_active : true,
+        ];
+
+        // Craft Pillars
+        $pillarsSettings = Media::where('page', 'about')
+            ->where('section', 'craft_pillars')
+            ->where('slot', 'section_settings')
+            ->first();
+
+        $pillarsItems = Media::where('page', 'about')
+            ->where('section', 'craft_pillars')
+            ->where('slot', '!=', 'section_settings')
+            ->where('is_active', true)
+            ->orderBy('sort_order', 'asc')
+            ->get()
+            ->map(function ($item) {
+                $meta = $item->metadata ?: [];
+                $iconName = $item->tag_text ?: ($meta['icon_name'] ?? 'Leaf');
+                $isSvgOrImg = $item->file_type === 'image' || str_ends_with($item->file_path, '.svg');
+                return [
+                    'id' => $item->id,
+                    'title' => $item->title,
+                    'description' => $item->description,
+                    'icon' => $iconName,
+                    'icon_name' => $iconName,
+                    'icon_type' => $meta['icon_type'] ?? ($isSvgOrImg ? 'svg' : 'preset'),
+                    'icon_url' => $item->file_path && !str_starts_with($item->file_path, 'icon_') ? $item->url : null,
+                    'sort_order' => (int)$item->sort_order,
+                    'is_active' => (bool)$item->is_active,
+                ];
+            });
+
+        // Fallback default pillars if none seeded
+        if ($pillarsItems->isEmpty()) {
+            $pillarsItems = collect([
+                [
+                    'id' => 1,
+                    'title' => 'Natural Materials',
+                    'description' => 'We use 100% pure milk cotton and mercerized organic fibers that are gentle on skin and kind to mother nature.',
+                    'icon' => 'Leaf',
+                    'icon_name' => 'Leaf',
+                    'icon_type' => 'preset',
+                    'icon_url' => null,
+                    'sort_order' => 1,
+                    'is_active' => true,
+                ],
+                [
+                    'id' => 2,
+                    'title' => 'Bespoke Atelier',
+                    'description' => 'No two requests are alike. We collaborate with you on colors, sizing, and details to make every piece unique.',
+                    'icon' => 'Sparkles',
+                    'icon_name' => 'Sparkles',
+                    'icon_type' => 'preset',
+                    'icon_url' => null,
+                    'sort_order' => 2,
+                    'is_active' => true,
+                ],
+                [
+                    'id' => 3,
+                    'title' => 'Empowering Artisans',
+                    'description' => 'We provide fair wages, flexible hours, and creative dignity to our women-led artisan crafting community in India.',
+                    'icon' => 'Heart',
+                    'icon_name' => 'Heart',
+                    'icon_type' => 'preset',
+                    'icon_url' => null,
+                    'sort_order' => 3,
+                    'is_active' => true,
+                ],
+            ]);
+        }
+
+        $craftPillars = [
+            'title' => $pillarsSettings && $pillarsSettings->title ? $pillarsSettings->title : 'Our Craft Pillars',
+            'subtitle' => $pillarsSettings && $pillarsSettings->subtitle ? $pillarsSettings->subtitle : ($pillarsSettings && $pillarsSettings->description ? $pillarsSettings->description : 'Guiding principles behind every stitch we make.'),
+            'badge' => $pillarsSettings && $pillarsSettings->tag_text ? $pillarsSettings->tag_text : 'Artisan Standards',
+            'is_active' => $pillarsSettings ? (bool)$pillarsSettings->is_active : true,
+            'items' => $pillarsItems,
+        ];
 
         $about = [
-            'hero' => [
-                'image' => $aboutHeroMedia ? $aboutHeroMedia->url : 'https://images.unsplash.com/photo-1544816155-12df9643f363?q=80&w=1000&auto=format&fit=crop',
-                'title' => $aboutHeroMedia && $aboutHeroMedia->title ? $aboutHeroMedia->title : 'Every Loop Tells a Story',
-                'subtitle' => $aboutHeroMedia && $aboutHeroMedia->subtitle ? $aboutHeroMedia->subtitle : 'The KNOTELLE Story',
-                'description' => $aboutHeroMedia && $aboutHeroMedia->description ? $aboutHeroMedia->description : 'In a world flooded with disposable factory goods, KNOTELLE was born from a yearning for slow-made warmth. What began as a tiny home workshop in Bengaluru has grown into a vibrant collective of women artisans who share a deep love for yarn, color harmony, and delicate floral silhouettes.',
-                'badge' => $aboutHeroMedia && $aboutHeroMedia->tag_text ? $aboutHeroMedia->tag_text : '100% Handcrafted',
-                'cta_text' => $aboutHeroMedia && $aboutHeroMedia->cta_text ? $aboutHeroMedia->cta_text : 'Request a Custom Creation',
-                'cta_link' => $aboutHeroMedia && $aboutHeroMedia->cta_link ? $aboutHeroMedia->cta_link : '/custom-order',
-                'is_active' => $aboutHeroMedia ? (bool)$aboutHeroMedia->is_active : true,
-            ],
-            'studio' => [
-                'image' => $aboutStudioMedia ? $aboutStudioMedia->url : null,
-                'title' => $aboutStudioMedia && $aboutStudioMedia->title ? $aboutStudioMedia->title : 'Bengaluru Atelier',
-                'subtitle' => $aboutStudioMedia && $aboutStudioMedia->subtitle ? $aboutStudioMedia->subtitle : 'Where stitches come alive',
-            ]
+            'story' => $aboutStory,
+            'hero' => $aboutStory,
+            'craftPillars' => $craftPillars,
+            'pillars' => $craftPillars,
         ];
 
-        // 10. Contact Page Media
-        $contactBannerMedia = Media::where('page', 'contact')->where('section', 'contact_header')->where('slot', 'contact_banner_image')->where('is_active', true)->first();
-        $contactStudioMedia = Media::where('page', 'contact')->where('section', 'contact_header')->where('slot', 'contact_studio_image')->where('is_active', true)->first();
-
-        $contact = [
-            'banner' => [
-                'image' => $contactBannerMedia ? $contactBannerMedia->url : null,
-                'title' => $contactBannerMedia && $contactBannerMedia->title ? $contactBannerMedia->title : "Let's Connect",
-                'subtitle' => $contactBannerMedia && $contactBannerMedia->subtitle ? $contactBannerMedia->subtitle : "Have a question about a product, custom order, or collaboration? We'd love to hear from you.",
-                'tag_text' => $contactBannerMedia && $contactBannerMedia->tag_text ? $contactBannerMedia->tag_text : "We're Here For You",
-            ],
-            'studio' => [
-                'image' => $contactStudioMedia ? $contactStudioMedia->url : null,
-                'title' => $contactStudioMedia && $contactStudioMedia->title ? $contactStudioMedia->title : 'Atelier Studio',
-                'subtitle' => $contactStudioMedia && $contactStudioMedia->subtitle ? $contactStudioMedia->subtitle : '12th Main, 4th Cross, Indiranagar, Bengaluru',
-            ]
-        ];
+        // 10. Contact Page Media & Dynamic Content
+        $contact = $this->formatContactData();
 
         // 11. Blog & Reels / Behind The Stitches
         $blogReelsSettings = Media::where('page', 'homepage')
@@ -361,6 +538,7 @@ class MediaController extends Controller
                 'customOrder' => $customOrder,
                 'newsletter' => $newsletter,
                 'footer' => $footer,
+                'navbar' => $navbar,
                 'shop' => $shop,
                 'about' => $about,
                 'contact' => $contact,
@@ -397,5 +575,409 @@ class MediaController extends Controller
         }
 
         return response()->json(['success' => false, 'message' => 'Video not found.'], 404);
+    }
+
+    /**
+     * Get Dedicated About Page Data
+     */
+    public function getAboutPage(Request $request): JsonResponse
+    {
+        $aboutStoryMedia = Media::where('page', 'about')
+            ->where('section', 'about_story')
+            ->where('is_active', true)
+            ->first();
+
+        $storyMeta = $aboutStoryMedia && $aboutStoryMedia->metadata ? $aboutStoryMedia->metadata : [];
+
+        $aboutStory = [
+            'id' => $aboutStoryMedia ? $aboutStoryMedia->id : null,
+            'badge' => $aboutStoryMedia && $aboutStoryMedia->tag_text ? $aboutStoryMedia->tag_text : ($aboutStoryMedia && $aboutStoryMedia->subtitle ? $aboutStoryMedia->subtitle : 'The KNOTELLE Story'),
+            'title' => $aboutStoryMedia && $aboutStoryMedia->title ? $aboutStoryMedia->title : 'Every Loop Tells a Story',
+            'tagline' => $aboutStoryMedia && $aboutStoryMedia->subtitle ? $aboutStoryMedia->subtitle : '',
+            'description' => $aboutStoryMedia && $aboutStoryMedia->description ? $aboutStoryMedia->description : 'In a world flooded with disposable factory goods, KNOTELLE was born from a yearning for slow-made warmth. What began as a tiny home workshop in Bengaluru has grown into a vibrant collective of women artisans who share a deep love for yarn, color harmony, and delicate floral silhouettes.',
+            'secondary_description' => $storyMeta['paragraph_2'] ?? 'When you order a bouquet of crochet roses, a customized bunny keychain, or a granny square tote, you are not simply purchasing an object. You are welcoming hours of human patience, intention, and joy into your home.',
+            'paragraph_1' => $aboutStoryMedia && $aboutStoryMedia->description ? $aboutStoryMedia->description : 'In a world flooded with disposable factory goods, KNOTELLE was born from a yearning for slow-made warmth. What began as a tiny home workshop in Bengaluru has grown into a vibrant collective of women artisans who share a deep love for yarn, color harmony, and delicate floral silhouettes.',
+            'paragraph_2' => $storyMeta['paragraph_2'] ?? 'When you order a bouquet of crochet roses, a customized bunny keychain, or a granny square tote, you are not simply purchasing an object. You are welcoming hours of human patience, intention, and joy into your home.',
+            'desktop_image' => $aboutStoryMedia ? ($aboutStoryMedia->desktop_image_url ?: $aboutStoryMedia->url) : 'https://images.unsplash.com/photo-1544816155-12df9643f363?q=80&w=1000&auto=format&fit=crop',
+            'image' => $aboutStoryMedia ? ($aboutStoryMedia->desktop_image_url ?: $aboutStoryMedia->url) : 'https://images.unsplash.com/photo-1544816155-12df9643f363?q=80&w=1000&auto=format&fit=crop',
+            'mobile_image' => $aboutStoryMedia ? ($aboutStoryMedia->mobile_image_url ?: $aboutStoryMedia->url) : null,
+            'alt_text' => $aboutStoryMedia && $aboutStoryMedia->alt_text ? $aboutStoryMedia->alt_text : 'Artisan stitching crochet with wooden hook',
+            'floating_badge' => [
+                'title' => $storyMeta['floating_badge_title'] ?? '100% Handcrafted',
+                'subtitle' => $storyMeta['floating_badge_subtitle'] ?? 'Never mass machine produced',
+                'icon' => $storyMeta['floating_badge_icon'] ?? 'Heart',
+                'is_active' => isset($storyMeta['floating_badge_active']) ? (bool)$storyMeta['floating_badge_active'] : true,
+            ],
+            'cta' => [
+                'text' => $aboutStoryMedia && $aboutStoryMedia->cta_text ? $aboutStoryMedia->cta_text : 'Request a Custom Creation',
+                'url' => $aboutStoryMedia && $aboutStoryMedia->cta_link ? $aboutStoryMedia->cta_link : '/custom-order',
+                'link' => $aboutStoryMedia && $aboutStoryMedia->cta_link ? $aboutStoryMedia->cta_link : '/custom-order',
+                'is_active' => isset($storyMeta['cta_visible']) ? (bool)$storyMeta['cta_visible'] : true,
+            ],
+            'cta_text' => $aboutStoryMedia && $aboutStoryMedia->cta_text ? $aboutStoryMedia->cta_text : 'Request a Custom Creation',
+            'cta_link' => $aboutStoryMedia && $aboutStoryMedia->cta_link ? $aboutStoryMedia->cta_link : '/custom-order',
+            'is_active' => $aboutStoryMedia ? (bool)$aboutStoryMedia->is_active : true,
+        ];
+
+        // Craft Pillars
+        $pillarsSettings = Media::where('page', 'about')
+            ->where('section', 'craft_pillars')
+            ->where('slot', 'section_settings')
+            ->first();
+
+        $pillarsItems = Media::where('page', 'about')
+            ->where('section', 'craft_pillars')
+            ->where('slot', '!=', 'section_settings')
+            ->where('is_active', true)
+            ->orderBy('sort_order', 'asc')
+            ->get()
+            ->map(function ($item) {
+                $meta = $item->metadata ?: [];
+                $iconName = $item->tag_text ?: ($meta['icon_name'] ?? 'Leaf');
+                $isSvgOrImg = $item->file_type === 'image' || str_ends_with($item->file_path, '.svg');
+                return [
+                    'id' => $item->id,
+                    'title' => $item->title,
+                    'description' => $item->description,
+                    'icon' => $iconName,
+                    'icon_name' => $iconName,
+                    'icon_type' => $meta['icon_type'] ?? ($isSvgOrImg ? 'svg' : 'preset'),
+                    'icon_url' => $item->file_path && !str_starts_with($item->file_path, 'icon_') ? $item->url : null,
+                    'sort_order' => (int)$item->sort_order,
+                    'is_active' => (bool)$item->is_active,
+                ];
+            });
+
+        // Fallback default pillars if none seeded
+        if ($pillarsItems->isEmpty()) {
+            $pillarsItems = collect([
+                [
+                    'id' => 1,
+                    'title' => 'Natural Materials',
+                    'description' => 'We use 100% pure milk cotton and mercerized organic fibers that are gentle on skin and kind to mother nature.',
+                    'icon' => 'Leaf',
+                    'icon_name' => 'Leaf',
+                    'icon_type' => 'preset',
+                    'icon_url' => null,
+                    'sort_order' => 1,
+                    'is_active' => true,
+                ],
+                [
+                    'id' => 2,
+                    'title' => 'Bespoke Atelier',
+                    'description' => 'No two requests are alike. We collaborate with you on colors, sizing, and details to make every piece unique.',
+                    'icon' => 'Sparkles',
+                    'icon_name' => 'Sparkles',
+                    'icon_type' => 'preset',
+                    'icon_url' => null,
+                    'sort_order' => 2,
+                    'is_active' => true,
+                ],
+                [
+                    'id' => 3,
+                    'title' => 'Empowering Artisans',
+                    'description' => 'We provide fair wages, flexible hours, and creative dignity to our women-led artisan crafting community in India.',
+                    'icon' => 'Heart',
+                    'icon_name' => 'Heart',
+                    'icon_type' => 'preset',
+                    'icon_url' => null,
+                    'sort_order' => 3,
+                    'is_active' => true,
+                ],
+            ]);
+        }
+
+        $craftPillars = [
+            'title' => $pillarsSettings && $pillarsSettings->title ? $pillarsSettings->title : 'Our Craft Pillars',
+            'subtitle' => $pillarsSettings && $pillarsSettings->subtitle ? $pillarsSettings->subtitle : ($pillarsSettings && $pillarsSettings->description ? $pillarsSettings->description : 'Guiding principles behind every stitch we make.'),
+            'badge' => $pillarsSettings && $pillarsSettings->tag_text ? $pillarsSettings->tag_text : 'Artisan Standards',
+            'is_active' => $pillarsSettings ? (bool)$pillarsSettings->is_active : true,
+            'items' => $pillarsItems,
+        ];
+
+        return response()->json([
+            'success' => true,
+            'data' => [
+                'story' => $aboutStory,
+                'hero' => $aboutStory,
+                'craftPillars' => $craftPillars,
+                'pillars' => $craftPillars,
+            ]
+        ]);
+    }
+
+    /**
+     * Get Dedicated Contact Page Data
+     */
+    public function getContactPage(Request $request): JsonResponse
+    {
+        $contact = $this->formatContactData();
+
+        return response()->json([
+            'success' => true,
+            'data' => $contact
+        ]);
+    }
+
+    /**
+     * Build unified structured Contact page data payload.
+     */
+    protected function formatContactData(): array
+    {
+        // 1. Intro
+        $introMedia = Media::where('page', 'contact')
+            ->where('section', 'contact_intro')
+            ->where('slot', 'intro_banner')
+            ->first();
+
+        $intro = [
+            'id' => $introMedia ? $introMedia->id : null,
+            'badge' => $introMedia && $introMedia->tag_text ? $introMedia->tag_text : "Let's Connect",
+            'title' => $introMedia && $introMedia->title ? $introMedia->title : "Let's Connect",
+            'tagline' => $introMedia && $introMedia->subtitle ? $introMedia->subtitle : '',
+            'subtitle' => $introMedia && $introMedia->subtitle ? $introMedia->subtitle : "Have a question about a product, custom order, or collaboration? We'd love to hear from you.",
+            'description' => $introMedia && $introMedia->description ? $introMedia->description : "We're here to help bring your handcrafted crochet dreams to life. Reach out directly or fill out our message form below.",
+            'image' => $introMedia ? ($introMedia->desktop_image_url ?: $introMedia->url) : 'https://images.unsplash.com/photo-1544816155-12df9643f363?q=80&w=1200&auto=format&fit=crop',
+            'desktop_image' => $introMedia ? ($introMedia->desktop_image_url ?: $introMedia->url) : 'https://images.unsplash.com/photo-1544816155-12df9643f363?q=80&w=1200&auto=format&fit=crop',
+            'alt_text' => $introMedia && $introMedia->alt_text ? $introMedia->alt_text : 'KNOTELLE Artisan Studio Contact',
+            'cta_text' => $introMedia && $introMedia->cta_text ? $introMedia->cta_text : 'Send Us a Message',
+            'cta_link' => $introMedia && $introMedia->cta_link ? $introMedia->cta_link : '#contact-form',
+            'is_active' => $introMedia ? (bool)$introMedia->is_active : true,
+        ];
+
+        // 2. Contact Info Header & Items
+        $infoSettings = Media::where('page', 'contact')
+            ->where('section', 'contact_info')
+            ->where('slot', 'section_settings')
+            ->first();
+
+        $infoMeta = $infoSettings && $infoSettings->metadata ? $infoSettings->metadata : [];
+
+        $infoItems = Media::where('page', 'contact')
+            ->where('section', 'contact_info')
+            ->where('slot', '!=', 'section_settings')
+            ->where('is_active', true)
+            ->orderBy('sort_order', 'asc')
+            ->get()
+            ->map(function ($item) {
+                $meta = $item->metadata ?: [];
+                $iconName = $item->tag_text ?: ($meta['icon_name'] ?? 'MapPin');
+                return [
+                    'id' => $item->id,
+                    'icon' => $iconName,
+                    'icon_name' => $iconName,
+                    'title' => $item->title,
+                    'value' => $item->description,
+                    'description' => $item->description,
+                    'address_line_2' => $meta['address_line_2'] ?? '',
+                    'link' => $item->cta_link ?: '',
+                    'cta_link' => $item->cta_link ?: '',
+                    'sort_order' => (int)$item->sort_order,
+                    'is_active' => (bool)$item->is_active,
+                ];
+            })
+            ->values()
+            ->all();
+
+        // Fallback default info items if none found
+        if (empty($infoItems)) {
+            $infoItems = [
+                [
+                    'id' => 1,
+                    'icon' => 'MapPin',
+                    'icon_name' => 'MapPin',
+                    'title' => 'Visit Our Studio',
+                    'value' => 'KNOTELLE Studio, 12th Main Road, Indiranagar',
+                    'description' => 'KNOTELLE Studio, 12th Main Road, Indiranagar',
+                    'address_line_2' => 'Bengaluru, Karnataka 560038, India',
+                    'link' => 'https://maps.google.com/?q=Indiranagar+Bengaluru',
+                    'cta_link' => 'https://maps.google.com/?q=Indiranagar+Bengaluru',
+                    'sort_order' => 1,
+                    'is_active' => true,
+                ],
+                [
+                    'id' => 2,
+                    'icon' => 'Phone',
+                    'icon_name' => 'Phone',
+                    'title' => 'Call / WhatsApp Us',
+                    'value' => '+91 98765 43210',
+                    'description' => '+91 98765 43210',
+                    'address_line_2' => 'Mon – Sat, 10:00 AM – 7:00 PM IST',
+                    'link' => 'tel:+919876543210',
+                    'cta_link' => 'tel:+919876543210',
+                    'sort_order' => 2,
+                    'is_active' => true,
+                ],
+                [
+                    'id' => 3,
+                    'icon' => 'Mail',
+                    'icon_name' => 'Mail',
+                    'title' => 'Write to Us',
+                    'value' => 'hello@knotelle.com',
+                    'description' => 'hello@knotelle.com',
+                    'address_line_2' => 'We usually reply within 24 hours',
+                    'link' => 'mailto:hello@knotelle.com',
+                    'cta_link' => 'mailto:hello@knotelle.com',
+                    'sort_order' => 3,
+                    'is_active' => true,
+                ],
+                [
+                    'id' => 4,
+                    'icon' => 'Clock',
+                    'icon_name' => 'Clock',
+                    'title' => 'Studio Hours',
+                    'value' => 'Monday – Saturday: 10:00 AM – 7:00 PM',
+                    'description' => 'Monday – Saturday: 10:00 AM – 7:00 PM',
+                    'address_line_2' => 'Sunday: Closed (Crafting in silence)',
+                    'link' => '',
+                    'cta_link' => '',
+                    'sort_order' => 4,
+                    'is_active' => true,
+                ],
+            ];
+        }
+
+        $contactDetails = [
+            'badge' => $infoSettings && $infoSettings->tag_text ? $infoSettings->tag_text : 'Atelier Studio',
+            'title' => $infoSettings && $infoSettings->title ? $infoSettings->title : 'KNOTELLE Studio',
+            'subtitle' => $infoSettings && $infoSettings->subtitle ? $infoSettings->subtitle : 'Handmade with love in Bengaluru, India',
+            'is_active' => $infoSettings ? (bool)$infoSettings->is_active : true,
+            'items' => $infoItems,
+            'custom_order_box' => [
+                'title' => $infoMeta['custom_order_box_title'] ?? 'Looking for Custom Orders?',
+                'text' => $infoMeta['custom_order_box_text'] ?? 'Have a specific design, color palette, or bouquet arrangement in mind? Request a bespoke piece directly.',
+                'link' => $infoMeta['custom_order_box_link'] ?? '/custom-order',
+                'is_active' => isset($infoMeta['custom_order_box_active']) ? (bool)$infoMeta['custom_order_box_active'] : true,
+            ],
+        ];
+
+        // 3. Form Settings
+        $formSettings = Media::where('page', 'contact')
+            ->where('section', 'contact_form')
+            ->where('slot', 'form_settings')
+            ->first();
+
+        $formMeta = $formSettings && $formSettings->metadata ? $formSettings->metadata : [];
+        $defaultFields = [
+            ['key' => 'name', 'label' => 'Your Name', 'placeholder' => 'Enter your full name', 'required' => true, 'is_active' => true],
+            ['key' => 'email', 'label' => 'Email Address', 'placeholder' => 'Enter your email address', 'required' => true, 'is_active' => true],
+            ['key' => 'phone', 'label' => 'Phone Number', 'placeholder' => 'Enter your 10-digit phone number (optional)', 'required' => false, 'is_active' => true],
+            ['key' => 'subject', 'label' => 'Subject', 'placeholder' => 'What is this regarding?', 'required' => false, 'is_active' => true],
+            ['key' => 'message', 'label' => 'Your Message', 'placeholder' => 'Tell us how we can help you...', 'required' => true, 'is_active' => true],
+        ];
+
+        $form = [
+            'badge' => $formSettings && $formSettings->tag_text ? $formSettings->tag_text : 'Get In Touch',
+            'title' => $formSettings && $formSettings->title ? $formSettings->title : 'Send Us a Message',
+            'subtitle' => $formSettings && $formSettings->subtitle ? $formSettings->subtitle : 'Fill in your details and our team will get back to you promptly.',
+            'submit_btn_text' => $formSettings && $formSettings->cta_text ? $formSettings->cta_text : 'Send Message',
+            'cta_text' => $formSettings && $formSettings->cta_text ? $formSettings->cta_text : 'Send Message',
+            'success_title' => $formMeta['success_title'] ?? 'Message Sent!',
+            'success_message' => $formMeta['success_message'] ?? 'Thank you! Your message has been sent successfully. We will get back to you shortly.',
+            'error_message' => $formMeta['error_message'] ?? 'Something went wrong while sending your message. Please check the form and try again.',
+            'is_active' => $formSettings ? (bool)$formSettings->is_active : true,
+            'fields' => !empty($formMeta['fields']) ? $formMeta['fields'] : $defaultFields,
+        ];
+
+        // 4. FAQs Header & Items
+        $faqsSettings = Media::where('page', 'contact')
+            ->where('section', 'contact_faqs')
+            ->where('slot', 'section_settings')
+            ->first();
+
+        $faqItems = Media::where('page', 'contact')
+            ->where('section', 'contact_faqs')
+            ->where('slot', '!=', 'section_settings')
+            ->where('is_active', true)
+            ->orderBy('sort_order', 'asc')
+            ->get()
+            ->map(function ($item) {
+                return [
+                    'id' => $item->id,
+                    'question' => $item->title,
+                    'title' => $item->title,
+                    'answer' => $item->description,
+                    'description' => $item->description,
+                    'sort_order' => (int)$item->sort_order,
+                    'is_active' => (bool)$item->is_active,
+                ];
+            })
+            ->values()
+            ->all();
+
+        // Fallback default FAQs if none seeded
+        if (empty($faqItems)) {
+            $faqItems = [
+                [
+                    'id' => 1,
+                    'question' => 'How long does a custom order take?',
+                    'title' => 'How long does a custom order take?',
+                    'answer' => 'Custom orders usually take 7–14 working days depending on complexity and yarn availability. Once dispatched, courier delivery takes 3–5 business days.',
+                    'description' => 'Custom orders usually take 7–14 working days depending on complexity and yarn availability. Once dispatched, courier delivery takes 3–5 business days.',
+                    'sort_order' => 1,
+                    'is_active' => true,
+                ],
+                [
+                    'id' => 2,
+                    'question' => 'Do you ship across India?',
+                    'title' => 'Do you ship across India?',
+                    'answer' => 'Yes! We offer Pan-India shipping with trusted courier partners. Express delivery options and tracked shipping are provided for all orders.',
+                    'description' => 'Yes! We offer Pan-India shipping with trusted courier partners. Express delivery options and tracked shipping are provided for all orders.',
+                    'sort_order' => 2,
+                    'is_active' => true,
+                ],
+                [
+                    'id' => 3,
+                    'question' => 'How do I care for my crochet items?',
+                    'title' => 'How do I care for my crochet items?',
+                    'answer' => 'Hand-wash gently in cold water using mild liquid detergent. Lay flat on a clean dry towel in shade to dry. Do not machine wash, bleach, or wring.',
+                    'description' => 'Hand-wash gently in cold water using mild liquid detergent. Lay flat on a clean dry towel in shade to dry. Do not machine wash, bleach, or wring.',
+                    'sort_order' => 3,
+                    'is_active' => true,
+                ],
+                [
+                    'id' => 4,
+                    'question' => 'Can I customize the colors of a flower bouquet?',
+                    'title' => 'Can I customize the colors of a flower bouquet?',
+                    'answer' => 'Absolutely! Every everlasting bouquet can be customized with your choice of flower types, stem count, color shades, and personalized gift wrapping notes.',
+                    'description' => 'Absolutely! Every everlasting bouquet can be customized with your choice of flower types, stem count, color shades, and personalized gift wrapping notes.',
+                    'sort_order' => 4,
+                    'is_active' => true,
+                ],
+            ];
+        }
+
+        $faqs = [
+            'badge' => $faqsSettings && $faqsSettings->tag_text ? $faqsSettings->tag_text : 'Help & Support',
+            'title' => $faqsSettings && $faqsSettings->title ? $faqsSettings->title : 'Frequently Asked Questions',
+            'subtitle' => $faqsSettings && $faqsSettings->subtitle ? $faqsSettings->subtitle : 'Quick answers about our handmade creations, custom orders, and delivery.',
+            'is_active' => $faqsSettings ? (bool)$faqsSettings->is_active : true,
+            'items' => $faqItems,
+        ];
+
+        $firstItem = !empty($infoItems[0]) ? $infoItems[0] : [];
+        $phoneItem = collect($infoItems)->firstWhere('icon', 'Phone') ?? ($infoItems[1] ?? []);
+        $emailItem = collect($infoItems)->firstWhere('icon', 'Mail') ?? ($infoItems[2] ?? []);
+        $hoursItem = collect($infoItems)->firstWhere('icon', 'Clock') ?? ($infoItems[3] ?? []);
+
+        return [
+            'intro' => $intro,
+            'info' => $contactDetails,
+            'details' => $contactDetails,
+            'contactDetails' => $contactDetails,
+            'contactInfo' => $contactDetails,
+            'form' => $form,
+            'formSettings' => $form,
+            'faqs' => $faqs,
+            'settings' => [
+                'studio_name' => $contactDetails['title'],
+                'studio_badge' => $contactDetails['badge'],
+                'address_line_1' => $firstItem['value'] ?? '',
+                'address_line_2' => $firstItem['address_line_2'] ?? '',
+                'phone' => $phoneItem['value'] ?? '',
+                'email' => $emailItem['value'] ?? '',
+                'hours' => $hoursItem['value'] ?? '',
+            ]
+        ];
     }
 }

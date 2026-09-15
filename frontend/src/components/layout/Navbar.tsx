@@ -3,30 +3,64 @@
 import React, { useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Search, Heart, User, ShoppingBag, Menu, Sparkles } from "lucide-react";
+import { Search, Heart, User, ShoppingBag, Menu, Sparkles, ArrowRight } from "lucide-react";
 import { KnotelleCrownLogo } from "@/components/ui/BotanicalDecorations";
 import { useCart } from "@/context/CartContext";
 import { useWishlist } from "@/context/WishlistContext";
+import { useWebsiteMedia } from "@/context/MediaContext";
 import { SearchModal } from "./SearchModal";
 import { MobileDrawer } from "./MobileDrawer";
 
 export function Navbar() {
   const pathname = usePathname();
+  const { media } = useWebsiteMedia();
   const { totalItemsCount, setIsCartOpen } = useCart();
   const { wishlistCount } = useWishlist();
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
-  const navLinks = [
-    { name: "Home", href: "/" },
-    { name: "Shop", href: "/shop" },
-    { name: "Custom Order", href: "/custom-order" },
-    { name: "About", href: "/about" },
-    { name: "Contact", href: "/contact" },
+  const navbar = media?.navbar;
+  const announcement = navbar?.announcement;
+  const actions = navbar?.actions;
+
+  const defaultNavLinks = [
+    { name: "Home", href: "/", is_highlighted: false, is_active: true },
+    { name: "Shop", href: "/shop", is_highlighted: false, is_active: true },
+    { name: "Custom Order", href: "/custom-order", is_highlighted: true, is_active: true },
+    { name: "About", href: "/about", is_highlighted: false, is_active: true },
+    { name: "Contact", href: "/contact", is_highlighted: false, is_active: true },
   ];
+
+  const rawNavLinks = (navbar?.nav_links && navbar.nav_links.length > 0)
+    ? navbar.nav_links
+    : defaultNavLinks;
+
+  const navLinks = rawNavLinks.filter((link) => link.is_active !== false);
+
+  const showSearch = actions?.show_search !== false;
+  const showWishlist = actions?.show_wishlist !== false;
+  const showAccount = actions?.show_account !== false;
+  const showCart = actions?.show_cart !== false;
 
   return (
     <>
+      {/* Dynamic Announcement Banner */}
+      {announcement?.is_active && announcement?.text && (
+        <div className="bg-[#913638] text-white text-xs font-medium py-2 px-4 text-center tracking-wide transition-all z-50 relative">
+          {announcement.link ? (
+            <Link
+              href={announcement.link}
+              className="inline-flex items-center justify-center gap-1.5 hover:underline decoration-white/60 underline-offset-4"
+            >
+              <span>{announcement.text}</span>
+              <ArrowRight className="w-3.5 h-3.5" />
+            </Link>
+          ) : (
+            <span>{announcement.text}</span>
+          )}
+        </div>
+      )}
+
       <header className="sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b border-[#E7D1CC] transition-all">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-20">
@@ -35,7 +69,7 @@ export function Navbar() {
             <div className="flex items-center lg:hidden">
               <button
                 onClick={() => setIsMobileMenuOpen(true)}
-                className="p-2 rounded-full text-[#2E211E] hover:bg-[#FCE9E5] transition-colors"
+                className="p-2 rounded-full text-[#2E211E] hover:bg-[#FCE9E5] transition-colors cursor-pointer"
                 aria-label="Open mobile menu"
               >
                 <Menu className="w-6 h-6" />
@@ -49,16 +83,16 @@ export function Navbar() {
               </Link>
             </div>
 
-            {/* Center: Navigation Links */}
+            {/* Center: Dynamic Navigation Links */}
             <nav className="hidden lg:flex items-center gap-7 xl:gap-9">
-              {navLinks.map((link) => {
+              {navLinks.map((link, idx) => {
                 const isActive = pathname === link.href;
-                const isCustomOrder = link.href === "/custom-order";
+                const isHighlighted = Boolean(link.is_highlighted);
 
-                if (isCustomOrder) {
+                if (isHighlighted) {
                   return (
                     <Link
-                      key={link.href}
+                      key={link.href + idx}
                       href={link.href}
                       className={`inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-semibold tracking-wide transition-all shadow-xs active:scale-95 ${
                         isActive
@@ -74,7 +108,7 @@ export function Navbar() {
 
                 return (
                   <Link
-                    key={link.href}
+                    key={link.href + idx}
                     href={link.href}
                     className={`relative text-sm font-medium tracking-wide py-2 transition-colors flex flex-col items-center ${
                       isActive
@@ -93,45 +127,55 @@ export function Navbar() {
 
             {/* Right: Actions */}
             <div className="flex items-center gap-1 sm:gap-2">
-              <button
-                onClick={() => setIsSearchOpen(true)}
-                className="p-2.5 rounded-full text-[#2E211E] hover:text-[#913638] hover:bg-[#FCE9E5] transition-colors"
-                aria-label="Search store"
-              >
-                <Search className="w-5 h-5" />
-              </button>
+              {showSearch && (
+                <button
+                  onClick={() => setIsSearchOpen(true)}
+                  className="p-2.5 rounded-full text-[#2E211E] hover:text-[#913638] hover:bg-[#FCE9E5] transition-colors cursor-pointer"
+                  aria-label="Search store"
+                >
+                  <Search className="w-5 h-5" />
+                </button>
+              )}
 
-              <Link
-                href="/account/wishlist"
-                className="relative p-2.5 rounded-full text-[#2E211E] hover:text-[#913638] hover:bg-[#FCE9E5] transition-colors hidden sm:flex items-center justify-center"
-                aria-label="View wishlist"
-              >
-                <Heart className="w-5 h-5" />
-                {wishlistCount > 0 && (
-                  <span className="absolute top-1 right-1 w-4 h-4 rounded-full bg-[#913638] text-white text-[9px] font-bold flex items-center justify-center">
-                    {wishlistCount}
-                  </span>
-                )}
-              </Link>
+              {showWishlist && (
+                <Link
+                  href="/account/wishlist"
+                  className="relative p-2.5 rounded-full text-[#2E211E] hover:text-[#913638] hover:bg-[#FCE9E5] transition-colors hidden sm:flex items-center justify-center"
+                  aria-label="View wishlist"
+                >
+                  <Heart className="w-5 h-5" />
+                  {wishlistCount > 0 && (
+                    <span className="absolute top-1 right-1 w-4 h-4 rounded-full bg-[#913638] text-white text-[9px] font-bold flex items-center justify-center">
+                      {wishlistCount}
+                    </span>
+                  )}
+                </Link>
+              )}
 
-              <Link
-                href="/account"
-                className="p-2.5 rounded-full text-[#2E211E] hover:text-[#913638] hover:bg-[#FCE9E5] transition-colors hidden sm:flex items-center justify-center"
-                aria-label="My Account"
-              >
-                <User className="w-5 h-5" />
-              </Link>
+              {showAccount && (
+                <Link
+                  href="/account"
+                  className="p-2.5 rounded-full text-[#2E211E] hover:text-[#913638] hover:bg-[#FCE9E5] transition-colors hidden sm:flex items-center justify-center"
+                  aria-label="My Account"
+                >
+                  <User className="w-5 h-5" />
+                </Link>
+              )}
 
-              <button
-                onClick={() => setIsCartOpen(true)}
-                className="relative p-2.5 rounded-full text-[#2E211E] hover:text-[#913638] hover:bg-[#FCE9E5] transition-colors flex items-center justify-center"
-                aria-label="Shopping Cart"
-              >
-                <ShoppingBag className="w-5 h-5" />
-                <span className="absolute top-1 right-1 w-4 h-4 rounded-full bg-[#913638] text-white text-[9px] font-bold flex items-center justify-center">
-                  {totalItemsCount}
-                </span>
-              </button>
+              {showCart && (
+                <button
+                  onClick={() => setIsCartOpen(true)}
+                  className="relative p-2.5 rounded-full text-[#2E211E] hover:text-[#913638] hover:bg-[#FCE9E5] transition-colors flex items-center justify-center cursor-pointer"
+                  aria-label="Shopping Cart"
+                >
+                  <ShoppingBag className="w-5 h-5" />
+                  {totalItemsCount > 0 && (
+                    <span className="absolute top-1 right-1 w-4 h-4 rounded-full bg-[#913638] text-white text-[9px] font-bold flex items-center justify-center">
+                      {totalItemsCount}
+                    </span>
+                  )}
+                </button>
+              )}
             </div>
 
           </div>
@@ -154,3 +198,4 @@ export function Navbar() {
     </>
   );
 }
+

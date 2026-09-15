@@ -10,6 +10,9 @@ export const getApiBaseUrl = () => {
     return process.env.NEXT_PUBLIC_API_URL;
   }
   if (typeof window !== "undefined") {
+    if (window.location.port === "3000") {
+      return "http://127.0.0.1:8000/api";
+    }
     return "/api";
   }
   return "http://127.0.0.1:8000/api";
@@ -18,8 +21,20 @@ export const getApiBaseUrl = () => {
 export interface ContactFormData {
   name: string;
   email: string;
-  phone: string;
+  phone?: string;
+  subject?: string;
   message: string;
+}
+
+export interface ContactSettingsData {
+  studio_name?: string;
+  studio_badge?: string;
+  address_line_1: string;
+  address_line_2?: string;
+  phone: string;
+  hours: string;
+  email: string;
+  response_time: string;
 }
 
 export interface ApiCategory {
@@ -73,6 +88,8 @@ export interface HomepageMedia {
     cta_text?: string;
     cta_link?: string;
     tag_text?: string;
+    tag_active?: boolean;
+    alt_text?: string;
     is_active?: boolean;
   };
   brandStory: {
@@ -105,10 +122,60 @@ export interface HomepageMedia {
   };
   footer: {
     bg: string;
-    left: string | null;
-    right: string | null;
+    image?: string;
+    left?: string | null;
+    right?: string | null;
     title?: string;
     subtitle?: string;
+    tagline?: string;
+    copyright_text?: string;
+    heart_tagline?: string;
+    social?: {
+      instagram?: { url: string; is_active: boolean };
+      facebook?: { url: string; is_active: boolean };
+      pinterest?: { url: string; is_active: boolean };
+      youtube?: { url: string; is_active: boolean };
+    };
+    column_1?: {
+      title: string;
+      links: Array<{ label?: string; name?: string; url?: string; href?: string; is_active?: boolean }>;
+    };
+    column_2?: {
+      title: string;
+      links: Array<{ label?: string; name?: string; url?: string; href?: string; is_active?: boolean }>;
+    };
+    column_3?: {
+      title: string;
+      phone?: string;
+      phone_link?: string;
+      email?: string;
+      email_link?: string;
+      address?: string;
+      address_link?: string;
+    };
+    is_active?: boolean;
+  };
+  navbar?: {
+    logo?: string;
+    announcement?: {
+      text: string;
+      link?: string;
+      is_active: boolean;
+    };
+    nav_links?: Array<{
+      name: string;
+      href: string;
+      is_highlighted?: boolean;
+      is_active?: boolean;
+      sort_order?: number;
+    }>;
+    actions?: {
+      show_search?: boolean;
+      show_wishlist?: boolean;
+      show_account?: boolean;
+      show_cart?: boolean;
+    };
+    is_active?: boolean;
   };
   global: {
     logo: string;
@@ -505,6 +572,30 @@ export async function fetchHomeData(): Promise<any> {
 }
 
 /**
+ * Fetch Contact Page Settings from Laravel Backend API
+ */
+export async function fetchContactSettings(): Promise<ContactSettingsData | null> {
+  try {
+    const response = await fetch(`${getApiBaseUrl()}/customer/contact/settings?t=${Date.now()}`, {
+      headers: {
+        Accept: "application/json",
+      },
+      cache: "no-store",
+    });
+
+    if (!response.ok) return null;
+    const result = await response.json();
+    if (result.status === "success" && result.data) {
+      return result.data as ContactSettingsData;
+    }
+    return null;
+  } catch (error) {
+    console.warn("Error fetching contact settings:", error);
+    return null;
+  }
+}
+
+/**
  * Submit Contact Form to Laravel Backend API
  */
 export async function submitContactForm(
@@ -520,19 +611,20 @@ export async function submitContactForm(
       body: JSON.stringify({
         name: data.name,
         email: data.email,
-        phone: data.phone.replace(/\D/g, "").slice(-10),
+        phone: data.phone ? data.phone.replace(/\D/g, "").slice(-10) : undefined,
+        subject: data.subject || undefined,
         message: data.message,
       }),
     });
 
     const result = await response.json();
-    if (response.ok && result.status === "success") {
+    if (response.ok && (result.status === "success" || result.success === true)) {
       return { success: true, message: result.message || "Message sent successfully." };
     }
     return { success: false, message: result.message || "Failed to submit message." };
   } catch (error) {
-    console.warn("Contact API network issue, fallback active:", error);
-    return { success: true, message: "Thank you! Your message has been received." };
+    console.warn("Contact API network issue:", error);
+    return { success: false, message: "Network error. Please try again." };
   }
 }
 
@@ -593,6 +685,91 @@ export async function fetchHomepageMedia(): Promise<HomepageMedia | null> {
   }
 }
 
+export interface AboutStoryData {
+  id?: number | null;
+  badge?: string;
+  tag_text?: string;
+  title?: string;
+  tagline?: string;
+  subtitle?: string;
+  description?: string;
+  paragraph_1?: string;
+  paragraph_2?: string;
+  secondary_description?: string;
+  desktop_image?: string;
+  image?: string;
+  mobile_image?: string | null;
+  alt_text?: string;
+  floating_badge?: {
+    title: string;
+    subtitle: string;
+    icon: string;
+    is_active: boolean;
+  };
+  cta?: {
+    text: string;
+    url: string;
+    link?: string;
+    is_active: boolean;
+  };
+  cta_text?: string;
+  cta_link?: string;
+  is_active?: boolean;
+}
+
+export interface CraftPillarItem {
+  id: number | string;
+  title: string;
+  description: string;
+  icon?: string;
+  icon_name?: string;
+  icon_type?: "preset" | "svg" | "image" | "custom" | string;
+  icon_url?: string | null;
+  sort_order?: number;
+  is_active?: boolean;
+}
+
+export interface CraftPillarsData {
+  title?: string;
+  subtitle?: string;
+  badge?: string;
+  is_active?: boolean;
+  items: CraftPillarItem[];
+}
+
+export interface AboutPageData {
+  story: AboutStoryData;
+  hero?: AboutStoryData;
+  craftPillars: CraftPillarsData;
+  pillars?: CraftPillarsData;
+}
+
+/**
+ * Fetch Structured Dedicated About Page Data (Always Live & Cache-Busted)
+ */
+export async function fetchAboutPageData(): Promise<AboutPageData | null> {
+  try {
+    const timestamp = Date.now();
+    const url = `${getApiBaseUrl()}/customer/about?_t=${timestamp}`;
+    const response = await fetch(url, {
+      headers: {
+        Accept: "application/json",
+        "Cache-Control": "no-cache, no-store, must-revalidate",
+        Pragma: "no-cache",
+      },
+      cache: "no-store",
+    });
+    const result = await response.json();
+    if (result.success && result.data) {
+      return result.data as AboutPageData;
+    }
+    return null;
+  } catch (error) {
+    console.warn("Fetch about page data error:", error);
+    return null;
+  }
+}
+
 /**
  * Record a View on Video / Reel Playback
  */
@@ -608,4 +785,137 @@ export async function recordVideoView(id: number | string): Promise<void> {
     // Non-critical metric
   }
 }
+
+export interface ContactIntroData {
+  badge?: string;
+  tag_text?: string;
+  title: string;
+  subtitle?: string;
+  description?: string;
+  image?: string;
+  desktop_image?: string;
+  mobile_image?: string;
+  alt_text?: string;
+  cta?: {
+    text: string;
+    link?: string;
+    url?: string;
+  };
+  cta_text?: string;
+  cta_link?: string;
+  is_active?: boolean;
+}
+
+export interface ContactDetailItem {
+  id: number | string;
+  title: string;
+  value: string;
+  address_line_2?: string;
+  link?: string;
+  cta_link?: string;
+  icon?: string;
+  icon_name?: string;
+  sort_order?: number;
+  is_active?: boolean;
+}
+
+export interface ContactInfoSectionData {
+  badge?: string;
+  tag_text?: string;
+  title: string;
+  subtitle?: string;
+  custom_order_box?: {
+    title: string;
+    text: string;
+    link: string;
+    is_active: boolean;
+  };
+  custom_order_box_title?: string;
+  custom_order_box_text?: string;
+  custom_order_box_link?: string;
+  custom_order_box_active?: boolean;
+  is_active?: boolean;
+  items: ContactDetailItem[];
+}
+
+export interface ContactFormFieldConfig {
+  key: "name" | "email" | "phone" | "subject" | "message" | string;
+  label: string;
+  placeholder?: string;
+  required?: boolean;
+  is_active?: boolean;
+}
+
+export interface ContactFormSettingsData {
+  badge?: string;
+  tag_text?: string;
+  title: string;
+  subtitle?: string;
+  submit_btn_text?: string;
+  cta_text?: string;
+  success_title?: string;
+  success_message?: string;
+  error_message?: string;
+  fields?: ContactFormFieldConfig[];
+  is_active?: boolean;
+}
+
+export interface ContactFaqItem {
+  id: number | string;
+  question: string;
+  answer: string;
+  title?: string;
+  description?: string;
+  sort_order?: number;
+  is_active?: boolean;
+}
+
+export interface ContactFaqsSectionData {
+  badge?: string;
+  tag_text?: string;
+  title: string;
+  subtitle?: string;
+  is_active?: boolean;
+  items: ContactFaqItem[];
+}
+
+export interface ContactPageData {
+  intro: ContactIntroData;
+  info: ContactInfoSectionData;
+  form: ContactFormSettingsData;
+  faqs: ContactFaqsSectionData;
+}
+
+/**
+ * Fetch Structured Dedicated Contact Page Data (Always Live & Cache-Busted)
+ */
+export async function fetchContactPageData(): Promise<ContactPageData | null> {
+  try {
+    const timestamp = Date.now();
+    const url = `${getApiBaseUrl()}/customer/contact?_t=${timestamp}`;
+    const response = await fetch(url, {
+      headers: {
+        Accept: "application/json",
+        "Cache-Control": "no-cache, no-store, must-revalidate",
+        Pragma: "no-cache",
+      },
+      cache: "no-store",
+    });
+    const result = await response.json();
+    if (result.success && result.data) {
+      const d = result.data;
+      return {
+        intro: d.intro,
+        info: d.info || d.contactDetails || d.contactInfo || d.details,
+        form: d.form || d.formSettings,
+        faqs: d.faqs,
+      } as ContactPageData;
+    }
+    return null;
+  } catch (error) {
+    console.warn("Fetch contact page data error:", error);
+    return null;
+  }
+}
+
 

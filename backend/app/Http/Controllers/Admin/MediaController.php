@@ -7,6 +7,7 @@ use App\Models\Media;
 use App\Models\Category;
 use App\Models\Product;
 use App\Models\Testimonial;
+use App\Models\Setting;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\File;
@@ -131,20 +132,30 @@ class MediaController extends Controller
                 'id' => 'custom_crochet',
                 'page' => 'homepage',
                 'title' => 'Custom Crochet Banner',
-                'description' => 'Middle promotional banner ("Custom Crochet Just for You") with request button and hanging badge.',
+                'description' => 'Middle promotional banner ("Custom Crochet Just for You") with request button and hanging paper note ("Turn Your Ideas Into Handmade Reality").',
                 'badge' => 'Promotional Banner',
-                'slots' => [
-                    [
-                        'slot' => 'custom_crochet_visual',
-                        'title' => 'Custom Crochet Banner Visual',
-                        'description' => 'Showcase image for "Custom Crochet Just for You" banner.',
-                        'recommended_dimensions' => '1200 × 800',
-                        'device' => 'all',
+                'is_custom_crochet_section' => true,
+                'metadata' => (function() {
+                    $m = Media::where('page', 'homepage')->where('section', 'custom_crochet')->orderBy('updated_at', 'desc')->first();
+                    $meta = $m && $m->metadata ? $m->metadata : [];
+                    return [
+                        'id' => $m ? $m->id : null,
                         'page' => 'homepage',
                         'section' => 'custom_crochet',
-                        'sort_order' => 1,
-                    ],
-                ]
+                        'slot' => 'custom_crochet_visual',
+                        'title' => $m && $m->title ? $m->title : 'Custom Crochet',
+                        'subtitle' => $m && $m->subtitle ? $m->subtitle : 'Just for You',
+                        'description' => $m && $m->description ? $m->description : "Your imagination, our yarn. Let's create something special together.",
+                        'cta_text' => $m && $m->cta_text ? $m->cta_text : 'Request Your Custom Order',
+                        'cta_link' => $m && $m->cta_link ? $m->cta_link : '/custom-order',
+                        'tag_text' => $m && $m->tag_text ? $m->tag_text : 'Turn Your Ideas Into Handmade Reality',
+                        'tag_active' => isset($meta['tag_active']) ? (bool)$meta['tag_active'] : true,
+                        'desktop_image' => $m ? ($m->desktop_image_url ?: $m->url) : asset('images/homepage/middleimg.png'),
+                        'mobile_image' => $m ? ($m->mobile_image_url ?: '') : '',
+                        'alt_text' => $m && $m->alt_text ? $m->alt_text : 'Custom Crochet Banner',
+                        'is_active' => $m ? (bool)$m->is_active : true,
+                    ];
+                })(),
             ],
             [
                 'id' => 'brand_story',
@@ -303,9 +314,60 @@ class MediaController extends Controller
             [
                 'id' => 'footer',
                 'page' => 'homepage',
-                'title' => 'Footer Artwork',
-                'description' => 'Full-width panoramic boutique footer artwork and background illustration.',
-                'badge' => 'Footer Background',
+                'title' => 'Footer Artwork & Navigation',
+                'description' => 'Full-width panoramic boutique footer artwork, 3 navigation columns, social channels, contact info, and copyright note.',
+                'badge' => 'Footer & Links',
+                'is_footer_section' => true,
+                'metadata' => (function() {
+                    $m = Media::where('section', 'footer')->where('slot', 'section_settings')->first();
+                    if (!$m) {
+                        $m = Media::where('section', 'footer')->first();
+                    }
+                    $meta = $m && $m->metadata ? $m->metadata : [];
+                    $bgMedia = Media::where('section', 'footer')->where('slot', 'footer_bg')->where('is_active', true)->first() ?: $m;
+                    $bgUrl = $bgMedia ? ($bgMedia->desktop_image_url ?: $bgMedia->url) : asset('images/categories/footer.png');
+
+                    return [
+                        'id' => $m ? $m->id : null,
+                        'bg_image' => $bgUrl,
+                        'desktop_image' => $bgUrl,
+                        'title' => $m && $m->title ? $m->title : 'KNOTELLE Boutique Footer',
+                        'subtitle' => $m && $m->subtitle ? $m->subtitle : 'Made with ♡ for a kinder, cozier world.',
+                        'col1_title' => $meta['col1_title'] ?? 'Quick Links',
+                        'col1_links' => $meta['col1_links'] ?? [
+                            ['label' => 'Home', 'url' => '/', 'is_active' => true],
+                            ['label' => 'Shop', 'url' => '/shop', 'is_active' => true],
+                            ['label' => 'Custom Order', 'url' => '/custom-order', 'is_active' => true],
+                            ['label' => 'About', 'url' => '/about', 'is_active' => true],
+                            ['label' => 'Contact', 'url' => '/contact', 'is_active' => true],
+                        ],
+                        'col2_title' => $meta['col2_title'] ?? 'Help',
+                        'col2_links' => $meta['col2_links'] ?? [
+                            ['label' => 'Shipping Policy', 'url' => '/contact', 'is_active' => true],
+                            ['label' => 'Return & Refund', 'url' => '/contact', 'is_active' => true],
+                            ['label' => 'FAQ', 'url' => '/contact', 'is_active' => true],
+                            ['label' => 'Track Order', 'url' => '/account/orders', 'is_active' => true],
+                        ],
+                        'col3_title' => $meta['col3_title'] ?? 'Contact',
+                        'contact_phone' => $meta['contact_phone'] ?? '+91 97730 39243',
+                        'contact_phone_link' => $meta['contact_phone_link'] ?? 'tel:+919773039243',
+                        'contact_email' => $meta['contact_email'] ?? 'support@knotelle.in',
+                        'contact_email_link' => $meta['contact_email_link'] ?? 'mailto:support@knotelle.in',
+                        'contact_address' => $meta['contact_address'] ?? 'India',
+                        'contact_address_link' => $meta['contact_address_link'] ?? '',
+                        'instagram_url' => $meta['instagram_url'] ?? 'https://instagram.com/knotelleindia',
+                        'instagram_active' => isset($meta['instagram_active']) ? (bool)$meta['instagram_active'] : true,
+                        'facebook_url' => $meta['facebook_url'] ?? 'https://facebook.com/knotelleindia',
+                        'facebook_active' => isset($meta['facebook_active']) ? (bool)$meta['facebook_active'] : true,
+                        'pinterest_url' => $meta['pinterest_url'] ?? 'https://pinterest.com/knotelleindia',
+                        'pinterest_active' => isset($meta['pinterest_active']) ? (bool)$meta['pinterest_active'] : true,
+                        'youtube_url' => $meta['youtube_url'] ?? 'https://youtube.com/@knotelleindia',
+                        'youtube_active' => isset($meta['youtube_active']) ? (bool)$meta['youtube_active'] : true,
+                        'copyright_text' => $meta['copyright_text'] ?? '© {year} Knotelle. All rights reserved.',
+                        'heart_tagline' => $meta['heart_tagline'] ?? 'Made with ♡ for a kinder, cozier world.',
+                        'is_active' => $m ? (bool)$m->is_active : true,
+                    ];
+                })(),
                 'slots' => [
                     [
                         'slot' => 'footer_bg',
@@ -318,6 +380,40 @@ class MediaController extends Controller
                         'sort_order' => 1,
                     ],
                 ]
+            ],
+            [
+                'id' => 'navbar_settings',
+                'page' => 'global',
+                'title' => 'Navbar & Header Navigation',
+                'description' => 'Announcement bar banner, header links, sparkle highlight pill, and action buttons visibility.',
+                'badge' => 'Navigation & Announcement',
+                'is_navbar_section' => true,
+                'metadata' => (function() {
+                    $m = Media::where('page', 'global')->where('section', 'navbar')->where('slot', 'navbar_settings')->first();
+                    $meta = $m && $m->metadata ? $m->metadata : [];
+                    return [
+                        'id' => $m ? $m->id : null,
+                        'page' => 'global',
+                        'section' => 'navbar',
+                        'slot' => 'navbar_settings',
+                        'title' => $m && $m->title ? $m->title : 'Navbar Navigation & Announcement',
+                        'announcement_text' => $meta['announcement_text'] ?? '✨ Free Pan-India Delivery on all Orders above ₹999',
+                        'announcement_link' => $meta['announcement_link'] ?? '/shop',
+                        'announcement_active' => isset($meta['announcement_active']) ? (bool)$meta['announcement_active'] : false,
+                        'nav_links' => $meta['nav_links'] ?? [
+                            ['name' => 'Home', 'href' => '/', 'is_highlighted' => false, 'is_active' => true, 'sort_order' => 1],
+                            ['name' => 'Shop', 'href' => '/shop', 'is_highlighted' => false, 'is_active' => true, 'sort_order' => 2],
+                            ['name' => 'Custom Order', 'href' => '/custom-order', 'is_highlighted' => true, 'is_active' => true, 'sort_order' => 3],
+                            ['name' => 'About', 'href' => '/about', 'is_highlighted' => false, 'is_active' => true, 'sort_order' => 4],
+                            ['name' => 'Contact', 'href' => '/contact', 'is_highlighted' => false, 'is_active' => true, 'sort_order' => 5],
+                        ],
+                        'show_search' => isset($meta['show_search']) ? (bool)$meta['show_search'] : true,
+                        'show_wishlist' => isset($meta['show_wishlist']) ? (bool)$meta['show_wishlist'] : true,
+                        'show_account' => isset($meta['show_account']) ? (bool)$meta['show_account'] : true,
+                        'show_cart' => isset($meta['show_cart']) ? (bool)$meta['show_cart'] : true,
+                        'is_active' => $m ? (bool)$m->is_active : true,
+                    ];
+                })(),
             ],
             [
                 'id' => 'global_assets',
@@ -463,62 +559,226 @@ class MediaController extends Controller
             [
                 'id' => 'about_story',
                 'page' => 'about',
-                'title' => 'About Page Atelier & Story',
-                'description' => 'The KNOTELLE Story ("Every Loop Tells a Story") artisan photography and mission.',
+                'title' => 'The KNOTELLE Story',
+                'description' => 'Manage Story headings, two descriptive paragraphs, artisan crafting visual, floating 100% handcrafted badge, and custom creation button.',
                 'badge' => 'Story & Atelier',
-                'slots' => [
-                    [
-                        'slot' => 'about_hero_image',
-                        'title' => 'Main Artisan Crafting Visual',
-                        'description' => 'Primary showcase photo of artisan stitching with wooden hook.',
-                        'recommended_dimensions' => '1000 × 1100',
-                        'device' => 'all',
+                'is_about_story_section' => true,
+                'metadata' => (function() {
+                    $m = Media::where('page', 'about')->where('section', 'about_story')->first();
+                    $meta = $m && $m->metadata ? $m->metadata : [];
+                    return [
+                        'id' => $m ? $m->id : null,
                         'page' => 'about',
                         'section' => 'about_story',
-                        'sort_order' => 1,
-                    ],
-                    [
-                        'slot' => 'about_studio_image',
-                        'title' => 'Bengaluru Workshop & Studio',
-                        'description' => 'Atelier workshop photo and yarn gallery.',
-                        'recommended_dimensions' => '1200 × 600',
-                        'device' => 'all',
-                        'page' => 'about',
-                        'section' => 'about_story',
-                        'sort_order' => 2,
-                    ],
-                ]
+                        'slot' => 'story_hero',
+                        'badge' => $m && $m->tag_text ? $m->tag_text : 'The KNOTELLE Story',
+                        'tag_text' => $m && $m->tag_text ? $m->tag_text : 'The KNOTELLE Story',
+                        'title' => $m && $m->title ? $m->title : 'Every Loop Tells a Story',
+                        'subtitle' => $m && $m->subtitle ? $m->subtitle : '',
+                        'tagline' => $m && $m->subtitle ? $m->subtitle : '',
+                        'description' => $m && $m->description ? $m->description : 'In a world flooded with disposable factory goods, KNOTELLE was born from a yearning for slow-made warmth. What began as a tiny home workshop in Bengaluru has grown into a vibrant collective of women artisans who share a deep love for yarn, color harmony, and delicate floral silhouettes.',
+                        'paragraph_1' => $m && $m->description ? $m->description : 'In a world flooded with disposable factory goods, KNOTELLE was born from a yearning for slow-made warmth. What began as a tiny home workshop in Bengaluru has grown into a vibrant collective of women artisans who share a deep love for yarn, color harmony, and delicate floral silhouettes.',
+                        'paragraph_2' => $meta['paragraph_2'] ?? 'When you order a bouquet of crochet roses, a customized bunny keychain, or a granny square tote, you are not simply purchasing an object. You are welcoming hours of human patience, intention, and joy into your home.',
+                        'desktop_image' => $m ? ($m->desktop_image_url ?: $m->url) : 'https://images.unsplash.com/photo-1544816155-12df9643f363?q=80&w=1000&auto=format&fit=crop',
+                        'mobile_image' => $m ? ($m->mobile_image_url ?: '') : '',
+                        'alt_text' => $m && $m->alt_text ? $m->alt_text : 'Artisan stitching crochet with wooden hook',
+                        'floating_badge_title' => $meta['floating_badge_title'] ?? '100% Handcrafted',
+                        'floating_badge_subtitle' => $meta['floating_badge_subtitle'] ?? 'Never mass machine produced',
+                        'floating_badge_icon' => $meta['floating_badge_icon'] ?? 'Heart',
+                        'floating_badge_active' => isset($meta['floating_badge_active']) ? (bool)$meta['floating_badge_active'] : true,
+                        'cta_text' => $m && $m->cta_text ? $m->cta_text : 'Request a Custom Creation',
+                        'cta_link' => $m && $m->cta_link ? $m->cta_link : '/custom-order',
+                        'cta_visible' => isset($meta['cta_visible']) ? (bool)$meta['cta_visible'] : true,
+                        'is_active' => $m ? (bool)$m->is_active : true,
+                    ];
+                })(),
+            ],
+            [
+                'id' => 'craft_pillars',
+                'page' => 'about',
+                'title' => 'Our Craft Pillars',
+                'description' => 'Manage section heading, description, and dynamic list of Craft Pillars (icons, titles, descriptions, sort order, and status).',
+                'badge' => 'Craft Pillars',
+                'is_craft_pillars_section' => true,
+                'metadata' => (function() {
+                    $m = Media::where('page', 'about')->where('section', 'craft_pillars')->where('slot', 'section_settings')->first();
+                    return [
+                        'id' => $m ? $m->id : null,
+                        'title' => $m && $m->title ? $m->title : 'Our Craft Pillars',
+                        'subtitle' => $m && $m->subtitle ? $m->subtitle : ($m && $m->description ? $m->description : 'Guiding principles behind every stitch we make.'),
+                        'tag_text' => $m && $m->tag_text ? $m->tag_text : 'Artisan Standards',
+                        'is_active' => $m ? (bool)$m->is_active : true,
+                    ];
+                })(),
+                'items' => Media::where('page', 'about')
+                    ->where('section', 'craft_pillars')
+                    ->where('slot', '!=', 'section_settings')
+                    ->orderBy('sort_order', 'asc')
+                    ->get()
+                    ->map(function ($item) {
+                        $meta = $item->metadata ?: [];
+                        $iconName = $item->tag_text ?: ($meta['icon_name'] ?? 'Leaf');
+                        $isCustom = $item->file_path && !str_starts_with($item->file_path, 'icon_') && ($item->file_type === 'image' || str_ends_with($item->file_path, '.svg'));
+                        return [
+                            'id' => $item->id,
+                            'title' => $item->title,
+                            'description' => $item->description,
+                            'icon' => $iconName,
+                            'icon_name' => $iconName,
+                            'icon_type' => $meta['icon_type'] ?? ($isCustom ? 'custom' : 'preset'),
+                            'icon_url' => $isCustom ? $item->url : null,
+                            'sort_order' => (int)$item->sort_order,
+                            'is_active' => (bool)$item->is_active,
+                            'status' => (bool)$item->is_active,
+                            'updated_at_formatted' => $item->updated_at ? $item->updated_at->format('M d, Y') : '',
+                        ];
+                    }),
             ],
 
             // CONTACT PAGE SECTIONS
             [
-                'id' => 'contact_header',
+                'id' => 'contact_intro',
                 'page' => 'contact',
-                'title' => 'Contact Page Banner & Atelier',
-                'description' => 'Header visual ("Let\'s Connect"), studio info, and response guarantee.',
-                'badge' => 'Contact & Studio',
-                'slots' => [
-                    [
-                        'slot' => 'contact_banner_image',
-                        'title' => 'Contact Header Banner Visual',
-                        'description' => 'Decorative top banner with headline and tagline.',
-                        'recommended_dimensions' => '1920 × 400',
-                        'device' => 'desktop',
-                        'page' => 'contact',
-                        'section' => 'contact_header',
-                        'sort_order' => 1,
-                    ],
-                    [
-                        'slot' => 'contact_studio_image',
-                        'title' => 'Studio Storefront Photo',
-                        'description' => 'Indiranagar studio physical location photo.',
-                        'recommended_dimensions' => '800 × 600',
-                        'device' => 'all',
-                        'page' => 'contact',
-                        'section' => 'contact_header',
-                        'sort_order' => 2,
-                    ],
-                ]
+                'title' => 'Contact Introduction / Hero',
+                'description' => 'Manage main headline ("Let\'s Connect"), badge, subtitle tagline, introductory description, and banner artwork visual.',
+                'badge' => 'Hero & Intro',
+                'is_contact_intro_section' => true,
+                'metadata' => (function() {
+                    $m = Media::where('page', 'contact')->where('section', 'contact_intro')->where('slot', 'intro_banner')->first();
+                    return [
+                        'id' => $m ? $m->id : null,
+                        'badge' => $m && $m->tag_text ? $m->tag_text : "Let's Connect",
+                        'tag_text' => $m && $m->tag_text ? $m->tag_text : "Let's Connect",
+                        'title' => $m && $m->title ? $m->title : "Let's Connect",
+                        'subtitle' => $m && $m->subtitle ? $m->subtitle : "Have a question about a product, custom order, or collaboration? We'd love to hear from you.",
+                        'tagline' => $m && $m->subtitle ? $m->subtitle : '',
+                        'description' => $m && $m->description ? $m->description : "We're here to help bring your handcrafted crochet dreams to life. Reach out directly or fill out our message form below.",
+                        'desktop_image' => $m ? ($m->desktop_image_url ?: $m->url) : 'https://images.unsplash.com/photo-1544816155-12df9643f363?q=80&w=1200&auto=format&fit=crop',
+                        'mobile_image' => $m ? ($m->mobile_image_url ?: '') : '',
+                        'alt_text' => $m && $m->alt_text ? $m->alt_text : 'KNOTELLE Artisan Studio Contact',
+                        'cta_text' => $m && $m->cta_text ? $m->cta_text : 'Send Us a Message',
+                        'cta_link' => $m && $m->cta_link ? $m->cta_link : '#contact-form',
+                        'is_active' => $m ? (bool)$m->is_active : true,
+                    ];
+                })(),
+            ],
+            [
+                'id' => 'contact_info',
+                'page' => 'contact',
+                'title' => 'Contact Information & Atelier Studio',
+                'description' => 'Manage studio name/badge, custom order helper box, and dynamic contact items (Phone, Email, Address, Hours, Socials).',
+                'badge' => 'Contact Details & Studio',
+                'is_contact_info_section' => true,
+                'metadata' => (function() {
+                    $m = Media::where('page', 'contact')->where('section', 'contact_info')->where('slot', 'section_settings')->first();
+                    $meta = $m && $m->metadata ? $m->metadata : [];
+                    return [
+                        'id' => $m ? $m->id : null,
+                        'badge' => $m && $m->tag_text ? $m->tag_text : 'Atelier Studio',
+                        'tag_text' => $m && $m->tag_text ? $m->tag_text : 'Atelier Studio',
+                        'title' => $m && $m->title ? $m->title : 'KNOTELLE Studio',
+                        'subtitle' => $m && $m->subtitle ? $m->subtitle : 'Handmade with love in Bengaluru, India',
+                        'custom_order_box_title' => $meta['custom_order_box_title'] ?? 'Looking for Custom Orders?',
+                        'custom_order_box_text' => $meta['custom_order_box_text'] ?? 'Have a specific design, color palette, or bouquet arrangement in mind? Request a bespoke piece directly.',
+                        'custom_order_box_link' => $meta['custom_order_box_link'] ?? '/custom-order',
+                        'custom_order_box_active' => isset($meta['custom_order_box_active']) ? (bool)$meta['custom_order_box_active'] : true,
+                        'is_active' => $m ? (bool)$m->is_active : true,
+                    ];
+                })(),
+                'items' => Media::where('page', 'contact')
+                    ->where('section', 'contact_info')
+                    ->where('slot', '!=', 'section_settings')
+                    ->orderBy('sort_order', 'asc')
+                    ->get()
+                    ->map(function ($item) {
+                        $meta = $item->metadata ?: [];
+                        $iconName = $item->tag_text ?: ($meta['icon_name'] ?? 'MapPin');
+                        return [
+                            'id' => $item->id,
+                            'icon' => $iconName,
+                            'icon_name' => $iconName,
+                            'title' => $item->title,
+                            'value' => $item->description,
+                            'description' => $item->description,
+                            'address_line_2' => $meta['address_line_2'] ?? '',
+                            'link' => $item->cta_link ?: '',
+                            'cta_link' => $item->cta_link ?: '',
+                            'sort_order' => (int)$item->sort_order,
+                            'is_active' => (bool)$item->is_active,
+                            'status' => (bool)$item->is_active,
+                            'updated_at_formatted' => $item->updated_at ? $item->updated_at->format('M d, Y') : '',
+                        ];
+                    }),
+            ],
+            [
+                'id' => 'contact_form',
+                'page' => 'contact',
+                'title' => 'Send Us a Message (Contact Form)',
+                'description' => 'Manage form headline, subtitle, submit button text, success message, error message, and input fields.',
+                'badge' => 'Form Configuration',
+                'is_contact_form_section' => true,
+                'metadata' => (function() {
+                    $m = Media::where('page', 'contact')->where('section', 'contact_form')->where('slot', 'form_settings')->first();
+                    $meta = $m && $m->metadata ? $m->metadata : [];
+                    $defaultFields = [
+                        ['key' => 'name', 'label' => 'Your Name', 'placeholder' => 'Enter your full name', 'required' => true, 'is_active' => true],
+                        ['key' => 'email', 'label' => 'Email Address', 'placeholder' => 'Enter your email address', 'required' => true, 'is_active' => true],
+                        ['key' => 'phone', 'label' => 'Phone Number', 'placeholder' => 'Enter your 10-digit phone number (optional)', 'required' => false, 'is_active' => true],
+                        ['key' => 'subject', 'label' => 'Subject', 'placeholder' => 'What is this regarding?', 'required' => false, 'is_active' => true],
+                        ['key' => 'message', 'label' => 'Your Message', 'placeholder' => 'Tell us how we can help you...', 'required' => true, 'is_active' => true],
+                    ];
+                    return [
+                        'id' => $m ? $m->id : null,
+                        'badge' => $m && $m->tag_text ? $m->tag_text : 'Get In Touch',
+                        'tag_text' => $m && $m->tag_text ? $m->tag_text : 'Get In Touch',
+                        'title' => $m && $m->title ? $m->title : 'Send Us a Message',
+                        'subtitle' => $m && $m->subtitle ? $m->subtitle : 'Fill in your details and our team will get back to you promptly.',
+                        'cta_text' => $m && $m->cta_text ? $m->cta_text : 'Send Message',
+                        'submit_btn_text' => $m && $m->cta_text ? $m->cta_text : 'Send Message',
+                        'success_title' => $meta['success_title'] ?? 'Message Sent!',
+                        'success_message' => $meta['success_message'] ?? 'Thank you! Your message has been sent successfully. We will get back to you shortly.',
+                        'error_message' => $meta['error_message'] ?? 'Something went wrong while sending your message. Please check the form and try again.',
+                        'fields' => !empty($meta['fields']) ? $meta['fields'] : $defaultFields,
+                        'is_active' => $m ? (bool)$m->is_active : true,
+                    ];
+                })(),
+            ],
+            [
+                'id' => 'contact_faqs',
+                'page' => 'contact',
+                'title' => 'Frequently Asked Questions (FAQs)',
+                'description' => 'Manage FAQ section heading, subtitle, and dynamic list of questions and answers (Add, Edit, Delete, Toggle, Reorder).',
+                'badge' => 'FAQ Accordion Stream',
+                'is_contact_faqs_section' => true,
+                'metadata' => (function() {
+                    $m = Media::where('page', 'contact')->where('section', 'contact_faqs')->where('slot', 'section_settings')->first();
+                    return [
+                        'id' => $m ? $m->id : null,
+                        'badge' => $m && $m->tag_text ? $m->tag_text : 'Help & Support',
+                        'tag_text' => $m && $m->tag_text ? $m->tag_text : 'Help & Support',
+                        'title' => $m && $m->title ? $m->title : 'Frequently Asked Questions',
+                        'subtitle' => $m && $m->subtitle ? $m->subtitle : 'Quick answers about our handmade creations, custom orders, and delivery.',
+                        'is_active' => $m ? (bool)$m->is_active : true,
+                    ];
+                })(),
+                'items' => Media::where('page', 'contact')
+                    ->where('section', 'contact_faqs')
+                    ->where('slot', '!=', 'section_settings')
+                    ->orderBy('sort_order', 'asc')
+                    ->get()
+                    ->map(function ($item) {
+                        return [
+                            'id' => $item->id,
+                            'question' => $item->title,
+                            'title' => $item->title,
+                            'answer' => $item->description,
+                            'description' => $item->description,
+                            'sort_order' => (int)$item->sort_order,
+                            'is_active' => (bool)$item->is_active,
+                            'status' => (bool)$item->is_active,
+                            'updated_at_formatted' => $item->updated_at ? $item->updated_at->format('M d, Y') : '',
+                        ];
+                    }),
             ],
         ];
 
@@ -704,7 +964,21 @@ class MediaController extends Controller
             $extension = strtolower($file->getClientOriginalExtension() ?: 'jpg');
             $uniqueName = "{$section}_{$slot}_" . time() . '_' . Str::random(4) . '.' . $extension;
 
-            $targetFolder = 'images/' . ($section === 'hero' ? 'hero' : ($section === 'footer' ? 'footer' : ($section === 'categories' ? 'categories' : 'homepage')));
+            if ($page === 'about' || str_starts_with($section, 'about_') || $section === 'craft_pillars') {
+                $targetFolder = 'images/about';
+            } elseif ($page === 'contact' || str_starts_with($section, 'contact_')) {
+                $targetFolder = 'images/contact';
+            } elseif ($section === 'hero') {
+                $targetFolder = 'images/hero';
+            } elseif ($section === 'footer') {
+                $targetFolder = 'images/footer';
+            } elseif ($section === 'categories') {
+                $targetFolder = 'images/categories';
+            } elseif ($page === 'shop' || str_starts_with($section, 'shop_')) {
+                $targetFolder = 'images/shop';
+            } else {
+                $targetFolder = 'images/homepage';
+            }
             $targetDirectory = public_path($targetFolder);
             if (!File::isDirectory($targetDirectory)) {
                 File::makeDirectory($targetDirectory, 0755, true, true);
@@ -2208,4 +2482,1590 @@ class MediaController extends Controller
             ]
         ]);
     }
+
+    /**
+     * Get Custom Crochet Banner Data for Admin Manager
+     */
+    public function getCustomCrochet(): JsonResponse
+    {
+        $m = Media::where('page', 'homepage')
+            ->where('section', 'custom_crochet')
+            ->orderBy('updated_at', 'desc')
+            ->first();
+
+        $meta = $m && $m->metadata ? $m->metadata : [];
+
+        $data = [
+            'id' => $m ? $m->id : null,
+            'title' => $m && $m->title ? $m->title : 'Custom Crochet',
+            'subtitle' => $m && $m->subtitle ? $m->subtitle : 'Just for You',
+            'description' => $m && $m->description ? $m->description : "Your imagination, our yarn. Let's create something special together.",
+            'cta_text' => $m && $m->cta_text ? $m->cta_text : 'Request Your Custom Order',
+            'cta_link' => $m && $m->cta_link ? $m->cta_link : '/custom-order',
+            'tag_text' => $m && $m->tag_text ? $m->tag_text : 'Turn Your Ideas Into Handmade Reality',
+            'tag_active' => isset($meta['tag_active']) ? (bool)$meta['tag_active'] : true,
+            'image_url' => $m ? ($m->desktop_image_url ?: $m->url) : asset('images/homepage/middleimg.png'),
+            'desktop_image' => $m ? ($m->desktop_image_url ?: $m->url) : asset('images/homepage/middleimg.png'),
+            'mobile_image' => $m ? ($m->mobile_image_url ?: '') : '',
+            'alt_text' => $m && $m->alt_text ? $m->alt_text : 'Custom Crochet Banner',
+            'is_active' => $m ? (bool)$m->is_active : true,
+        ];
+
+        return response()->json(['success' => true, 'data' => $data]);
+    }
+
+    /**
+     * Save / Update Custom Crochet Banner & Hanging Tag
+     */
+    public function saveCustomCrochet(Request $request): JsonResponse
+    {
+        $request->validate([
+            'title' => 'required|string|max:255',
+            'subtitle' => 'nullable|string|max:255',
+            'description' => 'required|string',
+            'cta_text' => 'nullable|string|max:100',
+            'cta_link' => 'nullable|string|max:255',
+            'tag_text' => 'nullable|string|max:255',
+            'tag_active' => 'nullable',
+            'alt_text' => 'nullable|string|max:255',
+            'is_active' => 'nullable',
+            'image_file' => 'nullable|image|max:15360',
+            'image_url' => 'nullable|string',
+        ]);
+
+        $media = Media::where('page', 'homepage')
+            ->where('section', 'custom_crochet')
+            ->first();
+
+        if (!$media) {
+            $media = new Media();
+            $media->page = 'homepage';
+            $media->section = 'custom_crochet';
+            $media->slot = 'custom_crochet_visual';
+            $media->file_name = 'middleimg.png';
+            $media->file_path = 'images/homepage/middleimg.png';
+            $media->disk = 'local';
+            $media->mime_type = 'image/png';
+            $media->file_type = 'image';
+            $media->uploaded_by = auth()->id() ?: 1;
+            $media->uploader_type = 'admin';
+        }
+
+        // Handle uploaded image file
+        if ($request->hasFile('image_file')) {
+            $file = $request->file('image_file');
+            $ext = strtolower($file->getClientOriginalExtension() ?: 'png');
+            $fileName = 'custom_crochet_' . time() . '_' . Str::random(4) . '.' . $ext;
+            $targetDir = public_path('images/homepage');
+            if (!File::isDirectory($targetDir)) {
+                File::makeDirectory($targetDir, 0755, true, true);
+            }
+            $file->move($targetDir, $fileName);
+            $media->file_name = $file->getClientOriginalName();
+            $media->file_path = 'images/homepage/' . $fileName;
+            $media->mime_type = 'image/' . ($ext === 'png' ? 'png' : ($ext === 'webp' ? 'webp' : 'jpeg'));
+            $media->file_size = filesize($targetDir . DIRECTORY_SEPARATOR . $fileName);
+        } elseif ($request->filled('image_url')) {
+            $media->file_path = $request->input('image_url');
+        }
+
+        $media->slot = 'custom_crochet_visual';
+        $media->title = $request->input('title');
+        $media->subtitle = $request->input('subtitle');
+        $media->description = $request->input('description');
+        $media->cta_text = $request->input('cta_text');
+        $media->cta_link = $request->input('cta_link');
+        $media->tag_text = $request->input('tag_text', 'Turn Your Ideas Into Handmade Reality');
+        $media->alt_text = $request->input('alt_text', 'Custom Crochet Banner');
+        $media->is_active = $request->has('is_active') ? filter_var($request->input('is_active'), FILTER_VALIDATE_BOOLEAN) : true;
+
+        $meta = $media->metadata ?: [];
+        $meta['tag_active'] = $request->has('tag_active') ? filter_var($request->input('tag_active'), FILTER_VALIDATE_BOOLEAN) : true;
+        $media->metadata = $meta;
+
+        $media->save();
+
+        // Ensure other duplicate non-reel rows in section 'custom_crochet' mirror the active state or get cleaned up
+        Media::where('page', 'homepage')
+            ->where('section', 'custom_crochet')
+            ->where('id', '!=', $media->id)
+            ->where('content_type', '!=', 'reel')
+            ->delete();
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Custom Crochet banner and hanging tag saved successfully!',
+            'data' => $media,
+        ]);
+    }
+
+    /**
+     * Save / Update About Story Content & Visuals
+     */
+    public function saveAboutStory(Request $request): JsonResponse
+    {
+        $request->validate([
+            'title' => 'required|string|max:255',
+            'tag_text' => 'nullable|string|max:150',
+            'subtitle' => 'nullable|string|max:255',
+            'description' => 'required|string',
+            'paragraph_2' => 'nullable|string',
+            'floating_badge_title' => 'nullable|string|max:150',
+            'floating_badge_subtitle' => 'nullable|string|max:255',
+            'floating_badge_icon' => 'nullable|string|max:100',
+            'floating_badge_active' => 'nullable',
+            'cta_text' => 'nullable|string|max:100',
+            'cta_link' => 'nullable|string|max:255',
+            'cta_visible' => 'nullable',
+            'alt_text' => 'nullable|string|max:255',
+            'is_active' => 'nullable',
+            'image' => 'nullable|image|max:15360',
+            'mobile_image' => 'nullable|image|max:15360',
+            'desktop_image_url' => 'nullable|string',
+            'mobile_image_url' => 'nullable|string',
+        ]);
+
+        $media = Media::where('page', 'about')
+            ->where('section', 'about_story')
+            ->first();
+
+        if (!$media) {
+            $media = new Media();
+            $media->page = 'about';
+            $media->section = 'about_story';
+            $media->slot = 'story_hero';
+            $media->file_name = 'about_story_hero.jpg';
+            $media->file_path = 'https://images.unsplash.com/photo-1544816155-12df9643f363?q=80&w=1000&auto=format&fit=crop';
+            $media->disk = 'local';
+            $media->mime_type = 'image/jpeg';
+            $media->file_type = 'image';
+            $media->uploaded_by = auth()->id() ?: 1;
+            $media->uploader_type = 'admin';
+        }
+
+        // Handle desktop image upload
+        if ($request->hasFile('image')) {
+            $file = $request->file('image');
+            $ext = strtolower($file->getClientOriginalExtension() ?: 'jpg');
+            $fileName = 'about_story_' . time() . '_' . Str::random(4) . '.' . $ext;
+            $targetDir = public_path('images/about');
+            if (!File::isDirectory($targetDir)) {
+                File::makeDirectory($targetDir, 0755, true, true);
+            }
+            $file->move($targetDir, $fileName);
+            $media->file_name = $file->getClientOriginalName();
+            $media->file_path = 'images/about/' . $fileName;
+            $media->mime_type = 'image/' . ($ext === 'png' ? 'png' : ($ext === 'webp' ? 'webp' : 'jpeg'));
+            $media->file_size = filesize($targetDir . DIRECTORY_SEPARATOR . $fileName);
+        } elseif ($request->filled('desktop_image_url')) {
+            $media->file_path = $request->input('desktop_image_url');
+        }
+
+        // Handle mobile image upload
+        if ($request->hasFile('mobile_image')) {
+            $mFile = $request->file('mobile_image');
+            $mExt = strtolower($mFile->getClientOriginalExtension() ?: 'jpg');
+            $mFileName = 'about_story_mobile_' . time() . '_' . Str::random(4) . '.' . $mExt;
+            $targetDir = public_path('images/about');
+            if (!File::isDirectory($targetDir)) {
+                File::makeDirectory($targetDir, 0755, true, true);
+            }
+            $mFile->move($targetDir, $mFileName);
+            $media->mobile_image_path = 'images/about/' . $mFileName;
+        } elseif ($request->filled('mobile_image_url')) {
+            $media->mobile_image_path = $request->input('mobile_image_url');
+        }
+
+        $meta = $media->metadata ?: [];
+        $meta['paragraph_2'] = $request->input('paragraph_2', '');
+        $meta['floating_badge_title'] = $request->input('floating_badge_title', '100% Handcrafted');
+        $meta['floating_badge_subtitle'] = $request->input('floating_badge_subtitle', 'Never mass machine produced');
+        $meta['floating_badge_icon'] = $request->input('floating_badge_icon', 'Heart');
+        $meta['floating_badge_active'] = $request->has('floating_badge_active') ? filter_var($request->input('floating_badge_active'), FILTER_VALIDATE_BOOLEAN) : true;
+        $meta['cta_visible'] = $request->has('cta_visible') ? filter_var($request->input('cta_visible'), FILTER_VALIDATE_BOOLEAN) : true;
+
+        $media->title = $request->input('title', 'Every Loop Tells a Story');
+        $media->tag_text = $request->input('tag_text', 'The KNOTELLE Story');
+        $media->subtitle = $request->input('subtitle', '');
+        $media->description = $request->input('description');
+        $media->cta_text = $request->input('cta_text', 'Request a Custom Creation');
+        $media->cta_link = $request->input('cta_link', '/custom-order');
+        $media->alt_text = $request->input('alt_text', 'Artisan stitching crochet with wooden hook');
+        $media->is_active = $request->has('is_active') ? filter_var($request->input('is_active'), FILTER_VALIDATE_BOOLEAN) : true;
+        $media->metadata = $meta;
+        $media->save();
+
+        return response()->json([
+            'success' => true,
+            'message' => 'About Story updated successfully!',
+            'data' => [
+                'id' => $media->id,
+                'title' => $media->title,
+                'tag_text' => $media->tag_text,
+                'subtitle' => $media->subtitle,
+                'description' => $media->description,
+                'paragraph_2' => $meta['paragraph_2'],
+                'desktop_image' => $media->desktop_image_url ?: $media->url,
+                'mobile_image' => $media->mobile_image_url ?: '',
+                'alt_text' => $media->alt_text,
+                'floating_badge_title' => $meta['floating_badge_title'],
+                'floating_badge_subtitle' => $meta['floating_badge_subtitle'],
+                'floating_badge_icon' => $meta['floating_badge_icon'],
+                'floating_badge_active' => $meta['floating_badge_active'],
+                'cta_text' => $media->cta_text,
+                'cta_link' => $media->cta_link,
+                'cta_visible' => $meta['cta_visible'],
+                'is_active' => (bool)$media->is_active,
+            ]
+        ]);
+    }
+
+    /**
+     * Get About Story Data
+     */
+    public function getAboutStory(): JsonResponse
+    {
+        $media = Media::where('page', 'about')
+            ->where('section', 'about_story')
+            ->first();
+
+        $meta = $media && $media->metadata ? $media->metadata : [];
+
+        return response()->json([
+            'success' => true,
+            'data' => [
+                'id' => $media ? $media->id : null,
+                'title' => $media && $media->title ? $media->title : 'Every Loop Tells a Story',
+                'tag_text' => $media && $media->tag_text ? $media->tag_text : 'The KNOTELLE Story',
+                'subtitle' => $media && $media->subtitle ? $media->subtitle : '',
+                'description' => $media && $media->description ? $media->description : 'In a world flooded with disposable factory goods, KNOTELLE was born from a yearning for slow-made warmth. What began as a tiny home workshop in Bengaluru has grown into a vibrant collective of women artisans who share a deep love for yarn, color harmony, and delicate floral silhouettes.',
+                'paragraph_2' => $meta['paragraph_2'] ?? 'When you order a bouquet of crochet roses, a customized bunny keychain, or a granny square tote, you are not simply purchasing an object. You are welcoming hours of human patience, intention, and joy into your home.',
+                'desktop_image' => $media ? ($media->desktop_image_url ?: $media->url) : 'https://images.unsplash.com/photo-1544816155-12df9643f363?q=80&w=1000&auto=format&fit=crop',
+                'mobile_image' => $media ? ($media->mobile_image_url ?: '') : '',
+                'alt_text' => $media && $media->alt_text ? $media->alt_text : 'Artisan stitching crochet with wooden hook',
+                'floating_badge_title' => $meta['floating_badge_title'] ?? '100% Handcrafted',
+                'floating_badge_subtitle' => $meta['floating_badge_subtitle'] ?? 'Never mass machine produced',
+                'floating_badge_icon' => $meta['floating_badge_icon'] ?? 'Heart',
+                'floating_badge_active' => isset($meta['floating_badge_active']) ? (bool)$meta['floating_badge_active'] : true,
+                'cta_text' => $media && $media->cta_text ? $media->cta_text : 'Request a Custom Creation',
+                'cta_link' => $media && $media->cta_link ? $media->cta_link : '/custom-order',
+                'cta_visible' => isset($meta['cta_visible']) ? (bool)$meta['cta_visible'] : true,
+                'is_active' => $media ? (bool)$media->is_active : true,
+            ]
+        ]);
+    }
+
+    /**
+     * Save Craft Pillars Section Header
+     */
+    public function saveCraftPillarsHeader(Request $request): JsonResponse
+    {
+        $request->validate([
+            'title' => 'required|string|max:255',
+            'subtitle' => 'nullable|string|max:500',
+            'tag_text' => 'nullable|string|max:150',
+            'is_active' => 'nullable',
+        ]);
+
+        $settings = Media::where('page', 'about')
+            ->where('section', 'craft_pillars')
+            ->where('slot', 'section_settings')
+            ->first();
+
+        if (!$settings) {
+            $settings = new Media();
+            $settings->page = 'about';
+            $settings->section = 'craft_pillars';
+            $settings->slot = 'section_settings';
+            $settings->file_name = 'craft_pillars_settings.png';
+            $settings->file_path = 'images/logo/Logo_1.png';
+            $settings->disk = 'local';
+            $settings->mime_type = 'image/png';
+            $settings->file_type = 'image';
+            $settings->uploaded_by = auth()->id() ?: 1;
+            $settings->uploader_type = 'admin';
+        }
+
+        $settings->title = $request->input('title', 'Our Craft Pillars');
+        $settings->subtitle = $request->input('subtitle', 'Guiding principles behind every stitch we make.');
+        $settings->description = $request->input('subtitle');
+        $settings->tag_text = $request->input('tag_text', 'Artisan Standards');
+        $settings->is_active = $request->has('is_active') ? filter_var($request->input('is_active'), FILTER_VALIDATE_BOOLEAN) : true;
+        $settings->save();
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Craft Pillars section header updated successfully!',
+            'data' => [
+                'title' => $settings->title,
+                'subtitle' => $settings->subtitle,
+                'tag_text' => $settings->tag_text,
+                'is_active' => (bool)$settings->is_active,
+            ]
+        ]);
+    }
+
+    /**
+     * Add a new Craft Pillar item
+     */
+    public function addCraftPillar(Request $request): JsonResponse
+    {
+        $request->validate([
+            'title' => 'required|string|max:255',
+            'description' => 'required|string',
+            'icon_name' => 'nullable|string|max:100',
+            'icon_type' => 'nullable|string|in:preset,svg,image,custom',
+            'icon_file' => 'nullable|file|mimes:jpeg,png,jpg,webp,svg|max:5120',
+            'sort_order' => 'nullable|integer',
+            'is_active' => 'nullable',
+        ]);
+
+        $maxSort = Media::where('page', 'about')
+            ->where('section', 'craft_pillars')
+            ->where('slot', '!=', 'section_settings')
+            ->max('sort_order') ?: 0;
+
+        $iconName = $request->input('icon_name', 'Leaf');
+        $iconType = $request->input('icon_type', 'preset');
+        $filePath = 'icon_' . Str::slug($iconName);
+        $fileName = 'pillar_icon.png';
+        $mimeType = 'image/png';
+
+        if ($request->hasFile('icon_file')) {
+            $file = $request->file('icon_file');
+            $ext = strtolower($file->getClientOriginalExtension() ?: 'svg');
+            $uniqueName = 'pillar_' . time() . '_' . Str::random(4) . '.' . $ext;
+            $targetDir = public_path('images/about/pillars');
+            if (!File::isDirectory($targetDir)) {
+                File::makeDirectory($targetDir, 0755, true, true);
+            }
+            $file->move($targetDir, $uniqueName);
+            $filePath = 'images/about/pillars/' . $uniqueName;
+            $fileName = $file->getClientOriginalName();
+            $mimeType = $ext === 'svg' ? 'image/svg+xml' : 'image/' . $ext;
+            $iconType = $ext === 'svg' ? 'svg' : 'image';
+        }
+
+        $pillar = Media::create([
+            'page' => 'about',
+            'section' => 'craft_pillars',
+            'slot' => 'pillar_' . Str::random(8),
+            'title' => $request->input('title'),
+            'description' => $request->input('description'),
+            'tag_text' => $iconName,
+            'file_name' => $fileName,
+            'file_path' => $filePath,
+            'disk' => 'local',
+            'mime_type' => $mimeType,
+            'file_type' => 'image',
+            'sort_order' => $request->filled('sort_order') ? (int)$request->input('sort_order') : ($maxSort + 1),
+            'is_active' => $request->has('is_active') ? filter_var($request->input('is_active'), FILTER_VALIDATE_BOOLEAN) : true,
+            'uploaded_by' => auth()->id() ?: 1,
+            'uploader_type' => 'admin',
+            'metadata' => [
+                'icon_name' => $iconName,
+                'icon_type' => $iconType,
+            ],
+        ]);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Craft Pillar added successfully!',
+            'data' => [
+                'id' => $pillar->id,
+                'title' => $pillar->title,
+                'description' => $pillar->description,
+                'icon' => $iconName,
+                'icon_name' => $iconName,
+                'icon_type' => $iconType,
+                'icon_url' => str_starts_with($pillar->file_path, 'images/') ? $pillar->url : null,
+                'sort_order' => (int)$pillar->sort_order,
+                'is_active' => (bool)$pillar->is_active,
+            ]
+        ]);
+    }
+
+    /**
+     * Get a single Craft Pillar item
+     */
+    public function getCraftPillar($id): JsonResponse
+    {
+        $pillar = Media::where('page', 'about')
+            ->where('section', 'craft_pillars')
+            ->where('id', $id)
+            ->firstOrFail();
+
+        $meta = $pillar->metadata ?: [];
+        $iconName = $pillar->tag_text ?: ($meta['icon_name'] ?? 'Leaf');
+
+        return response()->json([
+            'success' => true,
+            'data' => [
+                'id' => $pillar->id,
+                'title' => $pillar->title,
+                'description' => $pillar->description,
+                'icon' => $iconName,
+                'icon_name' => $iconName,
+                'icon_type' => $meta['icon_type'] ?? (str_starts_with($pillar->file_path, 'images/') ? 'custom' : 'preset'),
+                'icon_url' => str_starts_with($pillar->file_path, 'images/') ? $pillar->url : null,
+                'sort_order' => (int)$pillar->sort_order,
+                'is_active' => (bool)$pillar->is_active,
+            ]
+        ]);
+    }
+
+    /**
+     * Update a Craft Pillar item
+     */
+    public function updateCraftPillar(Request $request, $id): JsonResponse
+    {
+        $pillar = Media::where('page', 'about')
+            ->where('section', 'craft_pillars')
+            ->where('id', $id)
+            ->firstOrFail();
+
+        $request->validate([
+            'title' => 'required|string|max:255',
+            'description' => 'required|string',
+            'icon_name' => 'nullable|string|max:100',
+            'icon_type' => 'nullable|string|in:preset,svg,image,custom',
+            'icon_file' => 'nullable|file|mimes:jpeg,png,jpg,webp,svg|max:5120',
+            'sort_order' => 'nullable|integer',
+            'is_active' => 'nullable',
+        ]);
+
+        $meta = $pillar->metadata ?: [];
+        $iconName = $request->input('icon_name', $pillar->tag_text ?: ($meta['icon_name'] ?? 'Leaf'));
+        $iconType = $request->input('icon_type', $meta['icon_type'] ?? 'preset');
+
+        if ($request->hasFile('icon_file')) {
+            $file = $request->file('icon_file');
+            $ext = strtolower($file->getClientOriginalExtension() ?: 'svg');
+            $uniqueName = 'pillar_' . time() . '_' . Str::random(4) . '.' . $ext;
+            $targetDir = public_path('images/about/pillars');
+            if (!File::isDirectory($targetDir)) {
+                File::makeDirectory($targetDir, 0755, true, true);
+            }
+            $file->move($targetDir, $uniqueName);
+            $pillar->file_path = 'images/about/pillars/' . $uniqueName;
+            $pillar->file_name = $file->getClientOriginalName();
+            $pillar->mime_type = $ext === 'svg' ? 'image/svg+xml' : 'image/' . $ext;
+            $iconType = $ext === 'svg' ? 'svg' : 'image';
+        }
+
+        $meta['icon_name'] = $iconName;
+        $meta['icon_type'] = $iconType;
+
+        $pillar->title = $request->input('title');
+        $pillar->description = $request->input('description');
+        $pillar->tag_text = $iconName;
+        $pillar->metadata = $meta;
+        if ($request->filled('sort_order')) {
+            $pillar->sort_order = (int)$request->input('sort_order');
+        }
+        if ($request->has('is_active')) {
+            $pillar->is_active = filter_var($request->input('is_active'), FILTER_VALIDATE_BOOLEAN);
+        }
+        $pillar->save();
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Craft Pillar updated successfully!',
+            'data' => [
+                'id' => $pillar->id,
+                'title' => $pillar->title,
+                'description' => $pillar->description,
+                'icon' => $iconName,
+                'icon_name' => $iconName,
+                'icon_type' => $iconType,
+                'icon_url' => str_starts_with($pillar->file_path, 'images/') ? $pillar->url : null,
+                'sort_order' => (int)$pillar->sort_order,
+                'is_active' => (bool)$pillar->is_active,
+            ]
+        ]);
+    }
+
+    /**
+     * Delete a Craft Pillar item
+     */
+    public function deleteCraftPillar($id): JsonResponse
+    {
+        $pillar = Media::where('page', 'about')
+            ->where('section', 'craft_pillars')
+            ->where('id', $id)
+            ->firstOrFail();
+
+        if (str_starts_with($pillar->file_path, 'images/about/pillars/') && file_exists(public_path($pillar->file_path))) {
+            @unlink(public_path($pillar->file_path));
+        }
+
+        $pillar->delete();
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Craft Pillar deleted successfully!'
+        ]);
+    }
+
+    /**
+     * Toggle Craft Pillar status
+     */
+    public function toggleCraftPillar($id): JsonResponse
+    {
+        $pillar = Media::where('page', 'about')
+            ->where('section', 'craft_pillars')
+            ->where('id', $id)
+            ->firstOrFail();
+
+        $pillar->is_active = !$pillar->is_active;
+        $pillar->save();
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Craft Pillar status changed to ' . ($pillar->is_active ? 'Active' : 'Inactive'),
+            'is_active' => (bool)$pillar->is_active,
+        ]);
+    }
+
+    /**
+     * Reorder Craft Pillars
+     */
+    public function reorderCraftPillars(Request $request): JsonResponse
+    {
+        $request->validate([
+            'orders' => 'required|array',
+            'orders.*.id' => 'required|integer',
+            'orders.*.sort_order' => 'required|integer',
+        ]);
+
+        foreach ($request->input('orders') as $item) {
+            Media::where('page', 'about')
+                ->where('section', 'craft_pillars')
+                ->where('id', $item['id'])
+                ->update(['sort_order' => $item['sort_order']]);
+        }
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Craft Pillars reordered successfully!'
+        ]);
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | CONTACT PAGE ADMIN MANAGEMENT HANDLERS
+    |--------------------------------------------------------------------------
+    */
+
+    /**
+     * Save Contact Intro / Hero settings and artwork
+     */
+    public function saveContactIntro(Request $request): JsonResponse
+    {
+        $request->validate([
+            'badge' => 'nullable|string|max:255',
+            'title' => 'required|string|max:255',
+            'subtitle' => 'nullable|string|max:500',
+            'description' => 'nullable|string',
+            'alt_text' => 'nullable|string|max:255',
+            'cta_text' => 'nullable|string|max:100',
+            'cta_link' => 'nullable|string|max:255',
+            'image_file' => 'nullable|file|mimes:jpeg,png,jpg,webp,svg|max:10240',
+            'image_url' => 'nullable|string|max:1000',
+            'is_active' => 'nullable',
+        ]);
+
+        $media = Media::where('page', 'contact')
+            ->where('section', 'contact_intro')
+            ->where('slot', 'intro_banner')
+            ->first();
+
+        $filePath = $media ? $media->file_path : 'https://images.unsplash.com/photo-1544816155-12df9643f363?q=80&w=1200&auto=format&fit=crop';
+        $fileName = $media ? $media->file_name : 'contact_hero.jpg';
+        $mimeType = $media ? $media->mime_type : 'image/jpeg';
+        $fileSize = $media ? $media->file_size : 0;
+
+        if ($request->hasFile('image_file')) {
+            $file = $request->file('image_file');
+            $ext = strtolower($file->getClientOriginalExtension() ?: 'jpg');
+            $uniqueName = 'contact_hero_' . time() . '_' . Str::random(4) . '.' . $ext;
+            $targetDir = public_path('images/contact');
+            if (!File::isDirectory($targetDir)) {
+                File::makeDirectory($targetDir, 0755, true, true);
+            }
+            $file->move($targetDir, $uniqueName);
+            $filePath = 'images/contact/' . $uniqueName;
+            $fileName = $file->getClientOriginalName();
+            $mimeType = 'image/' . ($ext === 'png' ? 'png' : ($ext === 'webp' ? 'webp' : 'jpeg'));
+            $fileSize = filesize($targetDir . DIRECTORY_SEPARATOR . $uniqueName);
+        } elseif ($request->filled('image_url')) {
+            $filePath = $request->input('image_url');
+            $fileName = basename($filePath);
+        }
+
+        $isActive = $request->has('is_active') ? filter_var($request->input('is_active'), FILTER_VALIDATE_BOOLEAN) : true;
+
+        $intro = Media::updateOrCreate(
+            [
+                'page' => 'contact',
+                'section' => 'contact_intro',
+                'slot' => 'intro_banner',
+            ],
+            [
+                'title' => $request->input('title'),
+                'tag_text' => $request->input('badge') ?: "Let's Connect",
+                'subtitle' => $request->input('subtitle'),
+                'description' => $request->input('description'),
+                'alt_text' => $request->input('alt_text') ?: $request->input('title'),
+                'cta_text' => $request->input('cta_text') ?: 'Send Us a Message',
+                'cta_link' => $request->input('cta_link') ?: '#contact-form',
+                'file_name' => $fileName,
+                'file_path' => $filePath,
+                'disk' => 'local',
+                'mime_type' => $mimeType,
+                'file_type' => 'image',
+                'file_size' => $fileSize,
+                'is_active' => $isActive,
+                'sort_order' => 1,
+            ]
+        );
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Contact Intro updated successfully!',
+            'data' => [
+                'id' => $intro->id,
+                'badge' => $intro->tag_text,
+                'title' => $intro->title,
+                'subtitle' => $intro->subtitle,
+                'description' => $intro->description,
+                'image' => $intro->desktop_image_url ?: $intro->url,
+                'alt_text' => $intro->alt_text,
+                'cta_text' => $intro->cta_text,
+                'cta_link' => $intro->cta_link,
+                'is_active' => (bool)$intro->is_active,
+            ]
+        ]);
+    }
+
+    /**
+     * Get Contact Intro data
+     */
+    public function getContactIntro(): JsonResponse
+    {
+        $intro = Media::where('page', 'contact')
+            ->where('section', 'contact_intro')
+            ->where('slot', 'intro_banner')
+            ->first();
+
+        return response()->json([
+            'success' => true,
+            'data' => [
+                'id' => $intro ? $intro->id : null,
+                'badge' => $intro && $intro->tag_text ? $intro->tag_text : "Let's Connect",
+                'title' => $intro && $intro->title ? $intro->title : "Let's Connect",
+                'subtitle' => $intro && $intro->subtitle ? $intro->subtitle : '',
+                'description' => $intro && $intro->description ? $intro->description : '',
+                'image' => $intro ? ($intro->desktop_image_url ?: $intro->url) : '',
+                'alt_text' => $intro ? $intro->alt_text : '',
+                'cta_text' => $intro && $intro->cta_text ? $intro->cta_text : 'Send Us a Message',
+                'cta_link' => $intro && $intro->cta_link ? $intro->cta_link : '#contact-form',
+                'is_active' => $intro ? (bool)$intro->is_active : true,
+            ]
+        ]);
+    }
+
+    /**
+     * Save Contact Information Section Header & Custom Order Box
+     */
+    public function saveContactInfoHeader(Request $request): JsonResponse
+    {
+        $request->validate([
+            'badge' => 'nullable|string|max:255',
+            'title' => 'required|string|max:255',
+            'subtitle' => 'nullable|string|max:500',
+            'custom_order_box_title' => 'nullable|string|max:255',
+            'custom_order_box_text' => 'nullable|string|max:1000',
+            'custom_order_box_link' => 'nullable|string|max:255',
+            'custom_order_box_active' => 'nullable',
+            'is_active' => 'nullable',
+        ]);
+
+        $settings = Media::where('page', 'contact')
+            ->where('section', 'contact_info')
+            ->where('slot', 'section_settings')
+            ->first();
+
+        $meta = $settings && $settings->metadata ? $settings->metadata : [];
+        $meta['custom_order_box_title'] = $request->input('custom_order_box_title', 'Looking for Custom Orders?');
+        $meta['custom_order_box_text'] = $request->input('custom_order_box_text', 'Have a specific design, color palette, or bouquet arrangement in mind? Request a bespoke piece directly.');
+        $meta['custom_order_box_link'] = $request->input('custom_order_box_link', '/custom-order');
+        if ($request->has('custom_order_box_active')) {
+            $meta['custom_order_box_active'] = filter_var($request->input('custom_order_box_active'), FILTER_VALIDATE_BOOLEAN);
+        }
+
+        $isActive = $request->has('is_active') ? filter_var($request->input('is_active'), FILTER_VALIDATE_BOOLEAN) : true;
+
+        Media::updateOrCreate(
+            [
+                'page' => 'contact',
+                'section' => 'contact_info',
+                'slot' => 'section_settings',
+            ],
+            [
+                'file_name' => 'contact_info_settings.json',
+                'file_path' => 'media/contact/contact_info_settings.json',
+                'disk' => 'local',
+                'mime_type' => 'application/json',
+                'file_type' => 'document',
+                'title' => $request->input('title'),
+                'tag_text' => $request->input('badge') ?: 'Atelier Studio',
+                'subtitle' => $request->input('subtitle'),
+                'sort_order' => 0,
+                'is_active' => $isActive,
+                'metadata' => $meta,
+            ]
+        );
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Contact Information Header updated successfully!'
+        ]);
+    }
+
+    /**
+     * Get Contact Information Section Header & Custom Order Box
+     */
+    public function getContactInfoHeader(): JsonResponse
+    {
+        $settings = Media::where('page', 'contact')
+            ->where('section', 'contact_info')
+            ->where('slot', 'section_settings')
+            ->first();
+
+        $meta = $settings && $settings->metadata ? $settings->metadata : [];
+
+        return response()->json([
+            'success' => true,
+            'data' => [
+                'badge' => $settings && $settings->tag_text ? $settings->tag_text : 'Atelier Studio',
+                'title' => $settings && $settings->title ? $settings->title : 'KNOTELLE Studio',
+                'subtitle' => $settings && $settings->subtitle ? $settings->subtitle : 'Handmade with love in Bengaluru, India',
+                'custom_order_box_title' => $meta['custom_order_box_title'] ?? 'Looking for Custom Orders?',
+                'custom_order_box_text' => $meta['custom_order_box_text'] ?? 'Have a specific design, color palette, or bouquet arrangement in mind? Request a bespoke piece directly.',
+                'custom_order_box_link' => $meta['custom_order_box_link'] ?? '/custom-order',
+                'custom_order_box_active' => isset($meta['custom_order_box_active']) ? (bool)$meta['custom_order_box_active'] : true,
+                'is_active' => $settings ? (bool)$settings->is_active : true,
+            ]
+        ]);
+    }
+
+    /**
+     * Add a new Contact Detail item
+     */
+    public function addContactInfoItem(Request $request): JsonResponse
+    {
+        $request->validate([
+            'title' => 'required|string|max:255',
+            'value' => 'required|string',
+            'icon' => 'nullable|string|max:100',
+            'address_line_2' => 'nullable|string|max:255',
+            'link' => 'nullable|string|max:500',
+            'sort_order' => 'nullable|integer',
+            'is_active' => 'nullable',
+        ]);
+
+        $maxSort = Media::where('page', 'contact')
+            ->where('section', 'contact_info')
+            ->where('slot', '!=', 'section_settings')
+            ->max('sort_order') ?: 0;
+
+        $iconName = $request->input('icon') ?: 'MapPin';
+
+        $item = Media::create([
+            'page' => 'contact',
+            'section' => 'contact_info',
+            'slot' => 'info_' . Str::random(8),
+            'title' => $request->input('title'),
+            'description' => $request->input('value'),
+            'tag_text' => $iconName,
+            'cta_link' => $request->input('link'),
+            'file_name' => 'info_item.json',
+            'file_path' => 'icon_' . strtolower($iconName),
+            'disk' => 'local',
+            'mime_type' => 'application/json',
+            'file_type' => 'document',
+            'sort_order' => $request->filled('sort_order') ? (int)$request->input('sort_order') : ($maxSort + 1),
+            'is_active' => $request->has('is_active') ? filter_var($request->input('is_active'), FILTER_VALIDATE_BOOLEAN) : true,
+            'metadata' => [
+                'icon_name' => $iconName,
+                'address_line_2' => $request->input('address_line_2', ''),
+            ],
+        ]);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Contact detail added successfully!',
+            'data' => [
+                'id' => $item->id,
+                'title' => $item->title,
+                'value' => $item->description,
+                'icon' => $iconName,
+                'address_line_2' => $request->input('address_line_2', ''),
+                'link' => $item->cta_link,
+                'sort_order' => (int)$item->sort_order,
+                'is_active' => (bool)$item->is_active,
+            ]
+        ]);
+    }
+
+    /**
+     * Get a single Contact Detail item
+     */
+    public function getContactInfoItem($id): JsonResponse
+    {
+        $item = Media::where('page', 'contact')
+            ->where('section', 'contact_info')
+            ->where('id', $id)
+            ->firstOrFail();
+
+        $meta = $item->metadata ?: [];
+
+        return response()->json([
+            'success' => true,
+            'data' => [
+                'id' => $item->id,
+                'title' => $item->title,
+                'value' => $item->description,
+                'icon' => $item->tag_text ?: ($meta['icon_name'] ?? 'MapPin'),
+                'address_line_2' => $meta['address_line_2'] ?? '',
+                'link' => $item->cta_link ?: '',
+                'sort_order' => (int)$item->sort_order,
+                'is_active' => (bool)$item->is_active,
+            ]
+        ]);
+    }
+
+    /**
+     * Update a Contact Detail item
+     */
+    public function updateContactInfoItem(Request $request, $id): JsonResponse
+    {
+        $item = Media::where('page', 'contact')
+            ->where('section', 'contact_info')
+            ->where('id', $id)
+            ->firstOrFail();
+
+        $request->validate([
+            'title' => 'required|string|max:255',
+            'value' => 'required|string',
+            'icon' => 'nullable|string|max:100',
+            'address_line_2' => 'nullable|string|max:255',
+            'link' => 'nullable|string|max:500',
+            'sort_order' => 'nullable|integer',
+            'is_active' => 'nullable',
+        ]);
+
+        $meta = $item->metadata ?: [];
+        $iconName = $request->input('icon', $item->tag_text ?: 'MapPin');
+        $meta['icon_name'] = $iconName;
+        $meta['address_line_2'] = $request->input('address_line_2', $meta['address_line_2'] ?? '');
+
+        $item->title = $request->input('title');
+        $item->description = $request->input('value');
+        $item->tag_text = $iconName;
+        $item->cta_link = $request->input('link');
+        $item->metadata = $meta;
+
+        if ($request->filled('sort_order')) {
+            $item->sort_order = (int)$request->input('sort_order');
+        }
+        if ($request->has('is_active')) {
+            $item->is_active = filter_var($request->input('is_active'), FILTER_VALIDATE_BOOLEAN);
+        }
+        $item->save();
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Contact detail updated successfully!',
+            'data' => [
+                'id' => $item->id,
+                'title' => $item->title,
+                'value' => $item->description,
+                'icon' => $iconName,
+                'address_line_2' => $meta['address_line_2'],
+                'link' => $item->cta_link,
+                'sort_order' => (int)$item->sort_order,
+                'is_active' => (bool)$item->is_active,
+            ]
+        ]);
+    }
+
+    /**
+     * Delete a Contact Detail item
+     */
+    public function deleteContactInfoItem($id): JsonResponse
+    {
+        $item = Media::where('page', 'contact')
+            ->where('section', 'contact_info')
+            ->where('id', $id)
+            ->firstOrFail();
+
+        $item->delete();
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Contact detail deleted successfully!'
+        ]);
+    }
+
+    /**
+     * Toggle Contact Detail item status
+     */
+    public function toggleContactInfoItem($id): JsonResponse
+    {
+        $item = Media::where('page', 'contact')
+            ->where('section', 'contact_info')
+            ->where('id', $id)
+            ->firstOrFail();
+
+        $item->is_active = !$item->is_active;
+        $item->save();
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Contact detail status changed to ' . ($item->is_active ? 'Active' : 'Inactive'),
+            'is_active' => (bool)$item->is_active,
+        ]);
+    }
+
+    /**
+     * Reorder Contact Detail items
+     */
+    public function reorderContactInfoItems(Request $request): JsonResponse
+    {
+        $request->validate([
+            'orders' => 'required|array',
+            'orders.*.id' => 'required|integer',
+            'orders.*.sort_order' => 'required|integer',
+        ]);
+
+        foreach ($request->input('orders') as $item) {
+            Media::where('page', 'contact')
+                ->where('section', 'contact_info')
+                ->where('id', $item['id'])
+                ->update(['sort_order' => $item['sort_order']]);
+        }
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Contact details reordered successfully!'
+        ]);
+    }
+
+    /**
+     * Save Send Us a Message (Contact Form) Settings
+     */
+    public function saveContactFormSettings(Request $request): JsonResponse
+    {
+        $request->validate([
+            'badge' => 'nullable|string|max:255',
+            'title' => 'required|string|max:255',
+            'subtitle' => 'nullable|string|max:500',
+            'cta_text' => 'nullable|string|max:100',
+            'success_title' => 'nullable|string|max:255',
+            'success_message' => 'nullable|string|max:1000',
+            'error_message' => 'nullable|string|max:1000',
+            'fields' => 'nullable|array',
+            'is_active' => 'nullable',
+        ]);
+
+        $settings = Media::where('page', 'contact')
+            ->where('section', 'contact_form')
+            ->where('slot', 'form_settings')
+            ->first();
+
+        $meta = $settings && $settings->metadata ? $settings->metadata : [];
+        $meta['success_title'] = $request->input('success_title', 'Message Sent!');
+        $meta['success_message'] = $request->input('success_message', 'Thank you! Your message has been sent successfully. We will get back to you shortly.');
+        $meta['error_message'] = $request->input('error_message', 'Something went wrong while sending your message. Please check the form and try again.');
+
+        if ($request->has('fields')) {
+            $meta['fields'] = $request->input('fields');
+        }
+
+        $isActive = $request->has('is_active') ? filter_var($request->input('is_active'), FILTER_VALIDATE_BOOLEAN) : true;
+
+        Media::updateOrCreate(
+            [
+                'page' => 'contact',
+                'section' => 'contact_form',
+                'slot' => 'form_settings',
+            ],
+            [
+                'file_name' => 'contact_form_settings.json',
+                'file_path' => 'media/contact/contact_form_settings.json',
+                'disk' => 'local',
+                'mime_type' => 'application/json',
+                'file_type' => 'document',
+                'title' => $request->input('title'),
+                'tag_text' => $request->input('badge') ?: 'Get In Touch',
+                'subtitle' => $request->input('subtitle'),
+                'cta_text' => $request->input('cta_text') ?: 'Send Message',
+                'sort_order' => 0,
+                'is_active' => $isActive,
+                'metadata' => $meta,
+            ]
+        );
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Contact Form settings updated successfully!'
+        ]);
+    }
+
+    /**
+     * Get Contact Form settings
+     */
+    public function getContactFormSettings(): JsonResponse
+    {
+        $settings = Media::where('page', 'contact')
+            ->where('section', 'contact_form')
+            ->where('slot', 'form_settings')
+            ->first();
+
+        $meta = $settings && $settings->metadata ? $settings->metadata : [];
+        $defaultFields = [
+            ['key' => 'name', 'label' => 'Your Name', 'placeholder' => 'Enter your full name', 'required' => true, 'is_active' => true],
+            ['key' => 'email', 'label' => 'Email Address', 'placeholder' => 'Enter your email address', 'required' => true, 'is_active' => true],
+            ['key' => 'phone', 'label' => 'Phone Number', 'placeholder' => 'Enter your 10-digit phone number (optional)', 'required' => false, 'is_active' => true],
+            ['key' => 'subject', 'label' => 'Subject', 'placeholder' => 'What is this regarding?', 'required' => false, 'is_active' => true],
+            ['key' => 'message', 'label' => 'Your Message', 'placeholder' => 'Tell us how we can help you...', 'required' => true, 'is_active' => true],
+        ];
+
+        return response()->json([
+            'success' => true,
+            'data' => [
+                'badge' => $settings && $settings->tag_text ? $settings->tag_text : 'Get In Touch',
+                'title' => $settings && $settings->title ? $settings->title : 'Send Us a Message',
+                'subtitle' => $settings && $settings->subtitle ? $settings->subtitle : 'Fill in your details and our team will get back to you promptly.',
+                'cta_text' => $settings && $settings->cta_text ? $settings->cta_text : 'Send Message',
+                'success_title' => $meta['success_title'] ?? 'Message Sent!',
+                'success_message' => $meta['success_message'] ?? 'Thank you! Your message has been sent successfully. We will get back to you shortly.',
+                'error_message' => $meta['error_message'] ?? 'Something went wrong while sending your message. Please check the form and try again.',
+                'fields' => !empty($meta['fields']) ? $meta['fields'] : $defaultFields,
+                'is_active' => $settings ? (bool)$settings->is_active : true,
+            ]
+        ]);
+    }
+
+    /**
+     * Save FAQs Section Header
+     */
+    public function saveContactFaqsHeader(Request $request): JsonResponse
+    {
+        $request->validate([
+            'badge' => 'nullable|string|max:255',
+            'title' => 'required|string|max:255',
+            'subtitle' => 'nullable|string|max:500',
+            'is_active' => 'nullable',
+        ]);
+
+        $isActive = $request->has('is_active') ? filter_var($request->input('is_active'), FILTER_VALIDATE_BOOLEAN) : true;
+
+        Media::updateOrCreate(
+            [
+                'page' => 'contact',
+                'section' => 'contact_faqs',
+                'slot' => 'section_settings',
+            ],
+            [
+                'file_name' => 'contact_faqs_settings.json',
+                'file_path' => 'media/contact/contact_faqs_settings.json',
+                'disk' => 'local',
+                'mime_type' => 'application/json',
+                'file_type' => 'document',
+                'title' => $request->input('title'),
+                'tag_text' => $request->input('badge') ?: 'Help & Support',
+                'subtitle' => $request->input('subtitle'),
+                'sort_order' => 0,
+                'is_active' => $isActive,
+            ]
+        );
+
+        return response()->json([
+            'success' => true,
+            'message' => 'FAQ Section Header updated successfully!'
+        ]);
+    }
+
+    /**
+     * Get Contact FAQs Section Header
+     */
+    public function getContactFaqsHeader(): JsonResponse
+    {
+        $settings = Media::where('page', 'contact')
+            ->where('section', 'contact_faqs')
+            ->where('slot', 'section_settings')
+            ->first();
+
+        return response()->json([
+            'success' => true,
+            'data' => [
+                'badge' => $settings && $settings->tag_text ? $settings->tag_text : 'Help & Support',
+                'title' => $settings && $settings->title ? $settings->title : 'Frequently Asked Questions',
+                'subtitle' => $settings && $settings->subtitle ? $settings->subtitle : 'Quick answers about our handmade creations, custom orders, and delivery.',
+                'is_active' => $settings ? (bool)$settings->is_active : true,
+            ]
+        ]);
+    }
+
+    /**
+     * Add a new FAQ item
+     */
+    public function addContactFaq(Request $request): JsonResponse
+    {
+        $request->validate([
+            'question' => 'required|string|max:500',
+            'answer' => 'required|string',
+            'sort_order' => 'nullable|integer',
+            'is_active' => 'nullable',
+        ]);
+
+        $maxSort = Media::where('page', 'contact')
+            ->where('section', 'contact_faqs')
+            ->where('slot', '!=', 'section_settings')
+            ->max('sort_order') ?: 0;
+
+        $faq = Media::create([
+            'page' => 'contact',
+            'section' => 'contact_faqs',
+            'slot' => 'faq_' . Str::random(8),
+            'title' => $request->input('question'),
+            'description' => $request->input('answer'),
+            'file_name' => 'faq_item.json',
+            'file_path' => 'faq_item',
+            'disk' => 'local',
+            'mime_type' => 'application/json',
+            'file_type' => 'document',
+            'sort_order' => $request->filled('sort_order') ? (int)$request->input('sort_order') : ($maxSort + 1),
+            'is_active' => $request->has('is_active') ? filter_var($request->input('is_active'), FILTER_VALIDATE_BOOLEAN) : true,
+        ]);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'FAQ added successfully!',
+            'data' => [
+                'id' => $faq->id,
+                'question' => $faq->title,
+                'answer' => $faq->description,
+                'sort_order' => (int)$faq->sort_order,
+                'is_active' => (bool)$faq->is_active,
+            ]
+        ]);
+    }
+
+    /**
+     * Get a single FAQ item
+     */
+    public function getContactFaq($id): JsonResponse
+    {
+        $faq = Media::where('page', 'contact')
+            ->where('section', 'contact_faqs')
+            ->where('id', $id)
+            ->firstOrFail();
+
+        return response()->json([
+            'success' => true,
+            'data' => [
+                'id' => $faq->id,
+                'question' => $faq->title,
+                'answer' => $faq->description,
+                'sort_order' => (int)$faq->sort_order,
+                'is_active' => (bool)$faq->is_active,
+            ]
+        ]);
+    }
+
+    /**
+     * Update an FAQ item
+     */
+    public function updateContactFaq(Request $request, $id): JsonResponse
+    {
+        $faq = Media::where('page', 'contact')
+            ->where('section', 'contact_faqs')
+            ->where('id', $id)
+            ->firstOrFail();
+
+        $request->validate([
+            'question' => 'required|string|max:500',
+            'answer' => 'required|string',
+            'sort_order' => 'nullable|integer',
+            'is_active' => 'nullable',
+        ]);
+
+        $faq->title = $request->input('question');
+        $faq->description = $request->input('answer');
+
+        if ($request->filled('sort_order')) {
+            $faq->sort_order = (int)$request->input('sort_order');
+        }
+        if ($request->has('is_active')) {
+            $faq->is_active = filter_var($request->input('is_active'), FILTER_VALIDATE_BOOLEAN);
+        }
+        $faq->save();
+
+        return response()->json([
+            'success' => true,
+            'message' => 'FAQ updated successfully!',
+            'data' => [
+                'id' => $faq->id,
+                'question' => $faq->title,
+                'answer' => $faq->description,
+                'sort_order' => (int)$faq->sort_order,
+                'is_active' => (bool)$faq->is_active,
+            ]
+        ]);
+    }
+
+    /**
+     * Delete an FAQ item
+     */
+    public function deleteContactFaq($id): JsonResponse
+    {
+        $faq = Media::where('page', 'contact')
+            ->where('section', 'contact_faqs')
+            ->where('id', $id)
+            ->firstOrFail();
+
+        $faq->delete();
+
+        return response()->json([
+            'success' => true,
+            'message' => 'FAQ deleted successfully!'
+        ]);
+    }
+
+    /**
+     * Toggle FAQ status
+     */
+    public function toggleContactFaq($id): JsonResponse
+    {
+        $faq = Media::where('page', 'contact')
+            ->where('section', 'contact_faqs')
+            ->where('id', $id)
+            ->firstOrFail();
+
+        $faq->is_active = !$faq->is_active;
+        $faq->save();
+
+        return response()->json([
+            'success' => true,
+            'message' => 'FAQ status changed to ' . ($faq->is_active ? 'Active' : 'Inactive'),
+            'is_active' => (bool)$faq->is_active,
+        ]);
+    }
+
+    /**
+     * Reorder FAQs
+     */
+    public function reorderContactFaqs(Request $request): JsonResponse
+    {
+        $request->validate([
+            'orders' => 'required|array',
+            'orders.*.id' => 'required|integer',
+            'orders.*.sort_order' => 'required|integer',
+        ]);
+
+        foreach ($request->input('orders') as $item) {
+            Media::where('page', 'contact')
+                ->where('section', 'contact_faqs')
+                ->where('id', $item['id'])
+                ->update(['sort_order' => $item['sort_order']]);
+        }
+
+        return response()->json([
+            'success' => true,
+            'message' => 'FAQs reordered successfully!'
+        ]);
+    }
+
+    /**
+     * Get Dynamic Footer Settings & Links
+     */
+    public function getFooterSettings(): JsonResponse
+    {
+        $media = Media::where('section', 'footer')->where('slot', 'section_settings')->first();
+        if (!$media) {
+            $media = Media::where('section', 'footer')->first();
+        }
+
+        $meta = $media && $media->metadata ? $media->metadata : [];
+        $bgMedia = Media::where('section', 'footer')->where('slot', 'footer_bg')->first() ?: $media;
+
+        return response()->json([
+            'success' => true,
+            'data' => [
+                'id' => $media ? $media->id : null,
+                'title' => $media && $media->title ? $media->title : 'KNOTELLE',
+                'subtitle' => $media && $media->subtitle ? $media->subtitle : 'Made with ♡ for a kinder, cozier world.',
+                'tagline' => $media && $media->subtitle ? $media->subtitle : 'Made with ♡ for a kinder, cozier world.',
+                'copyright_text' => $meta['copyright_text'] ?? '© ' . date('Y') . ' Knotelle. All rights reserved.',
+                'heart_tagline' => $meta['heart_tagline'] ?? 'Made with ♡ for a kinder, cozier world.',
+                'bg_image_url' => $bgMedia ? ($bgMedia->desktop_image_url ?: $bgMedia->url) : asset('images/categories/footer.png'),
+                'instagram_url' => $meta['instagram_url'] ?? (Setting::where('key', 'social_instagram')->value('value') ?: 'https://instagram.com/knotelleindia'),
+                'instagram_active' => isset($meta['instagram_active']) ? (bool)$meta['instagram_active'] : true,
+                'facebook_url' => $meta['facebook_url'] ?? (Setting::where('key', 'social_facebook')->value('value') ?: 'https://facebook.com/knotelleindia'),
+                'facebook_active' => isset($meta['facebook_active']) ? (bool)$meta['facebook_active'] : true,
+                'pinterest_url' => $meta['pinterest_url'] ?? 'https://pinterest.com/knotelleindia',
+                'pinterest_active' => isset($meta['pinterest_active']) ? (bool)$meta['pinterest_active'] : true,
+                'youtube_url' => $meta['youtube_url'] ?? 'https://youtube.com/@knotelleindia',
+                'youtube_active' => isset($meta['youtube_active']) ? (bool)$meta['youtube_active'] : true,
+                'col1_title' => $meta['col1_title'] ?? 'Quick Links',
+                'col1_links' => $meta['col1_links'] ?? [
+                    ['label' => 'Home', 'url' => '/', 'is_active' => true],
+                    ['label' => 'Shop', 'url' => '/shop', 'is_active' => true],
+                    ['label' => 'Custom Order', 'url' => '/custom-order', 'is_active' => true],
+                    ['label' => 'About', 'url' => '/about', 'is_active' => true],
+                    ['label' => 'Contact', 'url' => '/contact', 'is_active' => true],
+                ],
+                'col2_title' => $meta['col2_title'] ?? 'Help',
+                'col2_links' => $meta['col2_links'] ?? [
+                    ['label' => 'Shipping Policy', 'url' => '/contact', 'is_active' => true],
+                    ['label' => 'Return & Refund', 'url' => '/contact', 'is_active' => true],
+                    ['label' => 'FAQ', 'url' => '/contact', 'is_active' => true],
+                    ['label' => 'Track Order', 'url' => '/account/orders', 'is_active' => true],
+                ],
+                'col3_title' => $meta['col3_title'] ?? 'Contact',
+                'contact_phone' => $meta['contact_phone'] ?? (Setting::where('key', 'store_phone')->value('value') ?: '+91 97730 39243'),
+                'contact_phone_link' => $meta['contact_phone_link'] ?? 'tel:+919773039243',
+                'contact_email' => $meta['contact_email'] ?? (Setting::where('key', 'store_email')->value('value') ?: 'support@knotelle.in'),
+                'contact_email_link' => $meta['contact_email_link'] ?? 'mailto:support@knotelle.in',
+                'contact_address' => $meta['contact_address'] ?? 'India',
+                'contact_address_link' => $meta['contact_address_link'] ?? '',
+                'is_active' => $media ? (bool)$media->is_active : true,
+            ]
+        ]);
+    }
+
+    /**
+     * Save Dynamic Footer Settings
+     */
+    public function saveFooterSettings(Request $request): JsonResponse
+    {
+        $request->validate([
+            'title' => 'nullable|string|max:255',
+            'subtitle' => 'nullable|string|max:255',
+            'copyright_text' => 'nullable|string|max:255',
+            'heart_tagline' => 'nullable|string|max:255',
+            'instagram_url' => 'nullable|string|max:500',
+            'facebook_url' => 'nullable|string|max:500',
+            'pinterest_url' => 'nullable|string|max:500',
+            'youtube_url' => 'nullable|string|max:500',
+            'col1_title' => 'nullable|string|max:100',
+            'col2_title' => 'nullable|string|max:100',
+            'col3_title' => 'nullable|string|max:100',
+            'contact_phone' => 'nullable|string|max:100',
+            'contact_phone_link' => 'nullable|string|max:255',
+            'contact_email' => 'nullable|string|max:255',
+            'contact_email_link' => 'nullable|string|max:255',
+            'contact_address' => 'nullable|string|max:255',
+            'bg_image_file' => 'nullable|file|mimes:jpeg,png,jpg,webp|max:10240',
+            'bg_image_url' => 'nullable|string',
+        ]);
+
+        $media = Media::where('section', 'footer')->where('slot', 'section_settings')->first();
+        if (!$media) {
+            $media = new Media();
+            $media->page = 'homepage';
+            $media->section = 'footer';
+            $media->slot = 'section_settings';
+            $media->file_name = 'footer_settings.json';
+            $media->file_path = 'media/footer/footer_settings.json';
+            $media->disk = 'local';
+            $media->mime_type = 'application/json';
+            $media->file_type = 'document';
+            $media->uploaded_by = auth()->id() ?: 1;
+            $media->uploader_type = 'admin';
+        }
+
+        $meta = $media->metadata ?: [];
+        $meta['copyright_text'] = $request->input('copyright_text', '© ' . date('Y') . ' Knotelle. All rights reserved.');
+        $meta['heart_tagline'] = $request->input('heart_tagline', 'Made with ♡ for a kinder, cozier world.');
+        $meta['instagram_url'] = $request->input('instagram_url', 'https://instagram.com/knotelleindia');
+        $meta['instagram_active'] = $request->has('instagram_active') ? filter_var($request->input('instagram_active'), FILTER_VALIDATE_BOOLEAN) : true;
+        $meta['facebook_url'] = $request->input('facebook_url', 'https://facebook.com/knotelleindia');
+        $meta['facebook_active'] = $request->has('facebook_active') ? filter_var($request->input('facebook_active'), FILTER_VALIDATE_BOOLEAN) : true;
+        $meta['pinterest_url'] = $request->input('pinterest_url', 'https://pinterest.com/knotelleindia');
+        $meta['pinterest_active'] = $request->has('pinterest_active') ? filter_var($request->input('pinterest_active'), FILTER_VALIDATE_BOOLEAN) : true;
+        $meta['youtube_url'] = $request->input('youtube_url', 'https://youtube.com/@knotelleindia');
+        $meta['youtube_active'] = $request->has('youtube_active') ? filter_var($request->input('youtube_active'), FILTER_VALIDATE_BOOLEAN) : true;
+
+        $meta['col1_title'] = $request->input('col1_title', 'Quick Links');
+        if ($request->has('col1_links')) {
+            $meta['col1_links'] = is_array($request->input('col1_links')) ? $request->input('col1_links') : json_decode($request->input('col1_links'), true);
+        }
+
+        $meta['col2_title'] = $request->input('col2_title', 'Help');
+        if ($request->has('col2_links')) {
+            $meta['col2_links'] = is_array($request->input('col2_links')) ? $request->input('col2_links') : json_decode($request->input('col2_links'), true);
+        }
+
+        $meta['col3_title'] = $request->input('col3_title', 'Contact');
+        $meta['contact_phone'] = $request->input('contact_phone', '+91 97730 39243');
+        $meta['contact_phone_link'] = $request->input('contact_phone_link', 'tel:+919773039243');
+        $meta['contact_email'] = $request->input('contact_email', 'support@knotelle.in');
+        $meta['contact_email_link'] = $request->input('contact_email_link', 'mailto:support@knotelle.in');
+        $meta['contact_address'] = $request->input('contact_address', 'India');
+        $meta['contact_address_link'] = $request->input('contact_address_link', '');
+
+        // Handle background image upload
+        if ($request->hasFile('bg_image_file')) {
+            $file = $request->file('bg_image_file');
+            $uploadDir = public_path('images/footer');
+            if (!file_exists($uploadDir)) {
+                mkdir($uploadDir, 0755, true);
+            }
+            $ext = strtolower($file->getClientOriginalExtension() ?: 'png');
+            $uniqueName = 'footer_bg_' . time() . '.' . $ext;
+            $file->move($uploadDir, $uniqueName);
+            $bgPath = 'images/footer/' . $uniqueName;
+
+            // Update or create footer_bg media slot
+            Media::updateOrCreate(
+                ['page' => 'homepage', 'section' => 'footer', 'slot' => 'footer_bg'],
+                [
+                    'file_name' => $uniqueName,
+                    'file_path' => $bgPath,
+                    'disk' => 'local',
+                    'mime_type' => 'image/' . $ext,
+                    'file_type' => 'image',
+                    'title' => 'Footer Panoramic Background',
+                    'sort_order' => 1,
+                    'is_active' => true,
+                    'uploaded_by' => auth()->id() ?: 1,
+                    'uploader_type' => 'admin',
+                ]
+            );
+        } elseif ($request->filled('bg_image_url')) {
+            Media::updateOrCreate(
+                ['page' => 'homepage', 'section' => 'footer', 'slot' => 'footer_bg'],
+                [
+                    'file_name' => 'footer.png',
+                    'file_path' => $request->input('bg_image_url'),
+                    'disk' => 'local',
+                    'mime_type' => 'image/png',
+                    'file_type' => 'image',
+                    'title' => 'Footer Panoramic Background',
+                    'sort_order' => 1,
+                    'is_active' => true,
+                    'uploaded_by' => auth()->id() ?: 1,
+                    'uploader_type' => 'admin',
+                ]
+            );
+        }
+
+        $media->title = $request->input('title', 'KNOTELLE');
+        $media->subtitle = $request->input('subtitle', 'Made with ♡ for a kinder, cozier world.');
+        $media->metadata = $meta;
+        $media->is_active = $request->has('is_active') ? filter_var($request->input('is_active'), FILTER_VALIDATE_BOOLEAN) : true;
+        $media->save();
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Footer settings updated successfully!',
+            'data' => $media,
+        ]);
+    }
+
+    /**
+     * Get Dynamic Navbar Settings
+     */
+    public function getNavbarSettings(): JsonResponse
+    {
+        $media = Media::where('page', 'global')->where('section', 'navbar')->first();
+        $meta = $media && $media->metadata ? $media->metadata : [];
+        $logoMedia = Media::where('page', 'global')->where('section', 'global_assets')->where('slot', 'main_logo')->first();
+
+        return response()->json([
+            'success' => true,
+            'data' => [
+                'id' => $media ? $media->id : null,
+                'logo_url' => $logoMedia ? $logoMedia->url : asset('images/logo/Logo_1.png'),
+                'announcement_text' => $meta['announcement_text'] ?? '✨ Free Pan-India Delivery on all Orders above ₹999',
+                'announcement_link' => $meta['announcement_link'] ?? '/shop',
+                'announcement_active' => isset($meta['announcement_active']) ? (bool)$meta['announcement_active'] : false,
+                'nav_links' => $meta['nav_links'] ?? [
+                    ['name' => 'Home', 'href' => '/', 'is_highlighted' => false, 'is_active' => true],
+                    ['name' => 'Shop', 'href' => '/shop', 'is_highlighted' => false, 'is_active' => true],
+                    ['name' => 'Custom Order', 'href' => '/custom-order', 'is_highlighted' => true, 'is_active' => true],
+                    ['name' => 'About', 'href' => '/about', 'is_highlighted' => false, 'is_active' => true],
+                    ['name' => 'Contact', 'href' => '/contact', 'is_highlighted' => false, 'is_active' => true],
+                ],
+                'show_search' => isset($meta['show_search']) ? (bool)$meta['show_search'] : true,
+                'show_wishlist' => isset($meta['show_wishlist']) ? (bool)$meta['show_wishlist'] : true,
+                'show_account' => isset($meta['show_account']) ? (bool)$meta['show_account'] : true,
+                'show_cart' => isset($meta['show_cart']) ? (bool)$meta['show_cart'] : true,
+                'is_active' => $media ? (bool)$media->is_active : true,
+            ]
+        ]);
+    }
+
+    /**
+     * Save Dynamic Navbar Settings
+     */
+    public function saveNavbarSettings(Request $request): JsonResponse
+    {
+        $request->validate([
+            'announcement_text' => 'nullable|string|max:255',
+            'announcement_link' => 'nullable|string|max:255',
+            'announcement_active' => 'nullable',
+            'nav_links' => 'nullable',
+            'show_search' => 'nullable',
+            'show_wishlist' => 'nullable',
+            'show_account' => 'nullable',
+            'show_cart' => 'nullable',
+        ]);
+
+        $media = Media::where('page', 'global')->where('section', 'navbar')->first();
+        if (!$media) {
+            $media = new Media();
+            $media->page = 'global';
+            $media->section = 'navbar';
+            $media->slot = 'navbar_settings';
+            $media->file_name = 'navbar_settings.json';
+            $media->file_path = 'media/global/navbar_settings.json';
+            $media->disk = 'local';
+            $media->mime_type = 'application/json';
+            $media->file_type = 'document';
+            $media->uploaded_by = auth()->id() ?: 1;
+            $media->uploader_type = 'admin';
+        }
+
+        $meta = $media->metadata ?: [];
+        $meta['announcement_text'] = $request->input('announcement_text', '✨ Free Pan-India Delivery on all Orders above ₹999');
+        $meta['announcement_link'] = $request->input('announcement_link', '/shop');
+        $meta['announcement_active'] = $request->has('announcement_active') ? filter_var($request->input('announcement_active'), FILTER_VALIDATE_BOOLEAN) : false;
+
+        if ($request->has('nav_links')) {
+            $meta['nav_links'] = is_array($request->input('nav_links')) ? $request->input('nav_links') : json_decode($request->input('nav_links'), true);
+        }
+
+        $meta['show_search'] = $request->has('show_search') ? filter_var($request->input('show_search'), FILTER_VALIDATE_BOOLEAN) : true;
+        $meta['show_wishlist'] = $request->has('show_wishlist') ? filter_var($request->input('show_wishlist'), FILTER_VALIDATE_BOOLEAN) : true;
+        $meta['show_account'] = $request->has('show_account') ? filter_var($request->input('show_account'), FILTER_VALIDATE_BOOLEAN) : true;
+        $meta['show_cart'] = $request->has('show_cart') ? filter_var($request->input('show_cart'), FILTER_VALIDATE_BOOLEAN) : true;
+
+        $media->metadata = $meta;
+        $media->is_active = $request->has('is_active') ? filter_var($request->input('is_active'), FILTER_VALIDATE_BOOLEAN) : true;
+        $media->save();
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Navbar settings updated successfully!',
+            'data' => $media,
+        ]);
+    }
 }
+
+

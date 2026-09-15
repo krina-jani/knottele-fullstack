@@ -32,6 +32,10 @@
                             <i class="fas fa-map-marker-alt"></i> Visit Us
                         </div>
                         <div class="mb-3">
+                            <label class="block text-sm font-medium text-stone-700 mb-1">Studio / Place Name</label>
+                            <input type="text" name="studio_name" value="{{ old('studio_name', $contactSettings['studio_name'] ?? 'KNOTELLE Studio') }}" class="w-full px-3 py-2 border border-stone-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-red-500" placeholder="KNOTELLE Studio">
+                        </div>
+                        <div class="mb-3">
                             <label class="block text-sm font-medium text-stone-700 mb-1">Address Line 1</label>
                             <input type="text" name="address_line_1" value="{{ old('address_line_1', $contactSettings['address_line_1']) }}" class="w-full px-3 py-2 border border-stone-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-red-500" required>
                         </div>

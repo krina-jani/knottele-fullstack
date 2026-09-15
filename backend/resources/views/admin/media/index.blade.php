@@ -62,13 +62,18 @@
                         <option value="custom_order">Custom Order CTA (Homepage)</option>
                         <option value="newsletter">Newsletter (Homepage)</option>
                         <option value="blog_reels">Blog / Videos & Reels (Homepage)</option>
-                        <option value="footer">Footer Artwork (Homepage)</option>
+                        <option value="footer">Footer Artwork & Navigation (Homepage)</option>
+                        <option value="navbar_settings">Navbar & Header Navigation (Global)</option>
                         <option value="shop_banner">Shop Header & Banner (Shop)</option>
                         <option value="shop_promo">Shop Promo Banner (Shop)</option>
                         <option value="custom_order_header">Custom Order Header Banner (Custom Order)</option>
                         <option value="custom_order_showcase">Craft Process Showcase (Custom Order)</option>
-                        <option value="about_story">Atelier & Story (About)</option>
-                        <option value="contact_header">Contact Banner & Atelier (Contact)</option>
+                        <option value="about_story">The KNOTELLE Story (About)</option>
+                        <option value="craft_pillars">Our Craft Pillars (About)</option>
+                        <option value="contact_intro">Contact Introduction / Hero (Contact)</option>
+                        <option value="contact_info">Contact Information & Atelier (Contact)</option>
+                        <option value="contact_form">Send Us a Message / Form (Contact)</option>
+                        <option value="contact_faqs">Frequently Asked Questions (Contact)</option>
                         <option value="global_assets">Global Site Assets</option>
                     </select>
                 </div>
@@ -1058,6 +1063,1506 @@
             </form>
         </div>
     </div>
+
+    <!-- MODAL 9: ABOUT STORY MODAL -->
+    <div id="aboutStoryModal" onclick="if(event.target === this) closeAboutStoryModal()" class="fixed inset-0 bg-stone-900/60 backdrop-blur-xs hidden items-center justify-center z-50 p-4">
+        <div class="bg-white rounded-3xl max-w-3xl w-full max-h-[92vh] flex flex-col overflow-hidden shadow-2xl border border-stone-100 animate-fadeIn" onclick="event.stopPropagation()">
+            <!-- Pinned Header -->
+            <div class="p-5 px-6 border-b border-stone-100 flex items-center justify-between bg-stone-50/80 shrink-0">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-2xl bg-red-50 text-red-600 flex items-center justify-center font-bold text-base shadow-2xs">
+                        <i class="fas fa-book-open"></i>
+                    </div>
+                    <div>
+                        <h3 class="text-base font-bold text-stone-800">Edit The KNOTELLE Story & Atelier</h3>
+                        <p class="text-xs text-stone-500 font-medium">Manage story headings, descriptive paragraphs, visuals, floating badge, and CTA</p>
+                    </div>
+                </div>
+                <button type="button" onclick="closeAboutStoryModal()" class="w-8 h-8 rounded-full bg-stone-100 text-stone-400 hover:text-stone-700 flex items-center justify-center transition-colors cursor-pointer">
+                    <i class="fas fa-times text-sm"></i>
+                </button>
+            </div>
+
+            <!-- Form Wrapper -->
+            <form id="aboutStoryForm" onsubmit="handleAboutStorySubmit(event)" class="flex flex-col flex-1 min-h-0 overflow-hidden">
+                <input type="hidden" id="aboutStoryDesktopUrl" name="desktop_image_url" value="">
+                <input type="hidden" id="aboutStoryMobileUrl" name="mobile_image_url" value="">
+
+                <div class="p-6 space-y-5 overflow-y-auto flex-1 overscroll-contain">
+                    <!-- Headings Group -->
+                    <div class="space-y-3">
+                        <div class="flex items-center gap-2 border-b border-stone-100 pb-1.5">
+                            <i class="fas fa-heading text-red-600 text-xs"></i>
+                            <span class="text-xs font-bold text-stone-700 uppercase tracking-wider">Story Headings & Tagline</span>
+                        </div>
+
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+                            <div>
+                                <label class="block text-xs font-bold text-stone-600 uppercase tracking-wider mb-1">Eyebrow Badge <span class="text-red-500">*</span></label>
+                                <input type="text" id="aboutStoryTagText" name="tag_text" required placeholder="e.g. The KNOTELLE Story" class="w-full bg-stone-50 border border-stone-200 rounded-xl px-3.5 py-2.5 text-sm font-semibold text-stone-800 focus:bg-white focus:outline-none focus:ring-2 focus:ring-red-500">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold text-stone-600 uppercase tracking-wider mb-1">Main Headline Title <span class="text-red-500">*</span></label>
+                                <input type="text" id="aboutStoryTitle" name="title" required placeholder="e.g. Every Loop Tells a Story" class="w-full bg-stone-50 border border-stone-200 rounded-xl px-3.5 py-2.5 text-sm font-semibold text-stone-800 focus:bg-white focus:outline-none focus:ring-2 focus:ring-red-500">
+                            </div>
+                        </div>
+
+                        <div>
+                            <label class="block text-xs font-bold text-stone-600 uppercase tracking-wider mb-1">Subtitle / Catchphrase</label>
+                            <input type="text" id="aboutStorySubtitle" name="subtitle" placeholder="e.g. Handcrafted slow-made warmth from Bengaluru" class="w-full bg-stone-50 border border-stone-200 rounded-xl px-3.5 py-2.5 text-sm font-semibold text-stone-800 focus:bg-white focus:outline-none focus:ring-2 focus:ring-red-500">
+                        </div>
+                    </div>
+
+                    <!-- Story Paragraphs -->
+                    <div class="space-y-3 pt-1">
+                        <div class="flex items-center gap-2 border-b border-stone-100 pb-1.5">
+                            <i class="fas fa-paragraph text-red-600 text-xs"></i>
+                            <span class="text-xs font-bold text-stone-700 uppercase tracking-wider">Story Narrative (2 Paragraphs)</span>
+                        </div>
+
+                        <div>
+                            <label class="block text-xs font-bold text-stone-600 uppercase tracking-wider mb-1">Paragraph 1 (Primary Narrative) <span class="text-red-500">*</span></label>
+                            <textarea id="aboutStoryDescription" name="description" rows="3" required placeholder="In a world flooded with disposable factory goods..." class="w-full bg-stone-50 border border-stone-200 rounded-xl px-3.5 py-2.5 text-sm font-semibold text-stone-800 focus:bg-white focus:outline-none focus:ring-2 focus:ring-red-500"></textarea>
+                        </div>
+
+                        <div>
+                            <label class="block text-xs font-bold text-stone-600 uppercase tracking-wider mb-1">Paragraph 2 (Secondary Narrative)</label>
+                            <textarea id="aboutStoryParagraph2" name="paragraph_2" rows="3" placeholder="When you order a bouquet of crochet roses, a customized bunny keychain..." class="w-full bg-stone-50 border border-stone-200 rounded-xl px-3.5 py-2.5 text-sm font-semibold text-stone-800 focus:bg-white focus:outline-none focus:ring-2 focus:ring-red-500"></textarea>
+                        </div>
+                    </div>
+
+                    <!-- Story Imagery -->
+                    <div class="space-y-3 pt-1">
+                        <div class="flex items-center gap-2 border-b border-stone-100 pb-1.5">
+                            <i class="fas fa-image text-red-600 text-xs"></i>
+                            <span class="text-xs font-bold text-stone-700 uppercase tracking-wider">Artisan Crafting Visual (Desktop & Mobile)</span>
+                        </div>
+
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <!-- Desktop Box -->
+                            <div class="bg-stone-50/80 border border-stone-200/90 rounded-2xl p-4 space-y-2.5">
+                                <div class="flex items-center justify-between">
+                                    <span class="text-xs font-bold text-stone-800">Desktop / Main Photo</span>
+                                    <button type="button" onclick="openMediaPicker('about_desktop')" class="px-2 py-0.5 rounded-lg bg-white hover:bg-stone-100 border border-stone-200 text-stone-700 text-[10px] font-bold transition-all flex items-center gap-1 cursor-pointer">
+                                        <i class="fas fa-photo-video text-red-500"></i> Media Library
+                                    </button>
+                                </div>
+                                <div class="border-2 border-dashed border-stone-200 rounded-xl p-3 text-center hover:border-red-400 hover:bg-red-50/20 transition-all cursor-pointer" onclick="document.getElementById('aboutStoryDesktopFileInput').click()">
+                                    <i class="fas fa-cloud-upload-alt text-red-500 text-base mb-1"></i>
+                                    <p class="text-xs font-bold text-stone-700" id="aboutDesktopFileLabel">Upload Desktop Photo</p>
+                                    <p class="text-[10px] text-stone-400">1000 × 1100 px (JPG/PNG/WEBP)</p>
+                                    <input type="file" id="aboutStoryDesktopFileInput" name="image" class="hidden" accept=".jpg,.jpeg,.png,.webp" onchange="handleAboutDesktopFileChange(this)">
+                                </div>
+                                <div id="aboutDesktopPreviewContainer" class="bg-white rounded-xl p-2 border border-stone-200 flex items-center gap-3">
+                                    <img id="aboutDesktopPreviewImg" src="" class="w-14 h-14 rounded-lg object-cover border border-stone-200">
+                                    <div class="flex-1 min-w-0">
+                                        <p class="text-xs font-bold text-stone-800 truncate" id="aboutDesktopFileName">Main Photo Active</p>
+                                        <p class="text-[10px] text-emerald-600 font-semibold" id="aboutDesktopFileSize">Ready</p>
+                                    </div>
+                                    <button type="button" onclick="clearAboutDesktopFileInput()" class="text-stone-400 hover:text-red-600 p-1 cursor-pointer"><i class="fas fa-times"></i></button>
+                                </div>
+                            </div>
+
+                            <!-- Mobile Box -->
+                            <div class="bg-stone-50/80 border border-stone-200/90 rounded-2xl p-4 space-y-2.5">
+                                <div class="flex items-center justify-between">
+                                    <span class="text-xs font-bold text-stone-800">Mobile Photo <span class="text-stone-400 text-[10px]">(Optional)</span></span>
+                                    <button type="button" onclick="openMediaPicker('about_mobile')" class="px-2 py-0.5 rounded-lg bg-white hover:bg-stone-100 border border-stone-200 text-stone-700 text-[10px] font-bold transition-all flex items-center gap-1 cursor-pointer">
+                                        <i class="fas fa-photo-video text-red-500"></i> Media Library
+                                    </button>
+                                </div>
+                                <div class="border-2 border-dashed border-stone-200 rounded-xl p-3 text-center hover:border-red-400 hover:bg-red-50/20 transition-all cursor-pointer" onclick="document.getElementById('aboutStoryMobileFileInput').click()">
+                                    <i class="fas fa-cloud-upload-alt text-red-500 text-base mb-1"></i>
+                                    <p class="text-xs font-bold text-stone-700" id="aboutMobileFileLabel">Upload Mobile Photo</p>
+                                    <p class="text-[10px] text-stone-400">768 × 800 px (Optional)</p>
+                                    <input type="file" id="aboutStoryMobileFileInput" name="mobile_image" class="hidden" accept=".jpg,.jpeg,.png,.webp" onchange="handleAboutMobileFileChange(this)">
+                                </div>
+                                <div id="aboutMobilePreviewContainer" class="hidden bg-white rounded-xl p-2 border border-stone-200 flex items-center gap-3">
+                                    <img id="aboutMobilePreviewImg" src="" class="w-14 h-14 rounded-lg object-cover border border-stone-200">
+                                    <div class="flex-1 min-w-0">
+                                        <p class="text-xs font-bold text-stone-800 truncate" id="aboutMobileFileName">Mobile Photo Active</p>
+                                        <p class="text-[10px] text-emerald-600 font-semibold" id="aboutMobileFileSize">Ready</p>
+                                    </div>
+                                    <button type="button" onclick="clearAboutMobileFileInput()" class="text-stone-400 hover:text-red-600 p-1 cursor-pointer"><i class="fas fa-times"></i></button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div>
+                            <label class="block text-xs font-bold text-stone-600 uppercase tracking-wider mb-1">Alt Text (SEO & Accessibility)</label>
+                            <input type="text" id="aboutStoryAlt" name="alt_text" placeholder="e.g. Artisan stitching crochet with wooden hook" class="w-full bg-stone-50 border border-stone-200 rounded-xl px-3.5 py-2 text-sm font-semibold text-stone-800 focus:bg-white focus:outline-none focus:ring-2 focus:ring-red-500">
+                        </div>
+                    </div>
+
+                    <!-- Floating Badge Settings -->
+                    <div class="space-y-3 pt-1">
+                        <div class="flex items-center gap-2 border-b border-stone-100 pb-1.5">
+                            <i class="fas fa-certificate text-red-600 text-xs"></i>
+                            <span class="text-xs font-bold text-stone-700 uppercase tracking-wider">Floating Handcrafted Badge</span>
+                        </div>
+
+                        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3.5">
+                            <div>
+                                <label class="block text-xs font-bold text-stone-600 uppercase tracking-wider mb-1">Badge Title</label>
+                                <input type="text" id="aboutStoryFloatingTitle" name="floating_badge_title" placeholder="e.g. 100% Handcrafted" class="w-full bg-stone-50 border border-stone-200 rounded-xl px-3.5 py-2 text-sm font-semibold text-stone-800 focus:bg-white focus:outline-none focus:ring-2 focus:ring-red-500">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold text-stone-600 uppercase tracking-wider mb-1">Badge Subtitle</label>
+                                <input type="text" id="aboutStoryFloatingSubtitle" name="floating_badge_subtitle" placeholder="e.g. Never mass machine produced" class="w-full bg-stone-50 border border-stone-200 rounded-xl px-3.5 py-2 text-sm font-semibold text-stone-800 focus:bg-white focus:outline-none focus:ring-2 focus:ring-red-500">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold text-stone-600 uppercase tracking-wider mb-1">Badge Icon</label>
+                                <select id="aboutStoryFloatingIcon" name="floating_badge_icon" class="w-full bg-stone-50 border border-stone-200 rounded-xl px-3.5 py-2.5 text-sm font-semibold text-stone-800 focus:bg-white focus:outline-none focus:ring-2 focus:ring-red-500">
+                                    <option value="Heart">Heart (♡)</option>
+                                    <option value="Sparkles">Sparkles (✨)</option>
+                                    <option value="Leaf">Leaf (🌿)</option>
+                                    <option value="Flower2">Flower (🌸)</option>
+                                    <option value="ShieldCheck">Shield / Quality (🛡️)</option>
+                                    <option value="Star">Star (⭐)</option>
+                                    <option value="Sun">Sun (☀️)</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="flex items-center gap-2 pt-1">
+                            <input type="checkbox" id="aboutStoryFloatingActive" name="floating_badge_active" checked class="w-4 h-4 rounded text-red-600 focus:ring-red-500">
+                            <label for="aboutStoryFloatingActive" class="text-xs font-bold text-stone-700">Display Floating Badge on Photo</label>
+                        </div>
+                    </div>
+
+                    <!-- Call To Action Button -->
+                    <div class="space-y-3 pt-1">
+                        <div class="flex items-center gap-2 border-b border-stone-100 pb-1.5">
+                            <i class="fas fa-mouse-pointer text-red-600 text-xs"></i>
+                            <span class="text-xs font-bold text-stone-700 uppercase tracking-wider">Custom Creation Call-To-Action</span>
+                        </div>
+
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+                            <div>
+                                <label class="block text-xs font-bold text-stone-600 uppercase tracking-wider mb-1">CTA Button Text</label>
+                                <input type="text" id="aboutStoryCtaText" name="cta_text" placeholder="e.g. Request a Custom Creation" class="w-full bg-stone-50 border border-stone-200 rounded-xl px-3.5 py-2 text-sm font-semibold text-stone-800 focus:bg-white focus:outline-none focus:ring-2 focus:ring-red-500">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold text-stone-600 uppercase tracking-wider mb-1">CTA Button Link</label>
+                                <input type="text" id="aboutStoryCtaLink" name="cta_link" placeholder="e.g. /custom-order" class="w-full bg-stone-50 border border-stone-200 rounded-xl px-3.5 py-2 text-sm font-semibold text-stone-800 focus:bg-white focus:outline-none focus:ring-2 focus:ring-red-500">
+                            </div>
+                        </div>
+
+                        <div class="flex items-center justify-between gap-4 pt-1">
+                            <div class="flex items-center gap-2">
+                                <input type="checkbox" id="aboutStoryCtaVisible" name="cta_visible" checked class="w-4 h-4 rounded text-red-600 focus:ring-red-500">
+                                <label for="aboutStoryCtaVisible" class="text-xs font-bold text-stone-700">Display CTA Button on Story</label>
+                            </div>
+
+                            <div class="flex items-center gap-2">
+                                <input type="checkbox" id="aboutStoryActive" name="is_active" checked class="w-4 h-4 rounded text-red-600 focus:ring-red-500">
+                                <label for="aboutStoryActive" class="text-xs font-bold text-stone-700">Section Active on public /about page</label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Sticky Footer with Action Buttons -->
+                <div class="p-4 px-6 bg-stone-50 border-t border-stone-100 shrink-0 flex items-center justify-end gap-3">
+                    <button type="button" onclick="closeAboutStoryModal()" class="btn-secondary text-xs px-5 py-2.5 cursor-pointer">Cancel</button>
+                    <button type="submit" id="aboutStorySubmitBtn" class="btn-primary text-xs px-6 py-2.5 flex items-center gap-2 shadow-sm cursor-pointer">
+                        <i class="fas fa-save"></i>
+                        <span>Save Story & Visuals</span>
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- MODAL 10: CRAFT PILLARS HEADER SETTINGS MODAL -->
+    <div id="craftPillarsHeaderModal" onclick="if(event.target === this) closeCraftPillarsHeaderModal()" class="fixed inset-0 bg-stone-900/60 backdrop-blur-xs hidden items-center justify-center z-50 p-4">
+        <div class="bg-white rounded-3xl max-w-lg w-full max-h-[90vh] flex flex-col overflow-hidden shadow-2xl border border-stone-100 animate-fadeIn" onclick="event.stopPropagation()">
+            <!-- Pinned Header -->
+            <div class="p-5 px-6 border-b border-stone-100 flex items-center justify-between bg-stone-50/80 shrink-0">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-2xl bg-red-50 text-red-600 flex items-center justify-center font-bold text-base shadow-2xs">
+                        <i class="fas fa-cog"></i>
+                    </div>
+                    <div>
+                        <h3 class="text-base font-bold text-stone-800">Our Craft Pillars Section Header</h3>
+                        <p class="text-xs text-stone-500 font-medium">Customize section title, subtitle, and badge</p>
+                    </div>
+                </div>
+                <button type="button" onclick="closeCraftPillarsHeaderModal()" class="w-8 h-8 rounded-full bg-stone-100 text-stone-400 hover:text-stone-700 flex items-center justify-center transition-colors cursor-pointer">
+                    <i class="fas fa-times text-sm"></i>
+                </button>
+            </div>
+
+            <!-- Form Wrapper -->
+            <form id="craftPillarsHeaderForm" onsubmit="handleCraftPillarsHeaderSubmit(event)" class="flex flex-col flex-1 min-h-0 overflow-hidden">
+                <div class="p-6 space-y-4 overflow-y-auto flex-1 overscroll-contain">
+                    <div>
+                        <label class="block text-xs font-bold text-stone-600 uppercase tracking-wider mb-1">Section Title <span class="text-red-500">*</span></label>
+                        <input type="text" id="craftPillarsHeaderTitle" name="title" required value="Our Craft Pillars" placeholder="e.g. Our Craft Pillars" class="w-full bg-stone-50 border border-stone-200 rounded-xl px-3.5 py-2.5 text-sm font-semibold text-stone-800 focus:bg-white focus:outline-none focus:ring-2 focus:ring-red-500">
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-bold text-stone-600 uppercase tracking-wider mb-1">Eyebrow Badge Text</label>
+                        <input type="text" id="craftPillarsHeaderTagText" name="tag_text" value="Artisan Standards" placeholder="e.g. Artisan Standards" class="w-full bg-stone-50 border border-stone-200 rounded-xl px-3.5 py-2.5 text-sm font-semibold text-stone-800 focus:bg-white focus:outline-none focus:ring-2 focus:ring-red-500">
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-bold text-stone-600 uppercase tracking-wider mb-1">Section Subtitle / Description</label>
+                        <textarea id="craftPillarsHeaderSubtitle" name="subtitle" rows="3" placeholder="Guiding principles behind every stitch we make..." class="w-full bg-stone-50 border border-stone-200 rounded-xl px-3.5 py-2.5 text-sm font-semibold text-stone-800 focus:bg-white focus:outline-none focus:ring-2 focus:ring-red-500">Guiding principles behind every stitch we make.</textarea>
+                    </div>
+
+                    <div class="flex items-center gap-2 pt-2">
+                        <input type="checkbox" id="craftPillarsHeaderActive" name="is_active" checked class="w-4 h-4 rounded text-red-600 focus:ring-red-500">
+                        <label for="craftPillarsHeaderActive" class="text-xs font-bold text-stone-700">Section Active (Visible on About Page)</label>
+                    </div>
+                </div>
+
+                <!-- Sticky Footer with Action Buttons -->
+                <div class="p-4 px-6 bg-stone-50 border-t border-stone-100 shrink-0 flex items-center justify-end gap-3">
+                    <button type="button" onclick="closeCraftPillarsHeaderModal()" class="btn-secondary text-xs px-5 py-2.5 cursor-pointer">Cancel</button>
+                    <button type="submit" id="craftPillarsHeaderSubmitBtn" class="btn-primary text-xs px-6 py-2.5 flex items-center gap-2 shadow-sm cursor-pointer">
+                        <i class="fas fa-save"></i>
+                        <span>Save Section Header</span>
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- MODAL 11: ADD / EDIT CRAFT PILLAR MODAL -->
+    <div id="craftPillarModal" onclick="if(event.target === this) closeCraftPillarModal()" class="fixed inset-0 bg-stone-900/60 backdrop-blur-xs hidden items-center justify-center z-50 p-4">
+        <div class="bg-white rounded-3xl max-w-xl w-full max-h-[92vh] flex flex-col overflow-hidden shadow-2xl border border-stone-100 animate-fadeIn" onclick="event.stopPropagation()">
+            <!-- Pinned Header -->
+            <div class="p-5 px-6 border-b border-stone-100 flex items-center justify-between bg-stone-50/80 shrink-0">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-2xl bg-red-50 text-red-600 flex items-center justify-center font-bold text-base shadow-2xs">
+                        <i class="fas fa-cube"></i>
+                    </div>
+                    <div>
+                        <h3 class="text-base font-bold text-stone-800" id="craftPillarModalTitle">Add Craft Pillar</h3>
+                        <p class="text-xs text-stone-500 font-medium">Add or edit craftsmanship pillars displayed on the About page</p>
+                    </div>
+                </div>
+                <button type="button" onclick="closeCraftPillarModal()" class="w-8 h-8 rounded-full bg-stone-100 text-stone-400 hover:text-stone-700 flex items-center justify-center transition-colors cursor-pointer">
+                    <i class="fas fa-times text-sm"></i>
+                </button>
+            </div>
+
+            <!-- Form Wrapper -->
+            <form id="craftPillarForm" onsubmit="handleCraftPillarSubmit(event)" class="flex flex-col flex-1 min-h-0 overflow-hidden">
+                <input type="hidden" id="craftPillarId" name="id" value="">
+                <input type="hidden" id="craftPillarIconName" name="icon_name" value="Leaf">
+                <input type="hidden" id="craftPillarIconType" name="icon_type" value="preset">
+
+                <div class="p-6 space-y-4 overflow-y-auto flex-1 overscroll-contain">
+                    <div>
+                        <label class="block text-xs font-bold text-stone-600 uppercase tracking-wider mb-1">Pillar Title <span class="text-red-500">*</span></label>
+                        <input type="text" id="craftPillarTitle" name="title" required placeholder="e.g. Natural Materials" class="w-full bg-stone-50 border border-stone-200 rounded-xl px-3.5 py-2.5 text-sm font-semibold text-stone-800 focus:bg-white focus:outline-none focus:ring-2 focus:ring-red-500">
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-bold text-stone-600 uppercase tracking-wider mb-1">Pillar Description <span class="text-red-500">*</span></label>
+                        <textarea id="craftPillarDescription" name="description" rows="3" required placeholder="We use 100% pure milk cotton and mercerized organic fibers..." class="w-full bg-stone-50 border border-stone-200 rounded-xl px-3.5 py-2.5 text-sm font-semibold text-stone-800 focus:bg-white focus:outline-none focus:ring-2 focus:ring-red-500"></textarea>
+                    </div>
+
+                    <!-- Icon Selector -->
+                    <div class="space-y-2 pt-1">
+                        <label class="block text-xs font-bold text-stone-600 uppercase tracking-wider">Choose Botanical / Luxury Icon</label>
+                        
+                        <!-- Visual Icon Preset Grid -->
+                        <div class="grid grid-cols-4 sm:grid-cols-6 gap-2 p-3 bg-stone-50 rounded-2xl border border-stone-200" id="pillarIconPickerGrid">
+                            <button type="button" onclick="selectPillarIcon('Leaf')" data-icon="Leaf" class="pillar-icon-btn p-2.5 rounded-xl border border-stone-200 bg-white hover:border-red-400 flex flex-col items-center gap-1 transition-all cursor-pointer">
+                                <i class="fas fa-leaf text-base text-red-600"></i>
+                                <span class="text-[10px] font-bold text-stone-700">Leaf</span>
+                            </button>
+                            <button type="button" onclick="selectPillarIcon('Sparkles')" data-icon="Sparkles" class="pillar-icon-btn p-2.5 rounded-xl border border-stone-200 bg-white hover:border-red-400 flex flex-col items-center gap-1 transition-all cursor-pointer">
+                                <i class="fas fa-magic text-base text-red-600"></i>
+                                <span class="text-[10px] font-bold text-stone-700">Sparkles</span>
+                            </button>
+                            <button type="button" onclick="selectPillarIcon('Heart')" data-icon="Heart" class="pillar-icon-btn p-2.5 rounded-xl border border-stone-200 bg-white hover:border-red-400 flex flex-col items-center gap-1 transition-all cursor-pointer">
+                                <i class="fas fa-heart text-base text-red-600"></i>
+                                <span class="text-[10px] font-bold text-stone-700">Heart</span>
+                            </button>
+                            <button type="button" onclick="selectPillarIcon('Flower2')" data-icon="Flower2" class="pillar-icon-btn p-2.5 rounded-xl border border-stone-200 bg-white hover:border-red-400 flex flex-col items-center gap-1 transition-all cursor-pointer">
+                                <i class="fas fa-spa text-base text-red-600"></i>
+                                <span class="text-[10px] font-bold text-stone-700">Flower</span>
+                            </button>
+                            <button type="button" onclick="selectPillarIcon('ShieldCheck')" data-icon="ShieldCheck" class="pillar-icon-btn p-2.5 rounded-xl border border-stone-200 bg-white hover:border-red-400 flex flex-col items-center gap-1 transition-all cursor-pointer">
+                                <i class="fas fa-shield-alt text-base text-red-600"></i>
+                                <span class="text-[10px] font-bold text-stone-700">Shield</span>
+                            </button>
+                            <button type="button" onclick="selectPillarIcon('Sun')" data-icon="Sun" class="pillar-icon-btn p-2.5 rounded-xl border border-stone-200 bg-white hover:border-red-400 flex flex-col items-center gap-1 transition-all cursor-pointer">
+                                <i class="fas fa-sun text-base text-red-600"></i>
+                                <span class="text-[10px] font-bold text-stone-700">Sun</span>
+                            </button>
+                            <button type="button" onclick="selectPillarIcon('Star')" data-icon="Star" class="pillar-icon-btn p-2.5 rounded-xl border border-stone-200 bg-white hover:border-red-400 flex flex-col items-center gap-1 transition-all cursor-pointer">
+                                <i class="fas fa-star text-base text-red-600"></i>
+                                <span class="text-[10px] font-bold text-stone-700">Star</span>
+                            </button>
+                            <button type="button" onclick="selectPillarIcon('Award')" data-icon="Award" class="pillar-icon-btn p-2.5 rounded-xl border border-stone-200 bg-white hover:border-red-400 flex flex-col items-center gap-1 transition-all cursor-pointer">
+                                <i class="fas fa-award text-base text-red-600"></i>
+                                <span class="text-[10px] font-bold text-stone-700">Award</span>
+                            </button>
+                            <button type="button" onclick="selectPillarIcon('Gem')" data-icon="Gem" class="pillar-icon-btn p-2.5 rounded-xl border border-stone-200 bg-white hover:border-red-400 flex flex-col items-center gap-1 transition-all cursor-pointer">
+                                <i class="fas fa-gem text-base text-red-600"></i>
+                                <span class="text-[10px] font-bold text-stone-700">Gem</span>
+                            </button>
+                            <button type="button" onclick="selectPillarIcon('Feather')" data-icon="Feather" class="pillar-icon-btn p-2.5 rounded-xl border border-stone-200 bg-white hover:border-red-400 flex flex-col items-center gap-1 transition-all cursor-pointer">
+                                <i class="fas fa-feather-alt text-base text-red-600"></i>
+                                <span class="text-[10px] font-bold text-stone-700">Feather</span>
+                            </button>
+                            <button type="button" onclick="selectPillarIcon('Gift')" data-icon="Gift" class="pillar-icon-btn p-2.5 rounded-xl border border-stone-200 bg-white hover:border-red-400 flex flex-col items-center gap-1 transition-all cursor-pointer">
+                                <i class="fas fa-gift text-base text-red-600"></i>
+                                <span class="text-[10px] font-bold text-stone-700">Gift</span>
+                            </button>
+                            <button type="button" onclick="selectPillarIcon('Smile')" data-icon="Smile" class="pillar-icon-btn p-2.5 rounded-xl border border-stone-200 bg-white hover:border-red-400 flex flex-col items-center gap-1 transition-all cursor-pointer">
+                                <i class="fas fa-smile text-base text-red-600"></i>
+                                <span class="text-[10px] font-bold text-stone-700">Smile</span>
+                            </button>
+                        </div>
+
+                        <!-- Or Upload Custom SVG / Image -->
+                        <div class="pt-2">
+                            <div class="text-[11px] font-bold text-stone-500 mb-1">Or Upload Custom Icon (SVG / PNG)</div>
+                            <div class="border-2 border-dashed border-stone-200 rounded-xl p-3 text-center hover:border-red-400 hover:bg-red-50/20 transition-all cursor-pointer" onclick="document.getElementById('craftPillarIconFileInput').click()">
+                                <i class="fas fa-upload text-stone-400 text-sm mb-0.5"></i>
+                                <p class="text-xs font-bold text-stone-700" id="craftPillarIconFileLabel">Upload SVG / Image Icon</p>
+                                <p class="text-[10px] text-stone-400">SVG, PNG, JPG (Max 5MB)</p>
+                                <input type="file" id="craftPillarIconFileInput" name="icon_file" class="hidden" accept=".svg,.png,.jpg,.jpeg,.webp" onchange="handlePillarIconFileChange(this)">
+                            </div>
+                            <div id="craftPillarIconPreviewContainer" class="hidden mt-2 bg-white rounded-xl p-2 border border-stone-200 flex items-center gap-3">
+                                <img id="craftPillarIconPreviewImg" src="" class="w-10 h-10 rounded-lg object-contain p-1 bg-stone-50 border border-stone-200">
+                                <div class="flex-1 min-w-0">
+                                    <p class="text-xs font-bold text-stone-800 truncate" id="craftPillarIconFileName">Custom Icon Uploaded</p>
+                                    <p class="text-[10px] text-emerald-600 font-semibold">Custom Icon Active</p>
+                                </div>
+                                <button type="button" onclick="clearPillarIconFileInput()" class="text-stone-400 hover:text-red-600 p-1 cursor-pointer"><i class="fas fa-times"></i></button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5 pt-1">
+                        <div>
+                            <label class="block text-xs font-bold text-stone-600 uppercase tracking-wider mb-1">Sort Order (Sequence)</label>
+                            <input type="number" id="craftPillarSortOrder" name="sort_order" min="1" placeholder="e.g. 1" class="w-full bg-stone-50 border border-stone-200 rounded-xl px-3.5 py-2.5 text-sm font-semibold text-stone-800 focus:bg-white focus:outline-none focus:ring-2 focus:ring-red-500">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-stone-600 uppercase tracking-wider mb-1">Status</label>
+                            <div class="flex items-center gap-2 pt-2.5">
+                                <input type="checkbox" id="craftPillarActive" name="is_active" checked class="w-4 h-4 rounded text-red-600 focus:ring-red-500">
+                                <label for="craftPillarActive" class="text-xs font-bold text-stone-700">Active (Visible on About Page)</label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Sticky Footer with Action Buttons -->
+                <div class="p-4 px-6 bg-stone-50 border-t border-stone-100 shrink-0 flex items-center justify-end gap-3">
+                    <button type="button" onclick="closeCraftPillarModal()" class="btn-secondary text-xs px-5 py-2.5 cursor-pointer">Cancel</button>
+                    <button type="submit" id="craftPillarSubmitBtn" class="btn-primary text-xs px-6 py-2.5 flex items-center gap-2 shadow-sm cursor-pointer">
+                        <i class="fas fa-save"></i>
+                        <span id="craftPillarSubmitBtnText">Save Craft Pillar</span>
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- MODAL 12: CONTACT INTRO MODAL -->
+    <div id="contactIntroModal" onclick="if(event.target === this) closeContactIntroModal()" class="fixed inset-0 bg-stone-900/60 backdrop-blur-xs hidden items-center justify-center z-50 p-4">
+        <div class="bg-white rounded-3xl max-w-3xl w-full max-h-[92vh] flex flex-col overflow-hidden shadow-2xl border border-stone-100 animate-fadeIn" onclick="event.stopPropagation()">
+            <!-- Pinned Header -->
+            <div class="p-5 px-6 border-b border-stone-100 flex items-center justify-between bg-stone-50/80 shrink-0">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-2xl bg-red-50 text-red-600 flex items-center justify-center font-bold text-base shadow-2xs">
+                        <i class="fas fa-handshake"></i>
+                    </div>
+                    <div>
+                        <h3 class="text-base font-bold text-stone-800">Edit Contact Introduction / Hero</h3>
+                        <p class="text-xs text-stone-500 font-medium">Manage main title, badge, tagline, introductory text, and banner artwork</p>
+                    </div>
+                </div>
+                <button type="button" onclick="closeContactIntroModal()" class="w-8 h-8 rounded-full bg-stone-100 text-stone-400 hover:text-stone-700 flex items-center justify-center transition-colors cursor-pointer">
+                    <i class="fas fa-times text-sm"></i>
+                </button>
+            </div>
+
+            <!-- Form Wrapper -->
+            <form id="contactIntroForm" onsubmit="handleContactIntroSubmit(event)" class="flex flex-col flex-1 min-h-0 overflow-hidden">
+                <input type="hidden" id="contactIntroImageUrl" name="image_url" value="">
+
+                <div class="p-6 space-y-5 overflow-y-auto flex-1 overscroll-contain">
+                    <!-- Headings Group -->
+                    <div class="space-y-3">
+                        <div class="flex items-center gap-2 border-b border-stone-100 pb-1.5">
+                            <i class="fas fa-heading text-red-600 text-xs"></i>
+                            <span class="text-xs font-bold text-stone-700 uppercase tracking-wider">Headings & Badge</span>
+                        </div>
+
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+                            <div>
+                                <label class="block text-xs font-bold text-stone-600 uppercase tracking-wider mb-1">Eyebrow Badge <span class="text-red-500">*</span></label>
+                                <input type="text" id="contactIntroBadge" name="badge" required placeholder="e.g. Let's Connect" class="w-full bg-stone-50 border border-stone-200 rounded-xl px-3.5 py-2.5 text-sm font-semibold text-stone-800 focus:bg-white focus:outline-none focus:ring-2 focus:ring-red-500">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold text-stone-600 uppercase tracking-wider mb-1">Main Headline Title <span class="text-red-500">*</span></label>
+                                <input type="text" id="contactIntroTitle" name="title" required placeholder="e.g. Let's Connect" class="w-full bg-stone-50 border border-stone-200 rounded-xl px-3.5 py-2.5 text-sm font-semibold text-stone-800 focus:bg-white focus:outline-none focus:ring-2 focus:ring-red-500">
+                            </div>
+                        </div>
+
+                        <div>
+                            <label class="block text-xs font-bold text-stone-600 uppercase tracking-wider mb-1">Tagline / Subtitle <span class="text-red-500">*</span></label>
+                            <input type="text" id="contactIntroSubtitle" name="subtitle" required placeholder="e.g. Have a question about a product, custom order, or collaboration? We'd love to hear from you." class="w-full bg-stone-50 border border-stone-200 rounded-xl px-3.5 py-2.5 text-sm font-semibold text-stone-800 focus:bg-white focus:outline-none focus:ring-2 focus:ring-red-500">
+                        </div>
+
+                        <div>
+                            <label class="block text-xs font-bold text-stone-600 uppercase tracking-wider mb-1">Introductory Narrative / Description</label>
+                            <textarea id="contactIntroDescription" name="description" rows="2" placeholder="e.g. We're here to help bring your handcrafted crochet dreams to life..." class="w-full bg-stone-50 border border-stone-200 rounded-xl px-3.5 py-2.5 text-sm font-semibold text-stone-800 focus:bg-white focus:outline-none focus:ring-2 focus:ring-red-500"></textarea>
+                        </div>
+                    </div>
+
+                    <!-- Visual Imagery -->
+                    <div class="space-y-3 pt-1">
+                        <div class="flex items-center gap-2 border-b border-stone-100 pb-1.5">
+                            <i class="fas fa-image text-red-600 text-xs"></i>
+                            <span class="text-xs font-bold text-stone-700 uppercase tracking-wider">Contact Banner Artwork</span>
+                        </div>
+
+                        <div class="bg-stone-50/80 border border-stone-200/90 rounded-2xl p-4 space-y-3">
+                            <div class="flex items-center justify-between">
+                                <span class="text-xs font-bold text-stone-800">Banner Photo Visual</span>
+                                <button type="button" onclick="openMediaPicker('contact_intro')" class="px-2.5 py-1 rounded-lg bg-white hover:bg-stone-100 border border-stone-200 text-stone-700 text-[11px] font-bold transition-all flex items-center gap-1 cursor-pointer">
+                                    <i class="fas fa-photo-video text-red-500"></i> Media Library
+                                </button>
+                            </div>
+
+                            <div class="border-2 border-dashed border-stone-200 rounded-xl p-3 text-center hover:border-red-400 hover:bg-red-50/20 transition-all cursor-pointer" onclick="document.getElementById('contactIntroFileInput').click()">
+                                <i class="fas fa-cloud-upload-alt text-red-500 text-lg mb-1"></i>
+                                <p class="text-xs font-bold text-stone-700" id="contactIntroFileLabel">Upload Banner Image</p>
+                                <p class="text-[10px] text-stone-400">1200 × 800 px (JPG/PNG/WEBP)</p>
+                                <input type="file" id="contactIntroFileInput" name="image_file" class="hidden" accept=".jpg,.jpeg,.png,.webp" onchange="handleContactIntroFileChange(this)">
+                            </div>
+
+                            <div id="contactIntroPreviewContainer" class="bg-white rounded-xl p-2.5 border border-stone-200 flex items-center gap-3">
+                                <img id="contactIntroPreviewImg" src="" class="w-14 h-14 rounded-lg object-cover border border-stone-200">
+                                <div class="flex-1 min-w-0">
+                                    <p class="text-xs font-bold text-stone-800 truncate" id="contactIntroFileName">Contact Banner Active</p>
+                                    <p class="text-[10px] text-emerald-600 font-semibold" id="contactIntroFileSize">Ready</p>
+                                </div>
+                                <button type="button" onclick="clearContactIntroFileInput()" class="text-stone-400 hover:text-red-600 p-1.5 cursor-pointer"><i class="fas fa-times"></i></button>
+                            </div>
+
+                            <div>
+                                <label class="block text-xs font-bold text-stone-600 uppercase tracking-wider mb-1">Alt Text (SEO & Accessibility)</label>
+                                <input type="text" id="contactIntroAlt" name="alt_text" placeholder="e.g. KNOTELLE Artisan Studio Contact" class="w-full bg-white border border-stone-200 rounded-xl px-3.5 py-2 text-sm font-semibold text-stone-800 focus:outline-none focus:ring-2 focus:ring-red-500">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Call To Action & Status -->
+                    <div class="space-y-3 pt-1">
+                        <div class="flex items-center gap-2 border-b border-stone-100 pb-1.5">
+                            <i class="fas fa-sliders-h text-red-600 text-xs"></i>
+                            <span class="text-xs font-bold text-stone-700 uppercase tracking-wider">CTA & Status</span>
+                        </div>
+
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+                            <div>
+                                <label class="block text-xs font-bold text-stone-600 uppercase tracking-wider mb-1">CTA Button Text</label>
+                                <input type="text" id="contactIntroCtaText" name="cta_text" placeholder="e.g. Send Us a Message" class="w-full bg-stone-50 border border-stone-200 rounded-xl px-3.5 py-2 text-sm font-semibold text-stone-800 focus:bg-white focus:outline-none focus:ring-2 focus:ring-red-500">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold text-stone-600 uppercase tracking-wider mb-1">CTA Button Link</label>
+                                <input type="text" id="contactIntroCtaLink" name="cta_link" placeholder="e.g. #contact-form" class="w-full bg-stone-50 border border-stone-200 rounded-xl px-3.5 py-2 text-sm font-semibold text-stone-800 focus:bg-white focus:outline-none focus:ring-2 focus:ring-red-500">
+                            </div>
+                        </div>
+
+                        <div class="flex items-center gap-2 pt-2">
+                            <input type="checkbox" id="contactIntroActive" name="is_active" checked class="w-4 h-4 rounded text-red-600 focus:ring-red-500">
+                            <label for="contactIntroActive" class="text-xs font-bold text-stone-700">Intro Section Active on /contact page</label>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Sticky Footer with Action Buttons -->
+                <div class="p-4 px-6 bg-stone-50 border-t border-stone-100 shrink-0 flex items-center justify-end gap-3">
+                    <button type="button" onclick="closeContactIntroModal()" class="btn-secondary text-xs px-5 py-2.5 cursor-pointer">Cancel</button>
+                    <button type="submit" id="contactIntroSubmitBtn" class="btn-primary text-xs px-6 py-2.5 flex items-center gap-2 shadow-sm cursor-pointer">
+                        <i class="fas fa-save"></i>
+                        <span>Save Contact Intro</span>
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- MODAL 13: CONTACT INFO HEADER & CUSTOM ORDER BOX MODAL -->
+    <div id="contactInfoHeaderModal" onclick="if(event.target === this) closeContactInfoHeaderModal()" class="fixed inset-0 bg-stone-900/60 backdrop-blur-xs hidden items-center justify-center z-50 p-4">
+        <div class="bg-white rounded-3xl max-w-xl w-full max-h-[92vh] flex flex-col overflow-hidden shadow-2xl border border-stone-100 animate-fadeIn" onclick="event.stopPropagation()">
+            <!-- Pinned Header -->
+            <div class="p-5 px-6 border-b border-stone-100 flex items-center justify-between bg-stone-50/80 shrink-0">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-2xl bg-red-50 text-red-600 flex items-center justify-center font-bold text-base shadow-2xs">
+                        <i class="fas fa-store"></i>
+                    </div>
+                    <div>
+                        <h3 class="text-base font-bold text-stone-800">Edit Studio Header & Custom Order Note</h3>
+                        <p class="text-xs text-stone-500 font-medium">Customize studio title, badge, subtitle, and custom order callout box</p>
+                    </div>
+                </div>
+                <button type="button" onclick="closeContactInfoHeaderModal()" class="w-8 h-8 rounded-full bg-stone-100 text-stone-400 hover:text-stone-700 flex items-center justify-center transition-colors cursor-pointer">
+                    <i class="fas fa-times text-sm"></i>
+                </button>
+            </div>
+
+            <!-- Form Wrapper -->
+            <form id="contactInfoHeaderForm" onsubmit="handleContactInfoHeaderSubmit(event)" class="flex flex-col flex-1 min-h-0 overflow-hidden">
+                <div class="p-6 space-y-4 overflow-y-auto flex-1 overscroll-contain">
+                    <div>
+                        <label class="block text-xs font-bold text-stone-600 uppercase tracking-wider mb-1">Studio Eyebrow Badge</label>
+                        <input type="text" id="contactInfoBadgeInput" name="badge" value="Atelier Studio" placeholder="e.g. Atelier Studio" class="w-full bg-stone-50 border border-stone-200 rounded-xl px-3.5 py-2.5 text-sm font-semibold text-stone-800 focus:bg-white focus:outline-none focus:ring-2 focus:ring-red-500">
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-bold text-stone-600 uppercase tracking-wider mb-1">Studio Name / Headline <span class="text-red-500">*</span></label>
+                        <input type="text" id="contactInfoTitleInput" name="title" required value="KNOTELLE Studio" placeholder="e.g. KNOTELLE Studio" class="w-full bg-stone-50 border border-stone-200 rounded-xl px-3.5 py-2.5 text-sm font-semibold text-stone-800 focus:bg-white focus:outline-none focus:ring-2 focus:ring-red-500">
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-bold text-stone-600 uppercase tracking-wider mb-1">Studio Subtitle</label>
+                        <input type="text" id="contactInfoSubtitleInput" name="subtitle" value="Handmade with love in Bengaluru, India" placeholder="e.g. Handmade with love in Bengaluru, India" class="w-full bg-stone-50 border border-stone-200 rounded-xl px-3.5 py-2.5 text-sm font-semibold text-stone-800 focus:bg-white focus:outline-none focus:ring-2 focus:ring-red-500">
+                    </div>
+
+                    <!-- Custom Order Note Box -->
+                    <div class="p-4 bg-amber-50/70 border border-amber-200/80 rounded-2xl space-y-3">
+                        <div class="flex items-center gap-2">
+                            <i class="fas fa-gift text-amber-700 text-xs"></i>
+                            <span class="text-xs font-bold text-amber-900 uppercase tracking-wider">Custom Order Helper Box</span>
+                        </div>
+
+                        <div>
+                            <label class="block text-xs font-bold text-stone-700 mb-1">Box Title</label>
+                            <input type="text" id="contactInfoCustomBoxTitle" name="custom_order_box_title" value="Looking for Custom Orders?" class="w-full bg-white border border-stone-200 rounded-xl px-3 py-2 text-sm font-semibold text-stone-800 focus:outline-none focus:ring-2 focus:ring-red-500">
+                        </div>
+
+                        <div>
+                            <label class="block text-xs font-bold text-stone-700 mb-1">Box Description Text</label>
+                            <textarea id="contactInfoCustomBoxText" name="custom_order_box_text" rows="2" class="w-full bg-white border border-stone-200 rounded-xl px-3 py-2 text-sm font-semibold text-stone-800 focus:outline-none focus:ring-2 focus:ring-red-500">Have a specific design, color palette, or bouquet arrangement in mind? Request a bespoke piece directly.</textarea>
+                        </div>
+
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                            <div>
+                                <label class="block text-xs font-bold text-stone-700 mb-1">Box Link URL</label>
+                                <input type="text" id="contactInfoCustomBoxLink" name="custom_order_box_link" value="/custom-order" class="w-full bg-white border border-stone-200 rounded-xl px-3 py-2 text-sm font-semibold text-stone-800 focus:outline-none focus:ring-2 focus:ring-red-500">
+                            </div>
+                            <div class="flex items-center pt-5">
+                                <label class="flex items-center gap-2 cursor-pointer">
+                                    <input type="checkbox" id="contactInfoCustomBoxActive" name="custom_order_box_active" checked class="w-4 h-4 rounded text-red-600 focus:ring-red-500">
+                                    <span class="text-xs font-bold text-stone-700">Display Helper Box</span>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="flex items-center gap-2 pt-1">
+                        <input type="checkbox" id="contactInfoHeaderActive" name="is_active" checked class="w-4 h-4 rounded text-red-600 focus:ring-red-500">
+                        <label for="contactInfoHeaderActive" class="text-xs font-bold text-stone-700">Section Active on Contact Page</label>
+                    </div>
+                </div>
+
+                <!-- Sticky Footer with Action Buttons -->
+                <div class="p-4 px-6 bg-stone-50 border-t border-stone-100 shrink-0 flex items-center justify-end gap-3">
+                    <button type="button" onclick="closeContactInfoHeaderModal()" class="btn-secondary text-xs px-5 py-2.5 cursor-pointer">Cancel</button>
+                    <button type="submit" id="contactInfoHeaderSubmitBtn" class="btn-primary text-xs px-6 py-2.5 flex items-center gap-2 shadow-sm cursor-pointer">
+                        <i class="fas fa-save"></i>
+                        <span>Save Studio Header</span>
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- MODAL 14: ADD / EDIT CONTACT DETAIL ITEM MODAL -->
+    <div id="contactInfoItemModal" onclick="if(event.target === this) closeContactInfoItemModal()" class="fixed inset-0 bg-stone-900/60 backdrop-blur-xs hidden items-center justify-center z-50 p-4">
+        <div class="bg-white rounded-3xl max-w-xl w-full max-h-[92vh] flex flex-col overflow-hidden shadow-2xl border border-stone-100 animate-fadeIn" onclick="event.stopPropagation()">
+            <!-- Pinned Header -->
+            <div class="p-5 px-6 border-b border-stone-100 flex items-center justify-between bg-stone-50/80 shrink-0">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-2xl bg-red-50 text-red-600 flex items-center justify-center font-bold text-base shadow-2xs">
+                        <i class="fas fa-address-card"></i>
+                    </div>
+                    <div>
+                        <h3 class="text-base font-bold text-stone-800" id="contactInfoItemModalTitle">Add Contact Detail</h3>
+                        <p class="text-xs text-stone-500 font-medium">Add or edit phone, email, studio address, hours, WhatsApp, or socials</p>
+                    </div>
+                </div>
+                <button type="button" onclick="closeContactInfoItemModal()" class="w-8 h-8 rounded-full bg-stone-100 text-stone-400 hover:text-stone-700 flex items-center justify-center transition-colors cursor-pointer">
+                    <i class="fas fa-times text-sm"></i>
+                </button>
+            </div>
+
+            <!-- Form Wrapper -->
+            <form id="contactInfoItemForm" onsubmit="handleContactInfoItemSubmit(event)" class="flex flex-col flex-1 min-h-0 overflow-hidden">
+                <input type="hidden" id="contactInfoItemId" name="id" value="">
+                <input type="hidden" id="contactInfoItemIcon" name="icon" value="MapPin">
+
+                <div class="p-6 space-y-4 overflow-y-auto flex-1 overscroll-contain">
+                    <div>
+                        <label class="block text-xs font-bold text-stone-600 uppercase tracking-wider mb-1">Title / Label <span class="text-red-500">*</span></label>
+                        <input type="text" id="contactInfoItemTitle" name="title" required placeholder="e.g. Visit Our Studio, Call / WhatsApp Us, Write to Us" class="w-full bg-stone-50 border border-stone-200 rounded-xl px-3.5 py-2.5 text-sm font-semibold text-stone-800 focus:bg-white focus:outline-none focus:ring-2 focus:ring-red-500">
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-bold text-stone-600 uppercase tracking-wider mb-1">Primary Value / Line 1 <span class="text-red-500">*</span></label>
+                        <input type="text" id="contactInfoItemValue" name="value" required placeholder="e.g. +91 98765 43210, hello@knotelle.com, 12th Main Road" class="w-full bg-stone-50 border border-stone-200 rounded-xl px-3.5 py-2.5 text-sm font-semibold text-stone-800 focus:bg-white focus:outline-none focus:ring-2 focus:ring-red-500">
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-bold text-stone-600 uppercase tracking-wider mb-1">Secondary Address / Hours / Note Line</label>
+                        <input type="text" id="contactInfoItemAddressLine2" name="address_line_2" placeholder="e.g. Bengaluru, Karnataka 560038, India or Mon – Sat, 10 AM – 7 PM" class="w-full bg-stone-50 border border-stone-200 rounded-xl px-3.5 py-2.5 text-sm font-semibold text-stone-800 focus:bg-white focus:outline-none focus:ring-2 focus:ring-red-500">
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-bold text-stone-600 uppercase tracking-wider mb-1">Clickable Action Link (tel:, mailto:, URL)</label>
+                        <input type="text" id="contactInfoItemLink" name="link" placeholder="e.g. tel:+919876543210, mailto:hello@knotelle.com, https://maps.google.com/..." class="w-full bg-stone-50 border border-stone-200 rounded-xl px-3.5 py-2.5 text-sm font-semibold text-stone-800 focus:bg-white focus:outline-none focus:ring-2 focus:ring-red-500">
+                    </div>
+
+                    <!-- Icon Preset Selector -->
+                    <div class="space-y-2 pt-1">
+                        <label class="block text-xs font-bold text-stone-600 uppercase tracking-wider">Choose Contact Detail Icon</label>
+                        
+                        <div class="grid grid-cols-5 sm:grid-cols-5 gap-2 p-3 bg-stone-50 rounded-2xl border border-stone-200" id="contactInfoIconGrid">
+                            <button type="button" onclick="selectContactInfoIcon('MapPin')" data-icon="MapPin" class="contact-info-icon-btn p-2 rounded-xl border border-stone-200 bg-white hover:border-red-400 flex flex-col items-center gap-1 transition-all cursor-pointer">
+                                <i class="fas fa-map-marker-alt text-base text-red-600"></i>
+                                <span class="text-[10px] font-bold text-stone-700">MapPin</span>
+                            </button>
+                            <button type="button" onclick="selectContactInfoIcon('Phone')" data-icon="Phone" class="contact-info-icon-btn p-2 rounded-xl border border-stone-200 bg-white hover:border-red-400 flex flex-col items-center gap-1 transition-all cursor-pointer">
+                                <i class="fas fa-phone text-base text-red-600"></i>
+                                <span class="text-[10px] font-bold text-stone-700">Phone</span>
+                            </button>
+                            <button type="button" onclick="selectContactInfoIcon('Mail')" data-icon="Mail" class="contact-info-icon-btn p-2 rounded-xl border border-stone-200 bg-white hover:border-red-400 flex flex-col items-center gap-1 transition-all cursor-pointer">
+                                <i class="fas fa-envelope text-base text-red-600"></i>
+                                <span class="text-[10px] font-bold text-stone-700">Mail</span>
+                            </button>
+                            <button type="button" onclick="selectContactInfoIcon('Clock')" data-icon="Clock" class="contact-info-icon-btn p-2 rounded-xl border border-stone-200 bg-white hover:border-red-400 flex flex-col items-center gap-1 transition-all cursor-pointer">
+                                <i class="fas fa-clock text-base text-red-600"></i>
+                                <span class="text-[10px] font-bold text-stone-700">Clock</span>
+                            </button>
+                            <button type="button" onclick="selectContactInfoIcon('MessageCircle')" data-icon="MessageCircle" class="contact-info-icon-btn p-2 rounded-xl border border-stone-200 bg-white hover:border-red-400 flex flex-col items-center gap-1 transition-all cursor-pointer">
+                                <i class="fab fa-whatsapp text-base text-red-600"></i>
+                                <span class="text-[10px] font-bold text-stone-700">WhatsApp</span>
+                            </button>
+                            <button type="button" onclick="selectContactInfoIcon('Instagram')" data-icon="Instagram" class="contact-info-icon-btn p-2 rounded-xl border border-stone-200 bg-white hover:border-red-400 flex flex-col items-center gap-1 transition-all cursor-pointer">
+                                <i class="fab fa-instagram text-base text-red-600"></i>
+                                <span class="text-[10px] font-bold text-stone-700">Instagram</span>
+                            </button>
+                            <button type="button" onclick="selectContactInfoIcon('Facebook')" data-icon="Facebook" class="contact-info-icon-btn p-2 rounded-xl border border-stone-200 bg-white hover:border-red-400 flex flex-col items-center gap-1 transition-all cursor-pointer">
+                                <i class="fab fa-facebook-f text-base text-red-600"></i>
+                                <span class="text-[10px] font-bold text-stone-700">Facebook</span>
+                            </button>
+                            <button type="button" onclick="selectContactInfoIcon('Globe')" data-icon="Globe" class="contact-info-icon-btn p-2 rounded-xl border border-stone-200 bg-white hover:border-red-400 flex flex-col items-center gap-1 transition-all cursor-pointer">
+                                <i class="fas fa-globe text-base text-red-600"></i>
+                                <span class="text-[10px] font-bold text-stone-700">Globe</span>
+                            </button>
+                            <button type="button" onclick="selectContactInfoIcon('Sparkles')" data-icon="Sparkles" class="contact-info-icon-btn p-2 rounded-xl border border-stone-200 bg-white hover:border-red-400 flex flex-col items-center gap-1 transition-all cursor-pointer">
+                                <i class="fas fa-magic text-base text-red-600"></i>
+                                <span class="text-[10px] font-bold text-stone-700">Sparkles</span>
+                            </button>
+                            <button type="button" onclick="selectContactInfoIcon('Heart')" data-icon="Heart" class="contact-info-icon-btn p-2 rounded-xl border border-stone-200 bg-white hover:border-red-400 flex flex-col items-center gap-1 transition-all cursor-pointer">
+                                <i class="fas fa-heart text-base text-red-600"></i>
+                                <span class="text-[10px] font-bold text-stone-700">Heart</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5 pt-1">
+                        <div>
+                            <label class="block text-xs font-bold text-stone-600 uppercase tracking-wider mb-1">Sort Order (Sequence)</label>
+                            <input type="number" id="contactInfoItemSortOrder" name="sort_order" min="1" placeholder="e.g. 1" class="w-full bg-stone-50 border border-stone-200 rounded-xl px-3.5 py-2.5 text-sm font-semibold text-stone-800 focus:bg-white focus:outline-none focus:ring-2 focus:ring-red-500">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-stone-600 uppercase tracking-wider mb-1">Status</label>
+                            <div class="flex items-center gap-2 pt-2.5">
+                                <input type="checkbox" id="contactInfoItemActive" name="is_active" checked class="w-4 h-4 rounded text-red-600 focus:ring-red-500">
+                                <label for="contactInfoItemActive" class="text-xs font-bold text-stone-700">Active (Visible on Contact Page)</label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Sticky Footer with Action Buttons -->
+                <div class="p-4 px-6 bg-stone-50 border-t border-stone-100 shrink-0 flex items-center justify-end gap-3">
+                    <button type="button" onclick="closeContactInfoItemModal()" class="btn-secondary text-xs px-5 py-2.5 cursor-pointer">Cancel</button>
+                    <button type="submit" id="contactInfoItemSubmitBtn" class="btn-primary text-xs px-6 py-2.5 flex items-center gap-2 shadow-sm cursor-pointer">
+                        <i class="fas fa-save"></i>
+                        <span id="contactInfoItemSubmitBtnText">Save Contact Detail</span>
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- MODAL 15: SEND US A MESSAGE / CONTACT FORM SETTINGS MODAL -->
+    <div id="contactFormModal" onclick="if(event.target === this) closeContactFormModal()" class="fixed inset-0 bg-stone-900/60 backdrop-blur-xs hidden items-center justify-center z-50 p-4">
+        <div class="bg-white rounded-3xl max-w-2xl w-full max-h-[92vh] flex flex-col overflow-hidden shadow-2xl border border-stone-100 animate-fadeIn" onclick="event.stopPropagation()">
+            <!-- Pinned Header -->
+            <div class="p-5 px-6 border-b border-stone-100 flex items-center justify-between bg-stone-50/80 shrink-0">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-2xl bg-red-50 text-red-600 flex items-center justify-center font-bold text-base shadow-2xs">
+                        <i class="fas fa-envelope-open-text"></i>
+                    </div>
+                    <div>
+                        <h3 class="text-base font-bold text-stone-800">Edit Send Us a Message (Contact Form)</h3>
+                        <p class="text-xs text-stone-500 font-medium">Configure form headings, button label, success message, and input field labels</p>
+                    </div>
+                </div>
+                <button type="button" onclick="closeContactFormModal()" class="w-8 h-8 rounded-full bg-stone-100 text-stone-400 hover:text-stone-700 flex items-center justify-center transition-colors cursor-pointer">
+                    <i class="fas fa-times text-sm"></i>
+                </button>
+            </div>
+
+            <!-- Form Wrapper -->
+            <form id="contactFormSettingsForm" onsubmit="handleContactFormSubmit(event)" class="flex flex-col flex-1 min-h-0 overflow-hidden">
+                <div class="p-6 space-y-5 overflow-y-auto flex-1 overscroll-contain">
+                    <!-- Headings Group -->
+                    <div class="space-y-3">
+                        <div class="flex items-center gap-2 border-b border-stone-100 pb-1.5">
+                            <i class="fas fa-heading text-red-600 text-xs"></i>
+                            <span class="text-xs font-bold text-stone-700 uppercase tracking-wider">Form Headings & Button</span>
+                        </div>
+
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+                            <div>
+                                <label class="block text-xs font-bold text-stone-600 uppercase tracking-wider mb-1">Eyebrow Badge</label>
+                                <input type="text" id="contactFormBadge" name="badge" value="Get In Touch" placeholder="e.g. Get In Touch" class="w-full bg-stone-50 border border-stone-200 rounded-xl px-3.5 py-2.5 text-sm font-semibold text-stone-800 focus:bg-white focus:outline-none focus:ring-2 focus:ring-red-500">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold text-stone-600 uppercase tracking-wider mb-1">Section Title <span class="text-red-500">*</span></label>
+                                <input type="text" id="contactFormTitle" name="title" required value="Send Us a Message" placeholder="e.g. Send Us a Message" class="w-full bg-stone-50 border border-stone-200 rounded-xl px-3.5 py-2.5 text-sm font-semibold text-stone-800 focus:bg-white focus:outline-none focus:ring-2 focus:ring-red-500">
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+                            <div>
+                                <label class="block text-xs font-bold text-stone-600 uppercase tracking-wider mb-1">Subtitle / Help Text</label>
+                                <input type="text" id="contactFormSubtitle" name="subtitle" value="Fill in your details and our team will get back to you promptly." placeholder="e.g. Fill in your details..." class="w-full bg-stone-50 border border-stone-200 rounded-xl px-3.5 py-2.5 text-sm font-semibold text-stone-800 focus:bg-white focus:outline-none focus:ring-2 focus:ring-red-500">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold text-stone-600 uppercase tracking-wider mb-1">Submit Button Text <span class="text-red-500">*</span></label>
+                                <input type="text" id="contactFormCtaText" name="cta_text" required value="Send Message" placeholder="e.g. Send Message" class="w-full bg-stone-50 border border-stone-200 rounded-xl px-3.5 py-2.5 text-sm font-semibold text-stone-800 focus:bg-white focus:outline-none focus:ring-2 focus:ring-red-500">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Feedback Messages Group -->
+                    <div class="space-y-3 pt-1">
+                        <div class="flex items-center gap-2 border-b border-stone-100 pb-1.5">
+                            <i class="fas fa-check-circle text-emerald-600 text-xs"></i>
+                            <span class="text-xs font-bold text-stone-700 uppercase tracking-wider">Success & Error Notification Messages</span>
+                        </div>
+
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+                            <div>
+                                <label class="block text-xs font-bold text-stone-600 uppercase tracking-wider mb-1">Success Title</label>
+                                <input type="text" id="contactFormSuccessTitle" name="success_title" value="Message Sent!" placeholder="e.g. Message Sent!" class="w-full bg-stone-50 border border-stone-200 rounded-xl px-3.5 py-2 text-sm font-semibold text-stone-800 focus:bg-white focus:outline-none focus:ring-2 focus:ring-red-500">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold text-stone-600 uppercase tracking-wider mb-1">Success Message Description</label>
+                                <input type="text" id="contactFormSuccessMessage" name="success_message" value="Thank you! Your message has been sent successfully. We will get back to you shortly." class="w-full bg-stone-50 border border-stone-200 rounded-xl px-3.5 py-2 text-sm font-semibold text-stone-800 focus:bg-white focus:outline-none focus:ring-2 focus:ring-red-500">
+                            </div>
+                        </div>
+
+                        <div>
+                            <label class="block text-xs font-bold text-stone-600 uppercase tracking-wider mb-1">Error Message (Submission Failed)</label>
+                            <input type="text" id="contactFormErrorMessage" name="error_message" value="Something went wrong while sending your message. Please check the form and try again." class="w-full bg-stone-50 border border-stone-200 rounded-xl px-3.5 py-2 text-sm font-semibold text-stone-800 focus:bg-white focus:outline-none focus:ring-2 focus:ring-red-500">
+                        </div>
+                    </div>
+
+                    <!-- Form Fields Configuration -->
+                    <div class="space-y-3 pt-1">
+                        <div class="flex items-center gap-2 border-b border-stone-100 pb-1.5">
+                            <i class="fas fa-list text-red-600 text-xs"></i>
+                            <span class="text-xs font-bold text-stone-700 uppercase tracking-wider">Input Field Labels & Placeholders</span>
+                        </div>
+
+                        <div class="space-y-3" id="contactFormFieldsContainer">
+                            <!-- Name Field Config -->
+                            <div class="bg-stone-50 p-3.5 rounded-2xl border border-stone-200 grid grid-cols-1 sm:grid-cols-12 gap-3 items-center">
+                                <div class="sm:col-span-3 font-bold text-xs text-stone-800 flex items-center gap-1.5">
+                                    <i class="fas fa-user text-stone-400"></i> Name Field
+                                </div>
+                                <div class="sm:col-span-4">
+                                    <input type="text" id="field_name_label" name="fields[0][label]" value="Your Name" placeholder="Label" class="w-full bg-white border border-stone-200 rounded-lg px-2.5 py-1.5 text-xs font-semibold">
+                                    <input type="hidden" name="fields[0][key]" value="name">
+                                </div>
+                                <div class="sm:col-span-5">
+                                    <input type="text" id="field_name_placeholder" name="fields[0][placeholder]" value="Enter your full name" placeholder="Placeholder" class="w-full bg-white border border-stone-200 rounded-lg px-2.5 py-1.5 text-xs font-semibold">
+                                    <input type="hidden" name="fields[0][required]" value="1">
+                                    <input type="hidden" name="fields[0][is_active]" value="1">
+                                </div>
+                            </div>
+
+                            <!-- Email Field Config -->
+                            <div class="bg-stone-50 p-3.5 rounded-2xl border border-stone-200 grid grid-cols-1 sm:grid-cols-12 gap-3 items-center">
+                                <div class="sm:col-span-3 font-bold text-xs text-stone-800 flex items-center gap-1.5">
+                                    <i class="fas fa-envelope text-stone-400"></i> Email Field
+                                </div>
+                                <div class="sm:col-span-4">
+                                    <input type="text" id="field_email_label" name="fields[1][label]" value="Email Address" placeholder="Label" class="w-full bg-white border border-stone-200 rounded-lg px-2.5 py-1.5 text-xs font-semibold">
+                                    <input type="hidden" name="fields[1][key]" value="email">
+                                </div>
+                                <div class="sm:col-span-5">
+                                    <input type="text" id="field_email_placeholder" name="fields[1][placeholder]" value="Enter your email address" placeholder="Placeholder" class="w-full bg-white border border-stone-200 rounded-lg px-2.5 py-1.5 text-xs font-semibold">
+                                    <input type="hidden" name="fields[1][required]" value="1">
+                                    <input type="hidden" name="fields[1][is_active]" value="1">
+                                </div>
+                            </div>
+
+                            <!-- Phone Field Config -->
+                            <div class="bg-stone-50 p-3.5 rounded-2xl border border-stone-200 grid grid-cols-1 sm:grid-cols-12 gap-3 items-center">
+                                <div class="sm:col-span-3 font-bold text-xs text-stone-800 flex items-center gap-1.5">
+                                    <i class="fas fa-phone text-stone-400"></i> Phone Field
+                                </div>
+                                <div class="sm:col-span-4">
+                                    <input type="text" id="field_phone_label" name="fields[2][label]" value="Phone Number" placeholder="Label" class="w-full bg-white border border-stone-200 rounded-lg px-2.5 py-1.5 text-xs font-semibold">
+                                    <input type="hidden" name="fields[2][key]" value="phone">
+                                </div>
+                                <div class="sm:col-span-5">
+                                    <input type="text" id="field_phone_placeholder" name="fields[2][placeholder]" value="Enter your 10-digit phone number (optional)" placeholder="Placeholder" class="w-full bg-white border border-stone-200 rounded-lg px-2.5 py-1.5 text-xs font-semibold">
+                                    <input type="hidden" name="fields[2][required]" value="0">
+                                    <input type="hidden" name="fields[2][is_active]" value="1">
+                                </div>
+                            </div>
+
+                            <!-- Subject Field Config -->
+                            <div class="bg-stone-50 p-3.5 rounded-2xl border border-stone-200 grid grid-cols-1 sm:grid-cols-12 gap-3 items-center">
+                                <div class="sm:col-span-3 font-bold text-xs text-stone-800 flex items-center gap-1.5">
+                                    <i class="fas fa-tag text-stone-400"></i> Subject Field
+                                </div>
+                                <div class="sm:col-span-4">
+                                    <input type="text" id="field_subject_label" name="fields[3][label]" value="Subject" placeholder="Label" class="w-full bg-white border border-stone-200 rounded-lg px-2.5 py-1.5 text-xs font-semibold">
+                                    <input type="hidden" name="fields[3][key]" value="subject">
+                                </div>
+                                <div class="sm:col-span-5">
+                                    <input type="text" id="field_subject_placeholder" name="fields[3][placeholder]" value="What is this regarding?" placeholder="Placeholder" class="w-full bg-white border border-stone-200 rounded-lg px-2.5 py-1.5 text-xs font-semibold">
+                                    <input type="hidden" name="fields[3][required]" value="0">
+                                    <input type="hidden" name="fields[3][is_active]" value="1">
+                                </div>
+                            </div>
+
+                            <!-- Message Field Config -->
+                            <div class="bg-stone-50 p-3.5 rounded-2xl border border-stone-200 grid grid-cols-1 sm:grid-cols-12 gap-3 items-center">
+                                <div class="sm:col-span-3 font-bold text-xs text-stone-800 flex items-center gap-1.5">
+                                    <i class="fas fa-comment-alt text-stone-400"></i> Message Field
+                                </div>
+                                <div class="sm:col-span-4">
+                                    <input type="text" id="field_message_label" name="fields[4][label]" value="Your Message" placeholder="Label" class="w-full bg-white border border-stone-200 rounded-lg px-2.5 py-1.5 text-xs font-semibold">
+                                    <input type="hidden" name="fields[4][key]" value="message">
+                                </div>
+                                <div class="sm:col-span-5">
+                                    <input type="text" id="field_message_placeholder" name="fields[4][placeholder]" value="Tell us how we can help you..." placeholder="Placeholder" class="w-full bg-white border border-stone-200 rounded-lg px-2.5 py-1.5 text-xs font-semibold">
+                                    <input type="hidden" name="fields[4][required]" value="1">
+                                    <input type="hidden" name="fields[4][is_active]" value="1">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="flex items-center gap-2 pt-1">
+                        <input type="checkbox" id="contactFormActive" name="is_active" checked class="w-4 h-4 rounded text-red-600 focus:ring-red-500">
+                        <label for="contactFormActive" class="text-xs font-bold text-stone-700">Contact Form Active on Website</label>
+                    </div>
+                </div>
+
+                <!-- Sticky Footer with Action Buttons -->
+                <div class="p-4 px-6 bg-stone-50 border-t border-stone-100 shrink-0 flex items-center justify-end gap-3">
+                    <button type="button" onclick="closeContactFormModal()" class="btn-secondary text-xs px-5 py-2.5 cursor-pointer">Cancel</button>
+                    <button type="submit" id="contactFormSubmitBtn" class="btn-primary text-xs px-6 py-2.5 flex items-center gap-2 shadow-sm cursor-pointer">
+                        <i class="fas fa-save"></i>
+                        <span>Save Form Configuration</span>
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- MODAL 16: FAQ SECTION HEADER SETTINGS MODAL -->
+    <div id="contactFaqsHeaderModal" onclick="if(event.target === this) closeContactFaqsHeaderModal()" class="fixed inset-0 bg-stone-900/60 backdrop-blur-xs hidden items-center justify-center z-50 p-4">
+        <div class="bg-white rounded-3xl max-w-lg w-full max-h-[90vh] flex flex-col overflow-hidden shadow-2xl border border-stone-100 animate-fadeIn" onclick="event.stopPropagation()">
+            <!-- Pinned Header -->
+            <div class="p-5 px-6 border-b border-stone-100 flex items-center justify-between bg-stone-50/80 shrink-0">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-2xl bg-red-50 text-red-600 flex items-center justify-center font-bold text-base shadow-2xs">
+                        <i class="fas fa-question-circle"></i>
+                    </div>
+                    <div>
+                        <h3 class="text-base font-bold text-stone-800">Frequently Asked Questions Header</h3>
+                        <p class="text-xs text-stone-500 font-medium">Customize FAQ section title, subtitle, and badge</p>
+                    </div>
+                </div>
+                <button type="button" onclick="closeContactFaqsHeaderModal()" class="w-8 h-8 rounded-full bg-stone-100 text-stone-400 hover:text-stone-700 flex items-center justify-center transition-colors cursor-pointer">
+                    <i class="fas fa-times text-sm"></i>
+                </button>
+            </div>
+
+            <!-- Form Wrapper -->
+            <form id="contactFaqsHeaderForm" onsubmit="handleContactFaqsHeaderSubmit(event)" class="flex flex-col flex-1 min-h-0 overflow-hidden">
+                <div class="p-6 space-y-4 overflow-y-auto flex-1 overscroll-contain">
+                    <div>
+                        <label class="block text-xs font-bold text-stone-600 uppercase tracking-wider mb-1">Eyebrow Badge</label>
+                        <input type="text" id="contactFaqsHeaderTagText" name="badge" value="Help & Support" placeholder="e.g. Help & Support" class="w-full bg-stone-50 border border-stone-200 rounded-xl px-3.5 py-2.5 text-sm font-semibold text-stone-800 focus:bg-white focus:outline-none focus:ring-2 focus:ring-red-500">
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-bold text-stone-600 uppercase tracking-wider mb-1">Section Title <span class="text-red-500">*</span></label>
+                        <input type="text" id="contactFaqsHeaderTitle" name="title" required value="Frequently Asked Questions" placeholder="e.g. Frequently Asked Questions" class="w-full bg-stone-50 border border-stone-200 rounded-xl px-3.5 py-2.5 text-sm font-semibold text-stone-800 focus:bg-white focus:outline-none focus:ring-2 focus:ring-red-500">
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-bold text-stone-600 uppercase tracking-wider mb-1">Section Subtitle / Help Text</label>
+                        <textarea id="contactFaqsHeaderSubtitle" name="subtitle" rows="3" placeholder="Quick answers about our handmade creations, custom orders, and delivery..." class="w-full bg-stone-50 border border-stone-200 rounded-xl px-3.5 py-2.5 text-sm font-semibold text-stone-800 focus:bg-white focus:outline-none focus:ring-2 focus:ring-red-500">Quick answers about our handmade creations, custom orders, and delivery.</textarea>
+                    </div>
+
+                    <div class="flex items-center gap-2 pt-2">
+                        <input type="checkbox" id="contactFaqsHeaderActive" name="is_active" checked class="w-4 h-4 rounded text-red-600 focus:ring-red-500">
+                        <label for="contactFaqsHeaderActive" class="text-xs font-bold text-stone-700">FAQ Section Active (Visible on Contact Page)</label>
+                    </div>
+                </div>
+
+                <!-- Sticky Footer with Action Buttons -->
+                <div class="p-4 px-6 bg-stone-50 border-t border-stone-100 shrink-0 flex items-center justify-end gap-3">
+                    <button type="button" onclick="closeContactFaqsHeaderModal()" class="btn-secondary text-xs px-5 py-2.5 cursor-pointer">Cancel</button>
+                    <button type="submit" id="contactFaqsHeaderSubmitBtn" class="btn-primary text-xs px-6 py-2.5 flex items-center gap-2 shadow-sm cursor-pointer">
+                        <i class="fas fa-save"></i>
+                        <span>Save FAQ Header</span>
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- MODAL 17: ADD / EDIT FAQ ITEM MODAL -->
+    <div id="contactFaqModal" onclick="if(event.target === this) closeContactFaqModal()" class="fixed inset-0 bg-stone-900/60 backdrop-blur-xs hidden items-center justify-center z-50 p-4">
+        <div class="bg-white rounded-3xl max-w-xl w-full max-h-[92vh] flex flex-col overflow-hidden shadow-2xl border border-stone-100 animate-fadeIn" onclick="event.stopPropagation()">
+            <!-- Pinned Header -->
+            <div class="p-5 px-6 border-b border-stone-100 flex items-center justify-between bg-stone-50/80 shrink-0">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-2xl bg-red-50 text-red-600 flex items-center justify-center font-bold text-base shadow-2xs">
+                        <i class="fas fa-question"></i>
+                    </div>
+                    <div>
+                        <h3 class="text-base font-bold text-stone-800" id="contactFaqModalTitle">Add FAQ Item</h3>
+                        <p class="text-xs text-stone-500 font-medium">Add or edit customer questions and helpful answers</p>
+                    </div>
+                </div>
+                <button type="button" onclick="closeContactFaqModal()" class="w-8 h-8 rounded-full bg-stone-100 text-stone-400 hover:text-stone-700 flex items-center justify-center transition-colors cursor-pointer">
+                    <i class="fas fa-times text-sm"></i>
+                </button>
+            </div>
+
+            <!-- Form Wrapper -->
+            <form id="contactFaqForm" onsubmit="handleContactFaqSubmit(event)" class="flex flex-col flex-1 min-h-0 overflow-hidden">
+                <input type="hidden" id="contactFaqId" name="id" value="">
+
+                <div class="p-6 space-y-4 overflow-y-auto flex-1 overscroll-contain">
+                    <div>
+                        <label class="block text-xs font-bold text-stone-600 uppercase tracking-wider mb-1">Question <span class="text-red-500">*</span></label>
+                        <input type="text" id="contactFaqQuestion" name="question" required placeholder="e.g. How long does a custom order take?" class="w-full bg-stone-50 border border-stone-200 rounded-xl px-3.5 py-2.5 text-sm font-semibold text-stone-800 focus:bg-white focus:outline-none focus:ring-2 focus:ring-red-500">
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-bold text-stone-600 uppercase tracking-wider mb-1">Answer <span class="text-red-500">*</span></label>
+                        <textarea id="contactFaqAnswer" name="answer" rows="4" required placeholder="e.g. Custom orders usually take 7–14 working days depending on complexity..." class="w-full bg-stone-50 border border-stone-200 rounded-xl px-3.5 py-2.5 text-sm font-semibold text-stone-800 focus:bg-white focus:outline-none focus:ring-2 focus:ring-red-500"></textarea>
+                    </div>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5 pt-1">
+                        <div>
+                            <label class="block text-xs font-bold text-stone-600 uppercase tracking-wider mb-1">Sort Order (Sequence)</label>
+                            <input type="number" id="contactFaqSortOrder" name="sort_order" min="1" placeholder="e.g. 1" class="w-full bg-stone-50 border border-stone-200 rounded-xl px-3.5 py-2.5 text-sm font-semibold text-stone-800 focus:bg-white focus:outline-none focus:ring-2 focus:ring-red-500">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-stone-600 uppercase tracking-wider mb-1">Status</label>
+                            <div class="flex items-center gap-2 pt-2.5">
+                                <input type="checkbox" id="contactFaqActive" name="is_active" checked class="w-4 h-4 rounded text-red-600 focus:ring-red-500">
+                                <label for="contactFaqActive" class="text-xs font-bold text-stone-700">Active (Visible on Website)</label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Sticky Footer with Action Buttons -->
+                <div class="p-4 px-6 bg-stone-50 border-t border-stone-100 shrink-0 flex items-center justify-end gap-3">
+                    <button type="button" onclick="closeContactFaqModal()" class="btn-secondary text-xs px-5 py-2.5 cursor-pointer">Cancel</button>
+                    <button type="submit" id="contactFaqSubmitBtn" class="btn-primary text-xs px-6 py-2.5 flex items-center gap-2 shadow-sm cursor-pointer">
+                        <i class="fas fa-save"></i>
+                        <span id="contactFaqSubmitBtnText">Save FAQ</span>
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- MODAL 18: CUSTOM CROCHET BANNER & HANGING TAG MODAL -->
+    <div id="customCrochetModal" onclick="if(event.target === this) closeCustomCrochetModal()" class="fixed inset-0 bg-stone-900/60 backdrop-blur-xs hidden items-center justify-center z-50 p-4">
+        <div class="bg-white rounded-3xl max-w-3xl w-full max-h-[92vh] flex flex-col overflow-hidden shadow-2xl border border-stone-100 animate-fadeIn" onclick="event.stopPropagation()">
+            <!-- Pinned Header -->
+            <div class="p-5 px-6 border-b border-stone-100 flex items-center justify-between bg-stone-50/80 shrink-0">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-2xl bg-red-50 text-red-600 flex items-center justify-center font-bold text-base shadow-2xs">
+                        <i class="fas fa-cut"></i>
+                    </div>
+                    <div>
+                        <h3 class="text-base font-bold text-stone-800">Edit Custom Crochet Banner & Hanging Tag</h3>
+                        <p class="text-xs text-stone-500 font-medium">Customize headline, italic highlight, narrative, button, artwork, and hanging note</p>
+                    </div>
+                </div>
+                <button type="button" onclick="closeCustomCrochetModal()" class="w-8 h-8 rounded-full bg-stone-100 text-stone-400 hover:text-stone-700 flex items-center justify-center transition-colors cursor-pointer">
+                    <i class="fas fa-times text-sm"></i>
+                </button>
+            </div>
+
+            <!-- Form Wrapper -->
+            <form id="customCrochetForm" onsubmit="handleCustomCrochetSubmit(event)" class="flex flex-col flex-1 min-h-0 overflow-hidden">
+                <input type="hidden" id="customCrochetImageUrl" name="image_url" value="">
+
+                <div class="p-6 space-y-5 overflow-y-auto flex-1 overscroll-contain">
+                    <!-- Headings Group -->
+                    <div class="space-y-3">
+                        <div class="flex items-center gap-2 border-b border-stone-100 pb-1.5">
+                            <i class="fas fa-heading text-red-600 text-xs"></i>
+                            <span class="text-xs font-bold text-stone-700 uppercase tracking-wider">Headings & Description</span>
+                        </div>
+
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+                            <div>
+                                <label class="block text-xs font-bold text-stone-600 uppercase tracking-wider mb-1">Main Headline <span class="text-red-500">*</span></label>
+                                <input type="text" id="customCrochetTitle" name="title" required placeholder="e.g. Custom Crochet" class="w-full bg-stone-50 border border-stone-200 rounded-xl px-3.5 py-2.5 text-sm font-semibold text-stone-800 focus:bg-white focus:outline-none focus:ring-2 focus:ring-red-500">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold text-stone-600 uppercase tracking-wider mb-1">Italic Highlight Subtitle</label>
+                                <input type="text" id="customCrochetSubtitle" name="subtitle" placeholder="e.g. Just for You" class="w-full bg-stone-50 border border-stone-200 rounded-xl px-3.5 py-2.5 text-sm font-semibold text-stone-800 focus:bg-white focus:outline-none focus:ring-2 focus:ring-red-500">
+                            </div>
+                        </div>
+
+                        <div>
+                            <label class="block text-xs font-bold text-stone-600 uppercase tracking-wider mb-1">Description Narrative <span class="text-red-500">*</span></label>
+                            <textarea id="customCrochetDescription" name="description" rows="2" required placeholder="e.g. Your imagination, our yarn. Let's create something special together." class="w-full bg-stone-50 border border-stone-200 rounded-xl px-3.5 py-2.5 text-sm font-semibold text-stone-800 focus:bg-white focus:outline-none focus:ring-2 focus:ring-red-500"></textarea>
+                        </div>
+                    </div>
+
+                    <!-- Hanging Note / Tag Configuration (Turn Your Ideas Section) -->
+                    <div class="space-y-3 pt-1">
+                        <div class="flex items-center gap-2 border-b border-stone-100 pb-1.5">
+                            <i class="fas fa-sticky-note text-amber-600 text-xs"></i>
+                            <span class="text-xs font-bold text-amber-900 uppercase tracking-wider">Hanging Paper Note (Turn Your Ideas Section)</span>
+                        </div>
+
+                        <div class="p-4 bg-amber-50/70 border border-amber-200/80 rounded-2xl space-y-3">
+                            <div>
+                                <label class="block text-xs font-bold text-stone-700 mb-1">Hanging Note Tag Text</label>
+                                <input type="text" id="customCrochetTagText" name="tag_text" placeholder="e.g. Turn Your Ideas Into Handmade Reality" class="w-full bg-white border border-stone-200 rounded-xl px-3.5 py-2.5 text-sm font-semibold text-stone-800 focus:outline-none focus:ring-2 focus:ring-red-500">
+                                <p class="text-[11px] text-stone-500 mt-1">This appears as the handcrafted paper card badge pinned over the right-side banner artwork.</p>
+                            </div>
+
+                            <div class="flex items-center gap-2 pt-1">
+                                <input type="checkbox" id="customCrochetTagActive" name="tag_active" checked class="w-4 h-4 rounded text-red-600 focus:ring-red-500">
+                                <label for="customCrochetTagActive" class="text-xs font-bold text-stone-700">Display Hanging Note on Banner</label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Button & Artwork -->
+                    <div class="space-y-3 pt-1">
+                        <div class="flex items-center gap-2 border-b border-stone-100 pb-1.5">
+                            <i class="fas fa-image text-red-600 text-xs"></i>
+                            <span class="text-xs font-bold text-stone-700 uppercase tracking-wider">Button CTA & Banner Artwork</span>
+                        </div>
+
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+                            <div>
+                                <label class="block text-xs font-bold text-stone-600 uppercase tracking-wider mb-1">Button Label</label>
+                                <input type="text" id="customCrochetCtaText" name="cta_text" placeholder="e.g. Request Your Custom Order" class="w-full bg-stone-50 border border-stone-200 rounded-xl px-3.5 py-2 text-sm font-semibold text-stone-800 focus:bg-white focus:outline-none focus:ring-2 focus:ring-red-500">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold text-stone-600 uppercase tracking-wider mb-1">Button Link URL</label>
+                                <input type="text" id="customCrochetCtaLink" name="cta_link" placeholder="e.g. /custom-order" class="w-full bg-stone-50 border border-stone-200 rounded-xl px-3.5 py-2 text-sm font-semibold text-stone-800 focus:bg-white focus:outline-none focus:ring-2 focus:ring-red-500">
+                            </div>
+                        </div>
+
+                        <div class="bg-stone-50/80 border border-stone-200/90 rounded-2xl p-4 space-y-3">
+                            <div class="flex items-center justify-between">
+                                <span class="text-xs font-bold text-stone-800">Banner Photo Visual</span>
+                                <button type="button" onclick="openMediaPicker('custom_crochet')" class="px-2.5 py-1 rounded-lg bg-white hover:bg-stone-100 border border-stone-200 text-stone-700 text-[11px] font-bold transition-all flex items-center gap-1 cursor-pointer">
+                                    <i class="fas fa-photo-video text-red-500"></i> Media Library
+                                </button>
+                            </div>
+
+                            <div class="border-2 border-dashed border-stone-200 rounded-xl p-3 text-center hover:border-red-400 hover:bg-red-50/20 transition-all cursor-pointer" onclick="document.getElementById('customCrochetFileInput').click()">
+                                <i class="fas fa-cloud-upload-alt text-red-500 text-lg mb-1"></i>
+                                <p class="text-xs font-bold text-stone-700" id="customCrochetFileLabel">Upload Banner Image</p>
+                                <p class="text-[10px] text-stone-400">1200 × 800 px (JPG/PNG/WEBP)</p>
+                                <input type="file" id="customCrochetFileInput" name="image_file" class="hidden" accept=".jpg,.jpeg,.png,.webp" onchange="handleCustomCrochetFileChange(this)">
+                            </div>
+
+                            <div id="customCrochetPreviewContainer" class="bg-white rounded-xl p-2.5 border border-stone-200 flex items-center gap-3">
+                                <img id="customCrochetPreviewImg" src="" class="w-14 h-14 rounded-lg object-cover border border-stone-200">
+                                <div class="flex-1 min-w-0">
+                                    <p class="text-xs font-bold text-stone-800 truncate" id="customCrochetFileName">Banner Active</p>
+                                    <p class="text-[10px] text-emerald-600 font-semibold">Ready</p>
+                                </div>
+                                <button type="button" onclick="clearCustomCrochetFileInput()" class="text-stone-400 hover:text-red-600 p-1.5 cursor-pointer"><i class="fas fa-times"></i></button>
+                            </div>
+
+                            <div>
+                                <label class="block text-xs font-bold text-stone-600 uppercase tracking-wider mb-1">Alt Text</label>
+                                <input type="text" id="customCrochetAlt" name="alt_text" placeholder="e.g. Custom Crochet Banner Visual" class="w-full bg-white border border-stone-200 rounded-xl px-3.5 py-2 text-sm font-semibold text-stone-800 focus:outline-none focus:ring-2 focus:ring-red-500">
+                            </div>
+                        </div>
+
+                        <div class="flex items-center gap-2 pt-2">
+                            <input type="checkbox" id="customCrochetActive" name="is_active" checked class="w-4 h-4 rounded text-red-600 focus:ring-red-500">
+                            <label for="customCrochetActive" class="text-xs font-bold text-stone-700">Banner Section Active on Homepage</label>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Sticky Footer with Action Buttons -->
+                <div class="p-4 px-6 bg-stone-50 border-t border-stone-100 shrink-0 flex items-center justify-end gap-3">
+                    <button type="button" onclick="closeCustomCrochetModal()" class="btn-secondary text-xs px-5 py-2.5 cursor-pointer">Cancel</button>
+                    <button type="submit" id="customCrochetSubmitBtn" class="btn-primary text-xs px-6 py-2.5 flex items-center gap-2 shadow-sm cursor-pointer">
+                        <i class="fas fa-save"></i>
+                        <span>Save Custom Crochet Banner</span>
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- MODAL 19: FOOTER SETTINGS & NAVIGATION MODAL -->
+    <div id="footerSettingsModal" class="fixed inset-0 bg-stone-900/60 backdrop-blur-xs hidden items-center justify-center z-50 p-4">
+        <div class="bg-white rounded-3xl max-w-3xl w-full max-h-[92vh] flex flex-col overflow-hidden shadow-2xl border border-stone-100 animate-fadeIn">
+            <!-- Header -->
+            <div class="p-5 px-6 border-b border-stone-100 flex items-center justify-between bg-stone-50/80 shrink-0">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-2xl bg-red-50 border border-red-100 flex items-center justify-center text-red-600 font-bold shadow-2xs">
+                        <i class="fas fa-shoe-prints"></i>
+                    </div>
+                    <div>
+                        <h3 class="text-lg font-bold text-stone-800">Footer Settings & Navigation</h3>
+                        <p class="text-xs text-stone-500 font-medium">Manage background image, column titles, link items, contact details, socials & copyright</p>
+                    </div>
+                </div>
+                <button type="button" onclick="closeFooterSettingsModal()" class="w-8 h-8 rounded-full bg-stone-100 text-stone-400 hover:text-stone-700 flex items-center justify-center transition-colors">
+                    <i class="fas fa-times text-sm"></i>
+                </button>
+            </div>
+
+            <!-- Form -->
+            <form id="footerSettingsForm" onsubmit="handleFooterSettingsSubmit(event)" class="flex flex-col flex-1 min-h-0 overflow-hidden">
+                <div class="p-6 space-y-6 overflow-y-auto flex-1 overscroll-contain">
+                    
+                    <!-- 1. Panoramic Background Artwork -->
+                    <div class="bg-stone-50/80 rounded-2xl p-4 border border-stone-200/80 space-y-3">
+                        <div class="flex items-center justify-between">
+                            <label class="block text-xs font-bold text-stone-700 uppercase tracking-wider">
+                                <i class="fas fa-image mr-1 text-red-600"></i>Panoramic Footer Background Artwork
+                            </label>
+                            <span class="text-[10px] text-stone-400 font-bold">1920 × 600 px (JPG/PNG/WEBP)</span>
+                        </div>
+
+                        <div class="border-2 border-dashed border-stone-200 rounded-xl p-4 text-center hover:border-red-400 hover:bg-red-50/20 transition-all cursor-pointer"
+                             onclick="document.getElementById('footerBgFileInput').click()">
+                            <i class="fas fa-cloud-upload-alt text-red-500 text-lg mb-1"></i>
+                            <p class="text-xs font-bold text-stone-700">Upload Panoramic Background Image</p>
+                            <p class="text-[10px] text-stone-400">Click or drag & drop a new background image</p>
+                            <input type="file" id="footerBgFileInput" name="bg_image_file" class="hidden" accept=".jpg,.jpeg,.png,.webp" onchange="handleFooterBgFileChange(this)">
+                        </div>
+
+                        <div id="footerBgPreviewContainer" class="bg-white rounded-xl p-2.5 border border-stone-200 flex items-center gap-3">
+                            <img id="footerBgPreviewImg" src="" class="w-20 h-10 rounded-lg object-cover border border-stone-200">
+                            <div class="flex-1 min-w-0">
+                                <p class="text-xs font-bold text-stone-800 truncate" id="footerBgFileName">Current Background</p>
+                                <p class="text-[10px] text-emerald-600 font-semibold">Active Background</p>
+                            </div>
+                            <button type="button" onclick="clearFooterBgFileInput()" class="text-stone-400 hover:text-red-600 p-1.5 cursor-pointer"><i class="fas fa-times"></i></button>
+                        </div>
+                        <input type="hidden" id="footerBgImageUrl" name="bg_image_url">
+                    </div>
+
+                    <!-- 2. Column 1: Quick Links Repeater -->
+                    <div class="bg-stone-50/80 rounded-2xl p-4 border border-stone-200/80 space-y-3">
+                        <div class="flex items-center justify-between">
+                            <div class="flex-1 max-w-xs">
+                                <label class="block text-xs font-bold text-stone-700 uppercase tracking-wider mb-1">Column 1 Title</label>
+                                <input type="text" id="footerCol1Title" name="col1_title" placeholder="Quick Links" class="w-full bg-white border border-stone-200 rounded-xl px-3 py-1.5 text-xs font-bold text-stone-800 focus:ring-2 focus:ring-red-500">
+                            </div>
+                            <button type="button" onclick="addFooterCol1Link()" class="px-3 py-1.5 rounded-xl bg-red-600 hover:bg-red-700 text-white text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer">
+                                <i class="fas fa-plus-circle text-xs"></i>
+                                <span>Add Link</span>
+                            </button>
+                        </div>
+
+                        <div id="footerCol1LinksContainer" class="space-y-2">
+                            <!-- Injected dynamically by JS -->
+                        </div>
+                    </div>
+
+                    <!-- 3. Column 2: Help Links Repeater -->
+                    <div class="bg-stone-50/80 rounded-2xl p-4 border border-stone-200/80 space-y-3">
+                        <div class="flex items-center justify-between">
+                            <div class="flex-1 max-w-xs">
+                                <label class="block text-xs font-bold text-stone-700 uppercase tracking-wider mb-1">Column 2 Title</label>
+                                <input type="text" id="footerCol2Title" name="col2_title" placeholder="Help" class="w-full bg-white border border-stone-200 rounded-xl px-3 py-1.5 text-xs font-bold text-stone-800 focus:ring-2 focus:ring-red-500">
+                            </div>
+                            <button type="button" onclick="addFooterCol2Link()" class="px-3 py-1.5 rounded-xl bg-red-600 hover:bg-red-700 text-white text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer">
+                                <i class="fas fa-plus-circle text-xs"></i>
+                                <span>Add Link</span>
+                            </button>
+                        </div>
+
+                        <div id="footerCol2LinksContainer" class="space-y-2">
+                            <!-- Injected dynamically by JS -->
+                        </div>
+                    </div>
+
+                    <!-- 4. Column 3: Contact Info & Support Details -->
+                    <div class="bg-stone-50/80 rounded-2xl p-4 border border-stone-200/80 space-y-3">
+                        <label class="block text-xs font-bold text-stone-700 uppercase tracking-wider">
+                            <i class="fas fa-address-card mr-1 text-red-600"></i>Column 3: Contact Information
+                        </label>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                            <div>
+                                <label class="block text-[11px] font-bold text-stone-600 mb-1">Column 3 Title</label>
+                                <input type="text" id="footerCol3Title" name="col3_title" placeholder="Contact" class="w-full bg-white border border-stone-200 rounded-xl px-3 py-2 text-xs font-bold text-stone-800 focus:ring-2 focus:ring-red-500">
+                            </div>
+                            <div>
+                                <label class="block text-[11px] font-bold text-stone-600 mb-1">Store Location / Country</label>
+                                <input type="text" id="footerContactAddress" name="contact_address" placeholder="India" class="w-full bg-white border border-stone-200 rounded-xl px-3 py-2 text-xs font-bold text-stone-800 focus:ring-2 focus:ring-red-500">
+                            </div>
+                            <div>
+                                <label class="block text-[11px] font-bold text-stone-600 mb-1">Phone Number</label>
+                                <input type="text" id="footerContactPhone" name="contact_phone" placeholder="+91 97730 39243" class="w-full bg-white border border-stone-200 rounded-xl px-3 py-2 text-xs font-bold text-stone-800 focus:ring-2 focus:ring-red-500">
+                            </div>
+                            <div>
+                                <label class="block text-[11px] font-bold text-stone-600 mb-1">Phone Link (e.g. tel:+91...)</label>
+                                <input type="text" id="footerContactPhoneLink" name="contact_phone_link" placeholder="tel:+919773039243" class="w-full bg-white border border-stone-200 rounded-xl px-3 py-2 text-xs font-bold text-stone-800 focus:ring-2 focus:ring-red-500">
+                            </div>
+                            <div>
+                                <label class="block text-[11px] font-bold text-stone-600 mb-1">Email Address</label>
+                                <input type="email" id="footerContactEmail" name="contact_email" placeholder="support@knotelle.in" class="w-full bg-white border border-stone-200 rounded-xl px-3 py-2 text-xs font-bold text-stone-800 focus:ring-2 focus:ring-red-500">
+                            </div>
+                            <div>
+                                <label class="block text-[11px] font-bold text-stone-600 mb-1">Email Link (e.g. mailto:...)</label>
+                                <input type="text" id="footerContactEmailLink" name="contact_email_link" placeholder="mailto:support@knotelle.in" class="w-full bg-white border border-stone-200 rounded-xl px-3 py-2 text-xs font-bold text-stone-800 focus:ring-2 focus:ring-red-500">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 5. Social Media Channels -->
+                    <div class="bg-stone-50/80 rounded-2xl p-4 border border-stone-200/80 space-y-3">
+                        <label class="block text-xs font-bold text-stone-700 uppercase tracking-wider">
+                            <i class="fas fa-share-alt mr-1 text-red-600"></i>Social Media Channels & Visibility
+                        </label>
+                        <div class="space-y-2.5">
+                            <!-- Instagram -->
+                            <div class="flex items-center gap-3 bg-white p-2.5 rounded-xl border border-stone-200">
+                                <span class="w-8 h-8 rounded-lg bg-pink-50 text-pink-600 flex items-center justify-center text-sm font-bold shrink-0">
+                                    <i class="fab fa-instagram"></i>
+                                </span>
+                                <input type="text" id="footerInstagramUrl" name="instagram_url" placeholder="https://instagram.com/knotelleindia" class="flex-1 bg-transparent border-0 text-xs font-semibold text-stone-800 focus:ring-0">
+                                <label class="flex items-center gap-1.5 text-xs text-stone-600 font-bold shrink-0 cursor-pointer">
+                                    <input type="checkbox" id="footerInstagramActive" name="instagram_active" class="w-4 h-4 rounded text-red-600 focus:ring-red-500">
+                                    <span>Active</span>
+                                </label>
+                            </div>
+
+                            <!-- Facebook -->
+                            <div class="flex items-center gap-3 bg-white p-2.5 rounded-xl border border-stone-200">
+                                <span class="w-8 h-8 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center text-sm font-bold shrink-0">
+                                    <i class="fab fa-facebook-f"></i>
+                                </span>
+                                <input type="text" id="footerFacebookUrl" name="facebook_url" placeholder="https://facebook.com/knotelleindia" class="flex-1 bg-transparent border-0 text-xs font-semibold text-stone-800 focus:ring-0">
+                                <label class="flex items-center gap-1.5 text-xs text-stone-600 font-bold shrink-0 cursor-pointer">
+                                    <input type="checkbox" id="footerFacebookActive" name="facebook_active" class="w-4 h-4 rounded text-red-600 focus:ring-red-500">
+                                    <span>Active</span>
+                                </label>
+                            </div>
+
+                            <!-- Pinterest -->
+                            <div class="flex items-center gap-3 bg-white p-2.5 rounded-xl border border-stone-200">
+                                <span class="w-8 h-8 rounded-lg bg-red-50 text-red-600 flex items-center justify-center text-sm font-bold shrink-0">
+                                    <i class="fab fa-pinterest-p"></i>
+                                </span>
+                                <input type="text" id="footerPinterestUrl" name="pinterest_url" placeholder="https://pinterest.com/knotelleindia" class="flex-1 bg-transparent border-0 text-xs font-semibold text-stone-800 focus:ring-0">
+                                <label class="flex items-center gap-1.5 text-xs text-stone-600 font-bold shrink-0 cursor-pointer">
+                                    <input type="checkbox" id="footerPinterestActive" name="pinterest_active" class="w-4 h-4 rounded text-red-600 focus:ring-red-500">
+                                    <span>Active</span>
+                                </label>
+                            </div>
+
+                            <!-- YouTube -->
+                            <div class="flex items-center gap-3 bg-white p-2.5 rounded-xl border border-stone-200">
+                                <span class="w-8 h-8 rounded-lg bg-rose-50 text-rose-600 flex items-center justify-center text-sm font-bold shrink-0">
+                                    <i class="fab fa-youtube"></i>
+                                </span>
+                                <input type="text" id="footerYouTubeUrl" name="youtube_url" placeholder="https://youtube.com/@knotelleindia" class="flex-1 bg-transparent border-0 text-xs font-semibold text-stone-800 focus:ring-0">
+                                <label class="flex items-center gap-1.5 text-xs text-stone-600 font-bold shrink-0 cursor-pointer">
+                                    <input type="checkbox" id="footerYouTubeActive" name="youtube_active" class="w-4 h-4 rounded text-red-600 focus:ring-red-500">
+                                    <span>Active</span>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 6. Bottom Bar Copyright & Heart Tagline -->
+                    <div class="bg-stone-50/80 rounded-2xl p-4 border border-stone-200/80 space-y-3">
+                        <label class="block text-xs font-bold text-stone-700 uppercase tracking-wider">
+                            <i class="fas fa-copyright mr-1 text-red-600"></i>Bottom Bar & Heart Tagline
+                        </label>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                            <div>
+                                <label class="block text-[11px] font-bold text-stone-600 mb-1">Copyright Text (supports {year})</label>
+                                <input type="text" id="footerCopyrightText" name="copyright_text" placeholder="© {year} Knotelle. All rights reserved." class="w-full bg-white border border-stone-200 rounded-xl px-3 py-2 text-xs font-bold text-stone-800 focus:ring-2 focus:ring-red-500">
+                            </div>
+                            <div>
+                                <label class="block text-[11px] font-bold text-stone-600 mb-1">Heart Motto / Tagline</label>
+                                <input type="text" id="footerHeartTagline" name="heart_tagline" placeholder="Made with ♡ for a kinder, cozier world." class="w-full bg-white border border-stone-200 rounded-xl px-3 py-2 text-xs font-bold text-stone-800 focus:ring-2 focus:ring-red-500">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="flex items-center gap-2 pt-1">
+                        <input type="checkbox" id="footerSectionActive" name="is_active" checked class="w-4 h-4 rounded text-red-600 focus:ring-red-500">
+                        <label for="footerSectionActive" class="text-xs font-bold text-stone-700">Footer Section Active on Website</label>
+                    </div>
+
+                </div>
+
+                <!-- Footer -->
+                <div class="p-4 px-6 bg-stone-50 border-t border-stone-100 shrink-0 flex items-center justify-end gap-3">
+                    <button type="button" onclick="closeFooterSettingsModal()" class="btn-secondary text-xs px-5 py-2.5 cursor-pointer">Cancel</button>
+                    <button type="submit" id="footerSettingsSubmitBtn" class="btn-primary text-xs px-6 py-2.5 flex items-center gap-2 shadow-sm cursor-pointer">
+                        <i class="fas fa-save"></i>
+                        <span>Save Footer Settings</span>
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- MODAL 20: NAVBAR SETTINGS & NAVIGATION MODAL -->
+    <div id="navbarSettingsModal" class="fixed inset-0 bg-stone-900/60 backdrop-blur-xs hidden items-center justify-center z-50 p-4">
+        <div class="bg-white rounded-3xl max-w-3xl w-full max-h-[92vh] flex flex-col overflow-hidden shadow-2xl border border-stone-100 animate-fadeIn">
+            <!-- Header -->
+            <div class="p-5 px-6 border-b border-stone-100 flex items-center justify-between bg-stone-50/80 shrink-0">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-2xl bg-red-50 border border-red-100 flex items-center justify-center text-red-600 font-bold shadow-2xs">
+                        <i class="fas fa-compass"></i>
+                    </div>
+                    <div>
+                        <h3 class="text-lg font-bold text-stone-800">Navbar & Navigation Settings</h3>
+                        <p class="text-xs text-stone-500 font-medium">Manage announcement bar banner, header links, sparkle highlight pill, and action buttons</p>
+                    </div>
+                </div>
+                <button type="button" onclick="closeNavbarSettingsModal()" class="w-8 h-8 rounded-full bg-stone-100 text-stone-400 hover:text-stone-700 flex items-center justify-center transition-colors">
+                    <i class="fas fa-times text-sm"></i>
+                </button>
+            </div>
+
+            <!-- Form -->
+            <form id="navbarSettingsForm" onsubmit="handleNavbarSettingsSubmit(event)" class="flex flex-col flex-1 min-h-0 overflow-hidden">
+                <div class="p-6 space-y-6 overflow-y-auto flex-1 overscroll-contain">
+                    
+                    <!-- 1. Announcement Bar Banner -->
+                    <div class="bg-stone-50/80 rounded-2xl p-4 border border-stone-200/80 space-y-3">
+                        <div class="flex items-center justify-between">
+                            <label class="block text-xs font-bold text-stone-700 uppercase tracking-wider">
+                                <i class="fas fa-bullhorn mr-1 text-red-600"></i>Announcement Bar Banner
+                            </label>
+                            <label class="flex items-center gap-1.5 text-xs text-stone-700 font-bold cursor-pointer">
+                                <input type="checkbox" id="navbarAnnouncementActive" name="announcement_active" class="w-4 h-4 rounded text-red-600 focus:ring-red-500">
+                                <span>Enable Banner</span>
+                            </label>
+                        </div>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                            <div>
+                                <label class="block text-[11px] font-bold text-stone-600 mb-1">Banner Text</label>
+                                <input type="text" id="navbarAnnouncementText" name="announcement_text" placeholder="✨ Free Pan-India Delivery on all Orders above ₹999" class="w-full bg-white border border-stone-200 rounded-xl px-3 py-2 text-xs font-bold text-stone-800 focus:ring-2 focus:ring-red-500">
+                            </div>
+                            <div>
+                                <label class="block text-[11px] font-bold text-stone-600 mb-1">Banner Link URL</label>
+                                <input type="text" id="navbarAnnouncementLink" name="announcement_link" placeholder="/shop" class="w-full bg-white border border-stone-200 rounded-xl px-3 py-2 text-xs font-bold text-stone-800 focus:ring-2 focus:ring-red-500">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 2. Navigation Links Repeater -->
+                    <div class="bg-stone-50/80 rounded-2xl p-4 border border-stone-200/80 space-y-3">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <label class="block text-xs font-bold text-stone-700 uppercase tracking-wider">
+                                    <i class="fas fa-link mr-1 text-red-600"></i>Navigation Links
+                                </label>
+                                <p class="text-[11px] text-stone-500">Customize labels, URLs, sparkle highlight style, and visibility</p>
+                            </div>
+                            <button type="button" onclick="addNavbarLinkRow()" class="px-3.5 py-1.5 rounded-xl bg-red-600 hover:bg-red-700 text-white text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer">
+                                <i class="fas fa-plus-circle text-xs"></i>
+                                <span>Add Nav Link</span>
+                            </button>
+                        </div>
+
+                        <div id="navbarLinksContainer" class="space-y-2">
+                            <!-- Injected dynamically by JS -->
+                        </div>
+                    </div>
+
+                    <!-- 3. Header Action Icons Visibility -->
+                    <div class="bg-stone-50/80 rounded-2xl p-4 border border-stone-200/80 space-y-3">
+                        <label class="block text-xs font-bold text-stone-700 uppercase tracking-wider">
+                            <i class="fas fa-toggle-on mr-1 text-red-600"></i>Header Action Buttons Visibility
+                        </label>
+                        <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                            <label class="flex items-center gap-2 p-3 bg-white rounded-xl border border-stone-200 text-xs font-bold text-stone-700 cursor-pointer hover:border-red-300">
+                                <input type="checkbox" id="navbarShowSearch" name="show_search" checked class="w-4 h-4 rounded text-red-600 focus:ring-red-500">
+                                <i class="fas fa-search text-stone-500"></i>
+                                <span>Search Bar</span>
+                            </label>
+                            <label class="flex items-center gap-2 p-3 bg-white rounded-xl border border-stone-200 text-xs font-bold text-stone-700 cursor-pointer hover:border-red-300">
+                                <input type="checkbox" id="navbarShowWishlist" name="show_wishlist" checked class="w-4 h-4 rounded text-red-600 focus:ring-red-500">
+                                <i class="fas fa-heart text-stone-500"></i>
+                                <span>Wishlist</span>
+                            </label>
+                            <label class="flex items-center gap-2 p-3 bg-white rounded-xl border border-stone-200 text-xs font-bold text-stone-700 cursor-pointer hover:border-red-300">
+                                <input type="checkbox" id="navbarShowAccount" name="show_account" checked class="w-4 h-4 rounded text-red-600 focus:ring-red-500">
+                                <i class="fas fa-user text-stone-500"></i>
+                                <span>Account</span>
+                            </label>
+                            <label class="flex items-center gap-2 p-3 bg-white rounded-xl border border-stone-200 text-xs font-bold text-stone-700 cursor-pointer hover:border-red-300">
+                                <input type="checkbox" id="navbarShowCart" name="show_cart" checked class="w-4 h-4 rounded text-red-600 focus:ring-red-500">
+                                <i class="fas fa-shopping-bag text-stone-500"></i>
+                                <span>Cart Bag</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="flex items-center gap-2 pt-1">
+                        <input type="checkbox" id="navbarSectionActive" name="is_active" checked class="w-4 h-4 rounded text-red-600 focus:ring-red-500">
+                        <label for="navbarSectionActive" class="text-xs font-bold text-stone-700">Navbar Section Active</label>
+                    </div>
+
+                </div>
+
+                <!-- Footer -->
+                <div class="p-4 px-6 bg-stone-50 border-t border-stone-100 shrink-0 flex items-center justify-end gap-3">
+                    <button type="button" onclick="closeNavbarSettingsModal()" class="btn-secondary text-xs px-5 py-2.5 cursor-pointer">Cancel</button>
+                    <button type="submit" id="navbarSettingsSubmitBtn" class="btn-primary text-xs px-6 py-2.5 flex items-center gap-2 shadow-sm cursor-pointer">
+                        <i class="fas fa-save"></i>
+                        <span>Save Navbar Settings</span>
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
 @endsection
 
 @push('scripts')
@@ -1353,16 +2858,765 @@
                         </div>
                     </div>
                 `;
-            } else if (section.is_content_section) {
-                // Trust & Benefits Content-Driven Info
+            } else if (section.is_custom_crochet_section) {
+                // Custom Crochet Banner & Hanging Tag Section Manager
+                const m = section.metadata || {};
+                const img = m.desktop_image || m.image_url || '/images/homepage/middleimg.png';
                 bodyContent = `
                     <div class="p-8">
-                        <div class="bg-[#FFF9F6] border border-[#E7D1CC] rounded-2xl p-6">
-                            <div class="flex items-center gap-3">
-                                <i class="fas fa-heart text-red-600 text-xl"></i>
+                        <div class="bg-[#FFF9F6] border border-[#E7D1CC] rounded-3xl p-6 sm:p-8 shadow-2xs hover:shadow-boutique transition-all">
+                            <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
+                                <!-- Details & Content -->
+                                <div class="lg:col-span-7 space-y-4">
+                                    <div class="flex flex-wrap items-center justify-between gap-3">
+                                        <div class="flex items-center gap-2">
+                                            <span class="px-3 py-1 rounded-full text-xs font-bold bg-red-50 text-red-700 border border-red-200">
+                                                <i class="fas fa-cut mr-1 text-[10px]"></i>Promotional Middle Banner
+                                            </span>
+                                            <span class="px-2.5 py-0.5 rounded-full text-[11px] font-bold ${m.is_active ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' : 'bg-stone-100 text-stone-500 border border-stone-200'}">
+                                                ${m.is_active ? '● Live on Storefront' : '○ Hidden'}
+                                            </span>
+                                        </div>
+
+                                        <button type="button" onclick="openCustomCrochetModal()"
+                                                class="px-5 py-2.5 rounded-2xl bg-red-600 hover:bg-red-700 text-white text-xs font-bold shadow-xs hover:shadow-md transition-all flex items-center gap-2 active:scale-95 cursor-pointer">
+                                            <i class="fas fa-edit text-xs"></i>
+                                            <span>Edit Banner & Hanging Tag</span>
+                                        </button>
+                                    </div>
+
+                                    <div>
+                                        <h3 class="text-2xl sm:text-3xl font-bold text-stone-800 tracking-tight mb-1">
+                                            ${escapeHtml(m.title || "Custom Crochet")}
+                                        </h3>
+                                        ${m.subtitle ? `<p class="text-base font-serif italic text-red-600">${escapeHtml(m.subtitle)}</p>` : ''}
+                                    </div>
+
+                                    <div class="space-y-2 bg-white/70 rounded-2xl p-4 border border-[#E7D1CC]/70">
+                                        <span class="text-[10px] font-bold text-stone-400 uppercase tracking-wider block mb-0.5">Banner Narrative</span>
+                                        <p class="text-xs text-stone-700 leading-relaxed">${escapeHtml(m.description || "Your imagination, our yarn. Let's create something special together.")}</p>
+                                    </div>
+
+                                    <div class="flex flex-wrap items-center gap-3 pt-1">
+                                        ${m.cta_text ? `
+                                            <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-xl bg-white border border-[#E7D1CC] text-xs font-semibold text-stone-700 shadow-2xs">
+                                                <i class="fas fa-mouse-pointer text-red-600 text-xs"></i>
+                                                <span>Button: "<strong>${escapeHtml(m.cta_text)}</strong>" ${m.cta_link ? `→ ${escapeHtml(m.cta_link)}` : ''}</span>
+                                            </div>
+                                        ` : ''}
+                                        ${m.tag_text ? `
+                                            <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-xl bg-amber-50 border border-amber-200 text-xs font-semibold text-amber-900 shadow-2xs">
+                                                <i class="fas fa-sticky-note text-amber-600 text-xs"></i>
+                                                <span>Hanging Note: "<strong>${escapeHtml(m.tag_text)}</strong>" ${m.tag_active ? '(Active)' : '(Hidden)'}</span>
+                                            </div>
+                                        ` : ''}
+                                    </div>
+                                </div>
+
+                                <!-- Image Preview Card with Pinned Hanging Tag -->
+                                <div class="lg:col-span-5">
+                                    <div class="relative w-full aspect-[4/3] rounded-2xl overflow-hidden bg-stone-100 border-2 border-white shadow-md group">
+                                        <img src="${img}" alt="${escapeHtml(m.alt_text || m.title || 'Custom Crochet')}" class="w-full h-full object-cover group-hover:scale-103 transition-transform duration-300" onerror="this.src='/images/homepage/middleimg.png'">
+
+                                        <!-- Hanging Paper Note Over Banner Image -->
+                                        ${m.tag_active && m.tag_text ? `
+                                            <div class="absolute bottom-3 right-3 bg-[#FFF9F6] border border-[#E7D1CC] rounded-xl p-2.5 shadow-lg text-center max-w-[150px] rotate-2 animate-fadeIn select-none">
+                                                <div class="absolute -top-2 left-1/2 -translate-x-1/2 flex flex-col items-center">
+                                                    <div class="w-1.5 h-2 bg-[#C89B61]/80 rounded-t"></div>
+                                                    <div class="w-2 h-2 rounded-full bg-white border border-[#E7D1CC]"></div>
+                                                </div>
+                                                <p class="font-serif italic font-bold text-xs text-[#2E211E] leading-tight pt-1">
+                                                    ${escapeHtml(m.tag_text)}
+                                                </p>
+                                                <span class="text-[10px] text-red-600 block mt-0.5">♡</span>
+                                            </div>
+                                        ` : ''}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            } else if (section.is_about_story_section) {
+                // The KNOTELLE Story & Atelier Section Manager
+                const m = section.metadata || {};
+                const img = m.desktop_image || '/images/logo/Logo_1.png';
+                bodyContent = `
+                    <div class="p-8">
+                        <div class="bg-[#FFF9F6] border border-[#E7D1CC] rounded-3xl p-6 sm:p-8 shadow-2xs hover:shadow-boutique transition-all">
+                            <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+                                <!-- Image Preview Card -->
+                                <div class="lg:col-span-4">
+                                    <div class="relative w-full aspect-[4/5] rounded-2xl overflow-hidden bg-stone-100 border border-[#E7D1CC] shadow-xs group">
+                                        <img src="${img}" alt="${escapeHtml(m.alt_text || m.title || 'About Story')}" class="w-full h-full object-cover group-hover:scale-103 transition-transform duration-300" onerror="this.src='/images/logo/Logo_1.png'">
+                                        
+                                        <!-- Floating Badge Preview on Image -->
+                                        ${m.floating_badge_active ? `
+                                            <div class="absolute bottom-3 left-3 right-3 bg-white/95 backdrop-blur-md p-3 rounded-xl border border-stone-200/80 shadow-md flex items-center gap-2.5">
+                                                <div class="w-8 h-8 rounded-lg bg-red-50 text-red-600 flex items-center justify-center font-bold text-xs shrink-0">
+                                                    <i class="${getPillarIconFa(m.floating_badge_icon || 'Heart')}"></i>
+                                                </div>
+                                                <div class="min-w-0">
+                                                    <p class="text-xs font-bold text-stone-800 truncate">${escapeHtml(m.floating_badge_title || '100% Handcrafted')}</p>
+                                                    <p class="text-[10px] text-stone-500 truncate">${escapeHtml(m.floating_badge_subtitle || 'Never mass machine produced')}</p>
+                                                </div>
+                                            </div>
+                                        ` : ''}
+
+                                        ${m.mobile_image ? `
+                                            <div class="absolute top-2 right-2 bg-stone-900/75 text-white text-[9px] font-bold px-2 py-0.5 rounded-md flex items-center gap-1">
+                                                <i class="fas fa-mobile-alt"></i> Mobile Set
+                                            </div>
+                                        ` : ''}
+                                    </div>
+                                </div>
+
+                                <!-- Text Details & Actions -->
+                                <div class="lg:col-span-8 space-y-4">
+                                    <div class="flex flex-wrap items-center justify-between gap-3">
+                                        <div class="flex items-center gap-2">
+                                            <span class="px-3 py-1 rounded-full text-xs font-bold bg-red-50 text-red-700 border border-red-200">
+                                                <i class="fas fa-tag mr-1 text-[10px]"></i>${escapeHtml(m.badge || m.tag_text || 'The KNOTELLE Story')}
+                                            </span>
+                                            <span class="px-2.5 py-0.5 rounded-full text-[11px] font-bold ${m.is_active ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' : 'bg-stone-100 text-stone-500 border border-stone-200'}">
+                                                ${m.is_active ? '● Live on Storefront' : '○ Hidden'}
+                                            </span>
+                                        </div>
+
+                                        <button type="button" onclick="openAboutStoryModal()"
+                                                class="px-5 py-2.5 rounded-2xl bg-red-600 hover:bg-red-700 text-white text-xs font-bold shadow-xs hover:shadow-md transition-all flex items-center gap-2 active:scale-95 cursor-pointer">
+                                            <i class="fas fa-edit text-xs"></i>
+                                            <span>Edit Story & Visuals</span>
+                                        </button>
+                                    </div>
+
+                                    <div>
+                                        <h3 class="text-2xl font-bold text-stone-800 tracking-tight mb-1">
+                                            ${escapeHtml(m.title || 'Every Loop Tells a Story')}
+                                        </h3>
+                                        ${m.subtitle ? `<p class="text-xs font-serif italic text-red-600">${escapeHtml(m.subtitle)}</p>` : ''}
+                                    </div>
+
+                                    <div class="space-y-2.5 bg-white/70 rounded-2xl p-4 border border-[#E7D1CC]/70">
+                                        <div>
+                                            <span class="text-[10px] font-bold text-stone-400 uppercase tracking-wider block mb-0.5">Paragraph 1 (Primary Narrative)</span>
+                                            <p class="text-xs text-stone-700 leading-relaxed">${escapeHtml(m.paragraph_1 || m.description || 'No description text set.')}</p>
+                                        </div>
+                                        ${m.paragraph_2 ? `
+                                            <div class="pt-2 border-t border-stone-100">
+                                                <span class="text-[10px] font-bold text-stone-400 uppercase tracking-wider block mb-0.5">Paragraph 2 (Secondary Narrative)</span>
+                                                <p class="text-xs text-stone-700 leading-relaxed">${escapeHtml(m.paragraph_2)}</p>
+                                            </div>
+                                        ` : ''}
+                                    </div>
+
+                                    <!-- CTA & Floating Info Pills -->
+                                    <div class="flex flex-wrap items-center gap-3 pt-1">
+                                        ${m.cta_text && m.cta_visible ? `
+                                            <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-xl bg-white border border-[#E7D1CC] text-xs font-semibold text-stone-700 shadow-2xs">
+                                                <i class="fas fa-mouse-pointer text-red-600 text-xs"></i>
+                                                <span>CTA: "<strong>${escapeHtml(m.cta_text)}</strong>" ${m.cta_link ? `→ ${escapeHtml(m.cta_link)}` : ''}</span>
+                                            </div>
+                                        ` : ''}
+                                        <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-xl bg-white border border-[#E7D1CC] text-xs font-semibold text-stone-700 shadow-2xs">
+                                            <i class="fas fa-image text-stone-400 text-xs"></i>
+                                            <span>Alt Text: "${escapeHtml(m.alt_text || 'Artisan stitching crochet')}"</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            } else if (section.is_craft_pillars_section) {
+                // Our Craft Pillars Dynamic Manager
+                const meta = section.metadata || {};
+                const items = section.items || [];
+                bodyContent = `
+                    <div class="p-8">
+                        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6 bg-[#FFF9F6] border border-[#E7D1CC] p-5 rounded-2xl">
+                            <div>
+                                <div class="flex items-center gap-2 mb-1">
+                                    <span class="px-2.5 py-0.5 rounded-md text-[10px] font-bold bg-red-100 text-red-800">
+                                        ${escapeHtml(meta.tag_text || 'Artisan Standards')}
+                                    </span>
+                                    <h4 class="font-bold text-stone-800 text-base">${escapeHtml(meta.title || 'Our Craft Pillars')}</h4>
+                                    <span class="px-2 py-0.5 rounded-full text-[10px] font-bold ${meta.is_active ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' : 'bg-stone-100 text-stone-500 border border-stone-200'}">
+                                        ${meta.is_active ? 'Active' : 'Hidden'}
+                                    </span>
+                                </div>
+                                <p class="text-xs text-stone-600 font-medium">${escapeHtml(meta.subtitle || 'Guiding principles behind every stitch we make.')}</p>
+                            </div>
+                            <div class="flex flex-wrap items-center gap-2.5">
+                                <button type="button" onclick="openCraftPillarsHeaderModal()" class="px-3.5 py-2 rounded-xl bg-white hover:bg-stone-100 border border-[#E7D1CC] text-stone-700 text-xs font-bold transition-all flex items-center gap-1.5 shadow-2xs cursor-pointer">
+                                    <i class="fas fa-cog text-xs text-stone-500"></i>
+                                    <span>Edit Header</span>
+                                </button>
+                                <button type="button" onclick="openAddCraftPillarModal()" class="px-4 py-2 rounded-xl bg-red-600 hover:bg-red-700 text-white text-xs font-bold shadow-xs hover:shadow-md transition-all flex items-center gap-1.5 active:scale-95 cursor-pointer">
+                                    <i class="fas fa-plus-circle text-xs"></i>
+                                    <span>+ Add Craft Pillar</span>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Pillars Grid -->
+                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                            ${items.length > 0 ? items.map(p => `
+                                <div class="bg-white border border-stone-200/90 rounded-2xl p-5 shadow-2xs hover:shadow-boutique transition-all flex flex-col justify-between group">
+                                    <div>
+                                        <div class="flex items-center justify-between gap-2 mb-3.5">
+                                            <div class="w-12 h-12 rounded-2xl bg-gradient-to-br from-red-50 to-rose-100 border border-red-200 text-red-700 flex items-center justify-center font-bold text-lg shadow-2xs shrink-0">
+                                                ${p.icon_url ? `<img src="${p.icon_url}" class="w-6 h-6 object-contain">` : `<i class="${getPillarIconFa(p.icon_name || p.icon || 'Leaf')}"></i>`}
+                                            </div>
+                                            <div class="flex items-center gap-1.5">
+                                                <span class="px-2 py-0.5 rounded-md text-[10px] font-bold bg-stone-100 text-stone-600">
+                                                    Order: #${p.sort_order || 1}
+                                                </span>
+                                                <button type="button" onclick="toggleCraftPillar(${p.id})" class="px-2.5 py-0.5 rounded-full text-[10px] font-bold transition-colors cursor-pointer ${p.is_active ? 'bg-emerald-50 text-emerald-700 hover:bg-emerald-100 border border-emerald-200' : 'bg-stone-100 text-stone-500 hover:bg-stone-200 border border-stone-200'}" title="Click to toggle status">
+                                                    ${p.is_active ? '● Active' : '○ Hidden'}
+                                                </button>
+                                            </div>
+                                        </div>
+
+                                        <h4 class="font-bold text-stone-800 text-base mb-1.5">${escapeHtml(p.title)}</h4>
+                                        <p class="text-xs text-stone-600 leading-relaxed line-clamp-3 mb-4">${escapeHtml(p.description)}</p>
+                                    </div>
+
+                                    <div class="pt-3 border-t border-stone-100 flex items-center justify-between gap-2">
+                                        <button type="button" onclick="openEditCraftPillarModal(${p.id})" class="flex-1 py-2 px-3 rounded-xl bg-red-50 text-red-700 hover:bg-red-600 hover:text-white text-xs font-bold transition-all flex items-center justify-center gap-1.5 cursor-pointer">
+                                            <i class="fas fa-edit text-xs"></i>
+                                            <span>Edit Pillar</span>
+                                        </button>
+                                        <button type="button" onclick="deleteCraftPillar(${p.id})" class="py-2 px-3 rounded-xl bg-stone-50 hover:bg-rose-50 text-stone-400 hover:text-rose-600 text-xs font-bold transition-all cursor-pointer" title="Delete Pillar">
+                                            <i class="fas fa-trash-alt text-xs"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            `).join('') : `
+                                <div class="col-span-full py-12 text-center text-stone-400 bg-stone-50 rounded-2xl border border-dashed border-stone-200">
+                                    <i class="fas fa-cubes text-3xl mb-2 text-stone-300"></i>
+                                    <p class="text-sm font-bold text-stone-600">No craft pillars added yet</p>
+                                    <p class="text-xs text-stone-400 mb-4">Click "+ Add Craft Pillar" above to define your craft pillars.</p>
+                                </div>
+                            `}
+                        </div>
+                    </div>
+                `;
+            } else if (section.is_contact_intro_section) {
+                // Contact Introduction / Hero Section Manager
+                const m = section.metadata || {};
+                const img = m.desktop_image || m.image || '/images/logo/Logo_1.png';
+                bodyContent = `
+                    <div class="p-8">
+                        <div class="bg-[#FFF9F6] border border-[#E7D1CC] rounded-3xl p-6 sm:p-8 shadow-2xs hover:shadow-boutique transition-all">
+                            <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+                                <!-- Image Preview Card -->
+                                <div class="lg:col-span-4">
+                                    <div class="relative w-full aspect-[4/3] rounded-2xl overflow-hidden bg-stone-100 border border-[#E7D1CC] shadow-xs group">
+                                        <img src="${img}" alt="${escapeHtml(m.alt_text || m.title || 'Contact Hero')}" class="w-full h-full object-cover group-hover:scale-103 transition-transform duration-300" onerror="this.src='/images/logo/Logo_1.png'">
+                                        <div class="absolute bottom-3 left-3 right-3 bg-white/95 backdrop-blur-md p-3 rounded-xl border border-stone-200/80 shadow-md flex items-center gap-2.5">
+                                            <div class="w-8 h-8 rounded-lg bg-red-50 text-red-600 flex items-center justify-center font-bold text-xs shrink-0">
+                                                <i class="fas fa-handshake"></i>
+                                            </div>
+                                            <div class="min-w-0">
+                                                <p class="text-xs font-bold text-stone-800 truncate">${escapeHtml(m.badge || "Let's Connect")}</p>
+                                                <p class="text-[10px] text-stone-500 truncate">${escapeHtml(m.title || "Let's Connect")}</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Details & Actions -->
+                                <div class="lg:col-span-8 space-y-4">
+                                    <div class="flex flex-wrap items-center justify-between gap-3">
+                                        <div class="flex items-center gap-2">
+                                            <span class="px-3 py-1 rounded-full text-xs font-bold bg-red-50 text-red-700 border border-red-200">
+                                                <i class="fas fa-tag mr-1 text-[10px]"></i>${escapeHtml(m.badge || m.tag_text || "Let's Connect")}
+                                            </span>
+                                            <span class="px-2.5 py-0.5 rounded-full text-[11px] font-bold ${m.is_active ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' : 'bg-stone-100 text-stone-500 border border-stone-200'}">
+                                                ${m.is_active ? '● Live on Storefront' : '○ Hidden'}
+                                            </span>
+                                        </div>
+
+                                        <button type="button" onclick="openContactIntroModal()"
+                                                class="px-5 py-2.5 rounded-2xl bg-red-600 hover:bg-red-700 text-white text-xs font-bold shadow-xs hover:shadow-md transition-all flex items-center gap-2 active:scale-95 cursor-pointer">
+                                            <i class="fas fa-edit text-xs"></i>
+                                            <span>Edit Intro & Visuals</span>
+                                        </button>
+                                    </div>
+
+                                    <div>
+                                        <h3 class="text-2xl font-bold text-stone-800 tracking-tight mb-1">
+                                            ${escapeHtml(m.title || "Let's Connect")}
+                                        </h3>
+                                        ${m.subtitle ? `<p class="text-xs font-serif italic text-red-600">${escapeHtml(m.subtitle)}</p>` : ''}
+                                    </div>
+
+                                    <div class="space-y-2 bg-white/70 rounded-2xl p-4 border border-[#E7D1CC]/70">
+                                        <span class="text-[10px] font-bold text-stone-400 uppercase tracking-wider block mb-0.5">Introductory Narrative</span>
+                                        <p class="text-xs text-stone-700 leading-relaxed">${escapeHtml(m.description || "We're here to help bring your handcrafted crochet dreams to life.")}</p>
+                                    </div>
+
+                                    <div class="flex flex-wrap items-center gap-3 pt-1">
+                                        ${m.cta_text ? `
+                                            <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-xl bg-white border border-[#E7D1CC] text-xs font-semibold text-stone-700 shadow-2xs">
+                                                <i class="fas fa-mouse-pointer text-red-600 text-xs"></i>
+                                                <span>Button: "<strong>${escapeHtml(m.cta_text)}</strong>" ${m.cta_link ? `→ ${escapeHtml(m.cta_link)}` : ''}</span>
+                                            </div>
+                                        ` : ''}
+                                        <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-xl bg-white border border-[#E7D1CC] text-xs font-semibold text-stone-700 shadow-2xs">
+                                            <i class="fas fa-image text-stone-400 text-xs"></i>
+                                            <span>Alt Text: "${escapeHtml(m.alt_text || 'Contact Banner')}"</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            } else if (section.is_contact_info_section) {
+                // Contact Information & Atelier Section Manager
+                const meta = section.metadata || {};
+                const items = section.items || [];
+                bodyContent = `
+                    <div class="p-8">
+                        <!-- Studio Header & Custom Order Box Preview -->
+                        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6 bg-[#FFF9F6] border border-[#E7D1CC] p-5 rounded-2xl">
+                            <div>
+                                <div class="flex items-center gap-2 mb-1">
+                                    <span class="px-2.5 py-0.5 rounded-md text-[10px] font-bold bg-red-100 text-red-800">
+                                        ${escapeHtml(meta.tag_text || meta.badge || 'Atelier Studio')}
+                                    </span>
+                                    <h4 class="font-bold text-stone-800 text-base">${escapeHtml(meta.title || 'KNOTELLE Studio')}</h4>
+                                    <span class="px-2 py-0.5 rounded-full text-[10px] font-bold ${meta.is_active ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' : 'bg-stone-100 text-stone-500 border border-stone-200'}">
+                                        ${meta.is_active ? 'Active' : 'Hidden'}
+                                    </span>
+                                </div>
+                                <p class="text-xs text-stone-600 font-medium">${escapeHtml(meta.subtitle || 'Handmade with love in Bengaluru, India')}</p>
+                                ${meta.custom_order_box_active ? `
+                                    <div class="mt-2.5 inline-flex items-center gap-2 px-3 py-1 bg-amber-50 border border-amber-200 rounded-lg text-amber-900 text-[11px] font-semibold">
+                                        <i class="fas fa-gift text-amber-600"></i>
+                                        <span>Helper Box: "<strong>${escapeHtml(meta.custom_order_box_title || 'Looking for Custom Orders?')}</strong>" (${escapeHtml(meta.custom_order_box_link || '/custom-order')})</span>
+                                    </div>
+                                ` : ''}
+                            </div>
+                            <div class="flex flex-wrap items-center gap-2.5">
+                                <button type="button" onclick="openContactInfoHeaderModal()" class="px-3.5 py-2 rounded-xl bg-white hover:bg-stone-100 border border-[#E7D1CC] text-stone-700 text-xs font-bold transition-all flex items-center gap-1.5 shadow-2xs cursor-pointer">
+                                    <i class="fas fa-cog text-xs text-stone-500"></i>
+                                    <span>Edit Header & Box</span>
+                                </button>
+                                <button type="button" onclick="openAddContactInfoItemModal()" class="px-4 py-2 rounded-xl bg-red-600 hover:bg-red-700 text-white text-xs font-bold shadow-xs hover:shadow-md transition-all flex items-center gap-1.5 active:scale-95 cursor-pointer">
+                                    <i class="fas fa-plus-circle text-xs"></i>
+                                    <span>+ Add Contact Detail</span>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Contact Details Grid -->
+                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-6">
+                            ${items.length > 0 ? items.map(d => `
+                                <div class="bg-white border border-stone-200/90 rounded-2xl p-5 shadow-2xs hover:shadow-boutique transition-all flex flex-col justify-between group">
+                                    <div>
+                                        <div class="flex items-center justify-between gap-2 mb-3.5">
+                                            <div class="w-12 h-12 rounded-2xl bg-gradient-to-br from-red-50 to-rose-100 border border-red-200 text-red-700 flex items-center justify-center font-bold text-lg shadow-2xs shrink-0">
+                                                <i class="${getContactIconFa(d.icon || d.icon_name || 'MapPin')}"></i>
+                                            </div>
+                                            <div class="flex items-center gap-1.5">
+                                                <span class="px-2 py-0.5 rounded-md text-[10px] font-bold bg-stone-100 text-stone-600">
+                                                    Order: #${d.sort_order || 1}
+                                                </span>
+                                                <button type="button" onclick="toggleContactInfoItem(${d.id})" class="px-2.5 py-0.5 rounded-full text-[10px] font-bold transition-colors cursor-pointer ${d.is_active ? 'bg-emerald-50 text-emerald-700 hover:bg-emerald-100 border border-emerald-200' : 'bg-stone-100 text-stone-500 hover:bg-stone-200 border border-stone-200'}" title="Click to toggle status">
+                                                    ${d.is_active ? '● Active' : '○ Hidden'}
+                                                </button>
+                                            </div>
+                                        </div>
+
+                                        <h4 class="font-bold text-stone-800 text-base mb-1">${escapeHtml(d.title)}</h4>
+                                        <p class="text-sm font-semibold text-stone-900 mb-0.5">${escapeHtml(d.value || d.description || '')}</p>
+                                        ${d.address_line_2 ? `<p class="text-xs text-stone-500">${escapeHtml(d.address_line_2)}</p>` : ''}
+                                        ${d.link || d.cta_link ? `<p class="text-[11px] font-mono text-red-600 truncate mt-2 bg-red-50/50 p-1.5 rounded-lg border border-red-100">Link: ${escapeHtml(d.link || d.cta_link)}</p>` : ''}
+                                    </div>
+
+                                    <div class="pt-4 mt-3 border-t border-stone-100 flex items-center justify-between gap-2">
+                                        <button type="button" onclick="openEditContactInfoItemModal(${d.id})" class="flex-1 py-2 px-3 rounded-xl bg-red-50 text-red-700 hover:bg-red-600 hover:text-white text-xs font-bold transition-all flex items-center justify-center gap-1.5 cursor-pointer">
+                                            <i class="fas fa-edit text-xs"></i>
+                                            <span>Edit Detail</span>
+                                        </button>
+                                        <button type="button" onclick="deleteContactInfoItem(${d.id})" class="py-2 px-3 rounded-xl bg-stone-50 hover:bg-rose-50 text-stone-400 hover:text-rose-600 text-xs font-bold transition-all cursor-pointer" title="Delete Detail">
+                                            <i class="fas fa-trash-alt text-xs"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            `).join('') : `
+                                <div class="col-span-full py-12 text-center text-stone-400 bg-stone-50 rounded-2xl border border-dashed border-stone-200">
+                                    <i class="fas fa-address-book text-3xl mb-2 text-stone-300"></i>
+                                    <p class="text-sm font-bold text-stone-600">No contact details added yet</p>
+                                    <p class="text-xs text-stone-400 mb-4">Click "+ Add Contact Detail" to add phone, email, address, or hours.</p>
+                                </div>
+                            `}
+                        </div>
+                    </div>
+                `;
+            } else if (section.is_contact_form_section) {
+                // Send Us a Message (Contact Form) Section Manager
+                const m = section.metadata || {};
+                const fields = m.fields || [];
+                bodyContent = `
+                    <div class="p-8">
+                        <div class="bg-[#FFF9F6] border border-[#E7D1CC] rounded-3xl p-6 sm:p-8 shadow-2xs hover:shadow-boutique transition-all">
+                            <div class="flex flex-wrap items-center justify-between gap-4 mb-6 border-b border-[#E7D1CC] pb-4">
                                 <div>
-                                    <h4 class="font-bold text-stone-800 text-sm">Icon & Content Driven Section</h4>
-                                    <p class="text-xs text-stone-500">The 4 benefits ("Handmade with Love", "Premium Yarn Quality", "100% Pure Natural Cotton", "Happiness Guaranteed") use SVG artwork and boutique typography.</p>
+                                    <div class="flex items-center gap-2 mb-1">
+                                        <span class="px-3 py-1 rounded-full text-xs font-bold bg-red-50 text-red-700 border border-red-200">
+                                            <i class="fas fa-tag mr-1 text-[10px]"></i>${escapeHtml(m.badge || m.tag_text || 'Get In Touch')}
+                                        </span>
+                                        <h3 class="text-xl font-bold text-stone-800">${escapeHtml(m.title || 'Send Us a Message')}</h3>
+                                        <span class="px-2.5 py-0.5 rounded-full text-[11px] font-bold ${m.is_active ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' : 'bg-stone-100 text-stone-500 border border-stone-200'}">
+                                            ${m.is_active ? '● Active' : '○ Hidden'}
+                                        </span>
+                                    </div>
+                                    <p class="text-xs text-stone-600 font-medium">${escapeHtml(m.subtitle || 'Fill in your details and our team will get back to you promptly.')}</p>
+                                </div>
+
+                                <button type="button" onclick="openContactFormModal()"
+                                        class="px-5 py-2.5 rounded-2xl bg-red-600 hover:bg-red-700 text-white text-xs font-bold shadow-xs hover:shadow-md transition-all flex items-center gap-2 active:scale-95 cursor-pointer">
+                                    <i class="fas fa-edit text-xs"></i>
+                                    <span>Edit Form Settings</span>
+                                </button>
+                            </div>
+
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                                <!-- Button & Notification Feedback Preview -->
+                                <div class="bg-white/80 rounded-2xl p-4 border border-[#E7D1CC] space-y-3">
+                                    <div class="text-[11px] font-bold text-stone-400 uppercase tracking-wider">Button & Notifications</div>
+                                    <div class="flex items-center gap-2">
+                                        <span class="text-xs font-bold text-stone-700">Submit Button:</span>
+                                        <span class="px-3 py-1 bg-red-600 text-white font-bold text-xs rounded-xl">${escapeHtml(m.cta_text || m.submit_btn_text || 'Send Message')}</span>
+                                    </div>
+                                    <div class="p-3 bg-emerald-50 border border-emerald-200 rounded-xl space-y-0.5">
+                                        <div class="text-xs font-bold text-emerald-900 flex items-center gap-1.5"><i class="fas fa-check-circle"></i> ${escapeHtml(m.success_title || 'Message Sent!')}</div>
+                                        <p class="text-[11px] text-emerald-700">${escapeHtml(m.success_message || 'Thank you! Your message has been sent successfully.')}</p>
+                                    </div>
+                                    <div class="p-3 bg-rose-50 border border-rose-200 rounded-xl space-y-0.5">
+                                        <div class="text-xs font-bold text-rose-900 flex items-center gap-1.5"><i class="fas fa-exclamation-circle"></i> Submission Error Note</div>
+                                        <p class="text-[11px] text-rose-700">${escapeHtml(m.error_message || 'Something went wrong while sending your message.')}</p>
+                                    </div>
+                                </div>
+
+                                <!-- Fields Configuration Summary -->
+                                <div class="bg-white/80 rounded-2xl p-4 border border-[#E7D1CC] space-y-2.5">
+                                    <div class="text-[11px] font-bold text-stone-400 uppercase tracking-wider mb-2">Configured Form Fields</div>
+                                    <div class="space-y-2">
+                                        ${fields.map(f => `
+                                            <div class="flex items-center justify-between p-2.5 bg-stone-50 rounded-xl border border-stone-200 text-xs">
+                                                <div>
+                                                    <span class="font-bold text-stone-800">${escapeHtml(f.label || f.key)}</span>
+                                                    <span class="text-[10px] text-stone-400 ml-1">("${escapeHtml(f.placeholder || '')}")</span>
+                                                </div>
+                                                <div>
+                                                    <span class="px-2 py-0.5 rounded-md text-[10px] font-bold ${f.required ? 'bg-amber-100 text-amber-800' : 'bg-stone-200 text-stone-600'}">
+                                                        ${f.required ? '✓ Required' : '○ Optional'}
+                                                    </span>
+                                                </div>
+                                            </div>
+                                        `).join('')}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            } else if (section.is_contact_faqs_section) {
+                // Frequently Asked Questions Section Manager
+                const meta = section.metadata || {};
+                const items = section.items || [];
+                bodyContent = `
+                    <div class="p-8">
+                        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6 bg-[#FFF9F6] border border-[#E7D1CC] p-5 rounded-2xl">
+                            <div>
+                                <div class="flex items-center gap-2 mb-1">
+                                    <span class="px-2.5 py-0.5 rounded-md text-[10px] font-bold bg-red-100 text-red-800">
+                                        ${escapeHtml(meta.tag_text || meta.badge || 'Help & Support')}
+                                    </span>
+                                    <h4 class="font-bold text-stone-800 text-base">${escapeHtml(meta.title || 'Frequently Asked Questions')}</h4>
+                                    <span class="px-2 py-0.5 rounded-full text-[10px] font-bold ${meta.is_active ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' : 'bg-stone-100 text-stone-500 border border-stone-200'}">
+                                        ${meta.is_active ? 'Active' : 'Hidden'}
+                                    </span>
+                                </div>
+                                <p class="text-xs text-stone-600 font-medium">${escapeHtml(meta.subtitle || 'Quick answers about our handmade creations, custom orders, and delivery.')}</p>
+                            </div>
+                            <div class="flex flex-wrap items-center gap-2.5">
+                                <button type="button" onclick="openContactFaqsHeaderModal()" class="px-3.5 py-2 rounded-xl bg-white hover:bg-stone-100 border border-[#E7D1CC] text-stone-700 text-xs font-bold transition-all flex items-center gap-1.5 shadow-2xs cursor-pointer">
+                                    <i class="fas fa-cog text-xs text-stone-500"></i>
+                                    <span>Edit Header</span>
+                                </button>
+                                <button type="button" onclick="openAddContactFaqModal()" class="px-4 py-2 rounded-xl bg-red-600 hover:bg-red-700 text-white text-xs font-bold shadow-xs hover:shadow-md transition-all flex items-center gap-1.5 active:scale-95 cursor-pointer">
+                                    <i class="fas fa-plus-circle text-xs"></i>
+                                    <span>+ Add FAQ Item</span>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- FAQ Items Accordion Style List -->
+                        <div class="space-y-4">
+                            ${items.length > 0 ? items.map((q, idx) => `
+                                <div class="bg-white border border-stone-200/90 rounded-2xl p-5 shadow-2xs hover:shadow-boutique transition-all flex flex-col md:flex-row md:items-start justify-between gap-4 group">
+                                    <div class="flex-1 space-y-2">
+                                        <div class="flex items-center gap-2">
+                                            <span class="w-6 h-6 rounded-full bg-red-50 text-red-700 font-bold text-xs flex items-center justify-center shrink-0">
+                                                ${idx + 1}
+                                            </span>
+                                            <h4 class="font-bold text-stone-800 text-base">${escapeHtml(q.question || q.title || '')}</h4>
+                                        </div>
+                                        <p class="text-xs text-stone-600 leading-relaxed pl-8 bg-stone-50/50 p-3 rounded-xl border border-stone-100">${escapeHtml(q.answer || q.description || '')}</p>
+                                    </div>
+
+                                    <div class="flex items-center gap-2 shrink-0 self-end md:self-start pt-2 md:pt-0">
+                                        <span class="px-2 py-1 rounded-md text-[10px] font-bold bg-stone-100 text-stone-600">
+                                            Order: #${q.sort_order || (idx + 1)}
+                                        </span>
+                                        <button type="button" onclick="toggleContactFaq(${q.id})" class="px-2.5 py-1 rounded-full text-[10px] font-bold transition-colors cursor-pointer ${q.is_active ? 'bg-emerald-50 text-emerald-700 hover:bg-emerald-100 border border-emerald-200' : 'bg-stone-100 text-stone-500 hover:bg-stone-200 border border-stone-200'}" title="Click to toggle status">
+                                            ${q.is_active ? '● Active' : '○ Hidden'}
+                                        </button>
+                                        <button type="button" onclick="openEditContactFaqModal(${q.id})" class="py-1 px-3 rounded-xl bg-red-50 text-red-700 hover:bg-red-600 hover:text-white text-xs font-bold transition-all flex items-center gap-1 cursor-pointer">
+                                            <i class="fas fa-edit text-xs"></i>
+                                            <span>Edit</span>
+                                        </button>
+                                        <button type="button" onclick="deleteContactFaq(${q.id})" class="py-1 px-3 rounded-xl bg-stone-50 hover:bg-rose-50 text-stone-400 hover:text-rose-600 text-xs font-bold transition-all cursor-pointer" title="Delete FAQ">
+                                            <i class="fas fa-trash-alt text-xs"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            `).join('') : `
+                                <div class="py-12 text-center text-stone-400 bg-stone-50 rounded-2xl border border-dashed border-stone-200">
+                                    <i class="fas fa-question-circle text-3xl mb-2 text-stone-300"></i>
+                                    <p class="text-sm font-bold text-stone-600">No FAQ questions added yet</p>
+                                    <p class="text-xs text-stone-400 mb-4">Click "+ Add FAQ Item" above to add customer questions and answers.</p>
+                                </div>
+                            `}
+                        </div>
+                    </div>
+                `;
+            } else if (section.is_footer_section) {
+                // Footer Artwork, Columns & Navigation Dynamic Manager
+                const m = section.metadata || {};
+                const bgImg = m.bg_image || m.desktop_image || '/images/categories/footer.png';
+                const col1Links = m.col1_links || [];
+                const col2Links = m.col2_links || [];
+                bodyContent = `
+                    <div class="p-8">
+                        <div class="bg-[#FFF9F6] border border-[#E7D1CC] rounded-3xl p-6 sm:p-8 shadow-2xs hover:shadow-boutique transition-all">
+                            <!-- Top Action Header -->
+                            <div class="flex flex-wrap items-center justify-between gap-4 mb-6 border-b border-[#E7D1CC] pb-5">
+                                <div>
+                                    <div class="flex items-center gap-2 mb-1">
+                                        <span class="px-3 py-1 rounded-full text-xs font-bold bg-red-50 text-red-700 border border-red-200">
+                                            <i class="fas fa-shoe-prints mr-1 text-[10px]"></i>Footer & Navigation
+                                        </span>
+                                        <h3 class="text-xl sm:text-2xl font-bold text-stone-800">${escapeHtml(m.title || 'KNOTELLE Boutique Footer')}</h3>
+                                        <span class="px-2.5 py-0.5 rounded-full text-[11px] font-bold ${m.is_active ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' : 'bg-stone-100 text-stone-500 border border-stone-200'}">
+                                            ${m.is_active ? '● Live on Storefront' : '○ Hidden'}
+                                        </span>
+                                    </div>
+                                    <p class="text-xs text-stone-600 font-medium">${escapeHtml(m.heart_tagline || m.subtitle || 'Made with ♡ for a kinder, cozier world.')}</p>
+                                </div>
+
+                                <button type="button" onclick="openFooterSettingsModal()"
+                                        class="px-6 py-3 rounded-2xl bg-red-600 hover:bg-red-700 text-white text-xs font-bold shadow-xs hover:shadow-md transition-all flex items-center gap-2.5 active:scale-95 cursor-pointer">
+                                    <i class="fas fa-sliders-h text-sm"></i>
+                                    <span>Edit Footer Settings & Links</span>
+                                </button>
+                            </div>
+
+                            <!-- Panoramic Background Artwork Preview -->
+                            <div class="mb-6">
+                                <div class="text-xs font-bold text-stone-500 uppercase tracking-wider mb-2 flex items-center justify-between">
+                                    <span>Panoramic Background Artwork</span>
+                                    <span class="text-[10px] text-stone-400 font-normal">Recommended: 1920 × 600 px</span>
+                                </div>
+                                <div class="relative w-full h-32 sm:h-40 rounded-2xl overflow-hidden bg-stone-100 border border-[#E7D1CC] shadow-inner group">
+                                    <img src="${bgImg}" alt="Footer Background" class="w-full h-full object-cover group-hover:scale-102 transition-transform duration-300" onerror="this.src='/images/categories/footer.png'">
+                                    <div class="absolute inset-0 bg-[#FFF9F6]/40 pointer-events-none"></div>
+                                    <div class="absolute bottom-3 left-4 bg-white/90 backdrop-blur-xs px-3 py-1 rounded-xl text-xs font-bold text-stone-800 shadow-xs border border-stone-200">
+                                        Panoramic Footer Background Visual
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- 3 Columns Preview Grid -->
+                            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+                                <!-- Column 1: Quick Links -->
+                                <div class="bg-white/85 rounded-2xl p-5 border border-[#E7D1CC] space-y-3">
+                                    <div class="flex items-center justify-between border-b border-stone-100 pb-2.5">
+                                        <h4 class="font-bold text-sm text-stone-800 border-b-2 border-red-700 pb-0.5 inline-block">
+                                            ${escapeHtml(m.col1_title || 'Quick Links')}
+                                        </h4>
+                                        <span class="px-2 py-0.5 rounded-md text-[10px] font-bold bg-stone-100 text-stone-600">
+                                            ${col1Links.length} links
+                                        </span>
+                                    </div>
+                                    <ul class="space-y-1.5 text-xs text-stone-600">
+                                        ${col1Links.map(l => `
+                                            <li class="flex items-center justify-between py-1 px-2 rounded-lg bg-stone-50/60 text-[11px]">
+                                                <span class="font-medium text-stone-800">${escapeHtml(l.label || l.name || '')}</span>
+                                                <span class="text-stone-400 font-mono text-[10px] truncate max-w-[120px]">${escapeHtml(l.url || l.href || '')}</span>
+                                            </li>
+                                        `).join('')}
+                                    </ul>
+                                </div>
+
+                                <!-- Column 2: Help -->
+                                <div class="bg-white/85 rounded-2xl p-5 border border-[#E7D1CC] space-y-3">
+                                    <div class="flex items-center justify-between border-b border-stone-100 pb-2.5">
+                                        <h4 class="font-bold text-sm text-stone-800 border-b-2 border-red-700 pb-0.5 inline-block">
+                                            ${escapeHtml(m.col2_title || 'Help')}
+                                        </h4>
+                                        <span class="px-2 py-0.5 rounded-md text-[10px] font-bold bg-stone-100 text-stone-600">
+                                            ${col2Links.length} links
+                                        </span>
+                                    </div>
+                                    <ul class="space-y-1.5 text-xs text-stone-600">
+                                        ${col2Links.map(l => `
+                                            <li class="flex items-center justify-between py-1 px-2 rounded-lg bg-stone-50/60 text-[11px]">
+                                                <span class="font-medium text-stone-800">${escapeHtml(l.label || l.name || '')}</span>
+                                                <span class="text-stone-400 font-mono text-[10px] truncate max-w-[120px]">${escapeHtml(l.url || l.href || '')}</span>
+                                            </li>
+                                        `).join('')}
+                                    </ul>
+                                </div>
+
+                                <!-- Column 3: Contact Details -->
+                                <div class="bg-white/85 rounded-2xl p-5 border border-[#E7D1CC] space-y-3">
+                                    <div class="flex items-center justify-between border-b border-stone-100 pb-2.5">
+                                        <h4 class="font-bold text-sm text-stone-800 border-b-2 border-red-700 pb-0.5 inline-block">
+                                            ${escapeHtml(m.col3_title || 'Contact')}
+                                        </h4>
+                                        <span class="px-2 py-0.5 rounded-md text-[10px] font-bold bg-emerald-50 text-emerald-700">
+                                            Store Contact
+                                        </span>
+                                    </div>
+                                    <div class="space-y-2 text-xs text-stone-700">
+                                        <p class="flex items-center gap-2"><i class="fas fa-phone-alt text-red-600 text-xs w-4"></i> <span class="font-bold">${escapeHtml(m.contact_phone || '+91 97730 39243')}</span></p>
+                                        <p class="flex items-center gap-2"><i class="fas fa-envelope text-red-600 text-xs w-4"></i> <span class="font-bold">${escapeHtml(m.contact_email || 'support@knotelle.in')}</span></p>
+                                        <p class="flex items-center gap-2"><i class="fas fa-map-marker-alt text-red-600 text-xs w-4"></i> <span class="font-bold">${escapeHtml(m.contact_address || 'India')}</span></p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Social Channels & Copyright Preview Row -->
+                            <div class="p-4 bg-white/70 rounded-2xl border border-[#E7D1CC] flex flex-col sm:flex-row items-center justify-between gap-4 text-xs">
+                                <div class="flex items-center gap-3">
+                                    <span class="text-stone-500 font-bold">Social Channels:</span>
+                                    <div class="flex items-center gap-2">
+                                        <span class="px-2.5 py-1 rounded-lg border text-[11px] font-semibold flex items-center gap-1.5 ${m.instagram_active !== false ? 'bg-pink-50 text-pink-700 border-pink-200' : 'bg-stone-50 text-stone-400 border-stone-200'}">
+                                            <i class="fab fa-instagram"></i> Instagram
+                                        </span>
+                                        <span class="px-2.5 py-1 rounded-lg border text-[11px] font-semibold flex items-center gap-1.5 ${m.facebook_active !== false ? 'bg-blue-50 text-blue-700 border-blue-200' : 'bg-stone-50 text-stone-400 border-stone-200'}">
+                                            <i class="fab fa-facebook-f"></i> Facebook
+                                        </span>
+                                        <span class="px-2.5 py-1 rounded-lg border text-[11px] font-semibold flex items-center gap-1.5 ${m.pinterest_active !== false ? 'bg-red-50 text-red-700 border-red-200' : 'bg-stone-50 text-stone-400 border-stone-200'}">
+                                            <i class="fab fa-pinterest-p"></i> Pinterest
+                                        </span>
+                                        <span class="px-2.5 py-1 rounded-lg border text-[11px] font-semibold flex items-center gap-1.5 ${m.youtube_active !== false ? 'bg-rose-50 text-rose-700 border-rose-200' : 'bg-stone-50 text-stone-400 border-stone-200'}">
+                                            <i class="fab fa-youtube"></i> YouTube
+                                        </span>
+                                    </div>
+                                </div>
+
+                                <div class="text-stone-500 text-right">
+                                    <p class="font-bold text-stone-700">${escapeHtml((m.copyright_text || '© {year} Knotelle. All rights reserved.').replace('{year}', new Date().getFullYear()))}</p>
+                                    <p class="text-[10px] text-stone-400 italic">${escapeHtml(m.heart_tagline || 'Made with ♡ for a kinder, cozier world.')}</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            } else if (section.is_navbar_section) {
+                // Navbar & Header Navigation Dynamic Manager
+                const m = section.metadata || {};
+                const navLinks = m.nav_links || [];
+                bodyContent = `
+                    <div class="p-8">
+                        <div class="bg-[#FFF9F6] border border-[#E7D1CC] rounded-3xl p-6 sm:p-8 shadow-2xs hover:shadow-boutique transition-all">
+                            <!-- Top Action Header -->
+                            <div class="flex flex-wrap items-center justify-between gap-4 mb-6 border-b border-[#E7D1CC] pb-5">
+                                <div>
+                                    <div class="flex items-center gap-2 mb-1">
+                                        <span class="px-3 py-1 rounded-full text-xs font-bold bg-red-50 text-red-700 border border-red-200">
+                                            <i class="fas fa-compass mr-1 text-[10px]"></i>Header Navigation
+                                        </span>
+                                        <h3 class="text-xl sm:text-2xl font-bold text-stone-800">${escapeHtml(m.title || 'Navbar & Header Navigation')}</h3>
+                                        <span class="px-2.5 py-0.5 rounded-full text-[11px] font-bold ${m.is_active ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' : 'bg-stone-100 text-stone-500 border border-stone-200'}">
+                                            ${m.is_active ? '● Live on Storefront' : '○ Hidden'}
+                                        </span>
+                                    </div>
+                                    <p class="text-xs text-stone-600 font-medium">Manage top announcement banner, navigation links, highlight sparkle pills, and action button visibility.</p>
+                                </div>
+
+                                <button type="button" onclick="openNavbarSettingsModal()"
+                                        class="px-6 py-3 rounded-2xl bg-red-600 hover:bg-red-700 text-white text-xs font-bold shadow-xs hover:shadow-md transition-all flex items-center gap-2.5 active:scale-95 cursor-pointer">
+                                    <i class="fas fa-sliders-h text-sm"></i>
+                                    <span>Edit Navbar & Announcement</span>
+                                </button>
+                            </div>
+
+                            <!-- Announcement Bar Preview -->
+                            <div class="mb-6 p-4 rounded-2xl border ${m.announcement_active ? 'bg-amber-50/80 border-amber-200' : 'bg-stone-50 border-stone-200'} flex items-center justify-between gap-4">
+                                <div class="flex items-center gap-3">
+                                    <span class="w-8 h-8 rounded-xl flex items-center justify-center font-bold text-xs ${m.announcement_active ? 'bg-amber-100 text-amber-800' : 'bg-stone-200 text-stone-500'}">
+                                        <i class="fas fa-bullhorn"></i>
+                                    </span>
+                                    <div>
+                                        <span class="text-[10px] font-bold uppercase tracking-wider block ${m.announcement_active ? 'text-amber-800' : 'text-stone-400'}">
+                                            Announcement Bar Banner (${m.announcement_active ? 'Active' : 'Disabled / Hidden'})
+                                        </span>
+                                        <p class="text-xs font-bold text-stone-800">${escapeHtml(m.announcement_text || '✨ Free Pan-India Delivery on all Orders above ₹999')}</p>
+                                    </div>
+                                </div>
+                                ${m.announcement_link ? `
+                                    <span class="text-[11px] font-mono text-stone-500 bg-white px-2.5 py-1 rounded-lg border border-stone-200">
+                                        Link: ${escapeHtml(m.announcement_link)}
+                                    </span>
+                                ` : ''}
+                            </div>
+
+                            <!-- Navigation Links Preview Pills -->
+                            <div class="bg-white/85 rounded-2xl p-5 border border-[#E7D1CC] mb-6">
+                                <div class="flex items-center justify-between mb-3 border-b border-stone-100 pb-2">
+                                    <span class="text-xs font-bold text-stone-500 uppercase tracking-wider">Navigation Bar Links</span>
+                                    <span class="px-2 py-0.5 rounded-md text-[10px] font-bold bg-stone-100 text-stone-600">${navLinks.length} Items</span>
+                                </div>
+                                <div class="flex flex-wrap items-center gap-3">
+                                    ${navLinks.map((l, idx) => `
+                                        <div class="flex items-center gap-2 px-3.5 py-2 rounded-2xl border text-xs font-semibold ${l.is_highlighted ? 'bg-[#FCE9E5] text-[#913638] border-[#E7D1CC] shadow-2xs' : 'bg-white text-stone-800 border-stone-200'}">
+                                            <span class="text-[10px] text-stone-400 font-mono">#${idx + 1}</span>
+                                            ${l.is_highlighted ? '<i class="fas fa-sparkles text-amber-500 text-xs"></i>' : ''}
+                                            <span class="font-bold">${escapeHtml(l.name)}</span>
+                                            <span class="text-[10px] text-stone-400 font-mono">(${escapeHtml(l.href)})</span>
+                                            <span class="px-1.5 py-0.5 rounded text-[9px] font-bold ${l.is_active !== false ? 'bg-emerald-100 text-emerald-800' : 'bg-stone-200 text-stone-600'}">
+                                                ${l.is_active !== false ? 'Active' : 'Off'}
+                                            </span>
+                                        </div>
+                                    `).join('')}
+                                </div>
+                            </div>
+
+                            <!-- Header Action Icons Visibility Preview -->
+                            <div class="p-4 bg-white/70 rounded-2xl border border-[#E7D1CC] flex flex-wrap items-center justify-between gap-4 text-xs">
+                                <span class="text-stone-500 font-bold">Header Quick Actions Visibility:</span>
+                                <div class="flex items-center gap-3">
+                                    <span class="px-3 py-1.5 rounded-xl border text-xs font-bold flex items-center gap-1.5 ${m.show_search !== false ? 'bg-emerald-50 text-emerald-800 border-emerald-200' : 'bg-stone-100 text-stone-400 border-stone-200'}">
+                                        <i class="fas fa-search"></i> Search Bar
+                                    </span>
+                                    <span class="px-3 py-1.5 rounded-xl border text-xs font-bold flex items-center gap-1.5 ${m.show_wishlist !== false ? 'bg-emerald-50 text-emerald-800 border-emerald-200' : 'bg-stone-100 text-stone-400 border-stone-200'}">
+                                        <i class="fas fa-heart"></i> Wishlist
+                                    </span>
+                                    <span class="px-3 py-1.5 rounded-xl border text-xs font-bold flex items-center gap-1.5 ${m.show_account !== false ? 'bg-emerald-50 text-emerald-800 border-emerald-200' : 'bg-stone-100 text-stone-400 border-stone-200'}">
+                                        <i class="fas fa-user"></i> Account
+                                    </span>
+                                    <span class="px-3 py-1.5 rounded-xl border text-xs font-bold flex items-center gap-1.5 ${m.show_cart !== false ? 'bg-emerald-50 text-emerald-800 border-emerald-200' : 'bg-stone-100 text-stone-400 border-stone-200'}">
+                                        <i class="fas fa-shopping-bag"></i> Cart
+                                    </span>
                                 </div>
                             </div>
                         </div>
@@ -1596,6 +3850,11 @@
             case 'custom_order_header': return 'fas fa-paint-brush';
             case 'custom_order_showcase': return 'fas fa-camera-retro';
             case 'about_story': return 'fas fa-heart';
+            case 'about_craft_pillars': return 'fas fa-feather-alt';
+            case 'contact_intro': return 'fas fa-handshake';
+            case 'contact_info': return 'fas fa-address-card';
+            case 'contact_form': return 'fas fa-envelope-open-text';
+            case 'contact_faqs': return 'fas fa-question-circle';
             case 'contact_header': return 'fas fa-envelope';
             case 'global_assets': return 'fas fa-globe';
             default: return 'fas fa-folder';
@@ -2440,6 +4699,29 @@
             document.getElementById('videoReelThumbnailName').innerText = name || 'Media Library Image';
             document.getElementById('videoReelThumbnailSize').innerText = 'Selected from Media Library';
             document.getElementById('videoReelThumbnailPreviewContainer').classList.remove('hidden');
+        } else if (pickerTarget === 'about_desktop') {
+            document.getElementById('aboutStoryDesktopUrl').value = url;
+            document.getElementById('aboutDesktopPreviewImg').src = url;
+            document.getElementById('aboutDesktopFileName').innerText = name || 'Media Library Image';
+            document.getElementById('aboutDesktopFileSize').innerText = 'Selected from Media Library';
+            document.getElementById('aboutDesktopPreviewContainer').classList.remove('hidden');
+        } else if (pickerTarget === 'about_mobile') {
+            document.getElementById('aboutStoryMobileUrl').value = url;
+            document.getElementById('aboutMobilePreviewImg').src = url;
+            document.getElementById('aboutMobileFileName').innerText = name || 'Media Library Image';
+            document.getElementById('aboutMobileFileSize').innerText = 'Selected from Media Library';
+            document.getElementById('aboutMobilePreviewContainer').classList.remove('hidden');
+        } else if (pickerTarget === 'contact_intro') {
+            document.getElementById('contactIntroImageUrl').value = url;
+            document.getElementById('contactIntroPreviewImg').src = url;
+            document.getElementById('contactIntroFileName').innerText = name || 'Media Library Image';
+            document.getElementById('contactIntroFileSize').innerText = 'Selected from Media Library';
+            document.getElementById('contactIntroPreviewContainer').classList.remove('hidden');
+        } else if (pickerTarget === 'custom_crochet') {
+            document.getElementById('customCrochetImageUrl').value = url;
+            document.getElementById('customCrochetPreviewImg').src = url;
+            document.getElementById('customCrochetFileName').innerText = name || 'Media Library Image';
+            document.getElementById('customCrochetPreviewContainer').classList.remove('hidden');
         } else {
             document.getElementById('heroSlideMobileMediaId').value = id;
             document.getElementById('heroSlideMobileImagePath').value = url;
@@ -3019,6 +5301,1194 @@
             }
         } catch (err) {
             toastr.error(err.response?.data?.message || 'Failed to delete media.');
+        }
+    }
+
+    function getPillarIconFa(iconName) {
+        const map = {
+            'Leaf': 'fas fa-leaf',
+            'Sparkles': 'fas fa-magic',
+            'Heart': 'fas fa-heart',
+            'Flower2': 'fas fa-spa',
+            'ShieldCheck': 'fas fa-shield-alt',
+            'Sun': 'fas fa-sun',
+            'Star': 'fas fa-star',
+            'Award': 'fas fa-award',
+            'Gem': 'fas fa-gem',
+            'Feather': 'fas fa-feather-alt',
+            'Gift': 'fas fa-gift',
+            'Smile': 'fas fa-smile',
+        };
+        return map[iconName] || 'fas fa-leaf';
+    }
+
+    function getContactIconFa(iconName) {
+        const map = {
+            'MapPin': 'fas fa-map-marker-alt',
+            'Phone': 'fas fa-phone',
+            'Mail': 'fas fa-envelope',
+            'Clock': 'fas fa-clock',
+            'MessageCircle': 'fab fa-whatsapp',
+            'Instagram': 'fab fa-instagram',
+            'Facebook': 'fab fa-facebook-f',
+            'Globe': 'fas fa-globe',
+            'Sparkles': 'fas fa-magic',
+            'Heart': 'fas fa-heart'
+        };
+        return map[iconName] || 'fas fa-map-marker-alt';
+    }
+
+    // ==========================================
+    // ABOUT STORY HANDLERS
+    // ==========================================
+    async function openAboutStoryModal() {
+        try {
+            const res = await axios.get('/admin/media/about/story');
+            if (res.data.success) {
+                const s = res.data.data;
+                document.getElementById('aboutStoryTagText').value = s.tag_text || 'The KNOTELLE Story';
+                document.getElementById('aboutStoryTitle').value = s.title || 'Every Loop Tells a Story';
+                document.getElementById('aboutStorySubtitle').value = s.subtitle || '';
+                document.getElementById('aboutStoryDescription').value = s.description || '';
+                document.getElementById('aboutStoryParagraph2').value = s.paragraph_2 || '';
+                document.getElementById('aboutStoryAlt').value = s.alt_text || '';
+                
+                document.getElementById('aboutStoryFloatingTitle').value = s.floating_badge_title || '100% Handcrafted';
+                document.getElementById('aboutStoryFloatingSubtitle').value = s.floating_badge_subtitle || 'Never mass machine produced';
+                document.getElementById('aboutStoryFloatingIcon').value = s.floating_badge_icon || 'Heart';
+                document.getElementById('aboutStoryFloatingActive').checked = s.floating_badge_active !== false;
+
+                document.getElementById('aboutStoryCtaText').value = s.cta_text || 'Request a Custom Creation';
+                document.getElementById('aboutStoryCtaLink').value = s.cta_link || '/custom-order';
+                document.getElementById('aboutStoryCtaVisible').checked = s.cta_visible !== false;
+                document.getElementById('aboutStoryActive').checked = s.is_active !== false;
+
+                document.getElementById('aboutStoryDesktopUrl').value = s.desktop_image || '';
+                document.getElementById('aboutStoryMobileUrl').value = s.mobile_image || '';
+
+                if (s.desktop_image) {
+                    document.getElementById('aboutDesktopPreviewImg').src = s.desktop_image;
+                    document.getElementById('aboutDesktopPreviewContainer').classList.remove('hidden');
+                }
+                if (s.mobile_image) {
+                    document.getElementById('aboutMobilePreviewImg').src = s.mobile_image;
+                    document.getElementById('aboutMobilePreviewContainer').classList.remove('hidden');
+                } else {
+                    document.getElementById('aboutMobilePreviewContainer').classList.add('hidden');
+                }
+
+                document.getElementById('aboutStoryModal').classList.remove('hidden');
+                document.getElementById('aboutStoryModal').classList.add('flex');
+            }
+        } catch (err) {
+            toastr.error('Failed to load About Story data.');
+        }
+    }
+
+    function closeAboutStoryModal() {
+        document.getElementById('aboutStoryModal').classList.add('hidden');
+        document.getElementById('aboutStoryModal').classList.remove('flex');
+    }
+
+    function handleAboutDesktopFileChange(input) {
+        if (input.files && input.files[0]) {
+            const file = input.files[0];
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                document.getElementById('aboutDesktopPreviewImg').src = e.target.result;
+                document.getElementById('aboutDesktopFileName').textContent = file.name;
+                document.getElementById('aboutDesktopFileSize').textContent = formatBytes(file.size);
+                document.getElementById('aboutDesktopPreviewContainer').classList.remove('hidden');
+            };
+            reader.readAsDataURL(file);
+        }
+    }
+
+    function clearAboutDesktopFileInput() {
+        document.getElementById('aboutStoryDesktopFileInput').value = '';
+        document.getElementById('aboutDesktopPreviewContainer').classList.add('hidden');
+    }
+
+    function handleAboutMobileFileChange(input) {
+        if (input.files && input.files[0]) {
+            const file = input.files[0];
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                document.getElementById('aboutMobilePreviewImg').src = e.target.result;
+                document.getElementById('aboutMobileFileName').textContent = file.name;
+                document.getElementById('aboutMobileFileSize').textContent = formatBytes(file.size);
+                document.getElementById('aboutMobilePreviewContainer').classList.remove('hidden');
+            };
+            reader.readAsDataURL(file);
+        }
+    }
+
+    function clearAboutMobileFileInput() {
+        document.getElementById('aboutStoryMobileFileInput').value = '';
+        document.getElementById('aboutMobilePreviewContainer').classList.add('hidden');
+    }
+
+    async function handleAboutStorySubmit(e) {
+        e.preventDefault();
+        const btn = document.getElementById('aboutStorySubmitBtn');
+        btn.disabled = true;
+        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving...';
+
+        const form = document.getElementById('aboutStoryForm');
+        const formData = new FormData(form);
+
+        try {
+            const res = await axios.post('/admin/media/about/story', formData, {
+                headers: { 'Content-Type': 'multipart/form-data' }
+            });
+            if (res.data.success) {
+                toastr.success(res.data.message);
+                closeAboutStoryModal();
+                broadcastMediaUpdate();
+                loadManagerData();
+            } else {
+                toastr.error(res.data.message);
+            }
+        } catch (err) {
+            toastr.error(err.response?.data?.message || 'Failed to save About Story.');
+        } finally {
+            btn.disabled = false;
+            btn.innerHTML = '<i class="fas fa-save"></i><span>Save Story & Visuals</span>';
+        }
+    }
+
+    // ==========================================
+    // CRAFT PILLARS HEADER HANDLERS
+    // ==========================================
+    function openCraftPillarsHeaderModal() {
+        if (managerData && managerData.sections) {
+            const sec = managerData.sections.find(s => s.id === 'craft_pillars');
+            if (sec && sec.metadata) {
+                document.getElementById('craftPillarsHeaderTitle').value = sec.metadata.title || 'Our Craft Pillars';
+                document.getElementById('craftPillarsHeaderTagText').value = sec.metadata.tag_text || 'Artisan Standards';
+                document.getElementById('craftPillarsHeaderSubtitle').value = sec.metadata.subtitle || 'Guiding principles behind every stitch we make.';
+                document.getElementById('craftPillarsHeaderActive').checked = sec.metadata.is_active !== false;
+            }
+        }
+        document.getElementById('craftPillarsHeaderModal').classList.remove('hidden');
+        document.getElementById('craftPillarsHeaderModal').classList.add('flex');
+    }
+
+    function closeCraftPillarsHeaderModal() {
+        document.getElementById('craftPillarsHeaderModal').classList.add('hidden');
+        document.getElementById('craftPillarsHeaderModal').classList.remove('flex');
+    }
+
+    async function handleCraftPillarsHeaderSubmit(e) {
+        e.preventDefault();
+        const btn = document.getElementById('craftPillarsHeaderSubmitBtn');
+        btn.disabled = true;
+        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving...';
+
+        const form = document.getElementById('craftPillarsHeaderForm');
+        const formData = new FormData(form);
+
+        try {
+            const res = await axios.post('/admin/media/about/craft-pillars/header', formData);
+            if (res.data.success) {
+                toastr.success(res.data.message);
+                closeCraftPillarsHeaderModal();
+                broadcastMediaUpdate();
+                loadManagerData();
+            } else {
+                toastr.error(res.data.message);
+            }
+        } catch (err) {
+            toastr.error(err.response?.data?.message || 'Failed to update Craft Pillars header.');
+        } finally {
+            btn.disabled = false;
+            btn.innerHTML = '<i class="fas fa-save"></i><span>Save Section Header</span>';
+        }
+    }
+
+    // ==========================================
+    // CRAFT PILLARS ITEM CRUD HANDLERS
+    // ==========================================
+    function selectPillarIcon(iconName) {
+        document.getElementById('craftPillarIconName').value = iconName;
+        document.getElementById('craftPillarIconType').value = 'preset';
+        document.querySelectorAll('.pillar-icon-btn').forEach(btn => {
+            if (btn.getAttribute('data-icon') === iconName) {
+                btn.classList.add('border-red-600', 'bg-red-50', 'ring-2', 'ring-red-500/20');
+                btn.classList.remove('border-stone-200', 'bg-white');
+            } else {
+                btn.classList.remove('border-red-600', 'bg-red-50', 'ring-2', 'ring-red-500/20');
+                btn.classList.add('border-stone-200', 'bg-white');
+            }
+        });
+    }
+
+    function handlePillarIconFileChange(input) {
+        if (input.files && input.files[0]) {
+            const file = input.files[0];
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                document.getElementById('craftPillarIconPreviewImg').src = e.target.result;
+                document.getElementById('craftPillarIconFileName').textContent = file.name;
+                document.getElementById('craftPillarIconPreviewContainer').classList.remove('hidden');
+                document.getElementById('craftPillarIconType').value = file.name.endsWith('.svg') ? 'svg' : 'image';
+            };
+            reader.readAsDataURL(file);
+        }
+    }
+
+    function clearPillarIconFileInput() {
+        document.getElementById('craftPillarIconFileInput').value = '';
+        document.getElementById('craftPillarIconPreviewContainer').classList.add('hidden');
+        document.getElementById('craftPillarIconType').value = 'preset';
+    }
+
+    function openAddCraftPillarModal() {
+        document.getElementById('craftPillarId').value = '';
+        document.getElementById('craftPillarModalTitle').textContent = 'Add Craft Pillar';
+        document.getElementById('craftPillarSubmitBtnText').textContent = 'Save Craft Pillar';
+        document.getElementById('craftPillarTitle').value = '';
+        document.getElementById('craftPillarDescription').value = '';
+        document.getElementById('craftPillarSortOrder').value = '';
+        document.getElementById('craftPillarActive').checked = true;
+        clearPillarIconFileInput();
+        selectPillarIcon('Leaf');
+
+        document.getElementById('craftPillarModal').classList.remove('hidden');
+        document.getElementById('craftPillarModal').classList.add('flex');
+    }
+
+    async function openEditCraftPillarModal(id) {
+        try {
+            const res = await axios.get(`/admin/media/about/craft-pillars/${id}`);
+            if (res.data.success) {
+                const p = res.data.data;
+                document.getElementById('craftPillarId').value = p.id;
+                document.getElementById('craftPillarModalTitle').textContent = 'Edit Craft Pillar';
+                document.getElementById('craftPillarSubmitBtnText').textContent = 'Update Craft Pillar';
+                document.getElementById('craftPillarTitle').value = p.title || '';
+                document.getElementById('craftPillarDescription').value = p.description || '';
+                document.getElementById('craftPillarSortOrder').value = p.sort_order || 1;
+                document.getElementById('craftPillarActive').checked = p.is_active !== false;
+                
+                selectPillarIcon(p.icon_name || p.icon || 'Leaf');
+
+                if (p.icon_url) {
+                    document.getElementById('craftPillarIconPreviewImg').src = p.icon_url;
+                    document.getElementById('craftPillarIconPreviewContainer').classList.remove('hidden');
+                    document.getElementById('craftPillarIconType').value = p.icon_type || 'custom';
+                } else {
+                    clearPillarIconFileInput();
+                }
+
+                document.getElementById('craftPillarModal').classList.remove('hidden');
+                document.getElementById('craftPillarModal').classList.add('flex');
+            }
+        } catch (err) {
+            toastr.error('Failed to load Craft Pillar details.');
+        }
+    }
+
+    function closeCraftPillarModal() {
+        document.getElementById('craftPillarModal').classList.add('hidden');
+        document.getElementById('craftPillarModal').classList.remove('flex');
+    }
+
+    async function handleCraftPillarSubmit(e) {
+        e.preventDefault();
+        const btn = document.getElementById('craftPillarSubmitBtn');
+        const id = document.getElementById('craftPillarId').value;
+        btn.disabled = true;
+        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving...';
+
+        const form = document.getElementById('craftPillarForm');
+        const formData = new FormData(form);
+
+        const url = id ? `/admin/media/about/craft-pillars/${id}` : '/admin/media/about/craft-pillars';
+
+        try {
+            const res = await axios.post(url, formData, {
+                headers: { 'Content-Type': 'multipart/form-data' }
+            });
+            if (res.data.success) {
+                toastr.success(res.data.message);
+                closeCraftPillarModal();
+                broadcastMediaUpdate();
+                loadManagerData();
+            } else {
+                toastr.error(res.data.message);
+            }
+        } catch (err) {
+            toastr.error(err.response?.data?.message || 'Failed to save Craft Pillar.');
+        } finally {
+            btn.disabled = false;
+            btn.innerHTML = '<i class="fas fa-save"></i><span id="craftPillarSubmitBtnText">Save Craft Pillar</span>';
+        }
+    }
+
+    async function deleteCraftPillar(id) {
+        if (!confirm('Are you sure you want to delete this Craft Pillar?')) return;
+        try {
+            const res = await axios.delete(`/admin/media/about/craft-pillars/${id}`);
+            if (res.data.success) {
+                toastr.success(res.data.message);
+                broadcastMediaUpdate();
+                loadManagerData();
+            } else {
+                toastr.error(res.data.message);
+            }
+        } catch (err) {
+            toastr.error(err.response?.data?.message || 'Failed to delete Craft Pillar.');
+        }
+    }
+
+    async function toggleCraftPillar(id) {
+        try {
+            const res = await axios.post(`/admin/media/about/craft-pillars/${id}/toggle`);
+            if (res.data.success) {
+                toastr.success(res.data.message);
+                broadcastMediaUpdate();
+                loadManagerData();
+            }
+        } catch (err) {
+            toastr.error('Failed to toggle status.');
+        }
+    }
+
+    // ==========================================
+    // 12. CONTACT INTRO / HERO HANDLERS
+    // ==========================================
+    async function openContactIntroModal() {
+        try {
+            const res = await axios.get('/admin/media/contact/intro');
+            if (res.data.success) {
+                const s = res.data.data || {};
+                document.getElementById('contactIntroBadge').value = s.badge || s.tag_text || "Let's Connect";
+                document.getElementById('contactIntroTitle').value = s.title || "Let's Connect";
+                document.getElementById('contactIntroSubtitle').value = s.subtitle || "Have a question about a product, custom order, or collaboration? We'd love to hear from you.";
+                document.getElementById('contactIntroDescription').value = s.description || "We're here to help bring your handcrafted crochet dreams to life.";
+                document.getElementById('contactIntroAlt').value = s.alt_text || "KNOTELLE Artisan Studio Contact";
+                document.getElementById('contactIntroCtaText').value = s.cta_text || "";
+                document.getElementById('contactIntroCtaLink').value = s.cta_link || "";
+                document.getElementById('contactIntroActive').checked = s.is_active !== false;
+
+                const img = s.image_url || s.desktop_image || s.image || '';
+                document.getElementById('contactIntroImageUrl').value = img;
+                if (img) {
+                    document.getElementById('contactIntroPreviewImg').src = img;
+                    document.getElementById('contactIntroFileName').textContent = img.split('/').pop() || 'Contact Banner Active';
+                    document.getElementById('contactIntroFileSize').textContent = 'Ready';
+                    document.getElementById('contactIntroPreviewContainer').classList.remove('hidden');
+                } else {
+                    clearContactIntroFileInput();
+                }
+
+                document.getElementById('contactIntroModal').classList.remove('hidden');
+                document.getElementById('contactIntroModal').classList.add('flex');
+            }
+        } catch (err) {
+            toastr.error('Failed to load Contact Intro details.');
+        }
+    }
+
+    function closeContactIntroModal() {
+        document.getElementById('contactIntroModal').classList.add('hidden');
+        document.getElementById('contactIntroModal').classList.remove('flex');
+    }
+
+    function handleContactIntroFileChange(input) {
+        if (input.files && input.files[0]) {
+            const file = input.files[0];
+            document.getElementById('contactIntroFileLabel').textContent = file.name;
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                document.getElementById('contactIntroPreviewImg').src = e.target.result;
+                document.getElementById('contactIntroFileName').textContent = file.name;
+                document.getElementById('contactIntroFileSize').textContent = (file.size / 1024).toFixed(1) + ' KB';
+                document.getElementById('contactIntroPreviewContainer').classList.remove('hidden');
+            };
+            reader.readAsDataURL(file);
+        }
+    }
+
+    function clearContactIntroFileInput() {
+        const fileInput = document.getElementById('contactIntroFileInput');
+        if (fileInput) fileInput.value = '';
+        document.getElementById('contactIntroFileLabel').textContent = 'Upload Banner Image';
+        document.getElementById('contactIntroPreviewImg').src = '';
+        document.getElementById('contactIntroImageUrl').value = '';
+        document.getElementById('contactIntroPreviewContainer').classList.add('hidden');
+    }
+
+    async function handleContactIntroSubmit(e) {
+        e.preventDefault();
+        const btn = document.getElementById('contactIntroSubmitBtn');
+        btn.disabled = true;
+        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving...';
+
+        const form = document.getElementById('contactIntroForm');
+        const formData = new FormData(form);
+
+        try {
+            const res = await axios.post('/admin/media/contact/intro', formData, {
+                headers: { 'Content-Type': 'multipart/form-data' }
+            });
+            if (res.data.success) {
+                toastr.success(res.data.message || 'Contact Intro saved successfully.');
+                closeContactIntroModal();
+                broadcastMediaUpdate();
+                loadManagerData();
+            } else {
+                toastr.error(res.data.message || 'Failed to save Contact Intro.');
+            }
+        } catch (err) {
+            toastr.error(err.response?.data?.message || 'Failed to save Contact Intro.');
+        } finally {
+            btn.disabled = false;
+            btn.innerHTML = '<i class="fas fa-save"></i><span>Save Contact Intro</span>';
+        }
+    }
+
+    // ==========================================
+    // 13. CONTACT INFO HEADER & HELPER BOX
+    // ==========================================
+    async function openContactInfoHeaderModal() {
+        try {
+            const res = await axios.get('/admin/media/contact/info/header');
+            if (res.data.success) {
+                const h = res.data.data || {};
+                document.getElementById('contactInfoBadgeInput').value = h.badge || h.tag_text || 'Atelier Studio';
+                document.getElementById('contactInfoTitleInput').value = h.title || 'KNOTELLE Studio';
+                document.getElementById('contactInfoSubtitleInput').value = h.subtitle || 'Handmade with love in Bengaluru, India';
+                document.getElementById('contactInfoCustomBoxTitle').value = h.custom_order_box_title || 'Looking for Custom Orders?';
+                document.getElementById('contactInfoCustomBoxText').value = h.custom_order_box_text || 'Have a specific design, color palette, or bouquet arrangement in mind? Request a bespoke piece directly.';
+                document.getElementById('contactInfoCustomBoxLink').value = h.custom_order_box_link || '/custom-order';
+                document.getElementById('contactInfoCustomBoxActive').checked = h.custom_order_box_active !== false;
+                document.getElementById('contactInfoHeaderActive').checked = h.is_active !== false;
+
+                document.getElementById('contactInfoHeaderModal').classList.remove('hidden');
+                document.getElementById('contactInfoHeaderModal').classList.add('flex');
+            }
+        } catch (err) {
+            toastr.error('Failed to load Contact Studio Header settings.');
+        }
+    }
+
+    function closeContactInfoHeaderModal() {
+        document.getElementById('contactInfoHeaderModal').classList.add('hidden');
+        document.getElementById('contactInfoHeaderModal').classList.remove('flex');
+    }
+
+    async function handleContactInfoHeaderSubmit(e) {
+        e.preventDefault();
+        const btn = document.getElementById('contactInfoHeaderSubmitBtn');
+        btn.disabled = true;
+        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving...';
+
+        const form = document.getElementById('contactInfoHeaderForm');
+        const formData = new FormData(form);
+
+        try {
+            const res = await axios.post('/admin/media/contact/info/header', formData);
+            if (res.data.success) {
+                toastr.success(res.data.message || 'Studio Header updated successfully.');
+                closeContactInfoHeaderModal();
+                broadcastMediaUpdate();
+                loadManagerData();
+            } else {
+                toastr.error(res.data.message || 'Failed to update Studio Header.');
+            }
+        } catch (err) {
+            toastr.error(err.response?.data?.message || 'Failed to update Studio Header.');
+        } finally {
+            btn.disabled = false;
+            btn.innerHTML = '<i class="fas fa-save"></i><span>Save Studio Header</span>';
+        }
+    }
+
+    // ==========================================
+    // 14. CONTACT INFO ITEMS (CRUD + TOGGLE)
+    // ==========================================
+    function openAddContactInfoItemModal() {
+        document.getElementById('contactInfoItemId').value = '';
+        document.getElementById('contactInfoItemModalTitle').textContent = 'Add Contact Detail';
+        document.getElementById('contactInfoItemSubmitBtnText').textContent = 'Save Contact Detail';
+        document.getElementById('contactInfoItemTitle').value = '';
+        document.getElementById('contactInfoItemValue').value = '';
+        document.getElementById('contactInfoItemAddressLine2').value = '';
+        document.getElementById('contactInfoItemLink').value = '';
+        document.getElementById('contactInfoItemSortOrder').value = 1;
+        document.getElementById('contactInfoItemActive').checked = true;
+
+        selectContactInfoIcon('MapPin');
+
+        document.getElementById('contactInfoItemModal').classList.remove('hidden');
+        document.getElementById('contactInfoItemModal').classList.add('flex');
+    }
+
+    async function openEditContactInfoItemModal(id) {
+        try {
+            const res = await axios.get(`/admin/media/contact/info/items/${id}`);
+            if (res.data.success) {
+                const item = res.data.data;
+                document.getElementById('contactInfoItemId').value = item.id;
+                document.getElementById('contactInfoItemModalTitle').textContent = 'Edit Contact Detail';
+                document.getElementById('contactInfoItemSubmitBtnText').textContent = 'Update Contact Detail';
+                document.getElementById('contactInfoItemTitle').value = item.title || '';
+                document.getElementById('contactInfoItemValue').value = item.value || '';
+                document.getElementById('contactInfoItemAddressLine2').value = item.address_line_2 || '';
+                document.getElementById('contactInfoItemLink').value = item.link || item.cta_link || '';
+                document.getElementById('contactInfoItemSortOrder').value = item.sort_order || 1;
+                document.getElementById('contactInfoItemActive').checked = item.is_active !== false;
+
+                selectContactInfoIcon(item.icon || item.icon_name || 'MapPin');
+
+                document.getElementById('contactInfoItemModal').classList.remove('hidden');
+                document.getElementById('contactInfoItemModal').classList.add('flex');
+            }
+        } catch (err) {
+            toastr.error('Failed to load Contact Detail.');
+        }
+    }
+
+    function closeContactInfoItemModal() {
+        document.getElementById('contactInfoItemModal').classList.add('hidden');
+        document.getElementById('contactInfoItemModal').classList.remove('flex');
+    }
+
+    function selectContactInfoIcon(iconName) {
+        document.getElementById('contactInfoItemIcon').value = iconName;
+        document.querySelectorAll('.contact-info-icon-btn').forEach(btn => {
+            if (btn.getAttribute('data-icon') === iconName) {
+                btn.classList.add('border-red-500', 'bg-red-50/50', 'ring-2', 'ring-red-300');
+                btn.classList.remove('border-stone-200', 'bg-white');
+            } else {
+                btn.classList.remove('border-red-500', 'bg-red-50/50', 'ring-2', 'ring-red-300');
+                btn.classList.add('border-stone-200', 'bg-white');
+            }
+        });
+    }
+
+    async function handleContactInfoItemSubmit(e) {
+        e.preventDefault();
+        const btn = document.getElementById('contactInfoItemSubmitBtn');
+        const id = document.getElementById('contactInfoItemId').value;
+        btn.disabled = true;
+        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving...';
+
+        const form = document.getElementById('contactInfoItemForm');
+        const formData = new FormData(form);
+        const url = id ? `/admin/media/contact/info/items/${id}` : '/admin/media/contact/info/items';
+
+        try {
+            const res = await axios.post(url, formData);
+            if (res.data.success) {
+                toastr.success(res.data.message || 'Contact detail saved successfully.');
+                closeContactInfoItemModal();
+                broadcastMediaUpdate();
+                loadManagerData();
+            } else {
+                toastr.error(res.data.message || 'Failed to save detail.');
+            }
+        } catch (err) {
+            toastr.error(err.response?.data?.message || 'Failed to save detail.');
+        } finally {
+            btn.disabled = false;
+            btn.innerHTML = '<i class="fas fa-save"></i><span id="contactInfoItemSubmitBtnText">Save Contact Detail</span>';
+        }
+    }
+
+    async function deleteContactInfoItem(id) {
+        if (!confirm('Are you sure you want to delete this contact detail?')) return;
+        try {
+            const res = await axios.delete(`/admin/media/contact/info/items/${id}`);
+            if (res.data.success) {
+                toastr.success(res.data.message || 'Contact detail deleted.');
+                broadcastMediaUpdate();
+                loadManagerData();
+            } else {
+                toastr.error(res.data.message);
+            }
+        } catch (err) {
+            toastr.error(err.response?.data?.message || 'Failed to delete detail.');
+        }
+    }
+
+    async function toggleContactInfoItem(id) {
+        try {
+            const res = await axios.post(`/admin/media/contact/info/items/${id}/toggle`);
+            if (res.data.success) {
+                toastr.success(res.data.message || 'Status updated.');
+                broadcastMediaUpdate();
+                loadManagerData();
+            }
+        } catch (err) {
+            toastr.error('Failed to toggle status.');
+        }
+    }
+
+    // ==========================================
+    // 15. CONTACT FORM SETTINGS
+    // ==========================================
+    async function openContactFormModal() {
+        try {
+            const res = await axios.get('/admin/media/contact/form');
+            if (res.data.success) {
+                const f = res.data.data || {};
+                document.getElementById('contactFormBadge').value = f.badge || f.tag_text || 'Get In Touch';
+                document.getElementById('contactFormTitle').value = f.title || 'Send Us a Message';
+                document.getElementById('contactFormSubtitle').value = f.subtitle || 'Fill in your details and our team will get back to you promptly.';
+                document.getElementById('contactFormCtaText').value = f.cta_text || f.submit_btn_text || 'Send Message';
+                document.getElementById('contactFormSuccessTitle').value = f.success_title || 'Message Sent!';
+                document.getElementById('contactFormSuccessMessage').value = f.success_message || 'Thank you! Your message has been sent successfully. We will get back to you shortly.';
+                document.getElementById('contactFormErrorMessage').value = f.error_message || 'Something went wrong while sending your message. Please check the form and try again.';
+                document.getElementById('contactFormActive').checked = f.is_active !== false;
+
+                if (f.fields && Array.isArray(f.fields)) {
+                    f.fields.forEach(field => {
+                        const labelEl = document.getElementById(`field_${field.key}_label`);
+                        const placeholderEl = document.getElementById(`field_${field.key}_placeholder`);
+                        if (labelEl) labelEl.value = field.label || '';
+                        if (placeholderEl) placeholderEl.value = field.placeholder || '';
+                    });
+                }
+
+                document.getElementById('contactFormModal').classList.remove('hidden');
+                document.getElementById('contactFormModal').classList.add('flex');
+            }
+        } catch (err) {
+            toastr.error('Failed to load Contact Form settings.');
+        }
+    }
+
+    function closeContactFormModal() {
+        document.getElementById('contactFormModal').classList.add('hidden');
+        document.getElementById('contactFormModal').classList.remove('flex');
+    }
+
+    async function handleContactFormSubmit(e) {
+        e.preventDefault();
+        const btn = document.getElementById('contactFormSubmitBtn');
+        btn.disabled = true;
+        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving...';
+
+        const form = document.getElementById('contactFormSettingsForm');
+        const formData = new FormData(form);
+
+        try {
+            const res = await axios.post('/admin/media/contact/form', formData);
+            if (res.data.success) {
+                toastr.success(res.data.message || 'Form configuration saved successfully.');
+                closeContactFormModal();
+                broadcastMediaUpdate();
+                loadManagerData();
+            } else {
+                toastr.error(res.data.message || 'Failed to save form settings.');
+            }
+        } catch (err) {
+            toastr.error(err.response?.data?.message || 'Failed to save form settings.');
+        } finally {
+            btn.disabled = false;
+            btn.innerHTML = '<i class="fas fa-save"></i><span>Save Form Configuration</span>';
+        }
+    }
+
+    // ==========================================
+    // 16. CONTACT FAQS (HEADER + CRUD + TOGGLE)
+    // ==========================================
+    async function openContactFaqsHeaderModal() {
+        try {
+            const res = await axios.get('/admin/media/contact/faqs/header');
+            if (res.data.success) {
+                const h = res.data.data || {};
+                document.getElementById('contactFaqsHeaderTagText').value = h.badge || h.tag_text || 'Help & Support';
+                document.getElementById('contactFaqsHeaderTitle').value = h.title || 'Frequently Asked Questions';
+                document.getElementById('contactFaqsHeaderSubtitle').value = h.subtitle || 'Quick answers about our handmade creations, custom orders, and delivery.';
+                document.getElementById('contactFaqsHeaderActive').checked = h.is_active !== false;
+
+                document.getElementById('contactFaqsHeaderModal').classList.remove('hidden');
+                document.getElementById('contactFaqsHeaderModal').classList.add('flex');
+            }
+        } catch (err) {
+            toastr.error('Failed to load FAQ Header settings.');
+        }
+    }
+
+    function closeContactFaqsHeaderModal() {
+        document.getElementById('contactFaqsHeaderModal').classList.add('hidden');
+        document.getElementById('contactFaqsHeaderModal').classList.remove('flex');
+    }
+
+    async function handleContactFaqsHeaderSubmit(e) {
+        e.preventDefault();
+        const btn = document.getElementById('contactFaqsHeaderSubmitBtn');
+        btn.disabled = true;
+        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving...';
+
+        const form = document.getElementById('contactFaqsHeaderForm');
+        const formData = new FormData(form);
+
+        try {
+            const res = await axios.post('/admin/media/contact/faqs/header', formData);
+            if (res.data.success) {
+                toastr.success(res.data.message || 'FAQ Header saved successfully.');
+                closeContactFaqsHeaderModal();
+                broadcastMediaUpdate();
+                loadManagerData();
+            } else {
+                toastr.error(res.data.message || 'Failed to save FAQ header.');
+            }
+        } catch (err) {
+            toastr.error(err.response?.data?.message || 'Failed to save FAQ header.');
+        } finally {
+            btn.disabled = false;
+            btn.innerHTML = '<i class="fas fa-save"></i><span>Save FAQ Header</span>';
+        }
+    }
+
+    function openAddContactFaqModal() {
+        document.getElementById('contactFaqId').value = '';
+        document.getElementById('contactFaqModalTitle').textContent = 'Add FAQ Item';
+        document.getElementById('contactFaqSubmitBtnText').textContent = 'Save FAQ';
+        document.getElementById('contactFaqQuestion').value = '';
+        document.getElementById('contactFaqAnswer').value = '';
+        document.getElementById('contactFaqSortOrder').value = 1;
+        document.getElementById('contactFaqActive').checked = true;
+
+        document.getElementById('contactFaqModal').classList.remove('hidden');
+        document.getElementById('contactFaqModal').classList.add('flex');
+    }
+
+    async function openEditContactFaqModal(id) {
+        try {
+            const res = await axios.get(`/admin/media/contact/faqs/items/${id}`);
+            if (res.data.success) {
+                const faq = res.data.data;
+                document.getElementById('contactFaqId').value = faq.id;
+                document.getElementById('contactFaqModalTitle').textContent = 'Edit FAQ Item';
+                document.getElementById('contactFaqSubmitBtnText').textContent = 'Update FAQ';
+                document.getElementById('contactFaqQuestion').value = faq.question || faq.title || '';
+                document.getElementById('contactFaqAnswer').value = faq.answer || faq.description || '';
+                document.getElementById('contactFaqSortOrder').value = faq.sort_order || 1;
+                document.getElementById('contactFaqActive').checked = faq.is_active !== false;
+
+                document.getElementById('contactFaqModal').classList.remove('hidden');
+                document.getElementById('contactFaqModal').classList.add('flex');
+            }
+        } catch (err) {
+            toastr.error('Failed to load FAQ details.');
+        }
+    }
+
+    function closeContactFaqModal() {
+        document.getElementById('contactFaqModal').classList.add('hidden');
+        document.getElementById('contactFaqModal').classList.remove('flex');
+    }
+
+    async function handleContactFaqSubmit(e) {
+        e.preventDefault();
+        const btn = document.getElementById('contactFaqSubmitBtn');
+        const id = document.getElementById('contactFaqId').value;
+        btn.disabled = true;
+        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving...';
+
+        const form = document.getElementById('contactFaqForm');
+        const formData = new FormData(form);
+        const url = id ? `/admin/media/contact/faqs/items/${id}` : '/admin/media/contact/faqs/items';
+
+        try {
+            const res = await axios.post(url, formData);
+            if (res.data.success) {
+                toastr.success(res.data.message || 'FAQ item saved successfully.');
+                closeContactFaqModal();
+                broadcastMediaUpdate();
+                loadManagerData();
+            } else {
+                toastr.error(res.data.message || 'Failed to save FAQ.');
+            }
+        } catch (err) {
+            toastr.error(err.response?.data?.message || 'Failed to save FAQ.');
+        } finally {
+            btn.disabled = false;
+            btn.innerHTML = '<i class="fas fa-save"></i><span id="contactFaqSubmitBtnText">Save FAQ</span>';
+        }
+    }
+
+    async function deleteContactFaq(id) {
+        if (!confirm('Are you sure you want to delete this FAQ?')) return;
+        try {
+            const res = await axios.delete(`/admin/media/contact/faqs/items/${id}`);
+            if (res.data.success) {
+                toastr.success(res.data.message || 'FAQ deleted.');
+                broadcastMediaUpdate();
+                loadManagerData();
+            } else {
+                toastr.error(res.data.message);
+            }
+        } catch (err) {
+            toastr.error(err.response?.data?.message || 'Failed to delete FAQ.');
+        }
+    }
+
+    async function toggleContactFaq(id) {
+        try {
+            const res = await axios.post(`/admin/media/contact/faqs/items/${id}/toggle`);
+            if (res.data.success) {
+                toastr.success(res.data.message || 'Status updated.');
+                broadcastMediaUpdate();
+                loadManagerData();
+            }
+        } catch (err) {
+            toastr.error('Failed to toggle status.');
+        }
+    }
+
+    // ==========================================
+    // CUSTOM CROCHET BANNER & HANGING TAG HANDLERS
+    // ==========================================
+    async function openCustomCrochetModal() {
+        try {
+            const res = await axios.get('/admin/media/homepage/custom-crochet');
+            if (res.data.success) {
+                const c = res.data.data;
+                document.getElementById('customCrochetTitle').value = c.title || 'Custom Crochet';
+                document.getElementById('customCrochetSubtitle').value = c.subtitle || 'Just for You';
+                document.getElementById('customCrochetDescription').value = c.description || "Your imagination, our yarn. Let's create something special together.";
+                document.getElementById('customCrochetTagText').value = c.tag_text || 'Turn Your Ideas Into Handmade Reality';
+                document.getElementById('customCrochetTagActive').checked = c.tag_active !== false;
+                document.getElementById('customCrochetCtaText').value = c.cta_text || 'Request Your Custom Order';
+                document.getElementById('customCrochetCtaLink').value = c.cta_link || '/custom-order';
+                document.getElementById('customCrochetAlt').value = c.alt_text || 'Custom Crochet Banner';
+                document.getElementById('customCrochetActive').checked = c.is_active !== false;
+                document.getElementById('customCrochetImageUrl').value = c.image_url || '';
+
+                if (c.image_url) {
+                    document.getElementById('customCrochetPreviewImg').src = c.image_url;
+                    document.getElementById('customCrochetFileName').textContent = c.image_url.split('/').pop() || 'Banner Visual';
+                    document.getElementById('customCrochetPreviewContainer').classList.remove('hidden');
+                }
+
+                document.getElementById('customCrochetModal').classList.remove('hidden');
+                document.getElementById('customCrochetModal').classList.add('flex');
+            }
+        } catch (err) {
+            toastr.error('Failed to load Custom Crochet Banner settings.');
+        }
+    }
+
+    function closeCustomCrochetModal() {
+        document.getElementById('customCrochetModal').classList.add('hidden');
+        document.getElementById('customCrochetModal').classList.remove('flex');
+    }
+
+    function handleCustomCrochetFileChange(input) {
+        if (input.files && input.files[0]) {
+            const file = input.files[0];
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                document.getElementById('customCrochetPreviewImg').src = e.target.result;
+                document.getElementById('customCrochetFileName').textContent = file.name;
+                document.getElementById('customCrochetPreviewContainer').classList.remove('hidden');
+            };
+            reader.readAsDataURL(file);
+        }
+    }
+
+    function clearCustomCrochetFileInput() {
+        document.getElementById('customCrochetFileInput').value = '';
+        document.getElementById('customCrochetImageUrl').value = '';
+        document.getElementById('customCrochetPreviewContainer').classList.add('hidden');
+    }
+
+    async function handleCustomCrochetSubmit(e) {
+        e.preventDefault();
+        const btn = document.getElementById('customCrochetSubmitBtn');
+        btn.disabled = true;
+        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving...';
+
+        const form = document.getElementById('customCrochetForm');
+        const formData = new FormData(form);
+
+        try {
+            const res = await axios.post('/admin/media/homepage/custom-crochet', formData);
+            if (res.data.success) {
+                toastr.success(res.data.message || 'Custom Crochet Banner updated successfully!');
+                closeCustomCrochetModal();
+                broadcastMediaUpdate();
+                loadManagerData();
+            } else {
+                toastr.error(res.data.message || 'Failed to save Custom Crochet Banner.');
+            }
+        } catch (err) {
+            toastr.error(err.response?.data?.message || 'Failed to save Custom Crochet Banner.');
+        } finally {
+            btn.disabled = false;
+            btn.innerHTML = '<i class="fas fa-save"></i><span>Save Custom Crochet Banner</span>';
+        }
+    }
+
+    // ==========================================
+    // 17. FOOTER SETTINGS & NAVIGATION HANDLERS
+    // ==========================================
+    let footerCol1LinkIndex = 0;
+    let footerCol2LinkIndex = 0;
+
+    async function openFooterSettingsModal() {
+        try {
+            const res = await axios.get('/admin/media/footer/settings');
+            if (res.data.success) {
+                const f = res.data.data || {};
+                document.getElementById('footerCol1Title').value = f.col1_title || 'Quick Links';
+                document.getElementById('footerCol2Title').value = f.col2_title || 'Help';
+                document.getElementById('footerCol3Title').value = f.col3_title || 'Contact';
+
+                document.getElementById('footerContactPhone').value = f.contact_phone || '+91 97730 39243';
+                document.getElementById('footerContactPhoneLink').value = f.contact_phone_link || 'tel:+919773039243';
+                document.getElementById('footerContactEmail').value = f.contact_email || 'support@knotelle.in';
+                document.getElementById('footerContactEmailLink').value = f.contact_email_link || 'mailto:support@knotelle.in';
+                document.getElementById('footerContactAddress').value = f.contact_address || 'India';
+
+                document.getElementById('footerInstagramUrl').value = f.instagram_url || 'https://instagram.com/knotelleindia';
+                document.getElementById('footerInstagramActive').checked = f.instagram_active !== false;
+                document.getElementById('footerFacebookUrl').value = f.facebook_url || 'https://facebook.com/knotelleindia';
+                document.getElementById('footerFacebookActive').checked = f.facebook_active !== false;
+                document.getElementById('footerPinterestUrl').value = f.pinterest_url || 'https://pinterest.com/knotelleindia';
+                document.getElementById('footerPinterestActive').checked = f.pinterest_active !== false;
+                document.getElementById('footerYouTubeUrl').value = f.youtube_url || 'https://youtube.com/@knotelleindia';
+                document.getElementById('footerYouTubeActive').checked = f.youtube_active !== false;
+
+                document.getElementById('footerCopyrightText').value = f.copyright_text || '© {year} Knotelle. All rights reserved.';
+                document.getElementById('footerHeartTagline').value = f.heart_tagline || 'Made with ♡ for a kinder, cozier world.';
+                document.getElementById('footerSectionActive').checked = f.is_active !== false;
+
+                // Background image
+                document.getElementById('footerBgImageUrl').value = f.bg_image || f.desktop_image || '';
+                if (f.bg_image || f.desktop_image) {
+                    document.getElementById('footerBgPreviewImg').src = f.bg_image || f.desktop_image;
+                    document.getElementById('footerBgFileName').textContent = (f.bg_image || f.desktop_image).split('/').pop() || 'Background Active';
+                    document.getElementById('footerBgPreviewContainer').classList.remove('hidden');
+                } else {
+                    document.getElementById('footerBgPreviewContainer').classList.add('hidden');
+                }
+
+                // Render Column 1 links
+                const col1Container = document.getElementById('footerCol1LinksContainer');
+                col1Container.innerHTML = '';
+                footerCol1LinkIndex = 0;
+                const col1Links = f.col1_links && f.col1_links.length > 0 ? f.col1_links : [
+                    { label: 'Home', url: '/', is_active: true },
+                    { label: 'Shop', url: '/shop', is_active: true },
+                    { label: 'Custom Order', url: '/custom-order', is_active: true },
+                    { label: 'About', url: '/about', is_active: true },
+                    { label: 'Contact', url: '/contact', is_active: true },
+                ];
+                col1Links.forEach(link => addFooterCol1Link(link));
+
+                // Render Column 2 links
+                const col2Container = document.getElementById('footerCol2LinksContainer');
+                col2Container.innerHTML = '';
+                footerCol2LinkIndex = 0;
+                const col2Links = f.col2_links && f.col2_links.length > 0 ? f.col2_links : [
+                    { label: 'Shipping Policy', url: '/contact', is_active: true },
+                    { label: 'Return & Refund', url: '/contact', is_active: true },
+                    { label: 'FAQ', url: '/contact', is_active: true },
+                    { label: 'Track Order', url: '/account/orders', is_active: true },
+                ];
+                col2Links.forEach(link => addFooterCol2Link(link));
+
+                document.getElementById('footerSettingsModal').classList.remove('hidden');
+                document.getElementById('footerSettingsModal').classList.add('flex');
+            }
+        } catch (err) {
+            toastr.error('Failed to load Footer settings.');
+        }
+    }
+
+    function closeFooterSettingsModal() {
+        document.getElementById('footerSettingsModal').classList.add('hidden');
+        document.getElementById('footerSettingsModal').classList.remove('flex');
+    }
+
+    function addFooterCol1Link(data = { label: '', url: '', is_active: true }) {
+        const container = document.getElementById('footerCol1LinksContainer');
+        const idx = footerCol1LinkIndex++;
+        const row = document.createElement('div');
+        row.className = 'flex items-center gap-2 p-2 bg-white rounded-xl border border-stone-200 text-xs footer-col1-row';
+        row.id = `footer_col1_row_${idx}`;
+        row.innerHTML = `
+            <input type="text" name="col1_links[${idx}][label]" value="${escapeHtml(data.label || data.name || '')}" placeholder="Link Label (e.g. Shop)" class="flex-1 bg-stone-50 border border-stone-200 rounded-lg px-2.5 py-1 text-xs font-bold text-stone-800 focus:ring-1 focus:ring-red-500">
+            <input type="text" name="col1_links[${idx}][url]" value="${escapeHtml(data.url || data.href || '')}" placeholder="URL (e.g. /shop)" class="flex-1 bg-stone-50 border border-stone-200 rounded-lg px-2.5 py-1 text-xs font-mono text-stone-700 focus:ring-1 focus:ring-red-500">
+            <label class="flex items-center gap-1 text-[11px] font-bold text-stone-600 shrink-0 cursor-pointer">
+                <input type="checkbox" name="col1_links[${idx}][is_active]" value="1" ${data.is_active !== false ? 'checked' : ''} class="w-3.5 h-3.5 rounded text-red-600 focus:ring-red-500">
+                <span>Active</span>
+            </label>
+            <button type="button" onclick="document.getElementById('footer_col1_row_${idx}').remove()" class="w-7 h-7 rounded-lg text-stone-400 hover:text-red-600 hover:bg-red-50 flex items-center justify-center transition-colors cursor-pointer">
+                <i class="fas fa-trash-alt text-xs"></i>
+            </button>
+        `;
+        container.appendChild(row);
+    }
+
+    function addFooterCol2Link(data = { label: '', url: '', is_active: true }) {
+        const container = document.getElementById('footerCol2LinksContainer');
+        const idx = footerCol2LinkIndex++;
+        const row = document.createElement('div');
+        row.className = 'flex items-center gap-2 p-2 bg-white rounded-xl border border-stone-200 text-xs footer-col2-row';
+        row.id = `footer_col2_row_${idx}`;
+        row.innerHTML = `
+            <input type="text" name="col2_links[${idx}][label]" value="${escapeHtml(data.label || data.name || '')}" placeholder="Link Label (e.g. FAQ)" class="flex-1 bg-stone-50 border border-stone-200 rounded-lg px-2.5 py-1 text-xs font-bold text-stone-800 focus:ring-1 focus:ring-red-500">
+            <input type="text" name="col2_links[${idx}][url]" value="${escapeHtml(data.url || data.href || '')}" placeholder="URL (e.g. /contact)" class="flex-1 bg-stone-50 border border-stone-200 rounded-lg px-2.5 py-1 text-xs font-mono text-stone-700 focus:ring-1 focus:ring-red-500">
+            <label class="flex items-center gap-1 text-[11px] font-bold text-stone-600 shrink-0 cursor-pointer">
+                <input type="checkbox" name="col2_links[${idx}][is_active]" value="1" ${data.is_active !== false ? 'checked' : ''} class="w-3.5 h-3.5 rounded text-red-600 focus:ring-red-500">
+                <span>Active</span>
+            </label>
+            <button type="button" onclick="document.getElementById('footer_col2_row_${idx}').remove()" class="w-7 h-7 rounded-lg text-stone-400 hover:text-red-600 hover:bg-red-50 flex items-center justify-center transition-colors cursor-pointer">
+                <i class="fas fa-trash-alt text-xs"></i>
+            </button>
+        `;
+        container.appendChild(row);
+    }
+
+    function handleFooterBgFileChange(input) {
+        if (input.files && input.files[0]) {
+            const file = input.files[0];
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                document.getElementById('footerBgPreviewImg').src = e.target.result;
+                document.getElementById('footerBgFileName').textContent = file.name;
+                document.getElementById('footerBgPreviewContainer').classList.remove('hidden');
+            };
+            reader.readAsDataURL(file);
+        }
+    }
+
+    function clearFooterBgFileInput() {
+        document.getElementById('footerBgFileInput').value = '';
+        document.getElementById('footerBgImageUrl').value = '';
+        document.getElementById('footerBgPreviewContainer').classList.add('hidden');
+    }
+
+    async function handleFooterSettingsSubmit(e) {
+        e.preventDefault();
+        const btn = document.getElementById('footerSettingsSubmitBtn');
+        btn.disabled = true;
+        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving...';
+
+        const form = document.getElementById('footerSettingsForm');
+        const formData = new FormData(form);
+
+        try {
+            const res = await axios.post('/admin/media/footer/settings', formData);
+            if (res.data.success) {
+                toastr.success(res.data.message || 'Footer settings updated successfully!');
+                closeFooterSettingsModal();
+                broadcastMediaUpdate();
+                loadManagerData();
+            } else {
+                toastr.error(res.data.message || 'Failed to save footer settings.');
+            }
+        } catch (err) {
+            toastr.error(err.response?.data?.message || 'Failed to save footer settings.');
+        } finally {
+            btn.disabled = false;
+            btn.innerHTML = '<i class="fas fa-save"></i><span>Save Footer Settings</span>';
+        }
+    }
+
+    // ==========================================
+    // 18. NAVBAR SETTINGS & NAVIGATION HANDLERS
+    // ==========================================
+    let navbarLinkIndex = 0;
+
+    async function openNavbarSettingsModal() {
+        try {
+            const res = await axios.get('/admin/media/navbar/settings');
+            if (res.data.success) {
+                const n = res.data.data || {};
+                document.getElementById('navbarAnnouncementText').value = n.announcement_text || '✨ Free Pan-India Delivery on all Orders above ₹999';
+                document.getElementById('navbarAnnouncementLink').value = n.announcement_link || '/shop';
+                document.getElementById('navbarAnnouncementActive').checked = n.announcement_active === true;
+
+                document.getElementById('navbarShowSearch').checked = n.show_search !== false;
+                document.getElementById('navbarShowWishlist').checked = n.show_wishlist !== false;
+                document.getElementById('navbarShowAccount').checked = n.show_account !== false;
+                document.getElementById('navbarShowCart').checked = n.show_cart !== false;
+                document.getElementById('navbarSectionActive').checked = n.is_active !== false;
+
+                // Render Nav links
+                const container = document.getElementById('navbarLinksContainer');
+                container.innerHTML = '';
+                navbarLinkIndex = 0;
+                const links = n.nav_links && n.nav_links.length > 0 ? n.nav_links : [
+                    { name: 'Home', href: '/', is_highlighted: false, is_active: true },
+                    { name: 'Shop', href: '/shop', is_highlighted: false, is_active: true },
+                    { name: 'Custom Order', href: '/custom-order', is_highlighted: true, is_active: true },
+                    { name: 'About', href: '/about', is_highlighted: false, is_active: true },
+                    { name: 'Contact', href: '/contact', is_highlighted: false, is_active: true },
+                ];
+                links.forEach(link => addNavbarLinkRow(link));
+
+                document.getElementById('navbarSettingsModal').classList.remove('hidden');
+                document.getElementById('navbarSettingsModal').classList.add('flex');
+            }
+        } catch (err) {
+            toastr.error('Failed to load Navbar settings.');
+        }
+    }
+
+    function closeNavbarSettingsModal() {
+        document.getElementById('navbarSettingsModal').classList.add('hidden');
+        document.getElementById('navbarSettingsModal').classList.remove('flex');
+    }
+
+    function addNavbarLinkRow(data = { name: '', href: '', is_highlighted: false, is_active: true }) {
+        const container = document.getElementById('navbarLinksContainer');
+        const idx = navbarLinkIndex++;
+        const row = document.createElement('div');
+        row.className = 'flex items-center gap-2 p-2.5 bg-white rounded-xl border border-stone-200 text-xs navbar-link-row';
+        row.id = `navbar_link_row_${idx}`;
+        row.innerHTML = `
+            <input type="text" name="nav_links[${idx}][name]" value="${escapeHtml(data.name || data.label || '')}" placeholder="Nav Name (e.g. Shop)" class="flex-1 bg-stone-50 border border-stone-200 rounded-lg px-2.5 py-1 text-xs font-bold text-stone-800 focus:ring-1 focus:ring-red-500">
+            <input type="text" name="nav_links[${idx}][href]" value="${escapeHtml(data.href || data.url || '')}" placeholder="URL Href (e.g. /shop)" class="flex-1 bg-stone-50 border border-stone-200 rounded-lg px-2.5 py-1 text-xs font-mono text-stone-700 focus:ring-1 focus:ring-red-500">
+            <label class="flex items-center gap-1.5 text-[11px] font-bold text-amber-800 bg-amber-50 px-2 py-1 rounded-lg border border-amber-200 shrink-0 cursor-pointer" title="Highlight with Sparkle Pill Style">
+                <input type="checkbox" name="nav_links[${idx}][is_highlighted]" value="1" ${data.is_highlighted ? 'checked' : ''} class="w-3.5 h-3.5 rounded text-amber-600 focus:ring-amber-500">
+                <span>Sparkle Pill</span>
+            </label>
+            <label class="flex items-center gap-1 text-[11px] font-bold text-stone-600 shrink-0 cursor-pointer">
+                <input type="checkbox" name="nav_links[${idx}][is_active]" value="1" ${data.is_active !== false ? 'checked' : ''} class="w-3.5 h-3.5 rounded text-red-600 focus:ring-red-500">
+                <span>Active</span>
+            </label>
+            <button type="button" onclick="document.getElementById('navbar_link_row_${idx}').remove()" class="w-7 h-7 rounded-lg text-stone-400 hover:text-red-600 hover:bg-red-50 flex items-center justify-center transition-colors cursor-pointer">
+                <i class="fas fa-trash-alt text-xs"></i>
+            </button>
+        `;
+        container.appendChild(row);
+    }
+
+    async function handleNavbarSettingsSubmit(e) {
+        e.preventDefault();
+        const btn = document.getElementById('navbarSettingsSubmitBtn');
+        btn.disabled = true;
+        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving...';
+
+        const form = document.getElementById('navbarSettingsForm');
+        const formData = new FormData(form);
+
+        try {
+            const res = await axios.post('/admin/media/navbar/settings', formData);
+            if (res.data.success) {
+                toastr.success(res.data.message || 'Navbar settings updated successfully!');
+                closeNavbarSettingsModal();
+                broadcastMediaUpdate();
+                loadManagerData();
+            } else {
+                toastr.error(res.data.message || 'Failed to save navbar settings.');
+            }
+        } catch (err) {
+            toastr.error(err.response?.data?.message || 'Failed to save navbar settings.');
+        } finally {
+            btn.disabled = false;
+            btn.innerHTML = '<i class="fas fa-save"></i><span>Save Navbar Settings</span>';
         }
     }
 </script>
