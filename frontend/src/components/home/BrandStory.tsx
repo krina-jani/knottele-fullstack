@@ -1,11 +1,39 @@
 "use client";
 
-import React from "react";
+import React, { useState, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { ArrowRight, Heart, Sparkles, Leaf, Smile } from "lucide-react";
+import { useWebsiteMedia } from "@/context/MediaContext";
+
+const DEFAULT_STORY_BG = "/images/homepage/middleimg.png";
 
 export function BrandStory() {
+  const { media } = useWebsiteMedia();
+  const [bgImage, setBgImage] = useState(DEFAULT_STORY_BG);
+  const [title, setTitle] = useState("Every Stitch");
+  const [subtitle, setSubtitle] = useState("Has a Story");
+  const [description, setDescription] = useState("More than just crochet, we create memories, happiness and a little bit of magic.");
+  const [ctaText, setCtaText] = useState("Read Our Story");
+  const [ctaLink, setCtaLink] = useState("/about");
+  const [isActive, setIsActive] = useState(true);
+
+  useEffect(() => {
+    const bs = media?.brandStory || media?.customCrochet;
+    if (!bs) return;
+    if (bs.is_active === false) {
+      setIsActive(false);
+      return;
+    }
+    setIsActive(true);
+    if (bs.desktop) setBgImage(bs.desktop);
+    if (bs.title) setTitle(bs.title);
+    if (bs.subtitle) setSubtitle(bs.subtitle);
+    if (bs.description) setDescription(bs.description);
+    if (bs.cta_text) setCtaText(bs.cta_text);
+    if (bs.cta_link) setCtaLink(bs.cta_link);
+  }, [media?.brandStory, media?.customCrochet]);
+
   const storyFeatures = [
     { title: "Handmade with Love", icon: Heart },
     { title: "Premium Yarn Quality", icon: Sparkles },
@@ -13,13 +41,15 @@ export function BrandStory() {
     { title: "Happiness Guaranteed", icon: Smile },
   ];
 
+  if (!isActive) return null;
+
   return (
     <section className="relative w-full overflow-hidden bg-[#FCE9E5] border-y border-[#E7D1CC]/70 py-12 sm:py-16 lg:py-20">
       
       {/* Full-Width Background Image Layer */}
       <div className="absolute inset-0 z-0 w-full h-full">
         <Image
-          src="/knotelle/images/homepage/middleimg.png"
+          src={bgImage}
           alt="KNOTELLE Artisanal Crochet Craftsmanship"
           fill
           quality={100}
@@ -38,25 +68,27 @@ export function BrandStory() {
           {/* Left Column: Heading, Subtitle & CTA (Spans 6 cols on lg) */}
           <div className="lg:col-span-6 space-y-4 sm:space-y-5 text-center lg:text-left flex flex-col items-center lg:items-start max-w-lg">
             <h2 className="font-serif-luxury text-3xl sm:text-4xl lg:text-5xl font-bold text-[#2E211E] leading-[1.12] tracking-tight">
-              Every Stitch <br />
+              {title} <br />
               <span className="text-[#913638] italic font-serif font-normal">
-                Has a Story
+                {subtitle}
               </span>
             </h2>
 
-            <p className="text-xs sm:text-sm md:text-base text-[#786864] leading-relaxed">
-              More than just crochet, we create memories, happiness and a little bit of magic.
+            <p className="text-xs sm:text-sm md:text-base text-[#786864] leading-relaxed whitespace-pre-line">
+              {description}
             </p>
 
-            <div className="pt-2">
-              <Link
-                href="/about"
-                className="inline-flex items-center gap-2 px-6 sm:px-7 py-3 rounded-full bg-[#913638] text-white text-xs sm:text-sm font-semibold hover:bg-[#74292B] shadow-xs hover:shadow-boutique-hover transition-all active:scale-[0.98]"
-              >
-                <span>Read Our Story</span>
-                <ArrowRight className="w-4 h-4" />
-              </Link>
-            </div>
+            {ctaText && ctaLink && (
+              <div className="pt-2">
+                <Link
+                  href={ctaLink}
+                  className="inline-flex items-center gap-2 px-6 sm:px-7 py-3 rounded-full bg-[#913638] text-white text-xs sm:text-sm font-semibold hover:bg-[#74292B] shadow-xs hover:shadow-boutique-hover transition-all active:scale-[0.98]"
+                >
+                  <span>{ctaText}</span>
+                  <ArrowRight className="w-4 h-4" />
+                </Link>
+              </div>
+            )}
           </div>
 
           {/* Right Column: 4 Feature Items (Spans 5 cols on lg, aligned to the right) */}

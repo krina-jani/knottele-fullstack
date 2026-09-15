@@ -10,7 +10,7 @@ use Illuminate\Support\Facades\Storage;
 class CategoryController extends Controller
 {
     /**
-     * Get a list of all active categories.
+     * Get a list of all active categories with dynamic counts and starting prices.
      *
      * @return \Illuminate\Http\JsonResponse
      */
@@ -19,10 +19,10 @@ class CategoryController extends Controller
         $categories = Category::where('status', 1)
             ->whereNull('parent_id') // Get main categories
             ->orderBy('sort_order', 'asc')
-            ->with('image') // Eager load image relationship
+            ->with(['image', 'products.variants'])
             ->get();
 
-        $priceFromMap = [
+        $priceFromFallback = [
             'keychain' => 'From ₹100 →',
             'flower' => 'From ₹200 →',
             'bouquet' => 'From ₹700 →',
@@ -36,19 +36,46 @@ class CategoryController extends Controller
             'clothing' => 'From ₹2,800 →',
         ];
 
-        $formattedCategories = $categories->map(function ($category) use ($priceFromMap) {
+        $formattedCategories = $categories->map(function ($category) use ($priceFromFallback) {
             $imageUrl = null;
-            if ($category->image && $category->image->file_name) {
-                if (str_starts_with($category->image->file_name, 'http')) {
-                    $imageUrl = $category->image->file_name;
+            if ($category->image && $category->image->file_path) {
+                $fp = $category->image->file_path;
+                if (str_starts_with($fp, 'http://') || str_starts_with($fp, 'https://')) {
+                    $imageUrl = $fp;
+                } elseif (str_starts_with($fp, 'images/')) {
+                    $imageUrl = asset($fp);
                 } else {
-                    $imageUrl = asset('storage/' . $category->image->file_name);
+                    $imageUrl = asset('storage/' . ltrim($fp, '/'));
+                }
+            } elseif ($category->image && $category->image->file_name) {
+                $fn = $category->image->file_name;
+                if (str_starts_with($fn, 'http://') || str_starts_with($fn, 'https://')) {
+                    $imageUrl = $fn;
+                } elseif (str_starts_with($fn, 'images/')) {
+                    $imageUrl = asset($fn);
+                } else {
+                    $imageUrl = asset('storage/' . ltrim($fn, '/'));
                 }
             } else {
                 $imageUrl = asset('images/categories/' . $category->slug . '.jpg');
             }
 
-            $productCount = $category->products()->count();
+            $activeProducts = $category->products->where('status', 'active');
+            $productCount = $activeProducts->count();
+
+            // Calculate min price from active products
+            $minPrice = null;
+            foreach ($activeProducts as $p) {
+                foreach ($p->variants as $v) {
+                    if ($v->price > 0 && ($minPrice === null || $v->price < $minPrice)) {
+                        $minPrice = (float) $v->price;
+                    }
+                }
+            }
+
+            $priceFromStr = $minPrice !== null
+                ? ('From ₹' . number_format($minPrice, 0) . ' →')
+                : ($priceFromFallback[$category->slug] ?? 'From ₹100 →');
 
             return [
                 'id' => 'cat-' . $category->id,
@@ -58,8 +85,8 @@ class CategoryController extends Controller
                 'description' => $category->description,
                 'image' => $imageUrl,
                 'featured' => (bool) $category->featured,
-                'priceFrom' => $priceFromMap[$category->slug] ?? 'From ₹100 →',
-                'itemCount' => $productCount > 0 ? $productCount : 10,
+                'priceFrom' => $priceFromStr,
+                'itemCount' => $productCount > 0 ? $productCount : ($priceFromFallback[$category->slug] ? 1 : 0),
             ];
         });
 

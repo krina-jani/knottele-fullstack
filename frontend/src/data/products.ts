@@ -10,7 +10,7 @@ export const PRODUCTS: Product[] = [
     price: 150,
     comparePrice: 199,
     images: [
-      "/knotelle/images/products/bunny-keychain.jpg",
+      "/images/products/bunny-keychain.jpg",
     ],
     description: "An adorable miniature bunny charm hand-crocheted with 100% soft milk cotton yarn. Features a sturdy gold alloy clasp ring, delicate blush cheeks, and a tiny embroidered nose. Perfect as a bag charm, car key accessory, or a heartwarming gift.",
     shortDescription: "Handmade miniature bunny charm with gold clasp and soft blush cheeks.",
@@ -60,7 +60,7 @@ export const PRODUCTS: Product[] = [
     price: 300,
     comparePrice: 350,
     images: [
-      "/knotelle/images/products/sunflower-stem.jpg",
+      "/images/products/sunflower-stem.jpg",
     ],
     description: "Brighten your desk or bedside table with our cheerful crochet sunflower. Hand-stitched with warm golden petals, textured chocolate brown center, and a flexible internal stem wrapped in leaf-green yarn that can be styled in any vase.",
     shortDescription: "Vibrant handmade everlasting sunflower with posable stem and textured center.",
@@ -90,7 +90,7 @@ export const PRODUCTS: Product[] = [
     price: 1000,
     comparePrice: 1299,
     images: [
-      "/knotelle/images/products/rose-bouquet.jpg",
+      "/images/products/rose-bouquet.jpg",
     ],
     description: "A breathtaking handcrafted bouquet consisting of multi-layered crochet pink roses, cream tulips, lavender sprigs, and eucalyptus leaves. Wrapped in Korean matte waterproof blush paper tied with a satin ribbon and custom wax seal tag.",
     shortDescription: "Luxury handcrafted roses, tulips, and eucalyptus in Korean matte wrap.",
@@ -121,7 +121,7 @@ export const PRODUCTS: Product[] = [
     price: 1200,
     comparePrice: 1450,
     images: [
-      "/knotelle/images/products/teddy-bear.jpg",
+      "/images/products/teddy-bear.jpg",
     ],
     description: "A huggable, nostalgic heirloom crochet teddy bear. Hand-stitched with hypoallergenic velvet chenille yarn, safety lock eyes, and a sweet little satin bow. The ultimate comfort keepsake for both children and adults.",
     shortDescription: "Ultra-soft heirloom amigurumi bear made with velvet chenille yarn.",
@@ -153,7 +153,7 @@ export const PRODUCTS: Product[] = [
     price: 1200,
     comparePrice: 1399,
     images: [
-      "/knotelle/images/products/daisy-phone-cover.jpg",
+      "/images/products/daisy-phone-cover.jpg",
     ],
     description: "Snug and protective handmade crochet phone sleeve decorated with 3D blooming daisies. Features a soft interior lining to prevent scratches, a natural wooden button loop closure, and a crossbody braided strap.",
     shortDescription: "Textured floral phone sleeve with 3D daisies, wood button, and crossbody strap.",
@@ -184,7 +184,7 @@ export const PRODUCTS: Product[] = [
     price: 5000,
     comparePrice: 5800,
     images: [
-      "/knotelle/images/products/granny-square-bag.jpg",
+      "/images/products/granny-square-bag.jpg",
     ],
     description: "The crown jewel of our boutique collection. An artisanal bohemian tote meticulously assembled from 24 individual floral granny squares. Reinforced with sturdy interior canvas lining, magnetic clasp, inner zipper pocket, and durable shoulder straps.",
     shortDescription: "Statement bohemian tote handcrafted from 24 intricate floral granny squares.",
@@ -214,7 +214,7 @@ export const PRODUCTS: Product[] = [
     price: 450,
     comparePrice: 550,
     images: [
-      "/knotelle/images/products/strawberry-coin-purse.jpg",
+      "/images/products/strawberry-coin-purse.jpg",
     ],
     description: "Charming antique-inspired strawberry coin purse with an embossed brass kiss-lock frame. The textured crochet shell is lined with floral fabric to keep coins, jewelry, or earphones safe.",
     shortDescription: "Strawberry-shaped crochet coin purse with antique bronze kiss-clasp.",
@@ -244,7 +244,7 @@ export const PRODUCTS: Product[] = [
     price: 400,
     comparePrice: 499,
     images: [
-      "/knotelle/images/products/tulip-mug-cozy.jpg",
+      "/images/products/tulip-mug-cozy.jpg",
     ],
     description: "Keep your tea or coffee warm while adding botanical elegance to your morning routine. Includes a buttoned thermal mug sleeve with 3D tulip details and a matching wavy scallop flower coaster.",
     shortDescription: "Buttoned thermal mug sleeve with 3D tulips and matching flower coaster.",
@@ -274,7 +274,7 @@ export const PRODUCTS: Product[] = [
     price: 180,
     comparePrice: 220,
     images: [
-      "/knotelle/images/products/sprout-bookmark.jpg",
+      "/images/products/sprout-bookmark.jpg",
     ],
     description: "Never lose your page again with this charming botanical crochet bookmark. Lies flat between pages without bending the spine, with sweet green leaves and a blooming daisy blossom draping over the top.",
     shortDescription: "Flat woven bookmark with 3D sprouting leaf and daisy topper.",
@@ -304,7 +304,7 @@ export const PRODUCTS: Product[] = [
     price: 350,
     comparePrice: 420,
     images: [
-      "/knotelle/images/products/floral-scrunchies.jpg",
+      "/images/products/floral-scrunchies.jpg",
     ],
     description: "Gentle on curls and straight hair alike. Knitted around snag-free elastic bands with delicate scalloped ruffle edges, paired with 3 handmade daisy hair clips for cottagecore charm.",
     shortDescription: "3 ruffled cotton scrunchies and matching handmade daisy hair clips.",
@@ -333,7 +333,7 @@ export const PRODUCTS: Product[] = [
     price: 3800,
     comparePrice: 4500,
     images: [
-      "/knotelle/images/products/crochet-vest.jpg",
+      "/images/products/crochet-vest.jpg",
     ],
     description: "An artisanal cottagecore layering piece made from breathable cotton blend yarn. Features delicate floral square motifs in cream, rose, and olive, wooden button closures, and scalloped borders.",
     shortDescription: "Handmade botanical granny square vest with wooden buttons and scalloped hem.",
@@ -364,7 +364,7 @@ export const PRODUCTS: Product[] = [
     price: 550,
     comparePrice: 650,
     images: [
-      "/knotelle/images/products/potted-tulips.jpg",
+      "/images/products/potted-tulips.jpg",
     ],
     description: "A zero-maintenance potted plant featuring 4 blooming pastel tulips nestled in a textured terracotta-colored crochet pot with twine bow. Filled with weighted beads at the base so it stands proudly on any desk or bookshelf.",
     shortDescription: "4 blooming tulips in a terracotta crochet pot that never needs watering.",

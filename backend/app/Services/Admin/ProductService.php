@@ -23,6 +23,8 @@ class ProductService
             Log::info('Starting product creation', ['data' => $data]);
 
             // 1. Create product
+            $status = $this->normalizeStatus($data['status'] ?? 'active');
+
             $product = Product::create([
                 'name' => $data['name'],
                 'slug' => $data['slug'],
@@ -31,12 +33,12 @@ class ProductService
                 'main_category_id' => $data['main_category_id'],
                 'tax_class_id' => $data['tax_class_id'] ?? null,
                 'short_description' => $data['short_description'] ?? null,
-                'description' => $data['description'],
-                'status' => $data['status'] ?? 'draft',
-                'is_featured' => $data['is_featured'] ?? false,
-                'is_new' => $data['is_new'] ?? false,
-                'is_bestseller' => $data['is_bestseller'] ?? false,
-                'cod_available' => $data['cod_available'] ?? false,
+                'description' => $data['description'] ?? '',
+                'status' => $status,
+                'is_featured' => !empty($data['is_featured']),
+                'is_new' => !empty($data['is_new']),
+                'is_bestseller' => !empty($data['is_bestseller']),
+                'cod_available' => !empty($data['cod_available']),
                 'weight' => $data['weight'] ?? 0,
                 'length' => $data['length'] ?? 0,
                 'width' => $data['width'] ?? 0,
@@ -174,15 +176,28 @@ class ProductService
      */
     private function createSimpleProductVariant(Product $product, array $data): void
     {
+        $sku = $data['sku'] ?? '';
+        if (empty($sku)) {
+            $prefix = strtoupper(\Illuminate\Support\Str::slug($product->name ?? 'PROD'));
+            $cleanPrefix = preg_replace('/[^A-Z0-9]/', '', $prefix);
+            if (empty($cleanPrefix)) {
+                $cleanPrefix = 'PROD';
+            }
+            $sku = substr($cleanPrefix, 0, 8) . '-' . rand(100, 999);
+            while (ProductVariant::where('sku', $sku)->withTrashed()->exists()) {
+                $sku = substr($cleanPrefix, 0, 8) . '-' . rand(1000, 9999);
+            }
+        }
+
         $variant = ProductVariant::create([
             'product_id' => $product->id,
-            'sku' => $data['sku'],
-            'price' => $data['price'],
+            'sku' => $sku,
+            'price' => isset($data['price']) && is_numeric($data['price']) ? $data['price'] : 0,
             'compare_price' => $data['compare_price'] ?? null,
             'cost_price' => $data['cost_price'] ?? null,
-            'stock_quantity' => $data['stock_quantity'] ?? 0,
+            'stock_quantity' => isset($data['stock_quantity']) && is_numeric($data['stock_quantity']) ? $data['stock_quantity'] : 0,
             'reserved_quantity' => 0,
-            'stock_status' => ($data['stock_quantity'] ?? 0) > 0 ? 'in_stock' : 'out_of_stock',
+            'stock_status' => (isset($data['stock_quantity']) && $data['stock_quantity'] > 0) ? 'in_stock' : 'out_of_stock',
             'is_default' => true,
             'status' => isset($data['status']) && $data['status'] === 'active' ? 1 : 0,
             'weight' => $data['weight'] ?? $product->weight,
@@ -194,7 +209,8 @@ class ProductService
         Log::info('Simple variant created', ['variant_id' => $variant->id]);
 
         // Handle images for simple product variant
-        $this->syncVariantImages($variant, $data);
+        $topLevelImageIds = $this->extractTopLevelImageIds($data);
+        $this->syncVariantImages($variant, $data, $topLevelImageIds);
     }
 
     /**
@@ -203,6 +219,8 @@ class ProductService
     private function createConfigurableProductVariants(Product $product, array $data): void
     {
         Log::info('Creating configurable variants', ['product_id' => $product->id, 'variant_count' => count($data['variants'] ?? [])]);
+
+        $topLevelImageIds = $this->extractTopLevelImageIds($data);
 
         if (isset($data['variants']) && is_array($data['variants'])) {
             $defaultVariantSet = false;
@@ -215,6 +233,8 @@ class ProductService
                         $combinationHash = $this->generateCombinationHash($variantData['attributes']);
                     }
 
+                    $isDefault = ($index === 0 && !$defaultVariantSet) || !empty($variantData['is_default']);
+
                     $variant = ProductVariant::create([
                         'product_id' => $product->id,
                         'sku' => $variantData['sku'],
@@ -225,7 +245,7 @@ class ProductService
                         'stock_quantity' => $variantData['stock_quantity'] ?? 0,
                         'reserved_quantity' => 0,
                         'stock_status' => ($variantData['stock_quantity'] ?? 0) > 0 ? 'in_stock' : 'out_of_stock',
-                        'is_default' => ($index === 0 && !$defaultVariantSet) || ($variantData['is_default'] ?? false),
+                        'is_default' => $isDefault,
                         'status' => isset($variantData['status'])
                             ? ($variantData['status'] === 'active' ? 1 : 0)
                             : 1,
@@ -249,7 +269,11 @@ class ProductService
                     $this->syncVariantAttributes($variant, $variantData);
 
                     // Handle variant images
-                    $this->syncVariantImages($variant, $variantData);
+                    if ($isDefault && !empty($topLevelImageIds)) {
+                        $this->syncVariantImages($variant, ['product_images' => $topLevelImageIds]);
+                    } else {
+                        $this->syncVariantImages($variant, $variantData, $topLevelImageIds);
+                    }
 
                 } catch (\Exception $e) {
                     Log::error('Failed to create variant', [
@@ -273,6 +297,8 @@ class ProductService
             Log::info('Starting product update', ['product_id' => $product->id, 'data' => $data]);
 
             // 1. Update product basic information
+            $status = $this->normalizeStatus($data['status'] ?? ($product->status ?? 'active'));
+
             $product->update([
                 'name' => $data['name'],
                 'slug' => $data['slug'],
@@ -281,12 +307,12 @@ class ProductService
                 'main_category_id' => $data['main_category_id'],
                 'tax_class_id' => $data['tax_class_id'] ?? null,
                 'short_description' => $data['short_description'] ?? null,
-                'description' => $data['description'],
-                'status' => $data['status'] ?? 'draft',
-                'is_featured' => $data['is_featured'] ?? false,
-                'is_new' => $data['is_new'] ?? false,
-                'is_bestseller' => $data['is_bestseller'] ?? false,
-                'cod_available' => $data['cod_available'] ?? false,
+                'description' => $data['description'] ?? '',
+                'status' => $status,
+                'is_featured' => !empty($data['is_featured']),
+                'is_new' => !empty($data['is_new']),
+                'is_bestseller' => !empty($data['is_bestseller']),
+                'cod_available' => !empty($data['cod_available']),
                 'weight' => $data['weight'] ?? 0,
                 'length' => $data['length'] ?? 0,
                 'width' => $data['width'] ?? 0,
@@ -597,34 +623,89 @@ if ($mainImage) {
     }
 
     /**
+     * Extract top-level product image IDs from request data (up to 5 slots)
+     */
+    private function extractTopLevelImageIds(array $data): array
+    {
+        $imageIds = [];
+
+        // 1. Check product_images array (5 slots)
+        if (!empty($data['product_images']) && is_array($data['product_images'])) {
+            foreach ($data['product_images'] as $imgId) {
+                if (!empty($imgId) && is_numeric($imgId)) {
+                    $imageIds[] = (int) $imgId;
+                }
+            }
+        }
+
+        // 2. Check main_image_id
+        if (!empty($data['main_image_id']) && is_numeric($data['main_image_id'])) {
+            if (!in_array((int)$data['main_image_id'], $imageIds)) {
+                array_unshift($imageIds, (int)$data['main_image_id']);
+            }
+        }
+
+        // 3. Check gallery_image_ids
+        if (!empty($data['gallery_image_ids']) && is_array($data['gallery_image_ids'])) {
+            foreach ($data['gallery_image_ids'] as $imgId) {
+                if (!empty($imgId) && is_numeric($imgId)) {
+                    $imageIds[] = (int) $imgId;
+                }
+            }
+        }
+
+        return array_values(array_unique(array_filter($imageIds)));
+    }
+
+    /**
      * Sync variant images
      */
-    private function syncVariantImages(ProductVariant $variant, array $variantData): void
+    private function syncVariantImages(ProductVariant $variant, array $variantData, array $fallbackImageIds = []): void
     {
         $imagesData = [];
 
         // Collect unique image IDs
         $imageIds = [];
 
-        if (!empty($variantData['main_image_id'])) {
-            $imageIds[] = $variantData['main_image_id'];
+        // Check for slot-based product_images array
+        if (!empty($variantData['product_images']) && is_array($variantData['product_images'])) {
+            foreach ($variantData['product_images'] as $imgId) {
+                if (!empty($imgId) && is_numeric($imgId)) {
+                    $imageIds[] = (int) $imgId;
+                }
+            }
+        }
+
+        if (!empty($variantData['main_image_id']) && is_numeric($variantData['main_image_id'])) {
+            $imageIds[] = (int) $variantData['main_image_id'];
         }
 
         if (!empty($variantData['gallery_image_ids']) && is_array($variantData['gallery_image_ids'])) {
-            $imageIds = array_merge($imageIds, $variantData['gallery_image_ids']);
+            foreach ($variantData['gallery_image_ids'] as $imgId) {
+                if (!empty($imgId) && is_numeric($imgId)) {
+                    $imageIds[] = (int) $imgId;
+                }
+            }
         }
 
         // Remove duplicates
-        $imageIds = array_values(array_unique($imageIds));
+        $imageIds = array_values(array_unique(array_filter($imageIds)));
+
+        // If no images set specifically for this variant, use fallback top-level product images
+        if (empty($imageIds) && !empty($fallbackImageIds)) {
+            $imageIds = $fallbackImageIds;
+        }
 
         // Clear existing images first
         DB::table('variant_images')->where('variant_id', $variant->id)->delete();
+
+        $mainImageId = $variantData['main_image_id'] ?? ($imageIds[0] ?? null);
 
         foreach ($imageIds as $index => $imageId) {
             $imagesData[] = [
                 'variant_id' => $variant->id,
                 'media_id' => $imageId,
-                'is_primary' => ($imageId == ($variantData['main_image_id'] ?? null)) ? 1 : 0,
+                'is_primary' => ($index === 0 || $imageId == $mainImageId) ? 1 : 0,
                 'sort_order' => $index,
                 'created_at' => now(),
                 'updated_at' => now(),
@@ -936,6 +1017,8 @@ if ($mainImage) {
      */
     private function handleVariantsUpdate(Product $product, array $data): void
     {
+        $topLevelImageIds = $this->extractTopLevelImageIds($data);
+
         // 1. Handle Simple Product
         if ($product->product_type === 'simple') {
             Log::info('Updating simple product variant', ['product_id' => $product->id]);
@@ -960,14 +1043,18 @@ if ($mainImage) {
                 'height' => $data['height'] ?? $product->height,
             ]);
 
-            // Sync images for simple product (they are at the top level of $data)
-            $this->syncVariantImages($variant, $data);
+            // Sync images for simple product using top level images
+            $this->syncVariantImages($variant, $data, $topLevelImageIds);
             Log::info('Simple product variant updated successfully', ['variant_id' => $variant->id]);
             return;
         }
 
         // 2. Handle Configurable Product
         if (!isset($data['variants']) || !is_array($data['variants'])) {
+            // If no variants array sent, at least sync top level images to default variant
+            if ($product->defaultVariant && !empty($topLevelImageIds)) {
+                $this->syncVariantImages($product->defaultVariant, ['product_images' => $topLevelImageIds]);
+            }
             Log::info('No variants data provided for configurable product update', ['product_id' => $product->id]);
             return;
         }
@@ -988,6 +1075,10 @@ if ($mainImage) {
                 }
             }
 
+            $isDefault = (isset($data['default_variant_index']) && $data['default_variant_index'] == $index) 
+                || !empty($variantData['is_default']) 
+                || ($index === 0 && empty($data['default_variant_index']));
+
             if ($variant) {
                 // UPDATE existing
                 $variant->update([
@@ -996,7 +1087,7 @@ if ($mainImage) {
                     'compare_price' => $variantData['compare_price'] ?? null,
                     'stock_quantity' => $variantData['stock_quantity'],
                     'stock_status' => ($variantData['stock_quantity'] > 0) ? 'in_stock' : 'out_of_stock',
-                    'is_default' => (isset($data['default_variant_index']) && $data['default_variant_index'] == $index) || ($variantData['is_default'] ?? 0),
+                    'is_default' => $isDefault,
                     'status' => 1
                 ]);
                 Log::debug('Variant updated', ['variant_id' => $variant->id, 'sku' => $variant->sku]);
@@ -1009,7 +1100,7 @@ if ($mainImage) {
                     'compare_price' => $variantData['compare_price'] ?? null,
                     'stock_quantity' => $variantData['stock_quantity'],
                     'stock_status' => ($variantData['stock_quantity'] > 0) ? 'in_stock' : 'out_of_stock',
-                    'is_default' => (isset($data['default_variant_index']) && $data['default_variant_index'] == $index) || ($variantData['is_default'] ?? 0),
+                    'is_default' => $isDefault,
                     'status' => 1
                 ]);
                 $submittedVariantIds[] = $variant->id;
@@ -1020,8 +1111,13 @@ if ($mainImage) {
                 }
             }
 
-            // Sync Images for both New and Existing
-            $this->syncVariantImages($variant, $variantData);
+            // Sync images:
+            // If this is default variant and top level images were provided, ensure it receives the top level product images!
+            if ($isDefault && !empty($topLevelImageIds)) {
+                $this->syncVariantImages($variant, ['product_images' => $topLevelImageIds]);
+            } else {
+                $this->syncVariantImages($variant, $variantData, $topLevelImageIds);
+            }
         }
 
         // 3. Remove variants not in submission (if any deletions were intended)
@@ -1033,6 +1129,23 @@ if ($mainImage) {
                 Log::info('Deleted variants not in submission', ['product_id' => $product->id, 'count' => $deletedCount]);
             }
         }
+    }
+
+    /**
+     * Normalize status value to match database enum
+     */
+    private function normalizeStatus($status): string
+    {
+        if ($status === '1' || $status === 1 || $status === true || $status === 'active') {
+            return 'active';
+        }
+        if ($status === '0' || $status === 0 || $status === false || $status === 'inactive') {
+            return 'inactive';
+        }
+        if (in_array($status, ['draft', 'active', 'inactive', 'out_of_stock'])) {
+            return $status;
+        }
+        return 'draft';
     }
 
 }

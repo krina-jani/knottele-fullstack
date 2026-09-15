@@ -1,15 +1,22 @@
 "use client";
 
-import React, { useState, useMemo } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { Filter, X, SlidersHorizontal, ArrowUpDown, Sparkles, RotateCcw } from "lucide-react";
 import { PRODUCTS } from "@/data/products";
 import { CATEGORIES } from "@/data/categories";
+import { Product } from "@/types/product";
+import { fetchProducts, fetchCategories, normalizeImageUrl, ApiCategory } from "@/lib/api";
 import { ProductCard } from "@/components/ui/ProductCard";
 import { Breadcrumbs } from "@/components/ui/Breadcrumbs";
 import { StarRating } from "@/components/ui/StarRating";
+import { useWebsiteMedia } from "@/context/MediaContext";
 
 export default function ShopPage() {
+  const { media } = useWebsiteMedia();
+  const [productsList, setProductsList] = useState<Product[]>(PRODUCTS);
+  const [categoriesList, setCategoriesList] = useState<any[]>(CATEGORIES);
   const [selectedCategory, setSelectedCategory] = useState<string>("all");
   const [priceRange, setPriceRange] = useState<number>(6000);
   const [selectedColors, setSelectedColors] = useState<string[]>([]);
@@ -17,19 +24,74 @@ export default function ShopPage() {
   const [availabilityOnly, setAvailabilityOnly] = useState<boolean>(false);
   const [sortBy, setSortBy] = useState<string>("featured");
   const [isMobileFiltersOpen, setIsMobileFiltersOpen] = useState<boolean>(false);
+  const [shopMedia, setShopMedia] = useState<{
+    desktop?: string | null;
+    mobile?: string | null;
+    title: string;
+    subtitle: string;
+    tag_text: string;
+    cta_text?: string | null;
+    cta_link?: string | null;
+  }>({
+    title: "Artisanal Handcrafted Creations",
+    subtitle: "Discover unique crochet treasures woven with love, patience, and 100% natural cotton fibers.",
+    tag_text: "Handmade with Love",
+  });
+
+  // Sync shop banner whenever media updates live
+  useEffect(() => {
+    if (media?.shop?.banner) {
+      setShopMedia({
+        desktop: media.shop.banner.desktop,
+        mobile: media.shop.banner.mobile,
+        title: media.shop.banner.title || "Artisanal Handcrafted Creations",
+        subtitle: media.shop.banner.subtitle || "Discover unique crochet treasures woven with love, patience, and 100% natural cotton fibers.",
+        tag_text: media.shop.banner.tag_text || "Handmade with Love",
+        cta_text: media.shop.banner.cta_text,
+        cta_link: media.shop.banner.cta_link,
+      });
+    }
+  }, [media?.shop?.banner]);
+
+  // Fetch live products & categories on mount
+  useEffect(() => {
+    let isMounted = true;
+
+    fetchProducts({ per_page: 100 })
+      .then((res) => {
+        if (isMounted && res.products && res.products.length > 0) {
+          setProductsList(res.products);
+        }
+      })
+      .catch((err) => console.warn("Live shop products fetch notice:", err));
+
+    fetchCategories()
+      .then((cats) => {
+        if (isMounted && cats && cats.length > 0) {
+          setCategoriesList(cats);
+        }
+      })
+      .catch((err) => console.warn("Live categories fetch notice:", err));
+
+    return () => {
+      isMounted = false;
+    };
+  }, []);
 
   // Available unique color swatches from all products
   const allColorSwatches = useMemo(() => {
     const map = new Map<string, string>();
-    PRODUCTS.forEach((p) => {
-      p.colors.forEach((c) => {
-        if (!map.has(c.name)) {
-          map.set(c.name, c.hex);
-        }
-      });
+    productsList.forEach((p) => {
+      if (p.colors && Array.isArray(p.colors)) {
+        p.colors.forEach((c) => {
+          if (!map.has(c.name)) {
+            map.set(c.name, c.hex);
+          }
+        });
+      }
     });
     return Array.from(map.entries()).map(([name, hex]) => ({ name, hex }));
-  }, []);
+  }, [productsList]);
 
   const toggleColor = (colorName: string) => {
     setSelectedColors((prev) =>
@@ -57,7 +119,7 @@ export default function ShopPage() {
 
   // Filter and sort products
   const filteredProducts = useMemo(() => {
-    return PRODUCTS.filter((product) => {
+    return productsList.filter((product) => {
       if (selectedCategory !== "all" && product.categorySlug !== selectedCategory) {
         return false;
       }
@@ -85,7 +147,7 @@ export default function ShopPage() {
       if (sortBy === "bestseller") return (b.isBestSeller ? 1 : 0) - (a.isBestSeller ? 1 : 0);
       return 0; // featured
     });
-  }, [selectedCategory, priceRange, selectedColors, minRating, availabilityOnly, sortBy]);
+  }, [selectedCategory, priceRange, selectedColors, minRating, availabilityOnly, sortBy, productsList]);
 
   const filterSidebarContent = (
     <div className="space-y-6">
@@ -104,13 +166,14 @@ export default function ShopPage() {
             }`}
           >
             <span>All Creations</span>
-            <span>({PRODUCTS.length})</span>
+            <span>({productsList.length})</span>
           </button>
-          {CATEGORIES.map((cat) => {
+          {categoriesList.map((cat) => {
             const isSelected = selectedCategory === cat.slug;
+            const count = productsList.filter((p) => p.categorySlug === cat.slug).length;
             return (
               <button
-                key={cat.id}
+                key={cat.id || cat.slug}
                 onClick={() => setSelectedCategory(cat.slug)}
                 className={`w-full text-left px-3 py-1.5 rounded-xl text-xs font-medium transition-colors flex items-center justify-between ${
                   isSelected
@@ -120,7 +183,7 @@ export default function ShopPage() {
               >
                 <span>{cat.name}</span>
                 <span>
-                  ({PRODUCTS.filter((p) => p.categorySlug === cat.slug).length})
+                  ({count > 0 ? count : (cat.itemCount || 0)})
                 </span>
               </button>
             );
@@ -253,7 +316,7 @@ export default function ShopPage() {
               <span>Filters {hasActiveFilters && "•"}</span>
             </button>
             <span className="text-xs text-[#78635E]">
-              Showing <strong className="text-[#3A211D] font-bold">{filteredProducts.length}</strong> of {PRODUCTS.length} handmade creations
+              Showing <strong className="text-[#3A211D] font-bold">{filteredProducts.length}</strong> of {productsList.length} handmade creations
             </span>
           </div>
 

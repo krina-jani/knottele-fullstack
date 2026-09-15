@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { notFound, useRouter } from "next/navigation";
@@ -28,6 +28,8 @@ import { Badge } from "@/components/ui/Badge";
 import { Breadcrumbs } from "@/components/ui/Breadcrumbs";
 import { ProductCard } from "@/components/ui/ProductCard";
 import { BotanicalFlourish, FlowerIcon } from "@/components/ui/BotanicalDecorations";
+import { fetchProductBySlug, fetchRelatedProducts } from "@/lib/api";
+import { Product } from "@/types/product";
 
 interface ProductDetailViewProps {
   slug: string;
@@ -35,7 +37,38 @@ interface ProductDetailViewProps {
 
 export default function ProductDetailView({ slug }: ProductDetailViewProps) {
   const router = useRouter();
-  const product = PRODUCTS.find((p) => p.slug === slug);
+  const fallbackProduct = PRODUCTS.find((p) => p.slug === slug);
+  const [liveProduct, setLiveProduct] = useState<Product | null>(null);
+  const product = liveProduct || fallbackProduct;
+  const [relatedProductsList, setRelatedProductsList] = useState<Product[]>([]);
+
+  useEffect(() => {
+    let isMounted = true;
+    fetchProductBySlug(slug)
+      .then((apiProd) => {
+        if (isMounted && apiProd) {
+          setLiveProduct(apiProd);
+          if (apiProd.colors && apiProd.colors[0]) {
+            setSelectedColor(apiProd.colors[0]);
+          }
+          if (apiProd.sizes && apiProd.sizes[0]) {
+            setSelectedSize(apiProd.sizes[0]);
+          }
+          fetchRelatedProducts(apiProd.id)
+            .then((rel) => {
+              if (isMounted && rel && rel.length > 0) {
+                setRelatedProductsList(rel);
+              }
+            })
+            .catch(() => {});
+        }
+      })
+      .catch((err) => console.warn("Live product fetch error:", err));
+
+    return () => {
+      isMounted = false;
+    };
+  }, [slug]);
 
   if (!product) {
     notFound();
@@ -57,9 +90,12 @@ export default function ProductDetailView({ slug }: ProductDetailViewProps) {
   const [activeTab, setActiveTab] = useState<"desc" | "specs" | "reviews">("desc");
 
   const isWishlisted = isInWishlist(product.id);
-  const relatedProducts = PRODUCTS.filter(
-    (p) => p.categorySlug === product.categorySlug && p.id !== product.id
-  ).slice(0, 4);
+  const relatedProducts =
+    relatedProductsList.length > 0
+      ? relatedProductsList
+      : PRODUCTS.filter(
+          (p) => p.categorySlug === product.categorySlug && p.id !== product.id
+        ).slice(0, 4);
 
   const handleAddToCart = () => {
     addItem(product, quantity, {

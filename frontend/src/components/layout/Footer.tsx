@@ -1,4 +1,6 @@
-import React from "react";
+"use client";
+
+import React, { useState, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import {
@@ -9,15 +11,27 @@ import {
   YouTubeIcon,
 } from "@/components/ui/BotanicalDecorations";
 import { Phone, Mail, MapPin } from "lucide-react";
+import { useWebsiteMedia } from "@/context/MediaContext";
+
+const DEFAULT_FOOTER_BG = "/images/categories/footer.png";
 
 export function Footer() {
+  const { media } = useWebsiteMedia();
+  const [footerBg, setFooterBg] = useState(DEFAULT_FOOTER_BG);
+
+  useEffect(() => {
+    if (media?.footer?.bg) {
+      setFooterBg(media.footer.bg);
+    }
+  }, [media?.footer?.bg]);
+
   return (
     <footer className="relative w-full overflow-hidden bg-[#FFF9F6] border-t border-[#E7D1CC]/70 pt-12 sm:pt-16 pb-8 text-[#2E211E]">
       
       {/* Full-Width Panoramic Footer Background Image */}
       <div className="absolute inset-0 z-0 w-full h-full">
         <Image
-          src="/knotelle/images/categories/footer.png"
+          src={footerBg}
           alt="KNOTELLE Boutique Footer"
           fill
           quality={100}

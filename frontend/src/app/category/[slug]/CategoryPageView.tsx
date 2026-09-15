@@ -1,0 +1,178 @@
+"use client";
+
+import React, { useState, useEffect, useMemo } from "react";
+import Image from "next/image";
+import Link from "next/link";
+import { notFound } from "next/navigation";
+import { CATEGORIES, Category } from "@/data/categories";
+import { PRODUCTS } from "@/data/products";
+import { Product } from "@/types/product";
+import { fetchProducts, fetchCategories } from "@/lib/api";
+import { ProductCard } from "@/components/ui/ProductCard";
+import { Breadcrumbs } from "@/components/ui/Breadcrumbs";
+import { BotanicalFlourish } from "@/components/ui/BotanicalDecorations";
+import { Sparkles, ArrowRight } from "lucide-react";
+
+interface CategoryPageViewProps {
+  slug: string;
+}
+
+export default function CategoryPageView({ slug }: CategoryPageViewProps) {
+  const fallbackCategory = CATEGORIES.find((c) => c.slug === slug);
+  const [categoriesList, setCategoriesList] = useState<any[]>(CATEGORIES);
+  const [productsList, setProductsList] = useState<Product[]>(PRODUCTS);
+
+  useEffect(() => {
+    let isMounted = true;
+
+    fetchCategories()
+      .then((cats) => {
+        if (isMounted && cats && cats.length > 0) {
+          setCategoriesList(cats);
+        }
+      })
+      .catch((err) => console.warn("Live categories fetch notice:", err));
+
+    fetchProducts({ per_page: 100 })
+      .then((res) => {
+        if (isMounted && res.products && res.products.length > 0) {
+          setProductsList(res.products);
+        }
+      })
+      .catch((err) => console.warn("Live products fetch notice:", err));
+
+    return () => {
+      isMounted = false;
+    };
+  }, []);
+
+  const category =
+    categoriesList.find((c) => c.slug === slug) || fallbackCategory;
+
+  if (!category && !fallbackCategory) {
+    notFound();
+  }
+
+  const currentCat = category || fallbackCategory!;
+
+  const categoryProducts = useMemo(() => {
+    return productsList.filter((p) => p.categorySlug === currentCat.slug);
+  }, [productsList, currentCat.slug]);
+
+  return (
+    <div className="bg-[#FFF9F6] min-h-screen py-8 lg:py-12">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        
+        {/* Breadcrumb */}
+        <Breadcrumbs
+          items={[
+            { label: "Shop", href: "/shop" },
+            { label: currentCat.name },
+          ]}
+          className="mb-6"
+        />
+
+        {/* Category Hero Banner */}
+        <div className="relative rounded-[2.5rem] bg-gradient-to-r from-[#FCE9E5] via-white to-[#FCE9E5] border border-[#E7D1CC] p-6 sm:p-12 mb-10 overflow-hidden shadow-boutique">
+          <div className="grid grid-cols-1 md:grid-cols-12 gap-8 items-center">
+            
+            <div className="md:col-span-8 space-y-3 text-center md:text-left">
+              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white border border-[#E7D1CC] text-xs font-semibold text-[#913638]">
+                <Sparkles className="w-3.5 h-3.5 text-[#C69A5A]" />
+                <span>Handmade Boutique Collection</span>
+              </div>
+
+              <h1 className="font-serif-luxury text-3xl sm:text-4xl lg:text-5xl font-bold text-[#2E211E]">
+                Crochet {currentCat.name}
+              </h1>
+
+              <p className="text-sm sm:text-base text-[#786864] max-w-xl leading-relaxed">
+                {currentCat.description} Each piece is hand-stitched with 100% pure cotton yarn and available for bespoke customizations.
+              </p>
+
+              <div className="pt-2 flex flex-wrap gap-2 justify-center md:justify-start">
+                <span className="text-xs text-[#786864] bg-white px-3 py-1 rounded-full border border-[#E7D1CC]">
+                  {categoryProducts.length} unique handcrafted items
+                </span>
+                <Link
+                  href="/custom-order"
+                  className="text-xs font-semibold text-[#913638] hover:underline flex items-center gap-1 bg-white px-3 py-1 rounded-full border border-[#E7D1CC]"
+                >
+                  <span>Need a custom colorway?</span>
+                  <ArrowRight className="w-3 h-3" />
+                </Link>
+              </div>
+            </div>
+
+            <div className="md:col-span-4 flex justify-center">
+              <div className="relative w-36 h-36 sm:w-44 sm:h-44 rounded-full overflow-hidden border-4 border-white shadow-lg bg-[#FFF9F6]">
+                <Image
+                  src={currentCat.image}
+                  alt={currentCat.name}
+                  fill
+                  sizes="180px"
+                  className="object-cover"
+                />
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+        {/* Other Category Quick Selector */}
+        <div className="flex items-center gap-2 overflow-x-auto pb-4 mb-8 no-scrollbar">
+          <Link
+            href="/shop"
+            className="px-4 py-1.5 rounded-full text-xs font-semibold bg-white text-[#786864] hover:text-[#2E211E] border border-[#E7D1CC] hover:border-[#EFB8B0] hover:bg-[#FCE9E5] whitespace-nowrap active:scale-[0.98] transition-all"
+          >
+            All Collections
+          </Link>
+          {categoriesList.map((cat) => (
+            <Link
+              key={cat.id || cat.slug}
+              href={`/category/${cat.slug}`}
+              className={`px-4 py-1.5 rounded-full text-xs font-semibold whitespace-nowrap active:scale-[0.98] transition-all ${
+                cat.slug === currentCat.slug
+                  ? "bg-[#913638] text-white shadow-xs"
+                  : "bg-white text-[#786864] hover:text-[#2E211E] border border-[#E7D1CC] hover:border-[#EFB8B0] hover:bg-[#FCE9E5] hover:text-[#913638]"
+              }`}
+            >
+              {cat.name}
+            </Link>
+          ))}
+        </div>
+
+        {/* Product Grid */}
+        {categoryProducts.length > 0 ? (
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-6">
+            {categoryProducts.map((product) => (
+              <ProductCard key={product.id} product={product} />
+            ))}
+          </div>
+        ) : (
+          <div className="bg-white rounded-3xl border border-[#E7D1CC] p-8 sm:p-12 text-center shadow-boutique">
+            <h3 className="font-serif-luxury text-xl font-bold text-[#2E211E] mb-2">
+              New Designs In Crafting!
+            </h3>
+            <p className="text-xs sm:text-sm text-[#786864] max-w-sm mx-auto mb-6">
+              Our artisans are currently handcrafting more {currentCat.name} designs. Request a bespoke piece now!
+            </p>
+            <Link
+              href="/custom-order"
+              className="inline-flex items-center gap-2 px-6 py-2.5 rounded-full bg-[#913638] text-white text-xs font-semibold hover:bg-[#74292B] active:scale-[0.98] transition-all"
+            >
+              <span>Request Custom {currentCat.name}</span>
+              <ArrowRight className="w-3.5 h-3.5" />
+            </Link>
+          </div>
+        )}
+
+        {/* Bottom Flourish */}
+        <div className="flex justify-center mt-12">
+          <BotanicalFlourish className="w-28 h-5 text-[#EFB8B0]" />
+        </div>
+
+      </div>
+    </div>
+  );
+}

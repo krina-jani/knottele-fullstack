@@ -1,10 +1,30 @@
-import React from "react";
+"use client";
+
+import React, { useState, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { Gift, ArrowRight } from "lucide-react";
+import { Gift } from "lucide-react";
 import { CATEGORIES } from "@/data/categories";
+import { fetchCategories, ApiCategory } from "@/lib/api";
 
 export function CategoryGrid() {
+  const [categories, setCategories] = useState<any[]>(CATEGORIES);
+
+  useEffect(() => {
+    let isMounted = true;
+    fetchCategories()
+      .then((liveCats) => {
+        if (isMounted && liveCats && liveCats.length > 0) {
+          setCategories(liveCats);
+        }
+      })
+      .catch((err) => console.warn("Live categories fetch notice:", err));
+
+    return () => {
+      isMounted = false;
+    };
+  }, []);
+
   return (
     <section className="py-14 sm:py-18 bg-[#FFF9F6]">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -27,9 +47,9 @@ export function CategoryGrid() {
 
         {/* 2 Rows of 6 Categories (6 cols desktop, 4 cols tablet, 2-3 cols mobile) */}
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3 sm:gap-4 md:gap-6">
-          {CATEGORIES.map((category) => (
+          {categories.map((category) => (
             <Link
-              key={category.id}
+              key={category.id || category.slug}
               href={`/category/${category.slug}`}
               className="group flex flex-col items-center text-center p-2 sm:p-3 rounded-2xl transition-all duration-300 transform hover:-translate-y-1"
             >

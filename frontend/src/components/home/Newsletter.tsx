@@ -4,20 +4,29 @@ import React, { useState } from "react";
 import { ArrowRight, CheckCircle2 } from "lucide-react";
 import { YarnHeartArt } from "@/components/ui/BotanicalDecorations";
 import { useToast } from "@/context/ToastContext";
+import { useWebsiteMedia } from "@/context/MediaContext";
 
 export function Newsletter() {
+  const { media } = useWebsiteMedia();
   const [email, setEmail] = useState("");
   const [isSubscribed, setIsSubscribed] = useState(false);
   const { showToast } = useToast();
+
+  const title = media?.newsletter?.title || "Join Our Creative Journey";
+  const description = (media?.newsletter as any)?.description || media?.newsletter?.subtitle || "Get updates on new products, offers and handmade stories.";
+  const promoCode = (media?.newsletter as any)?.tag_text || "KNOTELLE10";
+  const buttonText = (media?.newsletter as any)?.cta_text || "Subscribe";
 
   const handleSubscribe = (e: React.FormEvent) => {
     e.preventDefault();
     if (email.trim()) {
       setIsSubscribed(true);
-      showToast("Subscribed! 💌", "Thank you for joining our creative family. Use code KNOTELLE10 for 10% off!", "success");
+      showToast("Subscribed! 💌", `Thank you for joining our creative family. Use code ${promoCode} for 10% off!`, "success");
       setEmail("");
     }
   };
+
+  if ((media?.newsletter as any)?.is_active === false) return null;
 
   return (
     <section className="py-6 sm:py-8 bg-[#FFF9F6]">
@@ -28,10 +37,10 @@ export function Newsletter() {
             {/* Left: Heading & Description (Spans 4.5 cols on lg) */}
             <div className="lg:col-span-5 text-center lg:text-left space-y-1">
               <h2 className="font-serif-luxury text-2xl sm:text-3xl font-bold text-[#74292B] tracking-tight">
-                Join Our Creative Journey
+                {title}
               </h2>
               <p className="text-xs sm:text-sm text-[#786864]">
-                Get updates on new products, offers and handmade stories.
+                {description}
               </p>
             </div>
 

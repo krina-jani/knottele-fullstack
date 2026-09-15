@@ -148,25 +148,44 @@ export default function CheckoutPage() {
     } catch (e) {}
 
     // Submit order asynchronously to Laravel backend API
-    submitOrder({
-      items: items.map((item, index) => ({
-        variant_id: (index % 15) + 1,
+    const orderItemsPayload = items.map((item, index) => {
+      let variantId = 1;
+      const numMatch = String(item.product?.id || "").match(/\d+/);
+      if (numMatch) {
+        const parsed = parseInt(numMatch[0], 10);
+        if (parsed >= 1 && parsed <= 20) {
+          variantId = parsed;
+        }
+      }
+      return {
+        variant_id: variantId,
         quantity: item.quantity || 1,
-      })),
+      };
+    });
+
+    submitOrder({
+      items: orderItemsPayload.length > 0 ? orderItemsPayload : [{ variant_id: 1, quantity: 1 }],
       shipping_address: {
         name: fullName,
         email: email,
         phone: phone.replace(/\D/g, "").slice(-10) || "9876543210",
-        address_line_1: addressLine1,
+        address_line_1: `${addressLine1}${addressLine2 ? ', ' + addressLine2 : ''}`,
         city: city,
         pin_code: pincode,
       },
       payment_method: paymentMethod === "Cash on Delivery" ? "cod" : "upi",
-    }).catch((err) => console.warn("Background order sync notice:", err));
-
-    addOrder(newOrder);
-    clearCart();
-    router.push(`/order-confirmation?orderNumber=${orderNumber}&orderId=${newOrder.id}`);
+    })
+      .then((res) => {
+        if (res && res.orderNumber) {
+          newOrder.orderNumber = res.orderNumber;
+        }
+      })
+      .catch((err) => console.warn("Background order sync notice:", err))
+      .finally(() => {
+        addOrder(newOrder);
+        clearCart();
+        router.push(`/order-confirmation?orderNumber=${orderNumber}&orderId=${newOrder.id}`);
+      });
   };
 
   return (

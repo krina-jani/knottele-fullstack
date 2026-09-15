@@ -106,8 +106,9 @@ Route::prefix('admin')->group(function () {
             Route::get('/', [AdminProduct::class, 'index'])->name('admin.products.index');
             Route::get('/create', [AdminProduct::class, 'create'])->name('admin.products.create');
             Route::get('/{product}/edit', [AdminProduct::class, 'edit'])->name('admin.products.edit');
+            Route::get('/{product}', [AdminProduct::class, 'edit'])->name('admin.products.show');
             Route::post('/', [AdminProduct::class, 'store'])->name('admin.products.store');
-            Route::put('/{product}', [AdminProduct::class, 'update'])->name('admin.products.update');
+            Route::match(['post', 'put', 'patch'], '/{product}', [AdminProduct::class, 'update'])->name('admin.products.update');
             Route::delete('/{product}', [AdminProduct::class, 'destroy'])->name('admin.products.destroy');
 
 
@@ -146,8 +147,34 @@ Route::prefix('admin')->group(function () {
         */
         Route::prefix('media')->group(function () {
             Route::get('/', [AdminMedia::class, 'index'])->name('admin.media.index');
+            Route::get('/manager-data', [AdminMedia::class, 'getManagerData'])->name('admin.media.manager-data');
             Route::get('/data', [AdminMedia::class, 'getData'])->name('admin.media.data');
             Route::post('/upload', [AdminMedia::class, 'upload'])->name('admin.media.upload');
+            Route::post('/assign-slot', [AdminMedia::class, 'assignSlot'])->name('admin.media.assign-slot');
+            Route::post('/add-hero-slide', [AdminMedia::class, 'addHeroSlide'])->name('admin.media.add-hero-slide');
+            Route::post('/hero-slide', [AdminMedia::class, 'addHeroSlide'])->name('admin.media.hero-slide');
+            Route::get('/hero-slide/{id}', [AdminMedia::class, 'getHeroSlide'])->name('admin.media.get-hero-slide');
+            Route::post('/hero-slide/{id}', [AdminMedia::class, 'updateHeroSlide'])->name('admin.media.update-hero-slide');
+            Route::delete('/hero-slide/{id}', [AdminMedia::class, 'deleteHeroSlide'])->name('admin.media.delete-hero-slide');
+            Route::post('/update-metadata/{id?}', [AdminMedia::class, 'updateMetadata'])->name('admin.media.update-metadata');
+            Route::post('/detach-slot', [AdminMedia::class, 'detachSlot'])->name('admin.media.detach-slot');
+            Route::post('/toggle-status/{id}', [AdminMedia::class, 'toggleStatus'])->name('admin.media.toggle-status');
+            Route::post('/update-category/{id}', [AdminMedia::class, 'updateCategory'])->name('admin.media.update-category');
+            Route::post('/testimonial', [AdminMedia::class, 'saveTestimonial'])->name('admin.media.testimonial.save');
+            Route::get('/testimonial/{id}', [AdminMedia::class, 'getTestimonial'])->name('admin.media.testimonial.get');
+            Route::delete('/testimonial/{id}', [AdminMedia::class, 'deleteTestimonial'])->name('admin.media.testimonial.delete');
+            Route::post('/testimonial/{id}/toggle', [AdminMedia::class, 'toggleTestimonial'])->name('admin.media.testimonial.toggle');
+            Route::post('/video-reel', [AdminMedia::class, 'addVideoReel'])->name('admin.media.add-video-reel');
+            Route::post('/video-reel/add', [AdminMedia::class, 'addVideoReel']);
+            Route::get('/video-reel/{id}', [AdminMedia::class, 'getVideoReel'])->name('admin.media.get-video-reel');
+            Route::post('/video-reel/{id}', [AdminMedia::class, 'updateVideoReel'])->name('admin.media.update-video-reel');
+            Route::post('/video-reel/update/{id}', [AdminMedia::class, 'updateVideoReel']);
+            Route::delete('/video-reel/{id}', [AdminMedia::class, 'deleteVideoReel'])->name('admin.media.delete-video-reel');
+            Route::post('/video-reel/{id}/toggle', [AdminMedia::class, 'toggleVideoReelStatus'])->name('admin.media.toggle-video-reel');
+            Route::post('/video-reel/toggle-status/{id}', [AdminMedia::class, 'toggleVideoReelStatus']);
+            Route::post('/blog-reels-settings', [AdminMedia::class, 'updateBlogReelsSettings'])->name('admin.media.blog-reels-settings');
+            Route::post('/blog-reels/settings', [AdminMedia::class, 'updateBlogReelsSettings']);
+            Route::delete('/{id}', [AdminMedia::class, 'destroy'])->name('admin.media.destroy');
         });
 
 

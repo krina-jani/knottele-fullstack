@@ -4,8 +4,8 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "next build",
-    "build:laravel": "next build && node scripts/sync-to-backend.js",
+    "build": "next build --webpack",
+    "build:laravel": "next build --webpack && node scripts/sync-to-backend.js",
     "start": "next start",
     "lint": "eslint"
   },

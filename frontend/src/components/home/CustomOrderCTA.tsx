@@ -1,55 +1,76 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import Link from "next/link";
 import { ArrowRight, Sparkles } from "lucide-react";
 import { FlowerIcon, BotanicalFlourish } from "@/components/ui/BotanicalDecorations";
-
-const ROTATING_TITLES = [
-  {
-    badge: "Bespoke Handcrafting",
-    line1: "Your Idea.",
-    line2: "Our Yarn.",
-    desc: "From custom color palettes and personalized initials to unique floral bouquets and character plushies — let's create something made especially for you.",
-  },
-  {
-    badge: "Handmade Just For You",
-    line1: "Your Dream.",
-    line2: "Our Craft.",
-    desc: "Turn your favorite inspirations and vision into timeless, handcrafted cotton crochet keepsakes made with love.",
-  },
-  {
-    badge: "Custom Artisan Creations",
-    line1: "Your Wish.",
-    line2: "Our Magic.",
-    desc: "Bespoke floral bouquets, custom personalized plushies, and heirloom gifts tailored to your exact style.",
-  },
-  {
-    badge: "Crafted With Care",
-    line1: "Your Story.",
-    line2: "Every Stitch.",
-    desc: "Custom color matching, personalized embroidery tags, and bespoke crochet designs crafted exclusively for your moments.",
-  },
-];
+import { useWebsiteMedia } from "@/context/MediaContext";
 
 export function CustomOrderCTA() {
+  const { media } = useWebsiteMedia();
   const [index, setIndex] = useState(0);
   const [isFading, setIsFading] = useState(false);
+  const [ctaText, setCtaText] = useState("Start a Custom Order");
+  const [ctaLink, setCtaLink] = useState("/custom-order");
+  const [isActive, setIsActive] = useState(true);
 
-  // Rotate title every 2 seconds (2000ms) with smooth crossfade
+  const rotatingTitles = useMemo(() => {
+    const custom = media?.customOrder;
+    return [
+      {
+        badge: custom?.badge || "Bespoke Handcrafting",
+        line1: custom?.title_line1 || "Your Idea.",
+        line2: custom?.title_line2 || "Our Yarn.",
+        desc: custom?.description || "From custom color palettes and personalized initials to unique floral bouquets and character plushies — let's create something made especially for you.",
+      },
+      {
+        badge: "Handmade Just For You",
+        line1: "Your Dream.",
+        line2: "Our Craft.",
+        desc: "Turn your favorite inspirations and vision into timeless, handcrafted cotton crochet keepsakes made with love.",
+      },
+      {
+        badge: "Custom Artisan Creations",
+        line1: "Your Wish.",
+        line2: "Our Magic.",
+        desc: "Bespoke floral bouquets, custom personalized plushies, and heirloom gifts tailored to your exact style.",
+      },
+      {
+        badge: "Crafted With Care",
+        line1: "Your Story.",
+        line2: "Every Stitch.",
+        desc: "Custom color matching, personalized embroidery tags, and bespoke crochet designs crafted exclusively for your moments.",
+      },
+    ];
+  }, [media?.customOrder]);
+
+  useEffect(() => {
+    if (!media?.customOrder) return;
+    if (media.customOrder.is_active === false) {
+      setIsActive(false);
+      return;
+    }
+    setIsActive(true);
+    if (media.customOrder.cta_text) setCtaText(media.customOrder.cta_text);
+    if (media.customOrder.cta_link) setCtaLink(media.customOrder.cta_link);
+  }, [media?.customOrder]);
+
+  // Rotate title every 2.5 seconds with smooth crossfade
   useEffect(() => {
     const timer = setInterval(() => {
       setIsFading(true);
       setTimeout(() => {
-        setIndex((prev) => (prev + 1) % ROTATING_TITLES.length);
+        setIndex((prev) => (prev + 1) % rotatingTitles.length);
         setIsFading(false);
       }, 300);
-    }, 2000);
+    }, 2500);
 
     return () => clearInterval(timer);
-  }, []);
+  }, [rotatingTitles.length]);
 
-  const current = ROTATING_TITLES[index];
+  if (!isActive) return null;
+
+  const current = rotatingTitles[index] || rotatingTitles[0];
 
   return (
     <section className="py-16 lg:py-20 bg-[#FFF9F6]">
@@ -101,9 +122,9 @@ export function CustomOrderCTA() {
               {current.desc}
             </p>
 
-            {/* Indicator Dots for the 2-second rotating titles */}
+            {/* Indicator Dots for the rotating titles */}
             <div className="flex justify-center items-center gap-2 pt-1">
-              {ROTATING_TITLES.map((_, i) => (
+              {rotatingTitles.map((_: any, i: number) => (
                 <button
                   key={i}
                   onClick={() => {
@@ -124,15 +145,17 @@ export function CustomOrderCTA() {
             </div>
 
             {/* Action CTA Button */}
-            <div className="pt-2">
-              <Link
-                href="/custom-order"
-                className="inline-flex items-center gap-2 px-7 sm:px-8 py-3 sm:py-3.5 rounded-full bg-[#913638] text-white text-xs sm:text-sm font-semibold hover:bg-[#74292B] shadow-xs hover:shadow-boutique-hover transition-all active:scale-[0.98] group"
-              >
-                <span>Start a Custom Order</span>
-                <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-              </Link>
-            </div>
+            {ctaText && ctaLink && (
+              <div className="pt-2">
+                <Link
+                  href={ctaLink}
+                  className="inline-flex items-center gap-2 px-7 sm:px-8 py-3 sm:py-3.5 rounded-full bg-[#913638] text-white text-xs sm:text-sm font-semibold hover:bg-[#74292B] shadow-xs hover:shadow-boutique-hover transition-all active:scale-[0.98] group"
+                >
+                  <span>{ctaText}</span>
+                  <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                </Link>
+              </div>
+            )}
           </div>
 
         </div>

@@ -17,7 +17,7 @@ export const CATEGORIES: Category[] = [
     priceFrom: "From ₹100 →",
     itemCount: 14,
     description: "Charming miniature crochet keychains and bag charms made with durable cotton yarn.",
-    image: "/knotelle/images/categories/keychain.jpg",
+    image: "/images/categories/keychain.jpg",
     featured: true,
   },
   {
@@ -27,7 +27,7 @@ export const CATEGORIES: Category[] = [
     priceFrom: "From ₹200 →",
     itemCount: 18,
     description: "Everlasting individual crochet blossoms, sunflowers, tulips, and daisies.",
-    image: "/knotelle/images/categories/flower.jpg",
+    image: "/images/categories/flower.jpg",
     featured: true,
   },
   {
@@ -37,7 +37,7 @@ export const CATEGORIES: Category[] = [
     priceFrom: "From ₹700 →",
     itemCount: 12,
     description: "Stunning handcrafted flower arrangements that never wilt, wrapped in luxury paper.",
-    image: "/knotelle/images/categories/bouquet.jpg",
+    image: "/images/categories/bouquet.jpg",
     featured: true,
   },
   {
@@ -47,7 +47,7 @@ export const CATEGORIES: Category[] = [
     priceFrom: "From ₹1,000 →",
     itemCount: 16,
     description: "Adorable handmade amigurumi plushies, bunnies, bears, and whimsical characters.",
-    image: "/knotelle/images/categories/soft-toys.jpg",
+    image: "/images/categories/soft-toys.jpg",
     featured: true,
   },
   {
@@ -57,7 +57,7 @@ export const CATEGORIES: Category[] = [
     priceFrom: "From ₹4,800 →",
     itemCount: 10,
     description: "Boutique tote bags, granny square totes, shoulder bags, and bohemian market sacks.",
-    image: "/knotelle/images/categories/bags.jpg",
+    image: "/images/categories/bags.jpg",
     featured: true,
   },
   {
@@ -67,7 +67,7 @@ export const CATEGORIES: Category[] = [
     priceFrom: "From ₹250 →",
     itemCount: 8,
     description: "Vintage clasp crochet coin pouches and pocket-sized zippered mini organizers.",
-    image: "/knotelle/images/categories/coin-purse.jpg",
+    image: "/images/categories/coin-purse.jpg",
     featured: true,
   },
   {
@@ -77,7 +77,7 @@ export const CATEGORIES: Category[] = [
     priceFrom: "From ₹1,000 →",
     itemCount: 9,
     description: "Protective and stylish knitted phone sleeves with strap attachments and floral motifs.",
-    image: "/knotelle/images/categories/phone-cover.jpg",
+    image: "/images/categories/phone-cover.jpg",
     featured: true,
   },
   {
@@ -87,7 +87,7 @@ export const CATEGORIES: Category[] = [
     priceFrom: "From ₹500 →",
     itemCount: 11,
     description: "Insulating mug cozies, flower cup holders, teapot covers, and table coasters.",
-    image: "/knotelle/images/categories/cup-tea-coffee.jpg",
+    image: "/images/categories/cup-tea-coffee.jpg",
     featured: true,
   },
   {
@@ -97,7 +97,7 @@ export const CATEGORIES: Category[] = [
     priceFrom: "From ₹300 →",
     itemCount: 7,
     description: "Delicate botanical sprout, rosebud, and lace crochet bookmarks for avid book lovers.",
-    image: "/knotelle/images/categories/bookmark.jpg",
+    image: "/images/categories/bookmark.jpg",
     featured: false,
   },
   {
@@ -107,7 +107,7 @@ export const CATEGORIES: Category[] = [
     priceFrom: "From ₹200 →",
     itemCount: 15,
     description: "Romantic scrunchies, floral hair clips, headband crowns, and bow barrettes.",
-    image: "/knotelle/images/categories/hair-accessories.jpg",
+    image: "/images/categories/hair-accessories.jpg",
     featured: false,
   },
   {
@@ -117,7 +117,7 @@ export const CATEGORIES: Category[] = [
     priceFrom: "From ₹2,800 →",
     itemCount: 6,
     description: "Bespoke crochet cardigans, summer halter tops, delicate lace collars, and vests.",
-    image: "/knotelle/images/categories/clothing.jpg",
+    image: "/images/categories/clothing.jpg",
     featured: false,
   },
 ];

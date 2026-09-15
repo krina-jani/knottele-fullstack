@@ -18,13 +18,37 @@ class Media extends Model
     protected $fillable = [
         'file_name',
         'file_path',
+        'mobile_image_path',
+        'video_url',
         'disk',
         'mime_type',
         'file_type',
+        'content_type',
+        'category_name',
         'file_size',
+        'duration',
+        'audio_name',
+        'likes_count',
+        'comments_count',
+        'views_count',
         'thumbnails',
         'metadata',
         'alt_text',
+        'page',
+        'section',
+        'slot',
+        'device',
+        'title',
+        'subtitle',
+        'description',
+        'cta_text',
+        'cta_link',
+        'secondary_cta_text',
+        'secondary_cta_link',
+        'tag_text',
+        'sort_order',
+        'is_active',
+        'is_featured',
         'uploaded_by',
         'uploader_type',
     ];
@@ -33,14 +57,30 @@ class Media extends Model
         'thumbnails' => 'array',
         'metadata' => 'array',
         'file_size' => 'integer',
+        'likes_count' => 'integer',
+        'comments_count' => 'integer',
+        'views_count' => 'integer',
+        'sort_order' => 'integer',
+        'is_active' => 'boolean',
+        'is_featured' => 'boolean',
     ];
 
-    protected $appends = ['url', 'thumb_url', 'thumbnail_url', 'full_url'];
+    protected $appends = [
+        'url',
+        'thumb_url',
+        'thumbnail_url',
+        'full_url',
+        'desktop_image_url',
+        'mobile_image_url',
+        'video_stream_url',
+        'formatted_views',
+        'formatted_likes'
+    ];
 
     public function getUrlAttribute(): string
     {
         if (empty($this->file_path)) {
-            return '/images/logo/Logo_1.png';
+            return asset('images/logo/Logo_1.png');
         }
 
         if (str_starts_with($this->file_path, 'http://') || str_starts_with($this->file_path, 'https://')) {
@@ -49,15 +89,35 @@ class Media extends Model
 
         $cleanPath = ltrim($this->file_path, '/');
 
-        if (str_starts_with($cleanPath, 'images/')) {
-            return '/' . $cleanPath;
+        if (str_starts_with($cleanPath, 'images/') || str_starts_with($cleanPath, 'storage/')) {
+            return asset($cleanPath);
         }
 
-        if (str_starts_with($cleanPath, 'storage/')) {
-            return '/' . $cleanPath;
+        return asset('images/' . $cleanPath);
+    }
+
+    public function getDesktopImageUrlAttribute(): string
+    {
+        return $this->getUrlAttribute();
+    }
+
+    public function getMobileImageUrlAttribute(): string
+    {
+        if (empty($this->mobile_image_path)) {
+            return $this->getUrlAttribute();
         }
 
-        return '/images/' . $cleanPath;
+        if (str_starts_with($this->mobile_image_path, 'http://') || str_starts_with($this->mobile_image_path, 'https://')) {
+            return $this->mobile_image_path;
+        }
+
+        $cleanPath = ltrim($this->mobile_image_path, '/');
+
+        if (str_starts_with($cleanPath, 'images/') || str_starts_with($cleanPath, 'storage/')) {
+            return asset($cleanPath);
+        }
+
+        return asset('images/' . $cleanPath);
     }
 
     public function getThumbUrlAttribute(): string
@@ -73,6 +133,70 @@ class Media extends Model
     public function getFullUrlAttribute(): string
     {
         return $this->getUrlAttribute();
+    }
+
+    public function getVideoStreamUrlAttribute(): ?string
+    {
+        if (empty($this->video_url)) {
+            return null;
+        }
+
+        if (str_starts_with($this->video_url, 'http://') || str_starts_with($this->video_url, 'https://')) {
+            return $this->video_url;
+        }
+
+        $cleanPath = ltrim($this->video_url, '/');
+
+        if (str_starts_with($cleanPath, 'images/') || str_starts_with($cleanPath, 'storage/') || str_starts_with($cleanPath, 'videos/')) {
+            return asset($cleanPath);
+        }
+
+        return asset('storage/' . $cleanPath);
+    }
+
+    public function getFormattedViewsAttribute(): string
+    {
+        $views = $this->views_count ?: 0;
+        if ($views >= 1000000) {
+            return round($views / 1000000, 1) . 'M';
+        }
+        if ($views >= 1000) {
+            return round($views / 1000, 1) . 'K';
+        }
+        return (string) $views;
+    }
+
+    public function getFormattedLikesAttribute(): string
+    {
+        $likes = $this->likes_count ?: 0;
+        if ($likes >= 1000000) {
+            return round($likes / 1000000, 1) . 'M';
+        }
+        if ($likes >= 1000) {
+            return round($likes / 1000, 1) . 'K';
+        }
+        return (string) $likes;
+    }
+
+    // Query Scopes
+    public function scopeActive($query)
+    {
+        return $query->where('is_active', true);
+    }
+
+    public function scopeForSlot($query, string $page, string $section, string $slot)
+    {
+        return $query->where('page', $page)
+                     ->where('section', $section)
+                     ->where('slot', $slot);
+    }
+
+    public function scopeForDevice($query, string $device)
+    {
+        if ($device === 'all') {
+            return $query;
+        }
+        return $query->whereIn('device', [$device, 'all']);
     }
 
     // Relationships

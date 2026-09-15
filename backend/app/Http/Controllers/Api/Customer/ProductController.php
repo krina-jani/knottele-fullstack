@@ -221,6 +221,27 @@ class ProductController extends Controller
                 }
                 $isInStock = $totalStock > 0;
 
+                // Collect all images for product card (e.g. hover image and angles)
+                $allProductImages = [];
+                if ($defaultVariant && $defaultVariant->images && $defaultVariant->images->isNotEmpty()) {
+                    $allProductImages = $defaultVariant->images->sortBy('pivot.sort_order')->map(function($img) {
+                        return $img->url ?? $this->formatImageUrl($img->file_path);
+                    })->values()->toArray();
+                }
+                if (empty($allProductImages)) {
+                    foreach ($product->variants as $variant) {
+                        if ($variant->images && $variant->images->isNotEmpty()) {
+                            $allProductImages = $variant->images->sortBy('pivot.sort_order')->map(function($img) {
+                                return $img->url ?? $this->formatImageUrl($img->file_path);
+                            })->values()->toArray();
+                            break;
+                        }
+                    }
+                }
+                if (empty($allProductImages)) {
+                    $allProductImages = [$mainImage];
+                }
+
                 return [
                     'id' => $product->id,
                     'slug' => $product->slug,
@@ -269,7 +290,7 @@ class ProductController extends Controller
                     })->toArray(),
                     'created_at' => $product->created_at->format('Y-m-d H:i:s'),
                     'created_at_formatted' => $product->created_at->format('M d, Y'),
-                    'images' => [$mainImage], // for ProductCard.jsx
+                    'images' => $allProductImages, // for ProductCard.jsx and carousels
                     'featured' => (bool) $product->is_featured,
                     'bestseller' => (bool) $product->is_bestseller,
                 ];
@@ -474,16 +495,16 @@ public function show($slug): JsonResponse
             if (!$primaryImage) {
                 $primaryImage = $defaultVariant->images->sortBy('pivot.sort_order')->first();
             }
-            if ($primaryImage && $primaryImage->file_path) {
-                $mainImage = $this->formatImageUrl($primaryImage->file_path);
+            if ($primaryImage) {
+                $mainImage = $primaryImage->url ?? $this->formatImageUrl($primaryImage->file_path);
             }
         }
 
         // Fallback to any variant image
         if (!$mainImage && $allImages->isNotEmpty()) {
             $firstImage = $allImages->sortBy('pivot.sort_order')->first();
-            if ($firstImage && $firstImage->file_path) {
-                $mainImage = $this->formatImageUrl($firstImage->file_path);
+            if ($firstImage) {
+                $mainImage = $firstImage->url ?? $this->formatImageUrl($firstImage->file_path);
             }
         }
 
@@ -497,7 +518,7 @@ public function show($slug): JsonResponse
         $productImages = $allImages->unique('id')->map(function ($image) use ($self) {
             return [
                 'id' => $image->id,
-                'url' => $self->formatImageUrl($image->file_path),
+                'url' => $image->url ?? $self->formatImageUrl($image->file_path),
                 'is_primary' => (bool) ($image->pivot->is_primary ?? false),
                 'sort_order' => $image->pivot->sort_order ?? 0,
                 'alt_text' => $image->alt_text ?? 'KNOTELLE Product'
@@ -554,11 +575,11 @@ public function show($slug): JsonResponse
             'created_at' => $product->created_at->format('Y-m-d H:i:s'),
             'created_at_formatted' => $product->created_at->format('M d, Y'),
             // Include additional details for show method
-            'variants' => $product->variants->map(function ($variant) {
-                $images = $variant->images->map(function ($image) {
+            'variants' => $product->variants->map(function ($variant) use ($self) {
+                $images = $variant->images->map(function ($image) use ($self) {
                     return [
                         'id' => $image->id,
-                        'url' => asset('storage/' . $image->file_path),
+                        'url' => $self->formatImageUrl($image->file_path),
                         'is_primary' => (bool) ($image->pivot->is_primary ?? false),
                         'sort_order' => $image->pivot->sort_order ?? 0,
                         'alt_text' => $image->alt_text
@@ -650,7 +671,7 @@ public function show($slug): JsonResponse
                             $primaryImage = $defaultVariant->images->sortBy('pivot.sort_order')->first();
                         }
                         if ($primaryImage && $primaryImage->file_path) {
-                            $mainImage = asset('storage/' . $primaryImage->file_path);
+                            $mainImage = $this->formatImageUrl($primaryImage->file_path);
                         }
                     }
 
@@ -683,15 +704,16 @@ public function show($slug): JsonResponse
     public function getProductVariants($productId): JsonResponse
     {
         try {
+            $self = $this;
             $variants = ProductVariant::with(['images', 'attributes.attribute'])
                 ->where('product_id', $productId)
                 ->where('status', 1)
                 ->get()
-                ->map(function ($variant) {
-                    $images = $variant->images->map(function ($image) {
+                ->map(function ($variant) use ($self) {
+                    $images = $variant->images->map(function ($image) use ($self) {
                         return [
                             'id' => $image->id,
-                            'url' => asset('storage/' . $image->file_path),
+                            'url' => $self->formatImageUrl($image->file_path),
                             'is_primary' => (bool) ($image->pivot->is_primary ?? false),
                             'sort_order' => $image->pivot->sort_order ?? 0
                         ];

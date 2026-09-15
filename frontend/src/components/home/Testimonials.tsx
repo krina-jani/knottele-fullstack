@@ -1,98 +1,98 @@
 "use client";
 
 import React, { useState, useEffect, useMemo } from "react";
-import Image from "next/image";
 import { StarRating } from "@/components/ui/StarRating";
+import { useWebsiteMedia } from "@/context/MediaContext";
 
 export interface TestimonialItem {
   id: string;
   name: string;
-  avatar: string;
+  designation: string;
   rating: number;
   review: string;
-  productName: string;
-  productImage: string;
 }
 
+const DEFAULT_TESTIMONIALS: TestimonialItem[] = [
+  {
+    id: "t-1",
+    name: "Priya Sharma",
+    designation: "Bengaluru, India",
+    rating: 5,
+    review: "Absolutely in love with my crochet bouquet! The quality and detailing are breathtaking. It sits on my desk and brightens every single day.",
+  },
+  {
+    id: "t-2",
+    name: "Ananya Verma",
+    designation: "Delhi NCR, India",
+    rating: 5,
+    review: "The bunny keychain is insanely cute! Perfect for gifting. Beautiful craftsmanship, soft milk cotton yarn, and a super sturdy gold clasp.",
+  },
+  {
+    id: "t-3",
+    name: "Riya Patel",
+    designation: "Ahmedabad, India",
+    rating: 5,
+    review: "I ordered the vintage granny square tote and it turned out even more gorgeous in person. Sturdy straps and lovely artisan stitchwork!",
+  },
+  {
+    id: "t-4",
+    name: "Sneha Mukherjee",
+    designation: "Kolkata, India",
+    rating: 5,
+    review: "The sunflower stem looks forever fresh! The wired petals hold shape beautifully and the warm color tone is so cheerful.",
+  },
+  {
+    id: "t-5",
+    name: "Kavita Desai",
+    designation: "Mumbai, India",
+    rating: 5,
+    review: "My morning coffee feels so aesthetic with this tulip mug cozy! It protects my hands and feels velvety soft to hold.",
+  },
+  {
+    id: "t-6",
+    name: "Tanvi Joshi",
+    designation: "Pune, India",
+    rating: 5,
+    review: "The daisy phone sleeve fits my phone snugly with soft velvet yarn protection. Loved the boutique packaging and handwritten note!",
+  },
+];
+
 export function Testimonials() {
+  const { media } = useWebsiteMedia();
+  const [testimonials, setTestimonials] = useState<TestimonialItem[]>(DEFAULT_TESTIMONIALS);
   const [startIndex, setStartIndex] = useState<number>(0);
   const [isFading, setIsFading] = useState<boolean>(false);
 
-  const testimonials: TestimonialItem[] = useMemo(
-    () => [
-      {
-        id: "t-1",
-        name: "Priya Sharma",
-        avatar: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?q=80&w=200&auto=format&fit=crop",
-        rating: 5,
-        review: "Absolutely in love with my crochet bouquet! The quality and detailing are breathtaking. It sits on my desk and brightens every single day.",
-        productName: "Bespoke Rose Bouquet",
-        productImage: "/knotelle/images/products/rose-bouquet.jpg",
-      },
-      {
-        id: "t-2",
-        name: "Ananya Verma",
-        avatar: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=80&w=200&auto=format&fit=crop",
-        rating: 5,
-        review: "The bunny keychain is insanely cute! Perfect for gifting. Beautiful craftsmanship, soft milk cotton yarn, and a super sturdy gold clasp.",
-        productName: "Cute Bunny Keychain",
-        productImage: "/knotelle/images/products/bunny-keychain.jpg",
-      },
-      {
-        id: "t-3",
-        name: "Riya Patel",
-        avatar: "https://images.unsplash.com/photo-1517841905240-472988babdf9?q=80&w=200&auto=format&fit=crop",
-        rating: 5,
-        review: "I ordered the vintage granny square tote and it turned out even more gorgeous in person. Sturdy straps and lovely artisan stitchwork!",
-        productName: "Granny Square Bag",
-        productImage: "/knotelle/images/products/granny-square-bag.jpg",
-      },
-      {
-        id: "t-4",
-        name: "Sneha Mukherjee",
-        avatar: "https://images.unsplash.com/photo-1544005313-94ddf0286df2?q=80&w=200&auto=format&fit=crop",
-        rating: 5,
-        review: "The sunflower stem looks forever fresh! The wired petals hold shape beautifully and the warm color tone is so cheerful.",
-        productName: "Everlasting Sunflower",
-        productImage: "/knotelle/images/products/sunflower-stem.jpg",
-      },
-      {
-        id: "t-5",
-        name: "Kavita Desai",
-        avatar: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?q=80&w=200&auto=format&fit=crop",
-        rating: 5,
-        review: "My morning coffee feels so aesthetic with this tulip mug cozy! It protects my hands and feels velvety soft to hold.",
-        productName: "Tulip Blossom Mug Cozy",
-        productImage: "/knotelle/images/products/tulip-mug-cozy.jpg",
-      },
-      {
-        id: "t-6",
-        name: "Tanvi Joshi",
-        avatar: "https://images.unsplash.com/photo-1524504388940-b1c1722653e1?q=80&w=200&auto=format&fit=crop",
-        rating: 5,
-        review: "The daisy phone sleeve fits my phone snugly with soft velvet yarn protection. Loved the boutique packaging and handwritten note!",
-        productName: "Daisy Phone Sleeve",
-        productImage: "/knotelle/images/products/daisy-phone-cover.jpg",
-      },
-    ],
-    []
-  );
-
-  // Auto-advance reviews every 2 seconds (2000ms) with smooth crossfade
   useEffect(() => {
+    if (media?.testimonials && Array.isArray(media.testimonials) && media.testimonials.length > 0) {
+      const formatted: TestimonialItem[] = media.testimonials.map((t: any) => ({
+        id: `t-db-${t.id}`,
+        name: t.name,
+        designation: t.designation || "Verified Patron",
+        rating: Number(t.rating) || 5,
+        review: t.message,
+      }));
+      setTestimonials(formatted);
+    }
+  }, [media?.testimonials]);
+
+  // Auto-advance reviews every 2.5 seconds with smooth crossfade
+  useEffect(() => {
+    if (testimonials.length <= 3) return;
     const timer = setInterval(() => {
       setIsFading(true);
       setTimeout(() => {
         setStartIndex((prev) => (prev + 1) % testimonials.length);
         setIsFading(false);
       }, 250);
-    }, 2000);
+    }, 2500);
 
     return () => clearInterval(timer);
   }, [testimonials.length]);
 
   // Circular slice of 3 visible cards
   const visibleTestimonials = useMemo(() => {
+    if (testimonials.length <= 3) return testimonials;
     const items = [];
     for (let i = 0; i < 3; i++) {
       items.push(testimonials[(startIndex + i) % testimonials.length]);
@@ -113,7 +113,7 @@ export function Testimonials() {
           </p>
         </div>
 
-        {/* 6 Reviews Container with 2-second Auto-Rotation (Arrows Removed) */}
+        {/* Reviews Container with Auto-Rotation */}
         <div className="relative max-w-5xl mx-auto">
           {/* 3 Visible Review Cards */}
           <div
@@ -121,77 +121,81 @@ export function Testimonials() {
               isFading ? "opacity-30 scale-[0.98]" : "opacity-100 scale-100"
             }`}
           >
-            {visibleTestimonials.map((item, idx) => (
-              <div
-                key={`${item.id}-${startIndex}-${idx}`}
-                className="bg-white rounded-3xl border border-[#E7D1CC] p-6 shadow-boutique flex flex-col justify-between hover:shadow-md hover:border-[#EFB8B0] transition-all duration-200"
-              >
-                <div>
-                  {/* Avatar, Name & Stars */}
-                  <div className="flex items-center gap-3 mb-3">
-                    <div className="relative w-10 h-10 rounded-full overflow-hidden border border-[#E7D1CC] shrink-0">
-                      <Image
-                        src={item.avatar}
-                        alt={item.name}
-                        fill
-                        sizes="40px"
-                        className="object-cover"
-                      />
+            {visibleTestimonials.map((item, idx) => {
+              const initialLetter = (item.name || "K").trim().charAt(0).toUpperCase();
+
+              return (
+                <div
+                  key={`${item.id}-${startIndex}-${idx}`}
+                  className="bg-white rounded-3xl border border-[#E7D1CC] p-6 shadow-boutique flex flex-col justify-between hover:shadow-md hover:border-[#EFB8B0] transition-all duration-200 group"
+                >
+                  <div>
+                    {/* Monogram Badge, Name & Stars */}
+                    <div className="flex items-center gap-3 mb-3.5">
+                      <div className="w-10 h-10 rounded-2xl bg-gradient-to-br from-[#FCE9E5] to-[#F7D8D3] border border-[#E7D1CC] text-[#913638] flex items-center justify-center font-bold text-sm shadow-2xs shrink-0">
+                        {initialLetter}
+                      </div>
+                      <div className="truncate flex-1">
+                        <div className="flex items-center justify-between gap-1">
+                          <h3 className="text-xs sm:text-sm font-bold text-[#2E211E] truncate">
+                            {item.name}
+                          </h3>
+                        </div>
+                        <div className="flex items-center gap-2 mt-0.5">
+                          <StarRating rating={item.rating} size="sm" />
+                          <span className="text-[10px] text-[#A89895] truncate">
+                            {item.designation || "Verified Patron"}
+                          </span>
+                        </div>
+                      </div>
                     </div>
-                    <div>
-                      <h3 className="text-xs font-bold text-[#2E211E]">
-                        {item.name}
-                      </h3>
-                      <StarRating rating={item.rating} size="sm" />
-                    </div>
+
+                    {/* Review Text */}
+                    <p className="text-xs text-[#786864] leading-relaxed mb-4 italic min-h-[56px]">
+                      &ldquo;{item.review}&rdquo;
+                    </p>
                   </div>
 
-                  {/* Review Text */}
-                  <p className="text-xs text-[#786864] leading-relaxed mb-4 italic min-h-[56px]">
-                    &ldquo;{item.review}&rdquo;
-                  </p>
-                </div>
-
-                {/* Bottom Product Info */}
-                <div className="pt-3 border-t border-[#E7D1CC]/60 flex items-center gap-2.5">
-                  <div className="relative w-8 h-8 rounded-lg overflow-hidden bg-[#FCE9E5] border border-[#E7D1CC] shrink-0">
-                    <Image
-                      src={item.productImage}
-                      alt={item.productName}
-                      fill
-                      sizes="32px"
-                      className="object-cover"
-                    />
+                  {/* Bottom Verified Badge Pill */}
+                  <div className="pt-3 border-t border-[#E7D1CC]/60 flex items-center justify-between">
+                    <span className="inline-flex items-center gap-1.5 text-[10px] font-bold text-[#913638] bg-[#FCE9E5]/60 px-2.5 py-1 rounded-full border border-[#E7D1CC]/60">
+                      <svg className="w-3 h-3 text-[#913638]" fill="currentColor" viewBox="0 0 20 20">
+                        <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                      </svg>
+                      Verified Patron
+                    </span>
+                    <span className="text-[10px] text-[#A89895] font-semibold truncate max-w-[120px]">
+                      {item.designation || "Handmade Keepsake"}
+                    </span>
                   </div>
-                  <span className="text-[11px] font-medium text-[#2E211E] truncate">
-                    {item.productName}
-                  </span>
                 </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
 
           {/* Carousel Progress Dots */}
-          <div className="flex justify-center items-center gap-2 mt-8">
-            {testimonials.map((_, i) => (
-              <button
-                key={i}
-                onClick={() => {
-                  setIsFading(true);
-                  setTimeout(() => {
-                    setStartIndex(i);
-                    setIsFading(false);
-                  }, 200);
-                }}
-                className={`h-1.5 rounded-full transition-all duration-300 cursor-pointer ${
-                  startIndex === i
-                    ? "w-6 bg-[#913638]"
-                    : "w-2 bg-[#E7D1CC] hover:bg-[#EFB8B0]"
-                }`}
-                aria-label={`Go to customer review ${i + 1}`}
-              />
-            ))}
-          </div>
+          {testimonials.length > 3 && (
+            <div className="flex justify-center items-center gap-2 mt-8">
+              {testimonials.map((_, i) => (
+                <button
+                  key={i}
+                  onClick={() => {
+                    setIsFading(true);
+                    setTimeout(() => {
+                      setStartIndex(i);
+                      setIsFading(false);
+                    }, 200);
+                  }}
+                  className={`h-1.5 rounded-full transition-all duration-300 cursor-pointer ${
+                    startIndex === i
+                      ? "w-6 bg-[#913638]"
+                      : "w-2 bg-[#E7D1CC] hover:bg-[#EFB8B0]"
+                  }`}
+                  aria-label={`Go to customer review ${i + 1}`}
+                />
+              ))}
+            </div>
+          )}
         </div>
       </div>
     </section>

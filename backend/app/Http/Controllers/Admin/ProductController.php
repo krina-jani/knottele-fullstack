@@ -7,6 +7,7 @@ use App\Services\Admin\ProductService;
 use App\Models\Brand;
 use App\Models\Category;
 use App\Models\Product;
+use App\Models\ProductVariant;
 use App\Models\Tag;
 use App\Models\TaxClass;
 use Illuminate\Http\Request;
@@ -55,13 +56,69 @@ class ProductController extends Controller
         $taxClasses = TaxClass::all();
         $tags = Tag::all();
 
-        return view('admin.products.create', compact('categories', 'brands', 'taxClasses', 'tags'));
+        $maxId = Product::max('id') ?? 0;
+        $nextProductCode = 'prod-' . ($maxId + 1);
+        while (Product::where('product_code', $nextProductCode)->withTrashed()->exists()) {
+            $maxId++;
+            $nextProductCode = 'prod-' . ($maxId + 1);
+        }
+
+        return view('admin.products.create', compact('categories', 'brands', 'taxClasses', 'tags', 'nextProductCode'));
     }
 
     public function store(Request $request)
     {
-        // Basic Validation needed before hitting Service, mostly for UX feedback 
-        // Service handles deep validation usually, but good to catch obvious ones here.
+        $data = $request->all();
+
+        // 1. Auto-generate slug if empty
+        if (empty($data['slug']) && !empty($data['name'])) {
+            $data['slug'] = \Illuminate\Support\Str::slug($data['name']);
+        }
+        if (!empty($data['slug'])) {
+            $baseSlug = $data['slug'];
+            $slugCount = 1;
+            while (Product::where('slug', $data['slug'])->withTrashed()->exists()) {
+                $data['slug'] = $baseSlug . '-' . $slugCount;
+                $slugCount++;
+            }
+        }
+
+        // 2. Auto-generate product_code if empty
+        if (empty($data['product_code'])) {
+            $maxId = Product::max('id') ?? 0;
+            $code = 'prod-' . ($maxId + 1);
+            while (Product::where('product_code', $code)->withTrashed()->exists()) {
+                $maxId++;
+                $code = 'prod-' . ($maxId + 1);
+            }
+            $data['product_code'] = $code;
+        }
+
+        // 3. Auto-generate SKU for simple products if empty
+        if (($data['product_type'] ?? 'simple') === 'simple') {
+            if (empty($data['sku'])) {
+                $prefix = strtoupper(\Illuminate\Support\Str::slug($data['name'] ?? 'PROD'));
+                $cleanPrefix = preg_replace('/[^A-Z0-9]/', '', $prefix);
+                if (empty($cleanPrefix)) {
+                    $cleanPrefix = 'PROD';
+                }
+                $skuCandidate = substr($cleanPrefix, 0, 8) . '-' . rand(100, 999);
+                while (ProductVariant::where('sku', $skuCandidate)->withTrashed()->exists()) {
+                    $skuCandidate = substr($cleanPrefix, 0, 8) . '-' . rand(1000, 9999);
+                }
+                $data['sku'] = $skuCandidate;
+            }
+            if (!isset($data['stock_quantity']) || $data['stock_quantity'] === '') {
+                $data['stock_quantity'] = 0;
+            }
+            if (!isset($data['price']) || $data['price'] === '') {
+                $data['price'] = 0;
+            }
+        }
+
+        $request->merge($data);
+
+        // Basic Validation needed before hitting Service
         $request->validate([
             'name' => 'required|string|max:255',
             'main_category_id' => 'required|exists:categories,id',
@@ -70,14 +127,34 @@ class ProductController extends Controller
             'product_code' => 'nullable|string|max:255|unique:products,product_code',
             'slug' => 'required|string|max:255|unique:products,slug',
             'sku' => 'required_if:product_type,simple|nullable|string|max:255|unique:product_variants,sku',
-            'variants.*.sku' => 'required_if:product_type,configurable|string|max:255|unique:product_variants,sku',
+            'variants.*.sku' => 'required_if:product_type,configurable|string|max:255',
         ]);
 
         if ($request->input('product_type') === 'configurable' && empty($request->input('variants'))) {
+            if ($request->ajax() || $request->wantsJson() || $request->header('X-Requested-With') === 'XMLHttpRequest') {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Configurable products must have at least one variant generated. Please select attributes and generate variants.'
+                ], 422);
+            }
             return back()->withInput()->with('error', 'Configurable products must have at least one variant generated. Please select attributes and generate variants.');
         }
 
         $result = $this->productService->createProduct($request->all());
+
+        if ($request->ajax() || $request->wantsJson() || $request->header('X-Requested-With') === 'XMLHttpRequest') {
+            if ($result['success']) {
+                return response()->json([
+                    'success' => true,
+                    'message' => 'Product created successfully.',
+                    'redirect' => route('admin.products.index')
+                ]);
+            }
+            return response()->json([
+                'success' => false,
+                'message' => $result['error'] ?? 'Failed to create product.'
+            ], 422);
+        }
 
         if ($result['success']) {
             return redirect()->route('admin.products.index')->with('success', 'Product created successfully.');
@@ -122,25 +199,29 @@ class ProductController extends Controller
             'variants.*.sku' => 'required_if:product_type,configurable|string|max:255',
         ]);
         
-        // Prevent changing immutable fields logic if needed here, 
-        // but User requested "cannot be updated", usually handled by 'disabled' inputs in view.
-        // If inputs are disabled, they won't be in $request->all(), so Service might need to be careful?
-        // Service `updateProduct` does: 'product_type' => $data['product_type'],
-        // If it's missing from request, it will error or set null.
-        // We might need to merge existing values for disabled fields if Service relies on them.
-        
         $data = $request->all();
         if (!isset($data['product_type'])) {
             $data['product_type'] = $product->product_type;
         }
         if (!isset($data['main_category_id'])) {
-             // If disabled, we should probably keep existing.
-             // But category MIGHT be editable? User said "on edit category , product type cannot be update".
-             // So we keep existing.
              $data['main_category_id'] = $product->main_category_id;
         }
 
         $result = $this->productService->updateProduct($product, $data);
+
+        if ($request->ajax() || $request->wantsJson() || $request->header('X-Requested-With') === 'XMLHttpRequest') {
+            if ($result['success']) {
+                return response()->json([
+                    'success' => true,
+                    'message' => 'Product updated successfully.',
+                    'redirect' => route('admin.products.index')
+                ]);
+            }
+            return response()->json([
+                'success' => false,
+                'message' => $result['error'] ?? 'Failed to update product.'
+            ], 422);
+        }
 
         if ($result['success']) {
             return redirect()->route('admin.products.index')->with('success', 'Product updated successfully.');

@@ -4,16 +4,35 @@ import React, { useState, useEffect, useMemo } from "react";
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 import { PRODUCTS } from "@/data/products";
+import { Product } from "@/types/product";
+import { fetchProducts } from "@/lib/api";
 import { ProductCard } from "@/components/ui/ProductCard";
 
 export function BestSellers() {
+  const [productsList, setProductsList] = useState<Product[]>(PRODUCTS);
   const [activeTab, setActiveTab] = useState<string>("all");
   const [startIndex, setStartIndex] = useState<number>(0);
   const [isFading, setIsFading] = useState<boolean>(false);
 
-  const bestSellers = useMemo(() => {
-    return PRODUCTS.filter((p) => p.isBestSeller || p.isFeatured);
+  useEffect(() => {
+    let isMounted = true;
+    fetchProducts({ per_page: 100 })
+      .then((res) => {
+        if (isMounted && res.products && res.products.length > 0) {
+          setProductsList(res.products);
+        }
+      })
+      .catch((err) => console.warn("Live bestsellers fetch notice:", err));
+
+    return () => {
+      isMounted = false;
+    };
   }, []);
+
+  const bestSellers = useMemo(() => {
+    const list = productsList.filter((p) => p.isBestSeller || p.isFeatured);
+    return list.length > 0 ? list : productsList;
+  }, [productsList]);
 
   const categories = [
     { id: "all", label: "All" },

@@ -5,6 +5,7 @@ import { ToastProvider } from "@/context/ToastContext";
 import { CartProvider } from "@/context/CartContext";
 import { WishlistProvider } from "@/context/WishlistContext";
 import { AuthProvider } from "@/context/AuthContext";
+import { MediaProvider } from "@/context/MediaContext";
 import { AnnouncementBar } from "@/components/layout/AnnouncementBar";
 import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
@@ -56,19 +57,21 @@ export default function RootLayout({
       className={`${serifFont.variable} ${sansFont.variable} ${scriptFont.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col bg-[#FFF8F5] text-[#2C201D] font-sans">
-        <ToastProvider>
-          <CartProvider>
-            <WishlistProvider>
-              <AuthProvider>
-                <AnnouncementBar />
-                <Navbar />
-                <main className="flex-1">{children}</main>
-                <Footer />
-                <CartDrawer />
-              </AuthProvider>
-            </WishlistProvider>
-          </CartProvider>
-        </ToastProvider>
+        <MediaProvider>
+          <ToastProvider>
+            <CartProvider>
+              <WishlistProvider>
+                <AuthProvider>
+                  <AnnouncementBar />
+                  <Navbar />
+                  <main className="flex-1">{children}</main>
+                  <Footer />
+                  <CartDrawer />
+                </AuthProvider>
+              </WishlistProvider>
+            </CartProvider>
+          </ToastProvider>
+        </MediaProvider>
       </body>
     </html>
   );

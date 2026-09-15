@@ -77,75 +77,102 @@
                 </div>
             </div>
 
-            <!-- Media -->
-            <div class="bg-white rounded-xl shadow-sm p-6 border border-stone-100" id="media-section">
-                <h3 class="text-lg font-semibold text-stone-800 mb-4 pb-2 border-b">Product Images</h3>
-                
-                <!-- Main Image -->
-                <div class="mb-6">
-                    <label class="block text-sm font-medium text-stone-700 mb-2">Main Image <span class="text-stone-400 font-normal">(Primary display photo)</span></label>
-                    <input type="hidden" name="main_image_id" id="main_image_id" value="{{ old('main_image_id', $product->main_image_id) }}">
-                    
-                    @php
-                        $currentPrimaryImg = $product->defaultVariant?->images?->where('pivot.is_primary', 1)->first() ?? $product->defaultVariant?->images?->first();
-                        $currentPrimaryUrl = $currentPrimaryImg ? $currentPrimaryImg->url : ($product->main_image ? asset($product->main_image) : null);
-                    @endphp
-
-                    <div id="main-image-preview" class="mb-3">
-                         @if($currentPrimaryUrl)
-                              <img src="{{ $currentPrimaryUrl }}" class="h-32 object-cover rounded-xl border border-stone-200 shadow-sm">
-                         @endif
+            <!-- Media (5 Photo Slots) -->
+            @php
+                $productMediaList = collect();
+                if ($product->defaultVariant && $product->defaultVariant->images && $product->defaultVariant->images->isNotEmpty()) {
+                    $productMediaList = $product->defaultVariant->images->sortBy('pivot.sort_order')->values();
+                }
+                if ($productMediaList->isEmpty()) {
+                    foreach ($product->variants as $v) {
+                        if ($v->images && $v->images->isNotEmpty()) {
+                            $productMediaList = $v->images->sortBy('pivot.sort_order')->values();
+                            break;
+                        }
+                    }
+                }
+            @endphp
+            <div class="bg-white rounded-2xl shadow-sm p-6 border border-stone-100" id="media-section">
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 mb-6 border-b border-stone-100">
+                    <div>
+                        <h3 class="text-lg font-bold text-stone-900 flex items-center gap-2">
+                            <i class="fas fa-camera-retro text-red-500"></i>
+                            <span>Product Images</span>
+                            <span class="text-xs font-semibold px-2.5 py-0.5 rounded-full bg-red-50 text-red-600 border border-red-200">5 Photo Slots</span>
+                        </h3>
+                        <p class="text-xs text-stone-500 mt-0.5">Upload 4 to 5 high-quality photos. Slot 1 is the primary cover photo, and Slots 2–5 show other angles and details on the website.</p>
                     </div>
-                    
-                    <div class="flex flex-wrap items-center gap-3">
-                        <button type="button" onclick="openMediaModal('main')" 
-                            class="bg-red-50 text-red-600 hover:bg-red-100 px-4 py-2.5 rounded-xl border border-red-200 transition-all flex items-center font-medium shadow-sm">
-                            <i class="fas fa-images mr-2"></i>
-                            Select from Media Library
-                        </button>
-                        <label class="cursor-pointer bg-stone-100 hover:bg-stone-200 text-stone-700 px-4 py-2.5 rounded-xl border border-stone-200 transition-all flex items-center font-medium shadow-sm">
-                            <i class="fas fa-cloud-upload-alt mr-2 text-stone-500"></i>
-                            <span>Upload from Phone / Desktop</span>
-                            <input type="file" accept="image/*" class="hidden" onchange="handleDirectMainUpload(event)">
+
+                    <div class="flex items-center gap-2">
+                        <label class="cursor-pointer bg-red-600 hover:bg-red-700 text-white px-3.5 py-2 rounded-xl text-xs font-bold transition shadow-sm flex items-center gap-1.5">
+                            <i class="fas fa-cloud-upload-alt text-sm"></i>
+                            <span>Upload Multiple Photos</span>
+                            <input type="file" accept="image/*" multiple class="hidden" onchange="uploadMultipleSlots(event)">
                         </label>
                     </div>
-                    @error('main_image_id') <p class="text-rose-500 text-xs mt-1 font-medium">{{ $message }}</p> @enderror
                 </div>
 
-                <!-- Gallery Images -->
-                <div>
-                     <label class="block text-sm font-medium text-stone-700 mb-2">Gallery Images <span class="text-stone-400 font-normal">(Additional angles / colors)</span></label>
-                     <div id="gallery-container" class="grid grid-cols-3 md:grid-cols-5 gap-4 mb-3">
-                         @if($product->defaultVariant && $product->defaultVariant->images)
-                             @php
-                                 $galleryImages = $product->defaultVariant->images->where('pivot.is_primary', 0)->sortBy('pivot.sort_order');
-                             @endphp
-                             @foreach($galleryImages as $img)
-                                 <div class="relative group border rounded-xl overflow-hidden h-24 cursor-move gallery-item shadow-sm" data-id="{{ $img->id }}">
-                                    <img src="{{ $img->url }}" class="w-full h-full object-cover">
-                                    <input type="hidden" name="gallery_image_ids[]" value="{{ $img->id }}">
-                                    <div class="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition flex items-center justify-center">
-                                        <i class="fas fa-arrows-alt text-white"></i>
+                <!-- 5 Image Slots Grid -->
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
+                    @for($i = 0; $i < 5; $i++)
+                        @php
+                            $slotMedia = $productMediaList->get($i);
+                            $slotMediaId = $slotMedia ? $slotMedia->id : '';
+                            $slotMediaUrl = $slotMedia ? ($slotMedia->url ?? asset($slotMedia->file_path)) : '';
+                            $isPrimary = $i === 0;
+                        @endphp
+                        <div class="relative group flex flex-col bg-stone-50/80 rounded-2xl border-2 {{ $isPrimary ? 'border-red-300 bg-red-50/20 ring-1 ring-red-100' : 'border-dashed border-stone-300 hover:border-stone-400' }} p-3 transition duration-200" id="slot-card-{{ $i }}">
+                            
+                            <!-- Slot Header / Badge -->
+                            <div class="flex items-center justify-between mb-2">
+                                <span class="text-[11px] font-bold uppercase tracking-wider {{ $isPrimary ? 'text-red-600 bg-red-100/70 px-2 py-0.5 rounded-md' : 'text-stone-500 bg-stone-200/60 px-2 py-0.5 rounded-md' }}">
+                                    {{ $isPrimary ? '★ Primary (Cover)' : 'Slot #' . ($i + 1) }}
+                                </span>
+                                <button type="button" onclick="clearImageSlot({{ $i }})" id="slot-clear-btn-{{ $i }}" class="{{ $slotMediaId ? '' : 'hidden' }} text-stone-400 hover:text-red-600 text-xs p-1 rounded-md transition" title="Remove photo">
+                                    <i class="fas fa-times"></i>
+                                </button>
+                            </div>
+
+                            <!-- Preview Area -->
+                            <div class="relative aspect-square w-full rounded-xl overflow-hidden bg-white border border-stone-200/80 flex items-center justify-center shadow-inner group/thumb mb-3">
+                                <img id="slot-img-{{ $i }}" src="{{ $slotMediaUrl ?: '/images/logo/Logo_1.png' }}" class="{{ $slotMediaUrl ? '' : 'hidden' }} w-full h-full object-cover">
+                                
+                                <div id="slot-empty-{{ $i }}" class="{{ $slotMediaUrl ? 'hidden' : 'flex' }} flex-col items-center justify-center p-3 text-center">
+                                    <div class="w-10 h-10 rounded-full bg-stone-100 flex items-center justify-center text-stone-400 mb-1">
+                                        <i class="fas fa-image text-lg"></i>
                                     </div>
-                                    <button type="button" onclick="this.parentElement.remove()" class="absolute top-1 right-1 bg-red-500 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition z-10">
-                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
-                                    </button>
+                                    <span class="text-xs font-semibold text-stone-600">Empty Slot</span>
+                                    <span class="text-[10px] text-stone-400">Click to add</span>
                                 </div>
-                             @endforeach
-                         @endif
-                     </div>
-                     <div class="flex flex-wrap items-center gap-3">
-                         <button type="button" onclick="openMediaModal('gallery')"
-                            class="bg-stone-50 text-stone-700 hover:bg-stone-100 px-4 py-2.5 rounded-xl border border-stone-200 transition-all flex items-center font-medium shadow-sm">
-                            <i class="fas fa-plus mr-2 text-xs"></i>
-                            Add from Library
-                        </button>
-                        <label class="cursor-pointer bg-stone-100 hover:bg-stone-200 text-stone-700 px-4 py-2.5 rounded-xl border border-stone-200 transition-all flex items-center font-medium shadow-sm">
-                            <i class="fas fa-cloud-upload-alt mr-2 text-stone-500"></i>
-                            <span>Upload Multiple from Phone / Desktop</span>
-                            <input type="file" accept="image/*" multiple class="hidden" onchange="handleDirectGalleryUpload(event)">
-                        </label>
-                    </div>
+
+                                <div id="slot-loading-{{ $i }}" class="hidden absolute inset-0 bg-white/90 backdrop-blur-xs flex flex-col items-center justify-center p-2 z-10">
+                                    <i class="fas fa-spinner fa-spin text-red-500 text-lg mb-1"></i>
+                                    <span class="text-[11px] font-semibold text-stone-700">Uploading...</span>
+                                </div>
+                            </div>
+
+                            <!-- Hidden Inputs -->
+                            <input type="hidden" name="product_images[{{ $i }}]" id="slot-input-{{ $i }}" value="{{ $slotMediaId }}">
+                            @if($i === 0)
+                                <input type="hidden" name="main_image_id" id="main_image_id" value="{{ $slotMediaId }}">
+                            @endif
+
+                            <!-- Slot Action Buttons -->
+                            <div class="grid grid-cols-2 gap-1.5 mt-auto">
+                                <label class="cursor-pointer flex items-center justify-center gap-1 text-[11px] font-bold text-stone-700 bg-white hover:bg-stone-100 border border-stone-200/90 py-1.5 px-2 rounded-lg shadow-2xs transition active:scale-95">
+                                    <i class="fas fa-upload text-stone-500 text-[10px]"></i>
+                                    <span>Upload</span>
+                                    <input type="file" accept="image/*" class="hidden" onchange="uploadSingleSlot(event, {{ $i }})">
+                                </label>
+
+                                <button type="button" onclick="openMediaModalForSlot({{ $i }})" class="flex items-center justify-center gap-1 text-[11px] font-bold text-stone-700 bg-white hover:bg-stone-100 border border-stone-200/90 py-1.5 px-2 rounded-lg shadow-2xs transition active:scale-95">
+                                    <i class="fas fa-folder-open text-stone-500 text-[10px]"></i>
+                                    <span>Library</span>
+                                </button>
+                            </div>
+
+                        </div>
+                    @endfor
                 </div>
             </div>
 
@@ -183,7 +210,10 @@
             <!-- CONFIGURABLE VARIANTS SECTION -->
             @if($product->product_type === 'configurable')
             <div id="configurable-product-fields" class="bg-white rounded-xl shadow-sm p-6 border border-stone-100">
-                <h3 class="text-lg font-semibold text-stone-800 mb-4 pb-2 border-b">Product Variants</h3>
+                <div class="flex items-center justify-between mb-4 pb-2 border-b">
+                    <h3 class="text-lg font-semibold text-stone-800">Product Variants</h3>
+                    <span class="text-xs text-stone-500">Manage or remove variants below</span>
+                </div>
                 
                 <div class="overflow-x-auto">
                     <table class="min-w-full divide-y divide-stone-200 border rounded-xl overflow-hidden">
@@ -193,40 +223,23 @@
                                 <th class="px-3 py-2 text-left text-xs font-semibold text-stone-500 uppercase tracking-wider w-32">SKU</th>
                                 <th class="px-3 py-2 text-left text-xs font-semibold text-stone-500 uppercase tracking-wider w-24">Price</th>
                                 <th class="px-3 py-2 text-left text-xs font-semibold text-stone-500 uppercase tracking-wider w-24">Stock</th>
-                                <th class="px-3 py-2 text-left text-xs font-semibold text-stone-500 uppercase tracking-wider w-48">Images</th>
+                                <th class="px-3 py-2 text-left text-xs font-semibold text-stone-500 uppercase tracking-wider w-40">Images</th>
                                 <th class="px-3 py-2 text-center text-xs font-semibold text-stone-500 uppercase tracking-wider w-16">Default</th>
+                                <th class="px-3 py-2 text-center text-xs font-semibold text-stone-500 uppercase tracking-wider w-16">Action</th>
                             </tr>
                         </thead>
                         <tbody class="bg-white divide-y divide-stone-100" id="variants-container">
                             <!-- PHP RENDERED VARIANTS -->
                             @foreach($product->variants as $idx => $variant)
-                                @if(!$variant->is_default || $product->variants->count() > 1) 
-                                <!-- Skip the main "shell" default variant of configurable product if it exists and we have real variants, 
-                                     BUT usually configurable product structure in DB might differ.
-                                     Assuming $product->variants returns ALL variants including the generated ones.
-                                     The default variant for configurable parent (holding main SKU/price) might be separate or one of them.
-                                     Let's list ALL valid variants.
-                                     Usually `variants` relationship returns specific combinations. -->
-                                     
                                 <tr id="variant-row-{{ $idx }}">
                                     <td class="px-3 py-2 whitespace-nowrap text-sm text-gray-700">
-                                        {{-- Variant Name Construction --}}
                                         @php
                                             $name = $variant->attributes->map(function($a) {
-                                                return $a->value ?? $a->label ?? ''; // Fallback to label
+                                                return $a->value ?? $a->label ?? '';
                                             })->filter()->join(' / ');
                                         @endphp
-                                        {{ $name ?: 'Variant #' . ($idx + 1) }}
-                                        
+                                        <div class="font-medium text-stone-800">{{ $name ?: 'Variant #' . ($idx + 1) }}</div>
                                         <input type="hidden" name="variants[{{ $idx }}][id]" value="{{ $variant->id }}">
-                                        
-                                        {{-- We need to preserve attributes? Usually on Edit we don't change attribs of existing variant, just values --}}
-                                        {{-- But we need to send them back if we want to "sync"? 
-                                             Actually, ProductService update logic for existing variants might just check SKU/ID.
-                                             Let's look at ProductService::updateProduct:
-                                             It usually iterates variants.
-                                             If basic update, we just need ID.
-                                        --}}
                                     </td>
                                     <td class="px-3 py-2">
                                         <input type="text" name="variants[{{ $idx }}][sku]" value="{{ $variant->sku }}" class="w-full px-2 py-1 border rounded text-sm">
@@ -239,25 +252,22 @@
                                     </td>
                                     <td class="px-3 py-2">
                                         <div id="variant-images-{{ $idx }}" class="flex gap-1 flex-wrap">
-                                            {{-- Main Image --}}
                                             @if($variant->primaryImage && $variant->primaryImage->media)
-                                                <div class="relative w-10 h-10 variant-main-thumb border-2 border-red-500 rounded overflow-hidden">
+                                                <div class="relative w-9 h-9 variant-main-thumb border-2 border-red-500 rounded overflow-hidden">
                                                     <img src="{{ $variant->primaryImage->media->url }}" class="w-full h-full object-cover" onerror="this.onerror=null;this.src='/images/logo/Logo_1.png'">
                                                 </div>
                                             @endif
-                                            {{-- Gallery --}}
-                                            @foreach($variant->images as $vImg)
-                                                <div class="relative w-10 h-10 border border-stone-200 rounded overflow-hidden">
+                                            @foreach($variant->images->where('pivot.is_primary', 0) as $vImg)
+                                                <div class="relative w-9 h-9 border border-stone-200 rounded overflow-hidden">
                                                     <img src="{{ $vImg->url }}" class="w-full h-full object-cover" onerror="this.onerror=null;this.src='/images/logo/Logo_1.png'">
                                                 </div>
                                             @endforeach
                                         </div>
-                                        <button type="button" onclick="openVariantMediaModal({{ $idx }})" class="text-xs text-red-600 hover:text-red-800 font-bold mt-1">Manage Images</button>
+                                        <button type="button" onclick="openVariantMediaModal({{ $idx }})" class="text-[11px] text-red-600 hover:text-red-800 font-bold mt-1">Manage Images</button>
                                         
-                                        {{-- Hidden Inputs for Images --}}
                                         <input type="hidden" name="variants[{{ $idx }}][main_image_id]" id="variant-main-input-{{ $idx }}" value="{{ $variant->primaryImage ? $variant->primaryImage->media_id : '' }}">
                                         <div id="variant-gallery-inputs-{{ $idx }}">
-                                            @foreach($variant->images as $vImg)
+                                            @foreach($variant->images->where('pivot.is_primary', 0) as $vImg)
                                                 <input type="hidden" name="variants[{{ $idx }}][gallery_image_ids][]" value="{{ $vImg->id }}">
                                             @endforeach
                                         </div>
@@ -266,8 +276,12 @@
                                        <input type="radio" name="default_variant_index" value="{{ $idx }}" {{ $variant->is_default ? 'checked' : '' }} onclick="document.querySelectorAll('.is-default-input').forEach(el => el.value=0); document.getElementById('is-default-{{ $idx }}').value=1;">
                                        <input type="hidden" id="is-default-{{ $idx }}" name="variants[{{ $idx }}][is_default]" value="{{ $variant->is_default ? '1' : '0' }}" class="is-default-input">
                                     </td>
+                                    <td class="px-3 py-2 text-center">
+                                        <button type="button" onclick="removeVariantRow({{ $idx }})" class="text-stone-400 hover:text-red-600 p-1.5 rounded-lg hover:bg-red-50 transition" title="Delete Variant">
+                                            <i class="fas fa-trash-alt text-sm"></i>
+                                        </button>
+                                    </td>
                                 </tr>
-                                @endif
                             @endforeach
                         </tbody>
                     </table>
@@ -625,20 +639,160 @@
         fetchSpecifications(initialCategory);
     }
 
-
-    // Media Manager
-    let currentMode = 'main';
+    // Media Manager (5 Slots + Variants)
+    let currentMode = 'slot-0';
+    let activeSlotIndex = 0;
     let selectedMediaId = null;
-    let currentVariantIndex = null; // For variant images
+    let currentVariantIndex = null;
 
-    function openMediaModal(mode) {
-        currentMode = mode;
+    function openMediaModalForSlot(slotIndex) {
+        activeSlotIndex = slotIndex;
+        currentMode = 'slot-' + slotIndex;
+        selectedMediaId = null;
         document.getElementById('media-modal').classList.remove('hidden');
         loadMedia(1);
     }
 
+    function openMediaModalMulti() {
+        currentMode = 'multi-slot';
+        selectedMediaId = null;
+        document.getElementById('media-modal').classList.remove('hidden');
+        loadMedia(1);
+    }
+
+    function openMediaModal(mode) {
+        if (mode === 'main') {
+            openMediaModalForSlot(0);
+        } else {
+            currentMode = mode;
+            selectedMediaId = null;
+            document.getElementById('media-modal').classList.remove('hidden');
+            loadMedia(1);
+        }
+    }
+
     function closeMediaModal() {
         document.getElementById('media-modal').classList.add('hidden');
+    }
+
+    function assignImageToSlot(slotIndex, id, url) {
+        if (slotIndex < 0 || slotIndex >= 5) return;
+        const input = document.getElementById(`slot-input-${slotIndex}`);
+        const img = document.getElementById(`slot-img-${slotIndex}`);
+        const emptyState = document.getElementById(`slot-empty-${slotIndex}`);
+        const clearBtn = document.getElementById(`slot-clear-btn-${slotIndex}`);
+        
+        if (input) input.value = id;
+        if (slotIndex === 0) {
+            const mainInput = document.getElementById('main_image_id');
+            if (mainInput) mainInput.value = id;
+        }
+        if (img) {
+            img.src = url;
+            img.classList.remove('hidden');
+        }
+        if (emptyState) emptyState.classList.add('hidden');
+        if (clearBtn) clearBtn.classList.remove('hidden');
+    }
+
+    function clearImageSlot(slotIndex) {
+        const input = document.getElementById(`slot-input-${slotIndex}`);
+        const img = document.getElementById(`slot-img-${slotIndex}`);
+        const emptyState = document.getElementById(`slot-empty-${slotIndex}`);
+        const clearBtn = document.getElementById(`slot-clear-btn-${slotIndex}`);
+
+        if (input) input.value = '';
+        if (slotIndex === 0) {
+            const mainInput = document.getElementById('main_image_id');
+            if (mainInput) mainInput.value = '';
+        }
+        if (img) {
+            img.src = '/images/logo/Logo_1.png';
+            img.classList.add('hidden');
+        }
+        if (emptyState) emptyState.classList.remove('hidden');
+        if (clearBtn) clearBtn.classList.add('hidden');
+    }
+
+    async function uploadSingleSlot(event, slotIndex) {
+        const file = event.target.files[0];
+        if (!file) return;
+
+        const loading = document.getElementById(`slot-loading-${slotIndex}`);
+        if (loading) loading.classList.remove('hidden');
+
+        const formData = new FormData();
+        formData.append('files[]', file);
+
+        try {
+            const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
+            const response = await axios.post('{{ route("admin.media.upload") }}', formData, {
+                headers: { 
+                    'Content-Type': 'multipart/form-data',
+                    'X-CSRF-TOKEN': csrfToken
+                }
+            });
+
+            if (response.data && response.data.success && response.data.data) {
+                const media = response.data.data;
+                assignImageToSlot(slotIndex, media.id, media.url);
+                toastr.success(`Slot #${slotIndex + 1} photo uploaded!`);
+            } else {
+                toastr.error(response.data.message || 'Failed to upload photo.');
+            }
+        } catch (error) {
+            console.error('Upload error:', error);
+            toastr.error('Failed to upload photo.');
+        } finally {
+            if (loading) loading.classList.add('hidden');
+            event.target.value = '';
+        }
+    }
+
+    async function uploadMultipleSlots(event) {
+        const files = event.target.files;
+        if (!files || !files.length) return;
+
+        const formData = new FormData();
+        for (let i = 0; i < files.length; i++) {
+            formData.append('files[]', files[i]);
+        }
+
+        toastr.info(`Uploading ${files.length} photo(s)...`);
+
+        try {
+            const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
+            const response = await axios.post('{{ route("admin.media.upload") }}', formData, {
+                headers: { 
+                    'Content-Type': 'multipart/form-data',
+                    'X-CSRF-TOKEN': csrfToken
+                }
+            });
+
+            if (response.data && response.data.success && response.data.all_uploaded) {
+                const uploaded = response.data.all_uploaded;
+                let uploadIdx = 0;
+                for (let s = 0; s < 5 && uploadIdx < uploaded.length; s++) {
+                    const curVal = document.getElementById(`slot-input-${s}`)?.value;
+                    if (!curVal) {
+                        assignImageToSlot(s, uploaded[uploadIdx].id, uploaded[uploadIdx].url);
+                        uploadIdx++;
+                    }
+                }
+                for (let s = 0; s < 5 && uploadIdx < uploaded.length; s++) {
+                    assignImageToSlot(s, uploaded[uploadIdx].id, uploaded[uploadIdx].url);
+                    uploadIdx++;
+                }
+                toastr.success(`${uploaded.length} photo(s) attached to product slots!`);
+            } else {
+                toastr.error('Failed to upload photos.');
+            }
+        } catch (error) {
+            console.error('Batch upload error:', error);
+            toastr.error('Failed to upload photos.');
+        } finally {
+            event.target.value = '';
+        }
     }
     
     // Variant Modal Intent
@@ -652,16 +806,48 @@
             denyButtonText: 'Add Gallery Images',
         }).then((result) => {
             if (result.isConfirmed) {
-                openMediaModal('variant-main');
+                currentMode = 'variant-main';
+                document.getElementById('media-modal').classList.remove('hidden');
+                loadMedia(1);
             } else if (result.isDenied) {
-                openMediaModal('variant-gallery');
+                currentMode = 'variant-gallery';
+                document.getElementById('media-modal').classList.remove('hidden');
+                loadMedia(1);
+            }
+        });
+    }
+
+    function removeVariantRow(idx) {
+        const row = document.getElementById(`variant-row-${idx}`);
+        if (!row) return;
+
+        Swal.fire({
+            title: 'Remove Variant?',
+            text: 'This variant row will be deleted when you update the product.',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#ef4444',
+            cancelButtonColor: '#6b7280',
+            confirmButtonText: 'Yes, remove variant'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                row.remove();
+                // Ensure at least one remaining variant is default
+                const firstRadio = document.querySelector('#variants-container input[name="default_variant_index"]');
+                if (firstRadio && !document.querySelector('#variants-container input[name="default_variant_index"]:checked')) {
+                    firstRadio.checked = true;
+                    const val = firstRadio.value;
+                    const hiddenDef = document.getElementById(`is-default-${val}`);
+                    if (hiddenDef) hiddenDef.value = 1;
+                }
+                toastr.success('Variant removed. Click Update Product to save changes.');
             }
         });
     }
 
     async function loadMedia(page = 1, search = '') {
         const grid = document.getElementById('media-grid');
-        grid.innerHTML = '<div class="col-span-full text-center">Loading...</div>';
+        grid.innerHTML = '<div class="col-span-full text-center py-8 text-stone-400"><i class="fas fa-spinner fa-spin mr-2"></i>Loading media...</div>';
         
         try {
             const response = await axios.get('{{ route("admin.media.data") }}', {
@@ -670,7 +856,7 @@
             renderMediaGrid(response.data);
         } catch (error) {
             console.error(error);
-            grid.innerHTML = '<div class="col-span-full text-red-500">Error loading media</div>';
+            grid.innerHTML = '<div class="col-span-full text-red-500 py-8 text-center">Error loading media</div>';
         }
     }
 
@@ -736,45 +922,32 @@
     }
 
     function confirmSelection(id, url) {
-        if(currentMode === 'main') {
-            document.getElementById('main_image_id').value = id;
-            document.getElementById('main-image-preview').innerHTML = `<img src="${url}" class="h-32 object-cover rounded border">`;
-        } else if (currentMode === 'gallery') {
-            addGalleryImage(id, url);
+        if (currentMode.startsWith('slot-')) {
+            const slotIdx = parseInt(currentMode.replace('slot-', ''), 10);
+            assignImageToSlot(slotIdx, id, url);
+            closeMediaModal();
+            toastr.success(`Photo assigned to Slot #${slotIdx + 1}`);
+        } else if (currentMode === 'multi-slot') {
+            let targetSlot = 0;
+            for (let s = 0; s < 5; s++) {
+                if (!document.getElementById(`slot-input-${s}`)?.value) {
+                    targetSlot = s;
+                    break;
+                }
+            }
+            assignImageToSlot(targetSlot, id, url);
+            closeMediaModal();
+            toastr.success(`Photo assigned to Slot #${targetSlot + 1}`);
         } else if (currentMode === 'variant-main') {
             setVariantMainImage(currentVariantIndex, id, url);
+            closeMediaModal();
         } else if (currentMode === 'variant-gallery') {
             addVariantGalleryImage(currentVariantIndex, id, url);
-        }
-        
-        if(!currentMode.includes('gallery')) {
-             closeMediaModal();
+            toastr.success('Image added to variant gallery');
         } else {
-             toastr.success('Image added to gallery');
+            assignImageToSlot(0, id, url);
+            closeMediaModal();
         }
-    }
-    
-    function addGalleryImage(id, url) {
-        const inputs = document.querySelectorAll('input[name="gallery_image_ids[]"]');
-        for(let input of inputs) {
-            if(input.value == id) return;
-        }
-        
-        const container = document.getElementById('gallery-container');
-        const div = document.createElement('div');
-        div.className = "relative group border rounded-lg overflow-hidden h-24 cursor-move gallery-item";
-        div.setAttribute('data-id', id);
-        div.innerHTML = `
-            <img src="${url}" class="w-full h-full object-cover">
-            <input type="hidden" name="gallery_image_ids[]" value="${id}">
-            <div class="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition flex items-center justify-center">
-                <i class="fas fa-arrows-alt text-white"></i>
-            </div>
-            <button type="button" onclick="this.parentElement.remove()" class="absolute top-1 right-1 bg-red-500 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition z-10">
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
-            </button>
-        `;
-        container.appendChild(div);
     }
 
     function setVariantMainImage(idx, id, url) {
@@ -787,7 +960,7 @@
         input.value = id;
         
         const thumb = document.createElement('div');
-        thumb.className = 'relative w-10 h-10 variant-main-thumb border-2 border-red-500';
+        thumb.className = 'relative w-9 h-9 variant-main-thumb border-2 border-red-500 rounded overflow-hidden';
         thumb.innerHTML = `<img src="${url}" class="w-full h-full object-cover">`;
         container.prepend(thumb);
     }
@@ -805,83 +978,9 @@
         hiddenContainer.appendChild(input);
         
         const thumb = document.createElement('div');
-        thumb.className = 'relative w-10 h-10 border border-gray-200';
+        thumb.className = 'relative w-9 h-9 border border-stone-200 rounded overflow-hidden';
         thumb.innerHTML = `<img src="${url}" class="w-full h-full object-cover">`;
         container.appendChild(thumb);
-    }
-    
-    // =============== FILE UPLOAD FUNCTIONS ===============
-
-    async function handleDirectMainUpload(event) {
-        const file = event.target.files[0];
-        if (!file) return;
-
-        const formData = new FormData();
-        formData.append('files[]', file);
-
-        const preview = document.getElementById('main-image-preview');
-        preview.innerHTML = '<div class="text-sm text-stone-500 py-3 flex items-center"><i class="fas fa-spinner fa-spin mr-2 text-red-500"></i> Uploading & attaching photo...</div>';
-
-        try {
-            const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
-            const response = await axios.post('{{ route("admin.media.upload") }}', formData, {
-                headers: { 
-                    'Content-Type': 'multipart/form-data',
-                    'X-CSRF-TOKEN': csrfToken
-                }
-            });
-
-            if (response.data && response.data.success && response.data.data) {
-                const media = response.data.data;
-                document.getElementById('main_image_id').value = media.id;
-                preview.innerHTML = `<img src="${media.url}" class="h-32 object-cover rounded-xl border border-stone-200 shadow-sm">`;
-                toastr.success('Main image updated & selected!');
-            } else {
-                toastr.error(response.data.message || 'Failed to upload image.');
-            }
-        } catch (error) {
-            console.error('Upload error:', error);
-            const msg = error.response?.data?.message || 'Failed to upload image.';
-            toastr.error(msg);
-        } finally {
-            event.target.value = '';
-        }
-    }
-
-    async function handleDirectGalleryUpload(event) {
-        const files = event.target.files;
-        if (!files || !files.length) return;
-
-        const formData = new FormData();
-        for (let i = 0; i < files.length; i++) {
-            formData.append('files[]', files[i]);
-        }
-
-        toastr.info(`Uploading ${files.length} gallery image(s)...`);
-
-        try {
-            const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
-            const response = await axios.post('{{ route("admin.media.upload") }}', formData, {
-                headers: { 
-                    'Content-Type': 'multipart/form-data',
-                    'X-CSRF-TOKEN': csrfToken
-                }
-            });
-
-            if (response.data && response.data.success && response.data.all_uploaded) {
-                response.data.all_uploaded.forEach(media => {
-                    addGalleryImage(media.id, media.url);
-                });
-                toastr.success('Gallery image(s) uploaded successfully!');
-            } else {
-                toastr.error('Failed to upload gallery images.');
-            }
-        } catch (error) {
-            console.error('Gallery upload error:', error);
-            toastr.error('Failed to upload gallery images.');
-        } finally {
-            event.target.value = '';
-        }
     }
 
     async function handleFileUpload(event) {
@@ -959,21 +1058,89 @@
 </script>
 <script src="https://cdn.ckeditor.com/ckeditor5/40.0.0/classic/ckeditor.js"></script>
 <script>
+    window.productDescriptionEditor = null;
     document.addEventListener("DOMContentLoaded", function () {
-        ClassicEditor
-            .create(document.querySelector('#description'), {
-                toolbar: ['heading', '|', 'bold', 'italic', 'link', 'bulletedList', 'numberedList', 'blockQuote'],
-                heading: {
-                    options: [
-                        { model: 'paragraph', title: 'Paragraph', class: 'ck-heading_paragraph' },
-                        { model: 'heading2', view: 'h2', title: 'Heading 2', class: 'ck-heading_heading2' },
-                        { model: 'heading3', view: 'h3', title: 'Heading 3', class: 'ck-heading_heading3' }
-                    ]
+        if (document.querySelector('#description')) {
+            ClassicEditor
+                .create(document.querySelector('#description'), {
+                    toolbar: ['heading', '|', 'bold', 'italic', 'link', 'bulletedList', 'numberedList', 'blockQuote'],
+                    heading: {
+                        options: [
+                            { model: 'paragraph', title: 'Paragraph', class: 'ck-heading_paragraph' },
+                            { model: 'heading2', view: 'h2', title: 'Heading 2', class: 'ck-heading_heading2' },
+                            { model: 'heading3', view: 'h3', title: 'Heading 3', class: 'ck-heading_heading3' }
+                        ]
+                    }
+                })
+                .then(editor => {
+                    window.productDescriptionEditor = editor;
+                })
+                .catch(error => {
+                    console.error('CKEditor error:', error);
+                });
+        }
+
+        // AJAX Form Submission
+        const form = document.getElementById('product-form');
+        if (form) {
+            form.addEventListener('submit', async function(e) {
+                e.preventDefault();
+
+                if (window.productDescriptionEditor) {
+                    document.getElementById('description').value = window.productDescriptionEditor.getData();
                 }
-            })
-            .catch(error => {
-                console.error(error);
+
+                const submitBtn = this.querySelector('button[type="submit"]');
+                const originalText = submitBtn.innerHTML;
+                submitBtn.disabled = true;
+                submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Updating Product...';
+
+                const formData = new FormData(this);
+                const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
+
+                try {
+                    const response = await axios.post(this.action, formData, {
+                        headers: {
+                            'X-Requested-With': 'XMLHttpRequest',
+                            'X-CSRF-TOKEN': csrfToken,
+                            'Accept': 'application/json'
+                        }
+                    });
+
+                    if (response.data && response.data.success) {
+                        toastr.success(response.data.message || 'Product updated successfully!');
+                        setTimeout(() => {
+                            if (response.data.redirect) {
+                                window.location.href = response.data.redirect;
+                            } else {
+                                window.location.reload();
+                            }
+                        }, 800);
+                    } else {
+                        toastr.error(response.data?.message || 'Failed to update product');
+                        submitBtn.disabled = false;
+                        submitBtn.innerHTML = originalText;
+                    }
+                } catch (error) {
+                    console.error('Update product error:', error);
+                    submitBtn.disabled = false;
+                    submitBtn.innerHTML = originalText;
+
+                    if (error.response?.status === 422) {
+                        const errors = error.response.data?.errors;
+                        if (errors) {
+                            Object.values(errors).flat().forEach(msg => toastr.error(msg));
+                        } else {
+                            toastr.error(error.response.data?.message || 'Validation error');
+                        }
+                    } else if (error.response?.status === 419) {
+                        toastr.error('Session expired. Please refresh the page or log in again.');
+                    } else {
+                        toastr.error(error.response?.data?.message || 'An error occurred while saving the product.');
+                    }
+                }
             });
+        }
     });
 </script>
 @endpush
