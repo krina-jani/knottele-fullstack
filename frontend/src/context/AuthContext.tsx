@@ -71,8 +71,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const { showToast } = useToast();
 
   const refetchOrders = useCallback(async () => {
-    const liveOrders = await fetchCustomerOrders(user?.email);
-    if (liveOrders && liveOrders.length > 0) {
+    const emailToUse = user?.email || "ananya.sharma@example.com";
+    const liveOrders = await fetchCustomerOrders(emailToUse);
+    if (Array.isArray(liveOrders) && liveOrders.length > 0) {
       setOrders(liveOrders);
     } else {
       setOrders((prev) => (prev.length > 0 ? prev : INITIAL_ORDERS));
@@ -81,6 +82,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     refetchOrders();
+    const interval = setInterval(refetchOrders, 4000);
+    const handleFocus = () => refetchOrders();
+    window.addEventListener("focus", handleFocus);
+    return () => {
+      clearInterval(interval);
+      window.removeEventListener("focus", handleFocus);
+    };
   }, [refetchOrders]);
 
   const login = (email: string) => {

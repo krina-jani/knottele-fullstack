@@ -52,7 +52,7 @@ class OrderController extends Controller
     {
         try {
             $customerId = auth('customer_api')->id();
-            $email = $request->query('email');
+            $email = trim($request->query('email') ?? '');
 
             $query = Order::with(['items.variant.product', 'items.variant.images'])
                 ->orderBy('created_at', 'desc');
@@ -61,17 +61,28 @@ class OrderController extends Controller
                 $query->where(function ($q) use ($customerId, $email) {
                     $q->where('customer_id', $customerId);
                     if ($email) {
-                        $q->orWhere('shipping_address->email', $email);
+                        $q->orWhere('shipping_address->email', 'like', "%{$email}%");
                     }
                 });
-            } elseif ($email) {
-                $query->where('shipping_address->email', $email);
+            } elseif (!empty($email)) {
+                $query->where('shipping_address->email', 'like', "%{$email}%");
             }
 
             $orders = $query->get();
 
             // Format for frontend consumption
             $formattedOrders = $orders->map(function ($order) {
+                $statusLabel = match (strtolower($order->status)) {
+                    'pending' => 'Order Placed',
+                    'confirmed' => 'Order Confirmed',
+                    'processing' => 'Crafting Your Order',
+                    'shipped' => 'Shipped',
+                    'delivered' => 'Delivered',
+                    'cancelled' => 'Cancelled',
+                    'refunded' => 'Refunded',
+                    default => ucfirst($order->status ?? 'Order Placed'),
+                };
+
                 return [
                     'id' => (string) $order->id,
                     'orderNumber' => $order->order_number,
@@ -116,15 +127,7 @@ class OrderController extends Controller
                     'shipping' => (float) $order->shipping_total,
                     'discount' => (float) $order->discount_total,
                     'total' => (float) $order->grand_total,
-                    'status' => match ($order->status) {
-                        'pending' => 'Order Placed',
-                        'confirmed' => 'Order Confirmed',
-                        'processing' => 'Crafting Your Order',
-                        'shipped' => 'Shipped',
-                        'delivered' => 'Delivered',
-                        'cancelled' => 'Cancelled',
-                        default => ucfirst($order->status ?? 'Order Placed'),
-                    },
+                    'status' => $statusLabel,
                     'timeline' => [
                         [
                             'status' => 'Order Placed',

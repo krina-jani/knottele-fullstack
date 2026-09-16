@@ -10,6 +10,15 @@ import { FlowerIcon } from "@/components/ui/BotanicalDecorations";
 export default function MyOrdersPage() {
   const { orders } = useAuth();
 
+  const getStatusBadgeStyle = (status: string) => {
+    const s = (status || "").toLowerCase();
+    if (s.includes("delivered")) return "bg-emerald-50 text-emerald-800 border-emerald-200";
+    if (s.includes("refunded")) return "bg-purple-50 text-purple-800 border-purple-200";
+    if (s.includes("cancelled")) return "bg-rose-50 text-rose-800 border-rose-200";
+    if (s.includes("shipped")) return "bg-blue-50 text-blue-800 border-blue-200";
+    return "bg-[#FCE9E5] text-[#913638] border-[#E7D1CC]";
+  };
+
   return (
     <div className="bg-white rounded-3xl border border-[#E7D1CC] p-6 sm:p-8 shadow-boutique space-y-6 animate-in fade-in">
       <div className="flex items-center justify-between pb-4 border-b border-[#E7D1CC]">
@@ -75,11 +84,7 @@ export default function MyOrdersPage() {
                     </td>
                     <td className="py-4">
                       <span
-                        className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-semibold border ${
-                          order.status === "Delivered"
-                            ? "bg-emerald-50 text-emerald-800 border-emerald-200"
-                            : "bg-[#FCE9E5] text-[#913638] border-[#E7D1CC]"
-                        }`}
+                        className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-semibold border ${getStatusBadgeStyle(order.status)}`}
                       >
                         <span className="w-1.5 h-1.5 rounded-full bg-current" />
                         <span>{order.status}</span>
@@ -111,7 +116,7 @@ export default function MyOrdersPage() {
                   <span className="font-mono text-xs font-bold text-[#913638]">
                     {order.orderNumber}
                   </span>
-                  <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-[#FCE9E5] text-[#913638] border border-[#E7D1CC]">
+                  <span className={`text-[10px] font-semibold px-2.5 py-0.5 rounded-full border ${getStatusBadgeStyle(order.status)}`}>
                     {order.status}
                   </span>
                 </div>
