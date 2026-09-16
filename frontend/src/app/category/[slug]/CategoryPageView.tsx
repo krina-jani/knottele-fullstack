@@ -22,16 +22,21 @@ interface CategoryPageViewProps {
 
 export default function CategoryPageView({ slug }: CategoryPageViewProps) {
   const { media } = useWebsiteMedia();
-  const [categoriesList, setCategoriesList] = useState<any[]>(() =>
-    media?.categories && media.categories.length > 0
-      ? media.categories
-      : getLocalCache<any[]>(CATEGORIES_CACHE_KEY, [])
-  );
-  const [productsList, setProductsList] = useState<Product[]>(() =>
-    getLocalCache<Product[]>(PRODUCTS_CACHE_KEY, [])
-  );
+  const [categoriesList, setCategoriesList] = useState<any[]>([]);
+  const [productsList, setProductsList] = useState<Product[]>([]);
 
   useEffect(() => {
+    const cachedCats = media?.categories && media.categories.length > 0
+      ? media.categories
+      : getLocalCache<any[]>(CATEGORIES_CACHE_KEY, []);
+    if (cachedCats && cachedCats.length > 0) {
+      setCategoriesList(cachedCats);
+    }
+    const cachedProds = getLocalCache<Product[]>(PRODUCTS_CACHE_KEY, []);
+    if (cachedProds && cachedProds.length > 0) {
+      setProductsList(cachedProds);
+    }
+
     let isMounted = true;
 
     const loadData = () => {

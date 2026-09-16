@@ -3917,8 +3917,6 @@
             case 'footer': return 'fas fa-shoe-prints';
             case 'shop_banner': return 'fas fa-shopping-bag';
             case 'shop_promo': return 'fas fa-tag';
-            case 'custom_order_header': return 'fas fa-paint-brush';
-            case 'custom_order_showcase': return 'fas fa-camera-retro';
             case 'about_story': return 'fas fa-heart';
             case 'about_craft_pillars': return 'fas fa-feather-alt';
             case 'contact_intro': return 'fas fa-handshake';
@@ -3975,9 +3973,7 @@
         ],
         custom_order: [
             { id: 'all', name: 'All Custom Order Sections' },
-            { id: 'custom_order_items', name: 'Step 1: Item Types & Categories' },
-            { id: 'custom_order_header', name: 'Custom Order Header Banner' },
-            { id: 'custom_order_showcase', name: 'Craft Process Showcase' }
+            { id: 'custom_order_items', name: 'Step 1: Item Types & Categories' }
         ],
         about: [
             { id: 'all', name: 'All About Page Sections' },

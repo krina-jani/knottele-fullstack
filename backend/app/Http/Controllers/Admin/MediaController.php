@@ -584,54 +584,6 @@ class MediaController extends Controller
 
             // CUSTOM ORDER PAGE SECTIONS
             [
-                'id' => 'custom_order_header',
-                'page' => 'custom_order',
-                'title' => 'Custom Order Header & Banner',
-                'description' => 'Top bespoke order banner with headline ("Your Idea. Our Yarn.") and artisan introduction.',
-                'badge' => 'Page Header',
-                'slots' => [
-                    [
-                        'slot' => 'custom_order_hero_desktop',
-                        'title' => 'Custom Order Desktop Banner',
-                        'description' => 'Artisanal header banner visual for bespoke creation request form.',
-                        'recommended_dimensions' => '1920 × 500',
-                        'device' => 'desktop',
-                        'page' => 'custom_order',
-                        'section' => 'custom_order_header',
-                        'sort_order' => 1,
-                    ],
-                    [
-                        'slot' => 'custom_order_hero_mobile',
-                        'title' => 'Custom Order Mobile Banner',
-                        'description' => 'Mobile header visual for bespoke creation request form.',
-                        'recommended_dimensions' => '768 × 600',
-                        'device' => 'mobile',
-                        'page' => 'custom_order',
-                        'section' => 'custom_order_header',
-                        'sort_order' => 1,
-                    ],
-                ]
-            ],
-            [
-                'id' => 'custom_order_showcase',
-                'page' => 'custom_order',
-                'title' => 'Custom Order Craft Process Visual',
-                'description' => 'Handcrafted process photography and quality craftsmanship guarantee visual.',
-                'badge' => 'Process Showcase',
-                'slots' => [
-                    [
-                        'slot' => 'custom_order_process_visual',
-                        'title' => 'Craft Process Showcase Image',
-                        'description' => 'Photography illustrating our custom artisan hand-stitching process.',
-                        'recommended_dimensions' => '1000 × 700',
-                        'device' => 'all',
-                        'page' => 'custom_order',
-                        'section' => 'custom_order_showcase',
-                        'sort_order' => 1,
-                    ],
-                ]
-            ],
-            [
                 'id' => 'custom_order_items',
                 'page' => 'custom_order',
                 'title' => 'Custom Order Items / Categories',

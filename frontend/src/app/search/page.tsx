@@ -21,11 +21,14 @@ function SearchContent() {
   const [query, setQuery] = useState(initialQuery);
   const [selectedCategory, setSelectedCategory] = useState("all");
   const [sortBy, setSortBy] = useState("relevance");
-  const [productsList, setProductsList] = useState<Product[]>(() =>
-    getLocalCache<Product[]>(PRODUCTS_CACHE_KEY, [])
-  );
+  const [productsList, setProductsList] = useState<Product[]>([]);
 
   useEffect(() => {
+    const cached = getLocalCache<Product[]>(PRODUCTS_CACHE_KEY, []);
+    if (cached && cached.length > 0) {
+      setProductsList(cached);
+    }
+
     let isMounted = true;
     const loadProducts = () => {
       fetchProducts({ per_page: 100 })

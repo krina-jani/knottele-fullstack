@@ -17,15 +17,9 @@ const CATEGORIES_CACHE_KEY = "knotelle_cache_categories";
 
 export default function ShopPage() {
   const { media } = useWebsiteMedia();
-  const [productsList, setProductsList] = useState<Product[]>(() =>
-    getLocalCache<Product[]>(PRODUCTS_CACHE_KEY, [])
-  );
-  const [categoriesList, setCategoriesList] = useState<any[]>(() =>
-    media?.categories && media.categories.length > 0
-      ? media.categories
-      : getLocalCache<any[]>(CATEGORIES_CACHE_KEY, [])
-  );
-  const [isLoading, setIsLoading] = useState<boolean>(() => productsList.length === 0);
+  const [productsList, setProductsList] = useState<Product[]>([]);
+  const [categoriesList, setCategoriesList] = useState<any[]>([]);
+  const [isLoading, setIsLoading] = useState<boolean>(true);
   const [selectedCategory, setSelectedCategory] = useState<string>("all");
   const [priceRange, setPriceRange] = useState<number>(6000);
   const [selectedColors, setSelectedColors] = useState<string[]>([]);
@@ -48,6 +42,19 @@ export default function ShopPage() {
 
   // Fetch live products & categories on mount + admin sync
   useEffect(() => {
+    // Populate from local cache safely after mount to prevent hydration mismatch
+    const cachedProds = getLocalCache<Product[]>(PRODUCTS_CACHE_KEY, []);
+    if (cachedProds && cachedProds.length > 0) {
+      setProductsList(cachedProds);
+      setIsLoading(false);
+    }
+    const cachedCats = media?.categories && media.categories.length > 0
+      ? media.categories
+      : getLocalCache<any[]>(CATEGORIES_CACHE_KEY, []);
+    if (cachedCats && cachedCats.length > 0) {
+      setCategoriesList(cachedCats);
+    }
+
     let isMounted = true;
 
     const loadData = () => {

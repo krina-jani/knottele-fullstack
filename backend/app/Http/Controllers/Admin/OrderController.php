@@ -74,9 +74,9 @@ class OrderController extends Controller
                 return [
                     'id' => $order->id,
                     'order_number' => $order->order_number,
-                    'customer_name' => $order->customer->name ?? ($order->shipping_address['name'] ?? 'Guest'),
-                    'customer_email' => $order->customer->email ?? ($order->shipping_address['email'] ?? 'N/A'),
-                    'customer_mobile' => $order->shipping_address['phone'] ?? ($order->customer->mobile ?? 'N/A'),
+                    'customer_name' => !empty($order->shipping_address['name']) ? $order->shipping_address['name'] : ($order->customer->name ?? 'Guest'),
+                    'customer_email' => !empty($order->shipping_address['email']) ? $order->shipping_address['email'] : ($order->customer->email ?? 'N/A'),
+                    'customer_mobile' => !empty($order->shipping_address['phone']) ? $order->shipping_address['phone'] : ($order->customer->mobile ?? 'N/A'),
                     'date' => $order->created_at->format('Y-m-d'),
                     'created_at' => $order->created_at,
                     'items_count' => $order->items_count,

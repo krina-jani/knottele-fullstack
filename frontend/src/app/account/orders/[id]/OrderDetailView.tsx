@@ -18,10 +18,29 @@ interface OrderDetailViewProps {
 export default function OrderDetailView({ id }: OrderDetailViewProps) {
   const { orders } = useAuth();
 
-  const order = orders.find((o) => o.id === id) || orders[0];
+  const cleanId = decodeURIComponent(id || "");
+  const order = orders.find(
+    (o) =>
+      o.id === cleanId ||
+      o.orderNumber === cleanId ||
+      o.id === `ord-${cleanId}` ||
+      o.id === cleanId.replace("ord-", "") ||
+      o.orderNumber.toLowerCase() === cleanId.toLowerCase()
+  );
 
   if (!order) {
-    notFound();
+    return (
+      <div className="bg-white rounded-3xl border border-[#E7D1CC] p-8 text-center space-y-4">
+        <h2 className="font-serif-luxury text-xl font-bold text-[#2E211E]">Order Not Found</h2>
+        <p className="text-xs text-[#786864]">We couldn't locate an order with ID: <strong className="font-mono">{cleanId}</strong></p>
+        <Link
+          href="/account/orders"
+          className="inline-block px-6 py-2 rounded-full bg-[#913638] text-white text-xs font-semibold hover:bg-[#74292B] transition-colors"
+        >
+          ← Back to All Orders
+        </Link>
+      </div>
+    );
   }
 
   return (

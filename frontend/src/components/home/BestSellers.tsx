@@ -13,14 +13,18 @@ const PRODUCTS_CACHE_KEY = "knotelle_cache_products";
 
 export function BestSellers() {
   const { media } = useWebsiteMedia();
-  const [productsList, setProductsList] = useState<Product[]>(() =>
-    getLocalCache<Product[]>(PRODUCTS_CACHE_KEY, [])
-  );
+  const [productsList, setProductsList] = useState<Product[]>([]);
   const [activeTab, setActiveTab] = useState<string>("all");
   const [startIndex, setStartIndex] = useState<number>(0);
   const [isFading, setIsFading] = useState<boolean>(false);
 
   useEffect(() => {
+    // Safely populate from local cache after mount to prevent SSR hydration mismatch
+    const cached = getLocalCache<Product[]>(PRODUCTS_CACHE_KEY, []);
+    if (cached && cached.length > 0) {
+      setProductsList(cached);
+    }
+
     let isMounted = true;
     const loadProducts = () => {
       fetchProducts({ per_page: 100 })

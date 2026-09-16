@@ -676,6 +676,28 @@ export async function submitContactForm(
   }
 }
 
+export async function fetchCustomerOrders(email?: string): Promise<any[]> {
+  try {
+    const url = email
+      ? `${getApiBaseUrl()}/customer/orders?email=${encodeURIComponent(email)}`
+      : `${getApiBaseUrl()}/customer/orders`;
+    const response = await fetch(url, {
+      headers: {
+        Accept: "application/json",
+      },
+      cache: "no-store",
+    });
+    const result = await response.json();
+    if (result.success && Array.isArray(result.data)) {
+      return result.data;
+    }
+    return [];
+  } catch (error) {
+    console.warn("Failed to fetch customer orders:", error);
+    return [];
+  }
+}
+
 /**
  * Submit Order to Laravel Backend API
  */

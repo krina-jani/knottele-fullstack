@@ -1,9 +1,10 @@
 "use client";
 
-import React, { createContext, useContext, useState } from "react";
+import React, { createContext, useContext, useState, useEffect, useCallback } from "react";
 import { Order, ShippingAddress } from "@/types/order";
 import { INITIAL_ORDERS } from "@/data/orders";
 import { useToast } from "./ToastContext";
+import { fetchCustomerOrders } from "@/lib/api";
 
 export interface UserProfile {
   name: string;
@@ -24,6 +25,7 @@ interface AuthContextType {
   deleteAddress: (id: string) => void;
   setDefaultAddress: (id: string) => void;
   addOrder: (order: Order) => void;
+  refetchOrders: () => Promise<void>;
 }
 
 const DEFAULT_USER: UserProfile = {
@@ -65,8 +67,21 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<UserProfile | null>(DEFAULT_USER);
-  const [orders, setOrders] = useState<Order[]>(INITIAL_ORDERS);
+  const [orders, setOrders] = useState<Order[]>([]);
   const { showToast } = useToast();
+
+  const refetchOrders = useCallback(async () => {
+    const liveOrders = await fetchCustomerOrders(user?.email);
+    if (liveOrders && liveOrders.length > 0) {
+      setOrders(liveOrders);
+    } else {
+      setOrders((prev) => (prev.length > 0 ? prev : INITIAL_ORDERS));
+    }
+  }, [user?.email]);
+
+  useEffect(() => {
+    refetchOrders();
+  }, [refetchOrders]);
 
   const login = (email: string) => {
     setUser({
@@ -117,6 +132,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const addOrder = (newOrder: Order) => {
     setOrders((prev) => [newOrder, ...prev]);
+    setTimeout(() => {
+      refetchOrders();
+    }, 800);
   };
 
   return (
@@ -132,6 +150,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         deleteAddress,
         setDefaultAddress,
         addOrder,
+        refetchOrders,
       }}
     >
       {children}

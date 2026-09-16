@@ -147,24 +147,28 @@ export default function CheckoutPage() {
       });
     } catch (e) {}
 
-    // Submit order asynchronously to Laravel backend API
-    const orderItemsPayload = items.map((item, index) => {
+    // Submit order to Laravel backend API
+    const orderItemsPayload = items.map((item) => {
       let variantId = 1;
       const numMatch = String(item.product?.id || "").match(/\d+/);
       if (numMatch) {
         const parsed = parseInt(numMatch[0], 10);
-        if (parsed >= 1 && parsed <= 20) {
+        if (parsed >= 1 && parsed <= 50) {
           variantId = parsed;
         }
       }
       return {
         variant_id: variantId,
+        product_id: item.product?.id || item.productId,
+        product_code: item.product?.id || item.productId,
+        name: item.product?.name || "Handmade Product",
+        unit_price: item.price,
         quantity: item.quantity || 1,
       };
     });
 
     submitOrder({
-      items: orderItemsPayload.length > 0 ? orderItemsPayload : [{ variant_id: 1, quantity: 1 }],
+      items: orderItemsPayload.length > 0 ? orderItemsPayload : [{ variant_id: 1, quantity: 1, unit_price: subtotal }],
       shipping_address: {
         name: fullName,
         email: email,
@@ -176,15 +180,22 @@ export default function CheckoutPage() {
       payment_method: paymentMethod === "Cash on Delivery" ? "cod" : "upi",
     })
       .then((res) => {
-        if (res && res.orderNumber) {
-          newOrder.orderNumber = res.orderNumber;
+        if (res && res.success) {
+          if (res.orderNumber) {
+            newOrder.orderNumber = res.orderNumber;
+          }
+          if (res.orderId) {
+            newOrder.id = res.orderId;
+          }
         }
       })
       .catch((err) => console.warn("Background order sync notice:", err))
       .finally(() => {
         addOrder(newOrder);
         clearCart();
-        router.push(`/order-confirmation?orderNumber=${orderNumber}&orderId=${newOrder.id}`);
+        const finalNum = newOrder.orderNumber;
+        const finalId = newOrder.id;
+        router.push(`/order-confirmation?orderNumber=${encodeURIComponent(finalNum)}&orderId=${encodeURIComponent(finalId)}`);
       });
   };
 

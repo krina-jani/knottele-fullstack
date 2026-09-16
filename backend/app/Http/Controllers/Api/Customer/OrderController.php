@@ -43,38 +43,131 @@ class OrderController extends Controller
     }
 
     /**
-     * Get a list of orders for the authenticated customer.
+     * Get a list of orders for the authenticated customer or email query.
      *
+     * @param \Illuminate\Http\Request $request
      * @return \Illuminate\Http\JsonResponse
      */
-    public function index()
+    public function index(Request $request)
     {
         try {
             $customerId = auth('customer_api')->id();
-            
-            if (!$customerId) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Unauthenticated.'
-                ], 401);
+            $email = $request->query('email');
+
+            $query = Order::with(['items.variant.product', 'items.variant.images'])
+                ->orderBy('created_at', 'desc');
+
+            if ($customerId) {
+                $query->where(function ($q) use ($customerId, $email) {
+                    $q->where('customer_id', $customerId);
+                    if ($email) {
+                        $q->orWhere('shipping_address->email', $email);
+                    }
+                });
+            } elseif ($email) {
+                $query->where('shipping_address->email', $email);
             }
 
-            $orders = Order::where('customer_id', $customerId)
-                ->with(['items.variant.product', 'items.variant.images'])
-                ->orderBy('created_at', 'desc')
-                ->get();
+            $orders = $query->get();
 
-            // Map 'variant' to 'product_variant' for frontend compatibility
-            $orders->each(function ($order) {
-                $order->items->each(function ($item) {
-                    $item->product_variant = $item->variant;
-                    unset($item->variant);
-                });
+            // Format for frontend consumption
+            $formattedOrders = $orders->map(function ($order) {
+                return [
+                    'id' => (string) $order->id,
+                    'orderNumber' => $order->order_number,
+                    'orderDate' => $order->created_at ? $order->created_at->format('d M Y') : '',
+                    'estimatedDelivery' => $order->created_at ? $order->created_at->addDays(6)->format('d M Y') : '',
+                    'items' => $order->items->map(function ($item) {
+                        return [
+                            'id' => (string) $item->id,
+                            'productId' => (string) ($item->product_variant_id ?? 'prod-1'),
+                            'product' => [
+                                'id' => (string) ($item->product_variant_id ?? 'prod-1'),
+                                'name' => $item->product_name ?? 'Handmade Product',
+                                'price' => (float) $item->unit_price,
+                                'images' => [$item->variant->product->main_image ?? '/images/products/rose-bouquet.png'],
+                                'category' => 'Handmade Crochet',
+                                'slug' => $item->variant->product->slug ?? 'product',
+                            ],
+                            'quantity' => (int) $item->quantity,
+                            'price' => (float) $item->unit_price,
+                        ];
+                    }),
+                    'shippingAddress' => [
+                        'fullName' => $order->shipping_address['name'] ?? 'Customer',
+                        'email' => $order->shipping_address['email'] ?? '',
+                        'phone' => $order->shipping_address['phone'] ?? '',
+                        'addressLine1' => $order->shipping_address['address_line_1'] ?? '',
+                        'addressLine2' => $order->shipping_address['address_line_2'] ?? '',
+                        'city' => $order->shipping_address['city'] ?? '',
+                        'state' => $order->shipping_address['state'] ?? '',
+                        'pincode' => $order->shipping_address['pin_code'] ?? '',
+                        'country' => 'India',
+                    ],
+                    'paymentMethod' => match ($order->payment_method) {
+                        'cod' => 'Cash on Delivery',
+                        'upi' => 'UPI',
+                        'card' => 'Credit/Debit Card',
+                        'netbanking' => 'Net Banking',
+                        default => ucfirst($order->payment_method ?? 'UPI'),
+                    },
+                    'paymentStatus' => ucfirst($order->payment_status ?? 'Pending'),
+                    'subtotal' => (float) $order->subtotal,
+                    'shipping' => (float) $order->shipping_total,
+                    'discount' => (float) $order->discount_total,
+                    'total' => (float) $order->grand_total,
+                    'status' => match ($order->status) {
+                        'pending' => 'Order Placed',
+                        'confirmed' => 'Order Confirmed',
+                        'processing' => 'Crafting Your Order',
+                        'shipped' => 'Shipped',
+                        'delivered' => 'Delivered',
+                        'cancelled' => 'Cancelled',
+                        default => ucfirst($order->status ?? 'Order Placed'),
+                    },
+                    'timeline' => [
+                        [
+                            'status' => 'Order Placed',
+                            'date' => $order->created_at ? $order->created_at->format('d M Y, h:i A') : 'Just now',
+                            'description' => 'Order received and queued for artisan assignment.',
+                            'completed' => true,
+                            'current' => $order->status === 'pending',
+                        ],
+                        [
+                            'status' => 'Order Confirmed',
+                            'date' => $order->confirmed_at ? $order->confirmed_at->format('d M Y') : 'Upcoming',
+                            'description' => 'Natural cotton yarns prepared for crafting.',
+                            'completed' => in_array($order->status, ['confirmed', 'processing', 'shipped', 'delivered']),
+                            'current' => $order->status === 'confirmed',
+                        ],
+                        [
+                            'status' => 'Crafting Your Order',
+                            'date' => $order->processing_at ? $order->processing_at->format('d M Y') : 'Upcoming',
+                            'description' => 'Master artisan is hand-crocheting your order.',
+                            'completed' => in_array($order->status, ['processing', 'shipped', 'delivered']),
+                            'current' => $order->status === 'processing',
+                        ],
+                        [
+                            'status' => 'Shipped',
+                            'date' => $order->shipped_at ? $order->shipped_at->format('d M Y') : 'Upcoming',
+                            'description' => 'Handed over to express courier.',
+                            'completed' => in_array($order->status, ['shipped', 'delivered']),
+                            'current' => $order->status === 'shipped',
+                        ],
+                        [
+                            'status' => 'Delivered',
+                            'date' => $order->delivered_at ? $order->delivered_at->format('d M Y') : 'Upcoming',
+                            'description' => 'Delivered to your doorstep.',
+                            'completed' => $order->status === 'delivered',
+                            'current' => $order->status === 'delivered',
+                        ],
+                    ]
+                ];
             });
 
             return response()->json([
                 'success' => true,
-                'data' => $orders
+                'data' => $formattedOrders
             ]);
         } catch (\Exception $e) {
             Log::error('Error fetching customer orders: ' . $e->getMessage());
@@ -95,7 +188,11 @@ class OrderController extends Controller
     {
         $request->validate([
             'items' => 'required|array|min:1',
-            'items.*.variant_id' => 'required|exists:product_variants,id',
+            'items.*.variant_id' => 'nullable',
+            'items.*.product_id' => 'nullable',
+            'items.*.product_code' => 'nullable',
+            'items.*.name' => 'nullable|string',
+            'items.*.unit_price' => 'nullable|numeric',
             'items.*.quantity' => 'required|integer|min:1',
             
             'shipping_address' => 'required|array',
@@ -119,25 +216,46 @@ class OrderController extends Controller
             $orderItemsData = [];
 
             foreach ($request->items as $item) {
-                $variant = ProductVariant::with('product.taxClass')->findOrFail($item['variant_id']);
+                $variant = null;
                 
-                // Assuming price is standard, in a real app check discounts
-                $unitPrice = $variant->price;
-                $quantity = $item['quantity'];
-                $total = $unitPrice * $quantity;
+                if (!empty($item['variant_id']) && is_numeric($item['variant_id'])) {
+                    $variant = ProductVariant::with('product.taxClass')->find($item['variant_id']);
+                }
 
+                if (!$variant && !empty($item['product_id'])) {
+                    $code = $item['product_id'];
+                    $product = \App\Models\Product::where('product_code', $code)->first();
+                    if (!$product && is_numeric($code)) {
+                        $product = \App\Models\Product::find($code);
+                    }
+                    if ($product) {
+                        $variant = ProductVariant::with('product.taxClass')
+                            ->where('product_id', $product->id)
+                            ->first();
+                    }
+                }
+
+                if (!$variant) {
+                    $variant = ProductVariant::with('product.taxClass')->first();
+                }
+
+                $quantity = (int) $item['quantity'];
+                $unitPrice = isset($item['unit_price']) ? (float) $item['unit_price'] : ($variant ? (float) $variant->price : 0);
+                $productName = $item['name'] ?? ($variant->product->name ?? 'Handmade Product');
+
+                $total = $unitPrice * $quantity;
                 $subtotal += $total;
-                
+
                 $taxAmount = 0;
-                if ($variant->product && $variant->product->taxClass) {
-                    $taxAmount = ($total * $variant->product->taxClass->total_rate) / 100;
+                if ($variant && $variant->product && $variant->product->taxClass) {
+                    $taxAmount = ($total * (float) $variant->product->taxClass->total_rate) / 100;
                     $totalTaxAmount += $taxAmount;
                 }
 
                 $orderItemsData[] = [
-                    'product_variant_id' => $variant->id,
-                    'product_name' => $variant->product->name ?? 'Unknown',
-                    'sku' => $variant->sku,
+                    'product_variant_id' => $variant ? $variant->id : 1,
+                    'product_name' => $productName,
+                    'sku' => $variant ? $variant->sku : 'KNT-ITEM',
                     'quantity' => $quantity,
                     'unit_price' => $unitPrice,
                     'total' => $total,
@@ -167,17 +285,26 @@ class OrderController extends Controller
                 }
             }
 
-            // Simple shipping rule as per frontend
-            $shippingTotal = (($subtotal - $discountTotal) > 799 || $subtotal == 0) ? 0 : 50;
+            // Shipping rule: 99rs shipping for order subtotal < 999rs; Free (0rs) for subtotal >= 999rs or 0rs
+            $effectiveSubtotal = max(0, $subtotal - $discountTotal);
+            $shippingTotal = ($subtotal == 0 || $effectiveSubtotal >= 999) ? 0 : 99;
+
             $grandTotal = $subtotal - $discountTotal + $shippingTotal + $totalTaxAmount;
 
-            // Optional: get customer ID if authenticated
+            // Associate customer ID if authenticated or matching email found
             $customerId = auth('customer_api')->id();
+            $customerEmail = $request->shipping_address['email'] ?? null;
+            if (!$customerId && $customerEmail) {
+                $existingCust = \App\Models\Customer::where('email', $customerEmail)->first();
+                if ($existingCust) {
+                    $customerId = $existingCust->id;
+                }
+            }
 
             // 2. Create the Order
             $order = Order::create([
                 'order_number' => 'KN' . strtoupper(uniqid()),
-                'customer_id' => $customerId, // nullable
+                'customer_id' => $customerId,
                 'payment_method' => $request->payment_method,
                 'shipping_method' => 'custom',
                 'currency' => 'INR',
@@ -215,9 +342,11 @@ class OrderController extends Controller
                 'success' => true,
                 'message' => 'Order placed successfully',
                 'data' => [
-                    'order_id' => $order->id,
+                    'order_id' => (string) $order->id,
                     'order_number' => $order->order_number,
-                    'grand_total' => $order->grand_total,
+                    'grand_total' => (float) $order->grand_total,
+                    'subtotal' => (float) $order->subtotal,
+                    'shipping_total' => (float) $order->shipping_total,
                 ]
             ], 201);
 
@@ -232,5 +361,4 @@ class OrderController extends Controller
             ], 500);
         }
     }
-
 }
