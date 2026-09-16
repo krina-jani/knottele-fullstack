@@ -707,7 +707,7 @@
             status: document.getElementById('status').checked ? 1 : 0,
             featured: document.getElementById('featured').checked ? 1 : 0,
             show_in_nav: document.getElementById('show_in_nav').checked ? 1 : 0,
-
+        };
 
         // Show loading state
         const submitBtn = e.target.querySelector('button[type="submit"]');

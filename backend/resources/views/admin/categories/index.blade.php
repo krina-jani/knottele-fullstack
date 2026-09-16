@@ -1582,9 +1582,9 @@
             }
         }
 
-        // Edit category - REDIRECT TO EDIT PAGE
-        async function editCategory(id) {
-            window.location.href = `/admin/categories/${id}/edit`;
+        // Navigate to the dedicated edit page.
+        function editCategory(id) {
+            window.location.assign('{{ url('/admin/categories') }}/' + encodeURIComponent(id) + '/edit');
         }
 
         // View category details - KEEP THIS AS MODAL

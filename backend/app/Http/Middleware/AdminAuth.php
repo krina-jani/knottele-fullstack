@@ -2,8 +2,10 @@
 
 namespace App\Http\Middleware;
 
+use App\Models\Admin;
 use Closure;
 use Illuminate\Support\Facades\Auth;
+use Laravel\Sanctum\Sanctum;
 
 class AdminAuth
 {
@@ -11,6 +13,19 @@ class AdminAuth
     {
         if (!Auth::guard('admin')->check()) {
             return redirect()->route('admin.login');
+        }
+
+        // The admin UI uses the session guard, while its API uses Sanctum bearer
+        // tokens. Restore a usable API token when it is missing or was revoked.
+        $admin = Auth::guard('admin')->user();
+        $token = $request->session()->get('admin_api_token');
+        $accessToken = $token ? Sanctum::$personalAccessTokenModel::findToken($token) : null;
+
+        if (! $accessToken || ! $accessToken->tokenable instanceof Admin || ! $accessToken->tokenable->is($admin)) {
+            $request->session()->put(
+                'admin_api_token',
+                $admin->createToken('admin_api', ['admin'])->plainTextToken
+            );
         }
 
         return $next($request);

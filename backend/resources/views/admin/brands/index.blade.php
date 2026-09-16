@@ -568,7 +568,7 @@
             baseURL: '{{ url('') }}/api/admin',
             headers: {
                 'X-Requested-With': 'XMLHttpRequest',
-                'Authorization': `Bearer ${window.ADMIN_API_TOKEN || "{{ session('admin_api_token') }}"}`
+                'Authorization': `Bearer ${window.ADMIN_API_TOKEN}`
             }
         });
 
@@ -667,30 +667,6 @@
                 paginationSize: perPage,
                 paginationSizeSelector: [10, 25, 50, 100],
                 paginationCounter: "rows",
-                ajaxURL: "{{ url('') }}/api/admin/brands",
-                ajaxParams: {
-                    sort: 'created_at',
-                    direction: 'desc'
-                },
-                ajaxResponse: function(url, params, response) {
-                    if (response.success) {
-                        // Hide loading state
-                        document.getElementById('loadingState').style.display = 'none';
-
-                        // Ensure we're returning the correct data structure
-                        if (response.data && response.data.data) {
-                            updatePaginationInfo(response.data.meta);
-                            return response.data.data;
-                        }
-                        return [];
-                    }
-                    return [];
-                },
-                ajaxError: function(xhr, textStatus, errorThrown) {
-                    console.error('Ajax error:', xhr, textStatus, errorThrown);
-                    document.getElementById('loadingState').style.display = 'none';
-                    toastr.error('Failed to load brands data');
-                },
                 columns: [{
                         title: "<input type='checkbox' id='selectAllBrands'>",
                         field: "id",
@@ -761,7 +737,7 @@
                         field: "status",
                         width: 120,
                         hozAlign: "center",
-                        headerFilter: "select",
+                        headerFilter: "list",
                         headerFilterParams: {
                             values: {
                                 "": "All",
@@ -788,7 +764,7 @@
                         field: "featured",
                         width: 120,
                         hozAlign: "center",
-                        headerFilter: "select",
+                        headerFilter: "list",
                         headerFilterParams: {
                             values: {
                                 "": "All",

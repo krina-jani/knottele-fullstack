@@ -735,6 +735,8 @@
 
             <!-- Form Wrapper -->
             <form id="videoReelForm" novalidate onsubmit="handleVideoReelSubmit(event); return false;" class="flex flex-col flex-1 min-h-0 overflow-hidden">
+                @csrf
+                <input type="hidden" name="_token" value="{{ csrf_token() }}">
                 <input type="hidden" id="videoReelId" name="id" value="">
                 <input type="hidden" id="videoReelThumbnailMediaId" name="thumbnail_media_id" value="">
                 <input type="hidden" id="videoReelThumbnailUrl" name="thumbnail_url" value="">
