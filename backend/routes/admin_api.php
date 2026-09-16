@@ -6,12 +6,6 @@ use App\Http\Controllers\Api\Admin\MediaController;
 use App\Http\Controllers\Api\Admin\BrandController;
 use App\Http\Controllers\Api\Admin\TaxClassController;
 use App\Http\Controllers\Api\Admin\TaxRateController;
-use App\Http\Controllers\Api\Admin\TagController;
-use App\Http\Controllers\Api\Admin\AttributeController;
-use App\Http\Controllers\Api\Admin\AttributeValueController;
-use App\Http\Controllers\Api\Admin\SpecificationController;
-use App\Http\Controllers\Api\Admin\SpecificationValueController;
-use App\Http\Controllers\Api\Admin\SpecificationGroupController;
 use App\Http\Controllers\Api\Admin\CategoryController;
 use App\Http\Controllers\Api\Admin\ProductController;
 use App\Http\Controllers\Api\Admin\SettingController;
@@ -99,113 +93,6 @@ Route::prefix('admin')->middleware('api')->group(function () {
             Route::post('/calculate', [TaxRateController::class, 'calculate']);
         });
 
-
-        // Tag Routes
-        Route::prefix('tags')->group(function () {
-            Route::get('/', [TagController::class, 'index']);
-            Route::get('/dropdown', [TagController::class, 'dropdown']);
-            Route::get('/statistics', [TagController::class, 'statistics']);
-            Route::get('/popular', [TagController::class, 'popular']);
-            Route::post('/', [TagController::class, 'store']);
-            Route::get('/{id}', [TagController::class, 'show']);
-            Route::put('/{id}', [TagController::class, 'update']);
-            Route::delete('/{id}', [TagController::class, 'destroy']);
-
-            // Status operations
-            Route::post('/{id}/status', [TagController::class, 'updateStatus']);
-            Route::post('/{id}/featured', [TagController::class, 'updateFeatured']);
-
-            // Bulk operations
-            Route::post('/bulk-status', [TagController::class, 'bulkStatus']);
-            Route::post('/bulk-featured', [TagController::class, 'bulkFeatured']);
-            Route::post('/bulk-delete', [TagController::class, 'bulkDelete']);
-        });
-
-
-        // Attribute Routes
-        Route::prefix('attributes')->group(function () {
-            Route::get('/', [AttributeController::class, 'index']);
-            Route::get('/dropdown', [AttributeController::class, 'dropdown']);
-            Route::get('/types', [AttributeController::class, 'types']);
-            Route::get('/statistics', [AttributeController::class, 'statistics']);
-            Route::get('/for-product-variants', [AttributeController::class, 'forProductVariants']);
-            Route::post('/', [AttributeController::class, 'store']);
-            Route::get('/{id}', [AttributeController::class, 'show']);
-            Route::put('/{id}', [AttributeController::class, 'update']);
-            Route::delete('/{id}', [AttributeController::class, 'destroy']);
-
-            // Status operations
-            Route::post('/{id}/toggle-status', [AttributeController::class, 'toggleStatus']);
-            Route::post('/{id}/toggle-variant', [AttributeController::class, 'toggleVariant']);
-            Route::post('/{id}/toggle-filterable', [AttributeController::class, 'toggleFilterable']);
-
-            // Bulk operations
-            Route::post('/bulk-update', [AttributeController::class, 'bulkUpdate']);
-            Route::post('/bulk-delete', [AttributeController::class, 'bulkDelete']);
-
-            // Attribute Values Routes
-            Route::prefix('/{attribute}/values')->group(function () {
-                Route::get('/', [AttributeValueController::class, 'index']);
-                Route::post('/', [AttributeValueController::class, 'store']);
-                Route::get('/{id}', [AttributeValueController::class, 'show']);
-                Route::put('/{id}', [AttributeValueController::class, 'update']);
-                Route::delete('/{id}', [AttributeValueController::class, 'destroy']);
-                Route::post('/{id}/toggle-status', [AttributeValueController::class, 'toggleStatus']);
-                Route::post('/bulk-update', [AttributeValueController::class, 'bulkUpdate']);
-                Route::post('/bulk-delete', [AttributeValueController::class, 'bulkDelete']);
-            });
-        });
-
-
-        // Specification Routes
-        Route::prefix('specifications')->group(function () {
-            Route::get('/', [SpecificationController::class, 'index']);
-            Route::get('/dropdown', [SpecificationController::class, 'dropdown']);
-            Route::get('/input-types', [SpecificationController::class, 'inputTypes']);
-            Route::get('/statistics', [SpecificationController::class, 'statistics']);
-            Route::get('/for-product-creation', [SpecificationController::class, 'forProductCreation']);
-            Route::post('/', [SpecificationController::class, 'store']);
-            Route::get('/{id}', [SpecificationController::class, 'show']);
-            Route::put('/{id}', [SpecificationController::class, 'update']);
-            Route::delete('/{id}', [SpecificationController::class, 'destroy']);
-
-            // Status operations
-            Route::post('/{id}/toggle-status', [SpecificationController::class, 'toggleStatus']);
-            Route::post('/{id}/toggle-required', [SpecificationController::class, 'toggleRequired']);
-            Route::post('/{id}/toggle-filterable', [SpecificationController::class, 'toggleFilterable']);
-
-            // Bulk operations
-            Route::post('/bulk-update', [SpecificationController::class, 'bulkUpdate']);
-            Route::post('/bulk-delete', [SpecificationController::class, 'bulkDelete']);
-
-            // Specification Values Routes
-            Route::prefix('/{specification}/values')->group(function () {
-                Route::get('/', [SpecificationValueController::class, 'index']);
-                Route::post('/', [SpecificationValueController::class, 'store']);
-                Route::get('/{id}', [SpecificationValueController::class, 'show']);
-                Route::put('/{id}', [SpecificationValueController::class, 'update']);
-                Route::delete('/{id}', [SpecificationValueController::class, 'destroy']);
-                Route::post('/{id}/toggle-status', [SpecificationValueController::class, 'toggleStatus']);
-                Route::post('/bulk-update', [SpecificationValueController::class, 'bulkUpdate']);
-                Route::post('/bulk-delete', [SpecificationValueController::class, 'bulkDelete']);
-            });
-        });
-
-        // Specification Group Routes
-        Route::prefix('specification-groups')->group(function () {
-            Route::get('/', [SpecificationGroupController::class, 'index']);
-            Route::get('/dropdown', [SpecificationGroupController::class, 'dropdown']);
-            Route::get('/statistics', [SpecificationGroupController::class, 'statistics']);
-            Route::get('/for-category-assignment', [SpecificationGroupController::class, 'forCategoryAssignment']);
-            Route::post('/', [SpecificationGroupController::class, 'store']);
-            Route::get('/{id}', [SpecificationGroupController::class, 'show']);
-            Route::put('/{id}', [SpecificationGroupController::class, 'update']);
-            Route::delete('/{id}', [SpecificationGroupController::class, 'destroy']);
-            Route::post('/{id}/toggle-status', [SpecificationGroupController::class, 'toggleStatus']);
-            Route::post('/bulk-update', [SpecificationGroupController::class, 'bulkUpdate']);
-            Route::post('/bulk-delete', [SpecificationGroupController::class, 'bulkDelete']);
-        });
-
         // Category Routes
         Route::prefix('categories')->group(function () {
             Route::get('/', [CategoryController::class, 'index']);
@@ -223,14 +110,6 @@ Route::prefix('admin')->middleware('api')->group(function () {
 
             // Bulk operations
             Route::post('/bulk-delete', [CategoryController::class, 'bulkDelete']);
-
-            // Specification groups
-            Route::get('/{id}/spec-groups', [CategoryController::class, 'getSpecGroups']);
-            Route::post('/{id}/spec-groups', [CategoryController::class, 'updateSpecGroups']);
-
-            // Attributes
-            Route::get('/{id}/attributes', [CategoryController::class, 'getAttributes']);
-            Route::post('/{id}/attributes', [CategoryController::class, 'updateAttributes']);
         });
 
 
@@ -242,13 +121,6 @@ Route::prefix('admin')->middleware('api')->group(function () {
             Route::get('/dropdown', [ProductController::class, 'dropdown']);
             Route::get('/statistics', [ProductController::class, 'statistics']);
 
-
-
-            Route::get('/category/{category}/specifications', [ProductController::class, 'getCategorySpecifications']);
-            Route::get('/category/{category}/attributes', [ProductController::class, 'getCategoryAttributes']);
-            Route::post('/generate-variants', [ProductController::class, 'generateVariants']);
-
-
             // Core CRUD
             Route::get('/', [ProductController::class, 'index']);
             Route::post('/', [ProductController::class, 'store']);
@@ -257,15 +129,11 @@ Route::prefix('admin')->middleware('api')->group(function () {
             Route::delete('/{product}', [ProductController::class, 'destroy']);
 
             // Product logic
-            Route::post('/generate-variants', [ProductController::class, 'generateVariants']);
             Route::post('/check-sku', [ProductController::class, 'checkSku']);
 
             // Status & featured
             Route::post('/{product}/status', [ProductController::class, 'toggleStatus']);
             Route::post('/{product}/featured', [ProductController::class, 'toggleFeatured']);
-
-            // Category-based attributes
-            Route::get('/category/{category}/attributes', [ProductController::class, 'getCategoryAttributes']);
 
             // Bulk actions
             Route::post('/bulk-update', [ProductController::class, 'bulkUpdate']);

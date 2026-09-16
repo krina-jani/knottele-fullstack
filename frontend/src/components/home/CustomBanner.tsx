@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
@@ -11,37 +11,19 @@ const DEFAULT_BANNER_IMG = "/images/homepage/middleimg.png";
 
 export function CustomBanner() {
   const { media } = useWebsiteMedia();
-  const [bannerImg, setBannerImg] = useState(DEFAULT_BANNER_IMG);
-  const [bannerImgMobile, setBannerImgMobile] = useState<string | null>(null);
-  const [title, setTitle] = useState("Custom Crochet");
-  const [subtitle, setSubtitle] = useState("Just for You");
-  const [description, setDescription] = useState("Your imagination, our yarn. \nLet's create something special together.");
-  const [ctaText, setCtaText] = useState("Request Your Custom Order");
-  const [ctaLink, setCtaLink] = useState("/custom-order");
-  const [tagText, setTagText] = useState("Turn Your Ideas Into Handmade Reality");
-  const [tagActive, setTagActive] = useState(true);
-  const [altText, setAltText] = useState("Custom Crochet Banner");
-  const [isActive, setIsActive] = useState(true);
+  const cc = media?.customCrochet;
 
-  useEffect(() => {
-    if (!media?.customCrochet) return;
-    const cc = media.customCrochet;
-    if (cc.is_active === false) {
-      setIsActive(false);
-      return;
-    }
-    setIsActive(true);
-    if (cc.desktop) setBannerImg(cc.desktop);
-    if (cc.mobile) setBannerImgMobile(cc.mobile);
-    if (cc.title) setTitle(cc.title);
-    if (cc.subtitle) setSubtitle(cc.subtitle);
-    if (cc.description) setDescription(cc.description);
-    if (cc.cta_text) setCtaText(cc.cta_text);
-    if (cc.cta_link) setCtaLink(cc.cta_link);
-    if (cc.tag_text) setTagText(cc.tag_text);
-    if (cc.tag_active !== undefined) setTagActive(cc.tag_active !== false);
-    if (cc.alt_text) setAltText(cc.alt_text);
-  }, [media?.customCrochet]);
+  const bannerImg = cc?.desktop || DEFAULT_BANNER_IMG;
+  const bannerImgMobile = cc?.mobile || null;
+  const title = cc?.title || "Custom Crochet";
+  const subtitle = cc?.subtitle || "Just for You";
+  const description = cc?.description || "Your imagination, our yarn. \nLet's create something special together.";
+  const ctaText = cc?.cta_text || "Request Your Custom Order";
+  const ctaLink = cc?.cta_link || "/custom-order";
+  const tagText = cc?.tag_text || "Turn Your Ideas Into Handmade Reality";
+  const tagActive = cc?.tag_active !== false;
+  const altText = cc?.alt_text || "Custom Crochet Banner";
+  const isActive = cc?.is_active !== false;
 
   if (!isActive) return null;
 

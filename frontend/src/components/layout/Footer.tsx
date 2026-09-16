@@ -166,7 +166,7 @@ export function Footer() {
                   const label = link.label || link.name || "Link";
                   return (
                     <li key={idx}>
-                      <Link href={href} className="hover:text-[#913638] transition-colors">
+                      <Link href={href} prefetch={true} className="hover:text-[#913638] transition-colors">
                         {label}
                       </Link>
                     </li>
@@ -188,7 +188,7 @@ export function Footer() {
                   const label = link.label || link.name || "Help";
                   return (
                     <li key={idx}>
-                      <Link href={href} className="hover:text-[#913638] transition-colors">
+                      <Link href={href} prefetch={true} className="hover:text-[#913638] transition-colors">
                         {label}
                       </Link>
                     </li>

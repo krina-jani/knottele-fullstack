@@ -1,27 +1,59 @@
 "use client";
 
-import React, { useState, useMemo, Suspense } from "react";
+import React, { useState, useEffect, useMemo, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { Search, Sparkles, ArrowRight, SlidersHorizontal } from "lucide-react";
-import { PRODUCTS } from "@/data/products";
-import { CATEGORIES } from "@/data/categories";
+import { Product } from "@/types/product";
+import { fetchProducts } from "@/lib/api";
 import { ProductCard } from "@/components/ui/ProductCard";
 import { Breadcrumbs } from "@/components/ui/Breadcrumbs";
 import { BotanicalFlourish } from "@/components/ui/BotanicalDecorations";
+import { useWebsiteMedia } from "@/context/MediaContext";
+import { getLocalCache, setLocalCache, setupAdminSyncListener } from "@/lib/cache";
+
+const PRODUCTS_CACHE_KEY = "knotelle_cache_products";
 
 function SearchContent() {
+  const { media } = useWebsiteMedia();
   const searchParams = useSearchParams();
   const initialQuery = searchParams.get("q") || "";
   const [query, setQuery] = useState(initialQuery);
   const [selectedCategory, setSelectedCategory] = useState("all");
   const [sortBy, setSortBy] = useState("relevance");
+  const [productsList, setProductsList] = useState<Product[]>(() =>
+    getLocalCache<Product[]>(PRODUCTS_CACHE_KEY, [])
+  );
+
+  useEffect(() => {
+    let isMounted = true;
+    const loadProducts = () => {
+      fetchProducts({ per_page: 100 })
+        .then((res) => {
+          if (isMounted && res.products && res.products.length > 0) {
+            setProductsList(res.products);
+            setLocalCache(PRODUCTS_CACHE_KEY, res.products);
+          }
+        })
+        .catch((err) => console.warn("Live search products notice:", err));
+    };
+
+    loadProducts();
+    const cleanupListeners = setupAdminSyncListener(loadProducts);
+
+    return () => {
+      isMounted = false;
+      cleanupListeners();
+    };
+  }, []);
+
+  const categories = media?.categories || [];
 
   const searchResults = useMemo(() => {
     const q = query.toLowerCase().trim();
-    if (!q) return PRODUCTS;
+    if (!q) return productsList;
 
-    return PRODUCTS.filter((product) => {
+    return productsList.filter((product) => {
       const matchName = product.name.toLowerCase().includes(q);
       const matchCategory = product.category.toLowerCase().includes(q);
       const matchTags = product.tags.some((t) => t.toLowerCase().includes(q));
@@ -38,7 +70,7 @@ function SearchContent() {
       if (sortBy === "rating") return b.rating - a.rating;
       return 0;
     });
-  }, [query, selectedCategory, sortBy]);
+  }, [query, selectedCategory, sortBy, productsList]);
 
   return (
     <div className="bg-[#FFF9F6] min-h-screen py-8 lg:py-12">
@@ -103,7 +135,7 @@ function SearchContent() {
             >
               All Categories
             </button>
-            {CATEGORIES.slice(0, 6).map((cat) => (
+            {categories.slice(0, 6).map((cat) => (
               <button
                 key={cat.id}
                 onClick={() => setSelectedCategory(cat.slug)}

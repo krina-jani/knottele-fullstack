@@ -40,16 +40,6 @@ class CategoryRequest extends FormRequest
             'status' => ['required', 'in:0,1,true,false'],
             'featured' => ['required', 'in:0,1,true,false'],
             'show_in_nav' => ['required', 'in:0,1,true,false'],
-
-            // For specification groups
-            'spec_group_ids' => ['nullable', 'array'],
-            'spec_group_ids.*' => ['exists:specification_groups,id'],
-
-            // For attributes
-            'attributes' => ['nullable', 'array'],
-            'attributes.*.is_required' => ['boolean'],
-            'attributes.*.is_filterable' => ['boolean'],
-            'attributes.*.sort_order' => ['integer', 'min:0'],
         ];
     }
 

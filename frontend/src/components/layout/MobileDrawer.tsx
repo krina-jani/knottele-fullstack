@@ -4,7 +4,6 @@ import React, { useEffect } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { X, Heart, ShoppingBag, User, Sparkles, ChevronRight, Phone, Mail } from "lucide-react";
-import { CATEGORIES } from "@/data/categories";
 import { KnotelleCrownLogo } from "@/components/ui/BotanicalDecorations";
 import { useWishlist } from "@/context/WishlistContext";
 import { useCart } from "@/context/CartContext";
@@ -66,7 +65,7 @@ export function MobileDrawer({ isOpen, onClose, onOpenSearch }: MobileDrawerProp
   // Categories
   const categoriesList = (media?.categories && media.categories.length > 0)
     ? media.categories.slice(0, 8)
-    : CATEGORIES.slice(0, 8);
+    : [];
 
   return (
     <div className="fixed inset-0 z-50 overflow-hidden lg:hidden">
@@ -155,6 +154,7 @@ export function MobileDrawer({ isOpen, onClose, onOpenSearch }: MobileDrawerProp
                   <Link
                     key={item.href + idx}
                     href={item.href}
+                    prefetch={true}
                     onClick={onClose}
                     className={`flex items-center justify-between px-4 py-3 rounded-2xl text-sm font-medium transition-colors ${
                       isHighlighted

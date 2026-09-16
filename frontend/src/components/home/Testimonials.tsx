@@ -59,21 +59,20 @@ const DEFAULT_TESTIMONIALS: TestimonialItem[] = [
 
 export function Testimonials() {
   const { media } = useWebsiteMedia();
-  const [testimonials, setTestimonials] = useState<TestimonialItem[]>(DEFAULT_TESTIMONIALS);
   const [startIndex, setStartIndex] = useState<number>(0);
   const [isFading, setIsFading] = useState<boolean>(false);
 
-  useEffect(() => {
+  const testimonials = useMemo<TestimonialItem[]>(() => {
     if (media?.testimonials && Array.isArray(media.testimonials) && media.testimonials.length > 0) {
-      const formatted: TestimonialItem[] = media.testimonials.map((t: any) => ({
+      return media.testimonials.map((t: any) => ({
         id: `t-db-${t.id}`,
         name: t.name,
         designation: t.designation || "Verified Patron",
         rating: Number(t.rating) || 5,
         review: t.message,
       }));
-      setTestimonials(formatted);
     }
+    return DEFAULT_TESTIMONIALS;
   }, [media?.testimonials]);
 
   // Auto-advance reviews every 2.5 seconds with smooth crossfade

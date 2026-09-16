@@ -1,8 +1,19 @@
 import type { NextConfig } from "next";
 
+const isDev = process.env.NODE_ENV === "development";
+
 const nextConfig: NextConfig = {
-  output: "export",
+  // In development, do not force static export so database products and new slugs render dynamically
+  ...(isDev ? {} : { output: "export" }),
   trailingSlash: true,
+  experimental: {
+    optimizePackageImports: [
+      "lucide-react",
+      "clsx",
+      "tailwind-merge",
+      "canvas-confetti",
+    ],
+  },
   images: {
     unoptimized: true,
     remotePatterns: [
@@ -19,3 +30,4 @@ const nextConfig: NextConfig = {
 };
 
 export default nextConfig;
+

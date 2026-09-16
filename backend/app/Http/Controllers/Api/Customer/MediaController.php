@@ -155,6 +155,25 @@ class MediaController extends Controller
             'is_active' => $customOrderMedia ? (bool)$customOrderMedia->is_active : true,
         ];
 
+        $customOrderItems = Media::where('page', 'custom_order')
+            ->where('section', 'custom_order_items')
+            ->where('is_active', true)
+            ->orderBy('sort_order', 'asc')
+            ->get()
+            ->map(function ($item) {
+                return [
+                    'id' => $item->id,
+                    'name' => $item->title,
+                    'title' => $item->title,
+                    'subtitle' => $item->subtitle ?: 'Custom pattern',
+                    'icon' => $item->tag_text ?: 'Flower2',
+                    'sort_order' => (int)$item->sort_order,
+                    'is_active' => (bool)$item->is_active,
+                ];
+            });
+
+        $customOrder['items'] = $customOrderItems;
+
         // 5. Newsletter
         $newsletterMedia = Media::where('page', 'homepage')
             ->where('section', 'newsletter')
@@ -285,7 +304,19 @@ class MediaController extends Controller
             'is_active' => $navbarMedia ? (bool)$navbarMedia->is_active : true,
         ];
 
-        // 7. Categories for Homepage Grid
+        // 7. Categories for Homepage Grid & Section Metadata
+        $categorySectionMedia = Media::where('page', 'homepage')
+            ->where('section', 'categories')
+            ->first();
+
+        $categorySection = [
+            'tag_text' => $categorySectionMedia && $categorySectionMedia->tag_text ? $categorySectionMedia->tag_text : '🌸',
+            'title' => $categorySectionMedia && $categorySectionMedia->title ? $categorySectionMedia->title : 'Shop by Category',
+            'subtitle' => $categorySectionMedia && $categorySectionMedia->subtitle ? $categorySectionMedia->subtitle : 'Explore our wide range of handmade crochet products.',
+            'description' => $categorySectionMedia && $categorySectionMedia->description ? $categorySectionMedia->description : 'Explore our wide range of handmade crochet products.',
+            'is_active' => $categorySectionMedia ? (bool)$categorySectionMedia->is_active : true,
+        ];
+
         $categories = Category::where('status', 1)
             ->whereNull('parent_id')
             ->orderBy('sort_order', 'asc')
@@ -533,9 +564,11 @@ class MediaController extends Controller
                     'slides' => $heroSlides,
                 ],
                 'categories' => $categories,
+                'categorySection' => $categorySection,
                 'customCrochet' => $customCrochet,
                 'brandStory' => $brandStory,
                 'customOrder' => $customOrder,
+                'customOrderItems' => $customOrderItems,
                 'newsletter' => $newsletter,
                 'footer' => $footer,
                 'navbar' => $navbar,

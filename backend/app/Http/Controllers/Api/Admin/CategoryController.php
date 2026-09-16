@@ -6,8 +6,6 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Api\Admin\CategoryRequest;
 use App\Models\Category;
 use App\Models\Media;
-use App\Models\SpecificationGroup;
-use App\Models\Attribute;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -104,35 +102,10 @@ class CategoryController extends Controller
             DB::beginTransaction();
 
             $data = $request->validated();
-            $specGroupIds = $data['spec_group_ids'] ?? [];
-            $attributes = $data['attributes'] ?? [];
             unset($data['spec_group_ids'], $data['attributes']);
 
             // Create category
             $category = Category::create($data);
-
-            // Attach specification groups with correct column name (spec_group_id, not specification_group_id)
-            if (!empty($specGroupIds)) {
-                foreach ($specGroupIds as $specGroupId) {
-                    DB::table('category_spec_groups')->insert([
-                        'category_id' => $category->id,
-                        'spec_group_id' => $specGroupId, // CORRECT COLUMN NAME
-                        'created_at' => now(),
-                        'updated_at' => now(),
-                    ]);
-                }
-            }
-
-            // Attach attributes
-            if (!empty($attributes)) {
-                foreach ($attributes as $attributeId => $attributeData) {
-                    $category->attributes()->attach($attributeId, [
-                        'is_required' => $attributeData['is_required'] ?? false,
-                        'is_filterable' => $attributeData['is_filterable'] ?? false,
-                        'sort_order' => $attributeData['sort_order'] ?? 0,
-                    ]);
-                }
-            }
 
             // Update category hierarchy
             $this->updateCategoryHierarchy($category);
@@ -162,32 +135,11 @@ class CategoryController extends Controller
                 'parent',
                 'image',
                 'children',
-                'specificationGroups',
-                'attributes' => function($query) {
-                    $query->withPivot('is_required', 'is_filterable', 'sort_order');
-                }
             ])->withCount(['products', 'children'])->find($id);
 
             if (!$category) {
                 return $this->apiResponse(false, null, 'Category not found', 404);
             }
-
-            // Get specification group IDs
-            $specGroupIds = $category->specificationGroups->pluck('id')->toArray();
-
-            // Get category attributes with pivot data
-            $categoryAttributes = $category->attributes->map(function ($attribute) {
-                return [
-                    'id' => $attribute->id,
-                    'name' => $attribute->name,
-                    'code' => $attribute->code,
-                    'pivot' => [
-                        'is_required' => (bool) $attribute->pivot->is_required,
-                        'is_filterable' => (bool) $attribute->pivot->is_filterable,
-                        'sort_order' => $attribute->pivot->sort_order,
-                    ]
-                ];
-            });
 
             return $this->apiResponse(true, [
                 'id' => $category->id,
@@ -204,8 +156,8 @@ class CategoryController extends Controller
                 'parent_name' => $category->parent ? $category->parent->name : null,
                 'products_count' => $category->products_count,
                 'children_count' => $category->children_count,
-                'spec_group_ids' => $specGroupIds,
-                'attributes' => $categoryAttributes,
+                'spec_group_ids' => [],
+                'attributes' => [],
                 'created_at' => $category->created_at,
                 'updated_at' => $category->updated_at,
             ], 'Category retrieved successfully');
@@ -231,44 +183,10 @@ class CategoryController extends Controller
             DB::beginTransaction();
 
             $data = $request->validated();
-            $specGroupIds = $data['spec_group_ids'] ?? [];
-            $attributes = $data['attributes'] ?? [];
             unset($data['spec_group_ids'], $data['attributes']);
 
             // Update category
             $category->update($data);
-
-            // Sync specification groups with correct column name
-            if (isset($request->spec_group_ids)) {
-                // Delete existing specification groups
-                DB::table('category_spec_groups')->where('category_id', $id)->delete();
-
-                // Insert new specification groups
-                if (!empty($specGroupIds)) {
-                    foreach ($specGroupIds as $specGroupId) {
-                        DB::table('category_spec_groups')->insert([
-                            'category_id' => $category->id,
-                            'spec_group_id' => $specGroupId, // CORRECT COLUMN NAME
-                            'created_at' => now(),
-                            'updated_at' => now(),
-                        ]);
-                    }
-                }
-            }
-
-            // Sync attributes
-            if (isset($request->attributes)) {
-                $category->attributes()->detach();
-                if (!empty($attributes)) {
-                    foreach ($attributes as $attributeId => $attributeData) {
-                        $category->attributes()->attach($attributeId, [
-                            'is_required' => $attributeData['is_required'] ?? false,
-                            'is_filterable' => $attributeData['is_filterable'] ?? false,
-                            'sort_order' => $attributeData['sort_order'] ?? 0,
-                        ]);
-                    }
-                }
-            }
 
             // Update category hierarchy
             $this->updateCategoryHierarchy($category);
@@ -306,10 +224,6 @@ class CategoryController extends Controller
             }
 
             DB::beginTransaction();
-
-            // Detach all relationships
-            DB::table('category_spec_groups')->where('category_id', $id)->delete();
-            $category->attributes()->detach();
 
             // Remove from category hierarchy
             DB::table('category_hierarchies')->where('ancestor_id', $id)->orWhere('descendant_id', $id)->delete();
@@ -509,10 +423,6 @@ class CategoryController extends Controller
             foreach ($request->ids as $id) {
                 $category = Category::find($id);
                 if ($category) {
-                    // Detach relationships
-                    DB::table('category_spec_groups')->where('category_id', $id)->delete();
-                    $category->attributes()->detach();
-
                     // Remove from hierarchy
                     DB::table('category_hierarchies')->where('ancestor_id', $id)->orWhere('descendant_id', $id)->delete();
 
@@ -537,134 +447,7 @@ class CategoryController extends Controller
         }
     }
 
-    /**
-     * Get specification groups for a category.
-     */
-    public function getSpecGroups($id): JsonResponse
-    {
-        try {
-            $category = Category::find($id);
 
-            if (!$category) {
-                return $this->apiResponse(false, null, 'Category not found', 404);
-            }
-
-            $specGroups = $category->specificationGroups()
-                ->select('specification_groups.id', 'specification_groups.name')
-                ->get();
-
-            return $this->apiResponse(true, $specGroups, 'Specification groups retrieved successfully');
-
-        } catch (\Exception $e) {
-            \Log::error('Category spec groups error: ' . $e->getMessage());
-            return $this->apiResponse(false, null, 'Failed to retrieve specification groups', 500);
-        }
-    }
-
-    /**
-     * Update specification groups for a category.
-     */
-    public function updateSpecGroups(Request $request, $id): JsonResponse
-    {
-        try {
-            $request->validate([
-                'spec_group_ids' => 'required|array',
-                'spec_group_ids.*' => 'exists:specification_groups,id'
-            ]);
-
-            $category = Category::find($id);
-
-            if (!$category) {
-                return $this->apiResponse(false, null, 'Category not found', 404);
-            }
-
-            DB::beginTransaction();
-
-            // Delete existing
-            DB::table('category_spec_groups')->where('category_id', $id)->delete();
-
-            // Insert new with correct column name
-            foreach ($request->spec_group_ids as $specGroupId) {
-                DB::table('category_spec_groups')->insert([
-                    'category_id' => $category->id,
-                    'spec_group_id' => $specGroupId,
-                    'created_at' => now(),
-                    'updated_at' => now(),
-                ]);
-            }
-
-            DB::commit();
-
-            return $this->apiResponse(true, null, 'Specification groups updated successfully');
-
-        } catch (\Exception $e) {
-            DB::rollBack();
-            \Log::error('Category update spec groups error: ' . $e->getMessage());
-            return $this->apiResponse(false, null, 'Failed to update specification groups', 500);
-        }
-    }
-
-    /**
-     * Get attributes for a category.
-     */
-    public function getAttributes($id): JsonResponse
-    {
-        try {
-            $category = Category::find($id);
-
-            if (!$category) {
-                return $this->apiResponse(false, null, 'Category not found', 404);
-            }
-
-            $attributes = $category->attributes()
-                ->withPivot('is_required', 'is_filterable', 'sort_order')
-                ->get();
-
-            return $this->apiResponse(true, $attributes, 'Attributes retrieved successfully');
-
-        } catch (\Exception $e) {
-            \Log::error('Category attributes error: ' . $e->getMessage());
-            return $this->apiResponse(false, null, 'Failed to retrieve attributes', 500);
-        }
-    }
-
-    /**
-     * Update attributes for a category.
-     */
-    public function updateAttributes(Request $request, $id): JsonResponse
-    {
-        try {
-            $request->validate([
-                'attributes' => 'required|array',
-                'attributes.*.is_required' => 'boolean',
-                'attributes.*.is_filterable' => 'boolean',
-                'attributes.*.sort_order' => 'integer|min:0'
-            ]);
-
-            $category = Category::find($id);
-
-            if (!$category) {
-                return $this->apiResponse(false, null, 'Category not found', 404);
-            }
-
-            $attributes = [];
-            foreach ($request->attributes as $attributeId => $attributeData) {
-                $attributes[$attributeId] = [
-                    'is_required' => $attributeData['is_required'] ?? false,
-                    'is_filterable' => $attributeData['is_filterable'] ?? false,
-                    'sort_order' => $attributeData['sort_order'] ?? 0,
-                ];
-            }
-
-            $category->attributes()->sync($attributes);
-
-            return $this->apiResponse(true, null, 'Attributes updated successfully');
-
-        } catch (\Exception $e) {
-            \Log::error('Category update attributes error: ' . $e->getMessage());
-            return $this->apiResponse(false, null, 'Failed to update attributes', 500);
-        }
-    }
 
     /**
      * Build category tree recursively.

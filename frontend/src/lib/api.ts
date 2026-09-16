@@ -79,6 +79,13 @@ export interface HomepageMedia {
     }>;
   };
   categories: ApiCategory[];
+  categorySection?: {
+    tag_text?: string;
+    title?: string;
+    subtitle?: string;
+    description?: string;
+    is_active?: boolean;
+  };
   customCrochet: {
     desktop: string;
     mobile: string;
@@ -283,6 +290,14 @@ export interface HomepageMedia {
     image?: string;
     is_active?: boolean;
   }>;
+  customOrderItems?: Array<{
+    id: number;
+    name: string;
+    title?: string;
+    subtitle?: string;
+    sort_order?: number;
+    is_active?: boolean;
+  }>;
 }
 
 export function normalizeImageUrl(url?: string | null, fallback = "/images/logo/Logo_1.png"): string {
@@ -442,9 +457,16 @@ export function transformApiProductToProduct(apiProduct: ApiProduct): Product {
  */
 export async function fetchCategories(): Promise<ApiCategory[]> {
   try {
-    const response = await fetch(`${getApiBaseUrl()}/customer/categories`, {
+    const isBrowser = typeof window !== "undefined";
+    const isDev = process.env.NODE_ENV === "development";
+    const bypassCache = isBrowser || isDev;
+    const url = bypassCache
+      ? `${getApiBaseUrl()}/customer/categories?_t=${Date.now()}`
+      : `${getApiBaseUrl()}/customer/categories`;
+
+    const response = await fetch(url, {
       headers: { Accept: "application/json" },
-      next: { revalidate: 60 },
+      ...(bypassCache ? { cache: "no-store" as const } : { next: { revalidate: 60 } }),
     });
     const result = await response.json();
     if (result.status === "success" && Array.isArray(result.data)) {
@@ -474,6 +496,10 @@ export async function fetchProducts(params?: {
   in_stock?: boolean;
 }): Promise<{ products: Product[]; rawApiProducts?: ApiProduct[]; meta?: any; filters?: any }> {
   try {
+    const isBrowser = typeof window !== "undefined";
+    const isDev = process.env.NODE_ENV === "development";
+    const bypassCache = isBrowser || isDev;
+
     const query = new URLSearchParams();
     if (params?.category_id) query.set("category_id", String(params.category_id));
     if (params?.search) query.set("search", params.search);
@@ -485,13 +511,14 @@ export async function fetchProducts(params?: {
     if (params?.sort_by) query.set("sort_by", params.sort_by);
     if (params?.per_page) query.set("per_page", String(params.per_page));
     if (params?.in_stock) query.set("in_stock", "true");
+    if (bypassCache) query.set("_t", String(Date.now()));
 
     const qs = query.toString();
     const url = `${getApiBaseUrl()}/customer/products${qs ? `?${qs}` : ""}`;
 
     const response = await fetch(url, {
       headers: { Accept: "application/json" },
-      next: { revalidate: 30 },
+      ...(bypassCache ? { cache: "no-store" as const } : { next: { revalidate: 30 } }),
     });
 
     const result = await response.json();
@@ -516,9 +543,16 @@ export async function fetchProducts(params?: {
  */
 export async function fetchProductBySlug(slug: string): Promise<Product | null> {
   try {
-    const response = await fetch(`${getApiBaseUrl()}/customer/products/${encodeURIComponent(slug)}`, {
+    const isBrowser = typeof window !== "undefined";
+    const isDev = process.env.NODE_ENV === "development";
+    const bypassCache = isBrowser || isDev;
+    const url = bypassCache
+      ? `${getApiBaseUrl()}/customer/products/${encodeURIComponent(slug)}?_t=${Date.now()}`
+      : `${getApiBaseUrl()}/customer/products/${encodeURIComponent(slug)}`;
+
+    const response = await fetch(url, {
       headers: { Accept: "application/json" },
-      next: { revalidate: 30 },
+      ...(bypassCache ? { cache: "no-store" as const } : { next: { revalidate: 30 } }),
     });
     const result = await response.json();
     if (result.success && result.data) {
@@ -536,9 +570,16 @@ export async function fetchProductBySlug(slug: string): Promise<Product | null> 
  */
 export async function fetchRelatedProducts(productId: number | string): Promise<Product[]> {
   try {
-    const response = await fetch(`${getApiBaseUrl()}/customer/products/${productId}/related`, {
+    const isBrowser = typeof window !== "undefined";
+    const isDev = process.env.NODE_ENV === "development";
+    const bypassCache = isBrowser || isDev;
+    const url = bypassCache
+      ? `${getApiBaseUrl()}/customer/products/${productId}/related?_t=${Date.now()}`
+      : `${getApiBaseUrl()}/customer/products/${productId}/related`;
+
+    const response = await fetch(url, {
       headers: { Accept: "application/json" },
-      next: { revalidate: 60 },
+      ...(bypassCache ? { cache: "no-store" as const } : { next: { revalidate: 60 } }),
     });
     const result = await response.json();
     if (result.success && Array.isArray(result.data)) {
@@ -556,9 +597,16 @@ export async function fetchRelatedProducts(productId: number | string): Promise<
  */
 export async function fetchHomeData(): Promise<any> {
   try {
-    const response = await fetch(`${getApiBaseUrl()}/customer/home`, {
+    const isBrowser = typeof window !== "undefined";
+    const isDev = process.env.NODE_ENV === "development";
+    const bypassCache = isBrowser || isDev;
+    const url = bypassCache
+      ? `${getApiBaseUrl()}/customer/home?_t=${Date.now()}`
+      : `${getApiBaseUrl()}/customer/home`;
+
+    const response = await fetch(url, {
       headers: { Accept: "application/json" },
-      next: { revalidate: 60 },
+      ...(bypassCache ? { cache: "no-store" as const } : { next: { revalidate: 60 } }),
     });
     const result = await response.json();
     if (result.success && result.data) {
@@ -660,19 +708,22 @@ export async function submitOrder(
 }
 
 /**
- * Fetch Structured Homepage & Global Media (Always Live & Cache-Busted)
+ * Fetch Structured Homepage & Global Media (Always Live in Browser, Static-friendly on Server)
  */
 export async function fetchHomepageMedia(): Promise<HomepageMedia | null> {
   try {
-    const timestamp = Date.now();
-    const url = `${getApiBaseUrl()}/customer/media?_t=${timestamp}`;
+    const isBrowser = typeof window !== "undefined";
+    const isDev = process.env.NODE_ENV === "development";
+    const bypassCache = isBrowser || isDev;
+    const url = bypassCache
+      ? `${getApiBaseUrl()}/customer/media?_t=${Date.now()}`
+      : `${getApiBaseUrl()}/customer/media`;
+
     const response = await fetch(url, {
       headers: {
         Accept: "application/json",
-        "Cache-Control": "no-cache, no-store, must-revalidate",
-        Pragma: "no-cache",
       },
-      cache: "no-store",
+      ...(bypassCache ? { cache: "no-store" as const } : {}),
     });
     const result = await response.json();
     if (result.success && result.data) {
@@ -745,19 +796,22 @@ export interface AboutPageData {
 }
 
 /**
- * Fetch Structured Dedicated About Page Data (Always Live & Cache-Busted)
+ * Fetch Structured Dedicated About Page Data (Always Live in Browser & Dev Mode, Static-friendly on Build)
  */
 export async function fetchAboutPageData(): Promise<AboutPageData | null> {
   try {
-    const timestamp = Date.now();
-    const url = `${getApiBaseUrl()}/customer/about?_t=${timestamp}`;
+    const isBrowser = typeof window !== "undefined";
+    const isDev = process.env.NODE_ENV === "development";
+    const bypassCache = isBrowser || isDev;
+    const url = bypassCache
+      ? `${getApiBaseUrl()}/customer/about?_t=${Date.now()}`
+      : `${getApiBaseUrl()}/customer/about`;
+
     const response = await fetch(url, {
       headers: {
         Accept: "application/json",
-        "Cache-Control": "no-cache, no-store, must-revalidate",
-        Pragma: "no-cache",
       },
-      cache: "no-store",
+      ...(bypassCache ? { cache: "no-store" as const } : {}),
     });
     const result = await response.json();
     if (result.success && result.data) {
@@ -787,9 +841,11 @@ export async function recordVideoView(id: number | string): Promise<void> {
 }
 
 export interface ContactIntroData {
+  id?: number | null;
   badge?: string;
   tag_text?: string;
   title: string;
+  tagline?: string;
   subtitle?: string;
   description?: string;
   image?: string;
@@ -887,19 +943,22 @@ export interface ContactPageData {
 }
 
 /**
- * Fetch Structured Dedicated Contact Page Data (Always Live & Cache-Busted)
+ * Fetch Structured Dedicated Contact Page Data (Always Live in Browser & Dev Mode, Static-friendly on Build)
  */
 export async function fetchContactPageData(): Promise<ContactPageData | null> {
   try {
-    const timestamp = Date.now();
-    const url = `${getApiBaseUrl()}/customer/contact?_t=${timestamp}`;
+    const isBrowser = typeof window !== "undefined";
+    const isDev = process.env.NODE_ENV === "development";
+    const bypassCache = isBrowser || isDev;
+    const url = bypassCache
+      ? `${getApiBaseUrl()}/customer/contact?_t=${Date.now()}`
+      : `${getApiBaseUrl()}/customer/contact`;
+
     const response = await fetch(url, {
       headers: {
         Accept: "application/json",
-        "Cache-Control": "no-cache, no-store, must-revalidate",
-        Pragma: "no-cache",
       },
-      cache: "no-store",
+      ...(bypassCache ? { cache: "no-store" as const } : {}),
     });
     const result = await response.json();
     if (result.success && result.data) {
@@ -917,5 +976,3 @@ export async function fetchContactPageData(): Promise<ContactPageData | null> {
     return null;
   }
 }
-
-

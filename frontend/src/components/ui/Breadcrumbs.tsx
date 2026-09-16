@@ -14,7 +14,7 @@ interface BreadcrumbsProps {
 
 export function Breadcrumbs({ items, className = "" }: BreadcrumbsProps) {
   return (
-    <nav aria-label="Breadcrumb" className={`flex items-center text-xs text-[#786864] ${className}`}>
+    <nav suppressHydrationWarning aria-label="Breadcrumb" className={`flex items-center text-xs text-[#786864] ${className}`}>
       <ol className="flex items-center gap-1.5 flex-wrap">
         <li>
           <Link
@@ -34,11 +34,12 @@ export function Breadcrumbs({ items, className = "" }: BreadcrumbsProps) {
                 <Link
                   href={item.href}
                   className="hover:text-[#913638] transition-colors"
+                  suppressHydrationWarning
                 >
                   {item.label}
                 </Link>
               ) : (
-                <span className="font-medium text-[#2E211E] truncate max-w-[200px]">
+                <span suppressHydrationWarning className="font-medium text-[#2E211E] truncate max-w-[200px]">
                   {item.label}
                 </span>
               )}

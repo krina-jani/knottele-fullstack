@@ -19,6 +19,7 @@ export function AnnouncementBar() {
           <span className="text-[#E7D1CC]">|</span>
           <Link
             href="/custom-order"
+            prefetch={true}
             className="hover:text-[#913638] transition-colors font-medium"
           >
             Custom Orders Available

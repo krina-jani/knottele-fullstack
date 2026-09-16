@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useMemo } from "react";
 import Image from "next/image";
 import {
   Play,
@@ -19,8 +19,19 @@ import {
   Maximize2,
 } from "lucide-react";
 import { InstagramIcon } from "@/components/ui/BotanicalDecorations";
-import { REEL_POSTS, ReelPost } from "@/data/blogReels";
-import { fetchHomepageMedia, recordVideoView, normalizeImageUrl } from "@/lib/api";
+import { REEL_POSTS } from "@/data/blogReels";
+import { fetchHomepageMedia, recordVideoView, normalizeImageUrl, getApiBaseUrl } from "@/lib/api";
+
+function normalizeVideoUrl(url?: string | null): string {
+  if (!url) return "";
+  if (url.startsWith("http://") || url.startsWith("https://") || url.startsWith("data:") || url.startsWith("blob:")) {
+    return url;
+  }
+  const clean = url.startsWith("/") ? url : `/${url}`;
+  return `${getApiBaseUrl()}${clean}`;
+}
+
+import { useWebsiteMedia } from "@/context/MediaContext";
 
 interface ReelItemType {
   id: string;
@@ -48,16 +59,52 @@ interface ReelItemType {
 }
 
 export function BlogReels() {
-  const [reelsList, setReelsList] = useState<ReelItemType[]>(REEL_POSTS);
-  const [sectionMeta, setSectionMeta] = useState({
-    title: "Behind the Stitches",
-    subtitle: "Watch our artisans hand-craft each creation, styling guides, and cozy studio ASMR unboxings.",
-    tag_text: "Studio Journal & Video Reels",
-    cta_text: "Follow @knotelleindia",
-    cta_link: "https://instagram.com/knotelleindia",
-    is_active: true,
-  });
-  const [isLoading, setIsLoading] = useState<boolean>(true);
+  const { media } = useWebsiteMedia();
+  const br = media?.blogReels;
+
+  const sectionMeta = useMemo(() => ({
+    title: br?.title || "Behind the Stitches",
+    subtitle: br?.subtitle || "Watch our artisans hand-craft each creation, styling guides, and cozy studio ASMR unboxings.",
+    tag_text: br?.tag_text || "Studio Journal & Video Reels",
+    cta_text: br?.cta_text || "Follow @knotelleindia",
+    cta_link: br?.cta_link || "https://instagram.com/knotelleindia",
+    is_active: br?.is_active !== false,
+  }), [br]);
+
+  const reelsList = useMemo<ReelItemType[]>(() => {
+    if (br && Array.isArray(br.items)) {
+      if (br.items.length === 0) return [];
+      return br.items.map((item) => {
+        const vUrl = normalizeVideoUrl(item.video_url || item.videoUrl);
+        return {
+          id: String(item.id),
+          db_id: item.db_id,
+          title: item.title,
+          subtitle: item.subtitle || "",
+          description: item.description || "",
+          caption: item.caption || item.description || item.subtitle || item.title,
+          category: item.category || "Studio ASMR",
+          duration: item.duration || "00:48",
+          views: String(item.views || "0"),
+          likes: String(item.likes || "0"),
+          comments: String(item.comments || "0"),
+          thumbnail: normalizeImageUrl(item.thumbnail, "/images/homepage/middleimg.png"),
+          mobile_thumbnail: item.mobile_thumbnail ? normalizeImageUrl(item.mobile_thumbnail) : undefined,
+          videoUrl: vUrl,
+          video_url: vUrl,
+          audioTrack: item.audio_track || item.audioTrack || item.audio_name || "Original Audio",
+          author: item.author || {
+            name: "Krina Jani",
+            role: "Lead Artisan",
+            avatar: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=80&w=200&auto=format&fit=crop",
+          },
+          tags: item.tags || ["#Crochet", "#Handmade", "#Knotelle"],
+        };
+      });
+    }
+    return REEL_POSTS;
+  }, [br]);
+
   const [selectedReel, setSelectedReel] = useState<ReelItemType | null>(null);
   const [isPlaying, setIsPlaying] = useState<boolean>(true);
   const [isMuted, setIsMuted] = useState<boolean>(false);
@@ -68,64 +115,6 @@ export function BlogReels() {
 
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const recordedViewsRef = useRef<Record<string, boolean>>({});
-
-  // Fetch dynamic content from Laravel API
-  useEffect(() => {
-    let isMounted = true;
-    async function loadData() {
-      try {
-        const media = await fetchHomepageMedia();
-        if (media && media.blogReels && isMounted) {
-          const br = media.blogReels;
-          setSectionMeta({
-            title: br.title || "Behind the Stitches",
-            subtitle: br.subtitle || "Watch our artisans hand-craft each creation, styling guides, and cozy studio ASMR unboxings.",
-            tag_text: br.tag_text || "Studio Journal & Video Reels",
-            cta_text: br.cta_text || "Follow @knotelleindia",
-            cta_link: br.cta_link || "https://instagram.com/knotelleindia",
-            is_active: br.is_active !== false,
-          });
-
-          if (Array.isArray(br.items) && br.items.length > 0) {
-            const mapped: ReelItemType[] = br.items.map((item) => ({
-              id: String(item.id),
-              db_id: item.db_id,
-              title: item.title,
-              subtitle: item.subtitle || "",
-              description: item.description || "",
-              caption: item.caption || item.description || item.subtitle || item.title,
-              category: item.category || "Studio ASMR",
-              duration: item.duration || "00:48",
-              views: String(item.views || "0"),
-              likes: String(item.likes || "0"),
-              comments: String(item.comments || "0"),
-              thumbnail: normalizeImageUrl(item.thumbnail, "/images/homepage/middleimg.png"),
-              mobile_thumbnail: item.mobile_thumbnail ? normalizeImageUrl(item.mobile_thumbnail) : undefined,
-              videoUrl: item.video_url || item.videoUrl,
-              video_url: item.video_url || item.videoUrl,
-              audioTrack: item.audio_track || item.audioTrack || item.audio_name || "Original Audio",
-              author: item.author || {
-                name: "Krina Jani",
-                role: "Lead Artisan",
-                avatar: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=80&w=200&auto=format&fit=crop",
-              },
-              tags: item.tags || ["#Crochet", "#Handmade", "#Knotelle"],
-            }));
-            setReelsList(mapped);
-          }
-        }
-      } catch (err) {
-        console.warn("Failed to load blog/reels media", err);
-      } finally {
-        if (isMounted) setIsLoading(false);
-      }
-    }
-
-    loadData();
-    return () => {
-      isMounted = false;
-    };
-  }, []);
 
   // Handle Play/Pause when video element or selected reel changes
   useEffect(() => {
@@ -190,7 +179,7 @@ export function BlogReels() {
   const handleNextReel = (e?: React.MouseEvent) => {
     e?.stopPropagation();
     if (!selectedReel || reelsList.length === 0) return;
-    const currentIndex = reelsList.findIndex((r) => r.id === selectedReel.id);
+    const currentIndex = reelsList.findIndex((r: ReelItemType) => r.id === selectedReel.id);
     const nextIndex = (currentIndex + 1) % reelsList.length;
     setSelectedReel(reelsList[nextIndex]);
     setIsPlaying(true);
@@ -206,7 +195,7 @@ export function BlogReels() {
   const handlePrevReel = (e?: React.MouseEvent) => {
     e?.stopPropagation();
     if (!selectedReel || reelsList.length === 0) return;
-    const currentIndex = reelsList.findIndex((r) => r.id === selectedReel.id);
+    const currentIndex = reelsList.findIndex((r: ReelItemType) => r.id === selectedReel.id);
     const prevIndex = (currentIndex - 1 + reelsList.length) % reelsList.length;
     setSelectedReel(reelsList[prevIndex]);
     setIsPlaying(true);
@@ -271,96 +260,98 @@ export function BlogReels() {
           )}
         </div>
 
-        {/* 4 Reel Video Cards Grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
-          {reelsList.map((reel) => {
-            const isLiked = likedReels[reel.id];
+        {/* Reel Video Cards Grid or Clean Empty State */}
+        {reelsList.length > 0 ? (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
+            {reelsList.map((reel: ReelItemType) => {
+              const isLiked = likedReels[reel.id];
 
-            return (
-              <div
-                key={reel.id}
-                onClick={() => handleOpenReel(reel)}
-                className="group relative aspect-[9/15] rounded-3xl overflow-hidden bg-[#2E211E] border border-[#E7D1CC] shadow-boutique hover:shadow-xl hover:border-[#EFB8B0] transition-all duration-300 cursor-pointer flex flex-col justify-between p-4"
-              >
-                {/* Background Image Thumbnail */}
-                <Image
-                  src={reel.thumbnail}
-                  alt={reel.title}
-                  fill
-                  sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
-                  className="object-cover group-hover:scale-108 transition-transform duration-700 opacity-90 group-hover:opacity-100"
-                />
+              return (
+                <div
+                  key={reel.id}
+                  onClick={() => handleOpenReel(reel)}
+                  className="group relative aspect-[9/15] rounded-3xl overflow-hidden bg-[#2E211E] border border-[#E7D1CC] shadow-boutique hover:shadow-xl hover:border-[#EFB8B0] transition-all duration-300 cursor-pointer flex flex-col justify-between p-4"
+                >
+                  {/* Background Image Thumbnail */}
+                  <Image
+                    src={reel.thumbnail}
+                    alt={reel.title}
+                    fill
+                    sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
+                    className="object-cover group-hover:scale-108 transition-transform duration-700 opacity-90 group-hover:opacity-100"
+                  />
 
-                {/* Dark Gradient Vignette for Legibility */}
-                <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/25 to-black/60 pointer-events-none" />
+                  {/* Dark Gradient Vignette for Legibility */}
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/25 to-black/60 pointer-events-none" />
 
-                {/* Top Bar: Category Pill & Duration */}
-                <div className="relative z-10 flex items-center justify-between gap-2">
-                  <span className="px-3 py-1 rounded-full bg-black/40 backdrop-blur-md text-white text-[11px] font-semibold border border-white/20">
-                    {reel.category}
-                  </span>
-                  <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-black/40 backdrop-blur-md text-white text-[10px] font-medium border border-white/20">
-                    <span className="w-1.5 h-1.5 rounded-full bg-[#EFB8B0] animate-pulse" />
-                    <span>{reel.duration}</span>
-                  </div>
-                </div>
-
-                {/* Center Hover Play Button */}
-                <div className="relative z-10 self-center my-auto">
-                  <div className="w-13 h-13 rounded-full bg-white/30 backdrop-blur-md border border-white/60 text-white flex items-center justify-center group-hover:scale-115 group-hover:bg-[#913638] group-hover:border-[#913638] transition-all duration-300 shadow-lg">
-                    <Play className="w-5 h-5 fill-current ml-0.5" />
-                  </div>
-                </div>
-
-                {/* Bottom Overlay: Title, Audio & Engagement */}
-                <div className="relative z-10 space-y-2">
-                  <h3 className="font-serif-luxury text-base font-bold text-white line-clamp-2 leading-snug drop-shadow-sm group-hover:text-[#EFB8B0] transition-colors">
-                    {reel.title}
-                  </h3>
-
-                  <p className="text-[11px] text-white/80 line-clamp-1">
-                    {reel.subtitle}
-                  </p>
-
-                  {/* Audio Track */}
-                  <div className="flex items-center gap-1.5 text-[10px] text-white/70 truncate">
-                    <Music2 className="w-3 h-3 text-[#EFB8B0] shrink-0" />
-                    <span className="truncate">{reel.audioTrack}</span>
-                  </div>
-
-                  {/* Engagement Counts Bar */}
-                  <div className="pt-2 border-t border-white/20 flex items-center justify-between text-white/90 text-xs">
-                    <div className="flex items-center gap-3">
-                      <button
-                        onClick={(e) => toggleLike(reel.id, e)}
-                        className="flex items-center gap-1 hover:text-[#EFB8B0] transition-colors"
-                        aria-label="Like reel"
-                      >
-                        <Heart
-                          className={`w-3.5 h-3.5 ${
-                            isLiked ? "fill-[#EFB8B0] text-[#EFB8B0]" : "text-white"
-                          }`}
-                        />
-                        <span className="text-[11px] font-medium">
-                          {isLiked ? "Liked" : reel.likes}
-                        </span>
-                      </button>
-
-                      <div className="flex items-center gap-1">
-                        <MessageCircle className="w-3.5 h-3.5 text-white/80" />
-                        <span className="text-[11px] font-medium">{reel.comments}</span>
-                      </div>
-                    </div>
-
-                    <span className="text-[10px] text-white/70 font-medium">
-                      {reel.views} views
+                  {/* Top Bar: Category Pill & Duration */}
+                  <div className="relative z-10 flex items-center justify-between gap-2">
+                    <span className="px-3 py-1 rounded-full bg-black/40 backdrop-blur-md text-white text-[11px] font-semibold border border-white/20">
+                      {reel.category}
                     </span>
+                    <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-black/40 backdrop-blur-md text-white text-[10px] font-medium border border-white/20">
+                      <span className="w-1.5 h-1.5 rounded-full bg-[#EFB8B0] animate-pulse" />
+                      <span>{reel.duration}</span>
+                    </div>
+                  </div>
+
+                  {/* Center Hover Play Button */}
+                  <div className="relative z-10 self-center my-auto">
+                    <div className="w-13 h-13 rounded-full bg-white/30 backdrop-blur-md border border-white/60 text-white flex items-center justify-center group-hover:scale-115 group-hover:bg-[#913638] group-hover:border-[#913638] transition-all duration-300 shadow-lg">
+                      <Play className="w-5 h-5 fill-current ml-0.5" />
+                    </div>
+                  </div>
+
+                  {/* Bottom Overlay: Title, Audio & Engagement */}
+                  <div className="relative z-10 space-y-2">
+                    <h3 className="font-serif-luxury text-base font-bold text-white line-clamp-2 leading-snug drop-shadow-sm group-hover:text-[#EFB8B0] transition-colors">
+                      {reel.title}
+                    </h3>
+
+                    <p className="text-[11px] text-white/80 line-clamp-1">
+                      {reel.subtitle}
+                    </p>
+
+                    <div className="pt-2 border-t border-white/15 flex items-center justify-between text-white/90">
+                      <div className="flex items-center gap-3 text-xs">
+                        <button
+                          type="button"
+                          onClick={(e) => toggleLike(reel.id, e)}
+                          className="flex items-center gap-1 hover:text-[#EFB8B0] transition-colors"
+                        >
+                          <Heart
+                            className={`w-3.5 h-3.5 ${
+                              isLiked ? "fill-red-500 text-red-500" : ""
+                            }`}
+                          />
+                          <span className="text-[10px] font-medium">
+                            {reel.likes}
+                          </span>
+                        </button>
+                        <div className="flex items-center gap-1">
+                          <MessageCircle className="w-3.5 h-3.5" />
+                          <span className="text-[10px] font-medium">
+                            {reel.comments}
+                          </span>
+                        </div>
+                      </div>
+
+                      <span className="text-[10px] text-white/70 font-medium">
+                        {reel.views} views
+                      </span>
+                    </div>
                   </div>
                 </div>
-              </div>
-            );
-          })}
-        </div>
+              );
+            })}
+          </div>
+        ) : (
+          <div className="p-12 text-center rounded-3xl bg-[#FFF9F6] border border-dashed border-[#E7D1CC] text-[#786864]">
+            <Sparkles className="w-8 h-8 mx-auto mb-2 text-[#913638] opacity-60" />
+            <p className="font-serif-luxury font-bold text-lg text-[#3A211D]">Fresh Stitches Coming Soon</p>
+            <p className="text-xs text-[#786864] mt-1">Our artisans are recording new behind-the-scenes reels. Check back shortly!</p>
+          </div>
+        )}
 
       </div>
 

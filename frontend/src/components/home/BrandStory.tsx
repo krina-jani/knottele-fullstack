@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { ArrowRight, Heart, Sparkles, Leaf, Smile } from "lucide-react";
@@ -10,29 +10,15 @@ const DEFAULT_STORY_BG = "/images/homepage/middleimg.png";
 
 export function BrandStory() {
   const { media } = useWebsiteMedia();
-  const [bgImage, setBgImage] = useState(DEFAULT_STORY_BG);
-  const [title, setTitle] = useState("Every Stitch");
-  const [subtitle, setSubtitle] = useState("Has a Story");
-  const [description, setDescription] = useState("More than just crochet, we create memories, happiness and a little bit of magic.");
-  const [ctaText, setCtaText] = useState("Read Our Story");
-  const [ctaLink, setCtaLink] = useState("/about");
-  const [isActive, setIsActive] = useState(true);
+  const bs = media?.brandStory || media?.customCrochet;
 
-  useEffect(() => {
-    const bs = media?.brandStory || media?.customCrochet;
-    if (!bs) return;
-    if (bs.is_active === false) {
-      setIsActive(false);
-      return;
-    }
-    setIsActive(true);
-    if (bs.desktop) setBgImage(bs.desktop);
-    if (bs.title) setTitle(bs.title);
-    if (bs.subtitle) setSubtitle(bs.subtitle);
-    if (bs.description) setDescription(bs.description);
-    if (bs.cta_text) setCtaText(bs.cta_text);
-    if (bs.cta_link) setCtaLink(bs.cta_link);
-  }, [media?.brandStory, media?.customCrochet]);
+  const bgImage = bs?.desktop || DEFAULT_STORY_BG;
+  const title = bs?.title || "Every Stitch";
+  const subtitle = bs?.subtitle || "Has a Story";
+  const description = bs?.description || "More than just crochet, we create memories, happiness and a little bit of magic.";
+  const ctaText = bs?.cta_text || "Read Our Story";
+  const ctaLink = bs?.cta_link || "/about";
+  const isActive = bs?.is_active !== false;
 
   const storyFeatures = [
     { title: "Handmade with Love", icon: Heart },

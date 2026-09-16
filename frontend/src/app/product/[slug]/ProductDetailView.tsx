@@ -39,40 +39,10 @@ export default function ProductDetailView({ slug }: ProductDetailViewProps) {
   const router = useRouter();
   const fallbackProduct = PRODUCTS.find((p) => p.slug === slug);
   const [liveProduct, setLiveProduct] = useState<Product | null>(null);
+  const [isLoading, setIsLoading] = useState<boolean>(!fallbackProduct);
+  const [fetchAttempted, setFetchAttempted] = useState<boolean>(false);
   const product = liveProduct || fallbackProduct;
   const [relatedProductsList, setRelatedProductsList] = useState<Product[]>([]);
-
-  useEffect(() => {
-    let isMounted = true;
-    fetchProductBySlug(slug)
-      .then((apiProd) => {
-        if (isMounted && apiProd) {
-          setLiveProduct(apiProd);
-          if (apiProd.colors && apiProd.colors[0]) {
-            setSelectedColor(apiProd.colors[0]);
-          }
-          if (apiProd.sizes && apiProd.sizes[0]) {
-            setSelectedSize(apiProd.sizes[0]);
-          }
-          fetchRelatedProducts(apiProd.id)
-            .then((rel) => {
-              if (isMounted && rel && rel.length > 0) {
-                setRelatedProductsList(rel);
-              }
-            })
-            .catch(() => {});
-        }
-      })
-      .catch((err) => console.warn("Live product fetch error:", err));
-
-    return () => {
-      isMounted = false;
-    };
-  }, [slug]);
-
-  if (!product) {
-    notFound();
-  }
 
   const { addItem, setIsCartOpen } = useCart();
   const { toggleWishlist, isInWishlist } = useWishlist();
@@ -80,14 +50,82 @@ export default function ProductDetailView({ slug }: ProductDetailViewProps) {
 
   const [selectedImageIndex, setSelectedImageIndex] = useState(0);
   const [selectedColor, setSelectedColor] = useState<ProductColor>(
-    product.colors[0] || { name: "Default", hex: "#FFF" }
+    product?.colors?.[0] || { name: "Default", hex: "#FFF" }
   );
   const [selectedSize, setSelectedSize] = useState<string>(
-    product.sizes?.[0] || "Standard"
+    product?.sizes?.[0] || "Standard"
   );
   const [customText, setCustomText] = useState("");
   const [quantity, setQuantity] = useState(1);
   const [activeTab, setActiveTab] = useState<"desc" | "specs" | "reviews">("desc");
+
+  useEffect(() => {
+    let isMounted = true;
+    if (!fallbackProduct) {
+      setIsLoading(true);
+    }
+    fetchProductBySlug(slug)
+      .then((apiProd) => {
+        if (isMounted) {
+          if (apiProd) {
+            setLiveProduct(apiProd);
+            if (apiProd.colors && apiProd.colors[0]) {
+              setSelectedColor(apiProd.colors[0]);
+            }
+            if (apiProd.sizes && apiProd.sizes[0]) {
+              setSelectedSize(apiProd.sizes[0]);
+            }
+            fetchRelatedProducts(apiProd.id)
+              .then((rel) => {
+                if (isMounted && rel && rel.length > 0) {
+                  setRelatedProductsList(rel);
+                }
+              })
+              .catch(() => {});
+          }
+          setIsLoading(false);
+          setFetchAttempted(true);
+        }
+      })
+      .catch((err) => {
+        console.warn("Live product fetch error:", err);
+        if (isMounted) {
+          setIsLoading(false);
+          setFetchAttempted(true);
+        }
+      });
+
+    return () => {
+      isMounted = false;
+    };
+  }, [slug, fallbackProduct]);
+
+  if (isLoading && !product) {
+    return (
+      <div className="min-h-screen bg-warm-white py-12 px-4 sm:px-6 lg:px-8">
+        <div className="max-w-7xl mx-auto space-y-8 animate-pulse">
+          <div className="h-6 w-48 bg-stone-200 rounded-md"></div>
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
+            <div className="h-[460px] bg-stone-200 rounded-3xl"></div>
+            <div className="space-y-4">
+              <div className="h-9 w-3/4 bg-stone-200 rounded-lg"></div>
+              <div className="h-6 w-1/3 bg-stone-200 rounded-lg"></div>
+              <div className="h-28 bg-stone-200 rounded-xl"></div>
+              <div className="h-12 w-full bg-stone-200 rounded-xl"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (!product && fetchAttempted) {
+    notFound();
+  }
+
+  if (!product) {
+    return null;
+  }
 
   const isWishlisted = isInWishlist(product.id);
   const relatedProducts =

@@ -1,12 +1,15 @@
 "use client";
 
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useMemo } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Search, X, ArrowRight, Sparkles } from "lucide-react";
-import { PRODUCTS } from "@/data/products";
-import { CATEGORIES } from "@/data/categories";
+import { useWebsiteMedia } from "@/context/MediaContext";
+import { Product } from "@/types/product";
+import { getLocalCache } from "@/lib/cache";
+
+const PRODUCTS_CACHE_KEY = "knotelle_cache_products";
 
 interface SearchModalProps {
   isOpen: boolean;
@@ -14,9 +17,18 @@ interface SearchModalProps {
 }
 
 export function SearchModal({ isOpen, onClose }: SearchModalProps) {
+  const { media } = useWebsiteMedia();
   const [query, setQuery] = useState("");
   const router = useRouter();
   const inputRef = useRef<HTMLInputElement>(null);
+
+  const productsList = useMemo<Product[]>(() => {
+    return getLocalCache<Product[]>(PRODUCTS_CACHE_KEY, []);
+  }, [isOpen]);
+
+  const categoriesList = useMemo(() => {
+    return media?.categories || [];
+  }, [media?.categories]);
 
   useEffect(() => {
     if (isOpen) {
@@ -33,19 +45,21 @@ export function SearchModal({ isOpen, onClose }: SearchModalProps) {
   if (!isOpen) return null;
 
   const filteredProducts = query.trim()
-    ? PRODUCTS.filter(
-        (p) =>
-          p.name.toLowerCase().includes(query.toLowerCase()) ||
-          p.category.toLowerCase().includes(query.toLowerCase()) ||
-          p.tags.some((t) => t.toLowerCase().includes(query.toLowerCase())) ||
-          p.description.toLowerCase().includes(query.toLowerCase())
-      ).slice(0, 5)
+    ? productsList
+        .filter(
+          (p) =>
+            p.name.toLowerCase().includes(query.toLowerCase()) ||
+            p.category.toLowerCase().includes(query.toLowerCase()) ||
+            p.tags?.some((t) => t.toLowerCase().includes(query.toLowerCase())) ||
+            p.description?.toLowerCase().includes(query.toLowerCase())
+        )
+        .slice(0, 5)
     : [];
 
   const filteredCategories = query.trim()
-    ? CATEGORIES.filter((c) =>
-        c.name.toLowerCase().includes(query.toLowerCase())
-      ).slice(0, 3)
+    ? categoriesList
+        .filter((c) => c.name.toLowerCase().includes(query.toLowerCase()))
+        .slice(0, 3)
     : [];
 
   const handleSearchSubmit = (e: React.FormEvent) => {

@@ -21,20 +21,6 @@ $navItems = [
                 'title' => 'Add New',
                 'route' => 'admin.products.create',
             ],
-            'attributes' => [
-                'title' => 'Attributes',
-                'route' => 'admin.products.attributes',
-                'params' => ['id' => 1],
-            ],
-            'specs' => [
-                'title' => 'Specifications',
-                'route' => 'admin.products.specifications',
-                'params' => ['id' => 1],
-            ],
-            'tags' => [
-                'title' => 'Tags',
-                'route' => 'admin.products.tags',
-            ],
         ],
     ],
 

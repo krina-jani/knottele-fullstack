@@ -94,6 +94,7 @@ export function Navbar() {
                     <Link
                       key={link.href + idx}
                       href={link.href}
+                      prefetch={true}
                       className={`inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-semibold tracking-wide transition-all shadow-xs active:scale-95 ${
                         isActive
                           ? "bg-[#913638] text-white ring-2 ring-[#913638]/25 shadow-sm"
@@ -110,6 +111,7 @@ export function Navbar() {
                   <Link
                     key={link.href + idx}
                     href={link.href}
+                    prefetch={true}
                     className={`relative text-sm font-medium tracking-wide py-2 transition-colors flex flex-col items-center ${
                       isActive
                         ? "text-[#913638] font-bold"

@@ -4,60 +4,85 @@ import React, { useState, useEffect, useMemo } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { CATEGORIES, Category } from "@/data/categories";
-import { PRODUCTS } from "@/data/products";
 import { Product } from "@/types/product";
 import { fetchProducts, fetchCategories } from "@/lib/api";
 import { ProductCard } from "@/components/ui/ProductCard";
 import { Breadcrumbs } from "@/components/ui/Breadcrumbs";
 import { BotanicalFlourish } from "@/components/ui/BotanicalDecorations";
 import { Sparkles, ArrowRight } from "lucide-react";
+import { useWebsiteMedia } from "@/context/MediaContext";
+import { getLocalCache, setLocalCache, setupAdminSyncListener } from "@/lib/cache";
+
+const PRODUCTS_CACHE_KEY = "knotelle_cache_products";
+const CATEGORIES_CACHE_KEY = "knotelle_cache_categories";
 
 interface CategoryPageViewProps {
   slug: string;
 }
 
 export default function CategoryPageView({ slug }: CategoryPageViewProps) {
-  const fallbackCategory = CATEGORIES.find((c) => c.slug === slug);
-  const [categoriesList, setCategoriesList] = useState<any[]>(CATEGORIES);
-  const [productsList, setProductsList] = useState<Product[]>(PRODUCTS);
+  const { media } = useWebsiteMedia();
+  const [categoriesList, setCategoriesList] = useState<any[]>(() =>
+    media?.categories && media.categories.length > 0
+      ? media.categories
+      : getLocalCache<any[]>(CATEGORIES_CACHE_KEY, [])
+  );
+  const [productsList, setProductsList] = useState<Product[]>(() =>
+    getLocalCache<Product[]>(PRODUCTS_CACHE_KEY, [])
+  );
 
   useEffect(() => {
     let isMounted = true;
 
-    fetchCategories()
-      .then((cats) => {
-        if (isMounted && cats && cats.length > 0) {
-          setCategoriesList(cats);
-        }
-      })
-      .catch((err) => console.warn("Live categories fetch notice:", err));
+    const loadData = () => {
+      fetchCategories()
+        .then((cats) => {
+          if (isMounted && cats && cats.length > 0) {
+            setCategoriesList(cats);
+            setLocalCache(CATEGORIES_CACHE_KEY, cats);
+          }
+        })
+        .catch((err) => console.warn("Live categories fetch notice:", err));
 
-    fetchProducts({ per_page: 100 })
-      .then((res) => {
-        if (isMounted && res.products && res.products.length > 0) {
-          setProductsList(res.products);
-        }
-      })
-      .catch((err) => console.warn("Live products fetch notice:", err));
+      fetchProducts({ per_page: 100 })
+        .then((res) => {
+          if (isMounted && res.products && res.products.length > 0) {
+            setProductsList(res.products);
+            setLocalCache(PRODUCTS_CACHE_KEY, res.products);
+          }
+        })
+        .catch((err) => console.warn("Live products fetch notice:", err));
+    };
+
+    loadData();
+    const cleanupListeners = setupAdminSyncListener(loadData);
 
     return () => {
       isMounted = false;
+      cleanupListeners();
     };
   }, []);
 
-  const category =
-    categoriesList.find((c) => c.slug === slug) || fallbackCategory;
+  useEffect(() => {
+    if (media?.categories && media.categories.length > 0) {
+      setCategoriesList(media.categories);
+    }
+  }, [media?.categories]);
 
-  if (!category && !fallbackCategory) {
-    notFound();
-  }
+  const category = categoriesList.find((c) => c.slug === slug);
 
-  const currentCat = category || fallbackCategory!;
+  const currentCat = category || {
+    name: slug.charAt(0).toUpperCase() + slug.slice(1).replace(/-/g, " "),
+    slug: slug,
+    description: `Discover our artisanal handcrafted ${slug.replace(/-/g, " ")} creations.`,
+    image: "/images/logo/Logo_1.png",
+  };
 
   const categoryProducts = useMemo(() => {
-    return productsList.filter((p) => p.categorySlug === currentCat.slug);
-  }, [productsList, currentCat.slug]);
+    return productsList.filter(
+      (p) => p.categorySlug === slug || p.category.toLowerCase().includes(slug.replace(/-/g, " ").toLowerCase())
+    );
+  }, [productsList, slug]);
 
   return (
     <div className="bg-[#FFF9F6] min-h-screen py-8 lg:py-12">

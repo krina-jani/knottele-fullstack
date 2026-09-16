@@ -114,88 +114,7 @@
                     </div>
                 </div>
 
-                <!-- Specification Groups Card -->
-                <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
-                    <div class="px-6 py-4 border-b border-gray-200">
-                        <h3 class="text-lg font-semibold text-gray-800">Specification Groups</h3>
-                    </div>
-                    <div class="p-6">
-                        <p class="text-sm text-gray-600 mb-4">Select specification groups to assign to this category</p>
 
-                        <div class="mb-4">
-                            <div class="relative">
-                                <input type="text" id="specGroupSearch" placeholder="Search specification groups..."
-                                    class="pl-10 pr-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent w-full">
-                                <i class="fas fa-search absolute left-3 top-3 text-gray-400"></i>
-                            </div>
-                        </div>
-
-                        <div class="space-y-3 max-h-96 overflow-y-auto p-4 border rounded-lg bg-gray-50"
-                            id="specificationGroupsContainer">
-                            <div class="text-center py-8" id="specGroupsLoading">
-                                <i class="fas fa-spinner fa-spin text-gray-400 text-2xl"></i>
-                                <p class="text-sm text-gray-500 mt-2">Loading specification groups...</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Attributes Card -->
-                <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
-                    <div class="px-6 py-4 border-b border-gray-200">
-                        <h3 class="text-lg font-semibold text-gray-800">Attributes</h3>
-                    </div>
-                    <div class="p-6">
-                        <p class="text-sm text-gray-600 mb-4">Select attributes for variant creation (size, color, etc.)
-                        </p>
-
-                        <div class="mb-4">
-                            <div class="relative">
-                                <input type="text" id="attributeSearch" placeholder="Search attributes..."
-                                    class="pl-10 pr-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent w-full">
-                                <i class="fas fa-search absolute left-3 top-3 text-gray-400"></i>
-                            </div>
-                        </div>
-
-                        <div class="overflow-x-auto">
-                            <table class="min-w-full divide-y divide-gray-200">
-                                <thead class="bg-gray-50">
-                                    <tr>
-                                        <th scope="col"
-                                            class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                            <input type="checkbox" id="selectAllAttributes"
-                                                class="rounded border-gray-300 text-indigo-600 focus:ring-indigo-500">
-                                        </th>
-                                        <th scope="col"
-                                            class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                            Attribute
-                                        </th>
-                                        <th scope="col"
-                                            class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                            Required
-                                        </th>
-                                        <th scope="col"
-                                            class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                            Filterable
-                                        </th>
-                                        <th scope="col"
-                                            class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                            Sort Order
-                                        </th>
-                                    </tr>
-                                </thead>
-                                <tbody class="bg-white divide-y divide-gray-200" id="attributesContainer">
-                                    <tr id="attributesLoading">
-                                        <td colspan="5" class="px-4 py-8 text-center">
-                                            <i class="fas fa-spinner fa-spin text-gray-400 text-2xl"></i>
-                                            <p class="text-sm text-gray-500 mt-2">Loading attributes...</p>
-                                        </td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                </div>
             </div>
 
             <!-- Right Column - Image & Settings -->
@@ -389,8 +308,6 @@
         // Global variables
         let selectedMediaId = null;
         let selectedMediaUrl = null;
-        let allAttributes = [];
-        let allSpecGroups = [];
 
         // Initialize page
         document.addEventListener('DOMContentLoaded', function() {
@@ -398,9 +315,7 @@
 
             // Load initial data
             Promise.all([
-                loadParentCategories(),
-                loadAttributes(),
-                loadSpecificationGroups()
+                loadParentCategories()
             ]).then(() => {
                 console.log('All data loaded successfully');
                 setupEventListeners();
@@ -446,146 +361,6 @@
             }
         }
 
-        // Load attributes
-        async function loadAttributes() {
-            try {
-                const response = await axiosInstance.get('/attributes/dropdown');
-
-                if (response.data.success) {
-                    allAttributes = response.data.data;
-                    renderAttributes();
-                }
-            } catch (error) {
-                console.error('Error loading attributes:', error);
-                document.getElementById('attributesLoading').innerHTML =
-                    '<td colspan="5" class="px-4 py-8 text-center text-rose-500">Failed to load attributes</td>';
-            }
-        }
-
-        // Load specification groups
-        async function loadSpecificationGroups() {
-            try {
-                const response = await axiosInstance.get('/specification-groups/dropdown');
-
-                if (response.data.success) {
-                    allSpecGroups = response.data.data;
-                    renderSpecificationGroups();
-                }
-            } catch (error) {
-                console.error('Error loading specification groups:', error);
-                document.getElementById('specificationGroupsContainer').innerHTML =
-                    '<div class="text-center py-8 text-rose-500">Failed to load specification groups</div>';
-            }
-        }
-
-        // Render attributes table
-        function renderAttributes() {
-            const container = document.getElementById('attributesContainer');
-
-            if (allAttributes.length === 0) {
-                container.innerHTML = `
-                <tr>
-                    <td colspan="5" class="px-4 py-8 text-center text-gray-500">
-                        No attributes found. Create attributes first.
-                    </td>
-                </tr>
-            `;
-                return;
-            }
-
-            // Remove loading row
-            const loadingRow = document.getElementById('attributesLoading');
-            if (loadingRow) {
-                loadingRow.remove();
-            }
-
-            // Add attribute rows
-            allAttributes.forEach(attribute => {
-                const row = document.createElement('tr');
-                row.className = 'attribute-item hover:bg-gray-50';
-                row.innerHTML = `
-                <td class="px-4 py-3 whitespace-nowrap">
-                    <input type="checkbox"
-                           id="attribute_${attribute.id}"
-                           name="attributes[${attribute.id}][selected]"
-                           class="attribute-checkbox rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"
-                           data-id="${attribute.id}">
-                </td>
-                <td class="px-4 py-3 whitespace-nowrap">
-                    <div class="flex items-center">
-                        <div class="text-sm font-medium text-gray-900">${attribute.name}</div>
-                        <div class="ml-2 text-xs text-gray-500">(${attribute.code})</div>
-                    </div>
-                </td>
-                <td class="px-4 py-3 whitespace-nowrap">
-                    <input type="checkbox"
-                           id="attribute_${attribute.id}_required"
-                           name="attributes[${attribute.id}][is_required]"
-                           class="rounded border-gray-300 text-indigo-600 focus:ring-indigo-500 attribute-required"
-                           disabled>
-                </td>
-                <td class="px-4 py-3 whitespace-nowrap">
-                    <input type="checkbox"
-                           id="attribute_${attribute.id}_filterable"
-                           name="attributes[${attribute.id}][is_filterable]"
-                           class="rounded border-gray-300 text-indigo-600 focus:ring-indigo-500 attribute-filterable"
-                           disabled>
-                </td>
-                <td class="px-4 py-3 whitespace-nowrap">
-                    <input type="number"
-                           id="attribute_${attribute.id}_order"
-                           name="attributes[${attribute.id}][sort_order]"
-                           value="0"
-                           min="0"
-                           class="attribute-sort-order w-20 border border-gray-300 rounded px-2 py-1 text-sm"
-                           disabled>
-                </td>
-            `;
-                container.appendChild(row);
-            });
-
-            // Setup attribute checkbox event listeners
-            setupAttributeEventListeners();
-        }
-
-        // Render specification groups
-        function renderSpecificationGroups() {
-            const container = document.getElementById('specificationGroupsContainer');
-
-            if (allSpecGroups.length === 0) {
-                container.innerHTML = `
-                <div class="text-center py-8 text-gray-500">
-                    No specification groups found. Create groups first.
-                </div>
-            `;
-                return;
-            }
-
-            // Remove loading message
-            const loadingDiv = document.getElementById('specGroupsLoading');
-            if (loadingDiv) {
-                loadingDiv.remove();
-            }
-
-            // Add specification group checkboxes
-            allSpecGroups.forEach(group => {
-                const groupDiv = document.createElement('div');
-                groupDiv.className =
-                    'spec-group-item flex items-center p-3 bg-white rounded-lg border hover:border-indigo-300 transition-colors';
-                groupDiv.innerHTML = `
-                <input type="checkbox"
-                       id="spec_group_${group.id}"
-                       name="spec_group_ids[]"
-                       value="${group.id}"
-                       class="spec-group-checkbox rounded border-gray-300 text-indigo-600 focus:ring-indigo-500 mr-3">
-                <label for="spec_group_${group.id}" class="flex-1 cursor-pointer">
-                    <div class="font-medium text-gray-900">${group.name}</div>
-                </label>
-            `;
-                container.appendChild(groupDiv);
-            });
-        }
-
         // Setup event listeners
         function setupEventListeners() {
             // Auto-generate slug from name
@@ -593,21 +368,6 @@
 
             // Form submission
             document.getElementById('categoryForm').addEventListener('submit', saveCategory);
-
-            // Attribute search
-            document.getElementById('attributeSearch').addEventListener('keyup', filterAttributes);
-
-            // Specification group search
-            document.getElementById('specGroupSearch').addEventListener('keyup', filterSpecGroups);
-
-            // Select all attributes
-            document.getElementById('selectAllAttributes').addEventListener('change', function() {
-                const isChecked = this.checked;
-                document.querySelectorAll('.attribute-checkbox').forEach(checkbox => {
-                    checkbox.checked = isChecked;
-                    toggleAttributeOptions(checkbox.dataset.id, isChecked);
-                });
-            });
 
             // Clear errors on input
             ['name', 'slug'].forEach(fieldId => {
@@ -620,18 +380,6 @@
                             errorElement.textContent = '';
                         }
                     });
-                }
-            });
-        }
-
-        // Setup attribute event listeners
-        function setupAttributeEventListeners() {
-            // Individual attribute checkbox event delegation
-            document.getElementById('attributesContainer').addEventListener('change', function(e) {
-                if (e.target && e.target.classList.contains('attribute-checkbox')) {
-                    const attributeId = e.target.dataset.id;
-                    const isChecked = e.target.checked;
-                    toggleAttributeOptions(attributeId, isChecked);
                 }
             });
         }
@@ -651,43 +399,6 @@
                     .replace(/^-+|-+$/g, '');
                 slugInput.value = slug;
             }
-        }
-
-        // Toggle attribute options
-        function toggleAttributeOptions(attributeId, isChecked) {
-            const requiredCheckbox = document.getElementById(`attribute_${attributeId}_required`);
-            const filterableCheckbox = document.getElementById(`attribute_${attributeId}_filterable`);
-            const sortOrderInput = document.getElementById(`attribute_${attributeId}_order`);
-
-            if (requiredCheckbox && filterableCheckbox && sortOrderInput) {
-                requiredCheckbox.disabled = !isChecked;
-                filterableCheckbox.disabled = !isChecked;
-                sortOrderInput.disabled = !isChecked;
-
-                if (!isChecked) {
-                    requiredCheckbox.checked = false;
-                    filterableCheckbox.checked = false;
-                    sortOrderInput.value = '0';
-                }
-            }
-        }
-
-        // Filter attributes
-        function filterAttributes() {
-            const searchTerm = this.value.toLowerCase();
-            document.querySelectorAll('.attribute-item').forEach(row => {
-                const text = row.textContent.toLowerCase();
-                row.style.display = text.includes(searchTerm) ? '' : 'none';
-            });
-        }
-
-        // Filter specification groups
-        function filterSpecGroups() {
-            const searchTerm = this.value.toLowerCase();
-            document.querySelectorAll('.spec-group-item').forEach(item => {
-                const text = item.textContent.toLowerCase();
-                item.style.display = text.includes(searchTerm) ? '' : 'none';
-            });
         }
 
         // =============== MEDIA MANAGEMENT FUNCTIONS ===============
@@ -952,27 +663,7 @@
                 show_in_nav: document.getElementById('show_in_nav').checked ? 1 : 0
             };
 
-            // Collect specification groups
-            const specGroupIds = [];
-            document.querySelectorAll('.spec-group-checkbox:checked').forEach(checkbox => {
-                specGroupIds.push(parseInt(checkbox.value));
-            });
-            formData.spec_group_ids = specGroupIds;
 
-            // Collect attributes
-            const attributes = {};
-            document.querySelectorAll('.attribute-checkbox:checked').forEach(checkbox => {
-                const attributeId = checkbox.dataset.id;
-                attributes[attributeId] = {
-                    is_required: document.getElementById(`attribute_${attributeId}_required`).checked ? 1 :
-                        0,
-                    is_filterable: document.getElementById(`attribute_${attributeId}_filterable`).checked ?
-                        1 : 0,
-                    sort_order: parseInt(document.getElementById(`attribute_${attributeId}_order`).value) ||
-                        0
-                };
-            });
-            formData.attributes = attributes;
 
             // Show loading state
             const submitBtn = e.target.querySelector('button[type="submit"]');

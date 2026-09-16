@@ -34,72 +34,43 @@
             
             <!-- Filters Group -->
             <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 flex-1">
-                <!-- Page Filter -->
+                <!-- Page Filter (Strictly 7 options) -->
                 <div>
                     <label class="block text-xs font-bold text-stone-500 uppercase tracking-wider mb-1.5">Page</label>
-                    <select id="filterPage" onchange="applyFilters()" class="w-full bg-stone-50 border border-stone-200 rounded-xl px-3.5 py-2.5 text-sm font-semibold text-stone-700 focus:outline-none focus:ring-2 focus:ring-red-500">
+                    <select id="filterPage" onchange="onPageFilterChange()" class="w-full bg-stone-50 border border-stone-200 rounded-xl px-3.5 py-2.5 text-sm font-semibold text-stone-700 focus:outline-none focus:ring-2 focus:ring-red-500">
                         <option value="all">All Pages</option>
                         <option value="homepage" selected>Homepage</option>
                         <option value="shop">Shop Page</option>
                         <option value="custom_order">Custom Order Page</option>
                         <option value="about">About Page</option>
                         <option value="contact">Contact Page</option>
-                        <option value="global">Global Site Assets</option>
+                        <option value="footer">Footer</option>
                     </select>
                 </div>
 
-                <!-- Section Filter -->
+                <!-- Section Filter (Dynamically populated based on Page) -->
                 <div>
                     <label class="block text-xs font-bold text-stone-500 uppercase tracking-wider mb-1.5">Section</label>
                     <select id="filterSection" onchange="applyFilters()" class="w-full bg-stone-50 border border-stone-200 rounded-xl px-3.5 py-2.5 text-sm font-semibold text-stone-700 focus:outline-none focus:ring-2 focus:ring-red-500">
                         <option value="all">All Sections</option>
-                        <option value="hero">Hero Banner (Homepage)</option>
-                        <option value="categories">Shop by Category (Homepage)</option>
-                        <option value="custom_crochet">Custom Crochet Banner (Homepage)</option>
-                        <option value="brand_story">Brand Story (Homepage)</option>
-                        <option value="bestsellers">Best Sellers (Homepage)</option>
-                        <option value="trust_benefits">Trust & Benefits (Homepage)</option>
-                        <option value="custom_order">Custom Order CTA (Homepage)</option>
-                        <option value="newsletter">Newsletter (Homepage)</option>
-                        <option value="blog_reels">Blog / Videos & Reels (Homepage)</option>
-                        <option value="footer">Footer Artwork & Navigation (Homepage)</option>
-                        <option value="navbar_settings">Navbar & Header Navigation (Global)</option>
-                        <option value="shop_banner">Shop Header & Banner (Shop)</option>
-                        <option value="shop_promo">Shop Promo Banner (Shop)</option>
-                        <option value="custom_order_header">Custom Order Header Banner (Custom Order)</option>
-                        <option value="custom_order_showcase">Craft Process Showcase (Custom Order)</option>
-                        <option value="about_story">The KNOTELLE Story (About)</option>
-                        <option value="craft_pillars">Our Craft Pillars (About)</option>
-                        <option value="contact_intro">Contact Introduction / Hero (Contact)</option>
-                        <option value="contact_info">Contact Information & Atelier (Contact)</option>
-                        <option value="contact_form">Send Us a Message / Form (Contact)</option>
-                        <option value="contact_faqs">Frequently Asked Questions (Contact)</option>
-                        <option value="global_assets">Global Site Assets</option>
+                        <option value="hero">Hero Banner</option>
+                        <option value="categories">Shop by Category</option>
+                        <option value="custom_crochet">Custom Crochet Banner</option>
+                        <option value="brand_story">Brand Story</option>
+                        <option value="bestsellers">Best Sellers</option>
+                        <option value="trust_benefits">Trust & Benefits</option>
+                        <option value="custom_order">Custom Order CTA</option>
+                        <option value="newsletter">Newsletter</option>
+                        <option value="blog_reels">Blog / Videos & Reels</option>
                     </select>
                 </div>
 
-                <!-- Device Filter -->
+                <!-- Device Target (Desktop Only) -->
                 <div>
                     <label class="block text-xs font-bold text-stone-500 uppercase tracking-wider mb-1.5">Device Target</label>
                     <select id="filterDevice" onchange="applyFilters()" class="w-full bg-stone-50 border border-stone-200 rounded-xl px-3.5 py-2.5 text-sm font-semibold text-stone-700 focus:outline-none focus:ring-2 focus:ring-red-500">
-                        <option value="all">All Devices</option>
-                        <option value="desktop">Desktop Only</option>
-                        <option value="mobile">Mobile Only</option>
+                        <option value="desktop" selected>Desktop / All Desktop</option>
                     </select>
-                </div>
-            </div>
-
-            <!-- View Switcher -->
-            <div class="flex items-center gap-2 pt-2 lg:pt-5 shrink-0">
-                <div class="bg-stone-100 p-1 rounded-2xl flex items-center border border-stone-200">
-                    <button id="viewSectionsBtn" onclick="switchView('sections')" class="px-4 py-2 rounded-xl text-xs font-bold transition-all bg-white text-red-700 shadow-xs flex items-center gap-1.5">
-                        <i class="fas fa-th-large"></i>
-                        <span>Section Manager</span>
-                    </button>
-                    <button id="viewLibraryBtn" onclick="switchView('library')" class="px-4 py-2 rounded-xl text-xs font-bold transition-all text-stone-500 hover:text-stone-800 flex items-center gap-1.5">
-                        <i class="fas fa-images"></i>
-                        <span>All Media Files</span>
-                    </button>
                 </div>
             </div>
 
@@ -742,19 +713,14 @@
                         <i class="fas fa-save"></i>
                         <span id="testimonialSubmitBtnText">Save Review</span>
                     </button>
-                </div>
-            </form>
-        </div>
-    </div>
-
-    <!-- MODAL 7: ADD / EDIT VIDEO & REEL MODAL -->
-    <div id="videoReelModal" onclick="if(event.target === this) closeVideoReelModal()" class="fixed inset-0 bg-stone-900/60 backdrop-blur-xs hidden items-center justify-center z-50 p-4">
-        <div class="bg-white rounded-3xl max-w-2xl w-full max-h-[92vh] flex flex-col overflow-hidden shadow-2xl border border-stone-100 animate-fadeIn" onclick="event.stopPropagation()">
+          <!-- MODAL 7: ADD / EDIT VIDEO & REEL MODAL -->
+    <div id="videoReelModal" onclick="if(event.target === this) closeVideoReelModal()" class="fixed inset-0 bg-stone-900/60 backdrop-blur-xs hidden items-center justify-center z-50 p-3 sm:p-5">
+        <div class="bg-white rounded-3xl max-w-5xl w-full max-h-[94vh] flex flex-col overflow-hidden shadow-2xl border border-stone-100 animate-fadeIn" onclick="event.stopPropagation()">
             
             <!-- Pinned Header -->
-            <div class="p-5 px-6 border-b border-stone-100 flex items-center justify-between bg-stone-50/80 shrink-0">
+            <div class="p-4 sm:p-5 px-6 border-b border-stone-100 flex items-center justify-between bg-stone-50/90 shrink-0">
                 <div class="flex items-center gap-3">
-                    <div class="w-10 h-10 rounded-2xl bg-red-50 text-red-600 flex items-center justify-center font-bold text-base shadow-2xs">
+                    <div class="w-10 h-10 rounded-2xl bg-red-50 text-red-600 flex items-center justify-center font-bold text-base shadow-2xs shrink-0">
                         <i class="fas fa-play-circle text-lg"></i>
                     </div>
                     <div>
@@ -773,225 +739,218 @@
                 <input type="hidden" id="videoReelThumbnailMediaId" name="thumbnail_media_id" value="">
                 <input type="hidden" id="videoReelThumbnailUrl" name="thumbnail_url" value="">
 
-                <!-- Scrollable Body Content -->
-                <div class="p-6 space-y-5 overflow-y-auto flex-1 overscroll-contain">
-                    
-                    <!-- Section: Content Information -->
-                    <div class="space-y-3">
-                        <div class="flex items-center gap-2 border-b border-stone-100 pb-1.5">
-                            <i class="fas fa-info-circle text-red-600 text-xs"></i>
-                            <span class="text-xs font-bold text-stone-700 uppercase tracking-wider">Content & Category</span>
-                        </div>
-
-                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
-                            <div>
-                                <label class="block text-xs font-bold text-stone-600 uppercase tracking-wider mb-1">Content Type <span class="text-red-500">*</span></label>
-                                <select id="videoReelContentType" name="content_type" class="w-full bg-stone-50 border border-stone-200 rounded-xl px-3.5 py-2.5 text-sm font-semibold text-stone-800 focus:bg-white focus:outline-none focus:ring-2 focus:ring-red-500">
-                                    <option value="reel">Reel (Vertical 9:16)</option>
-                                    <option value="video">Video (Standard / Adaptive)</option>
-                                    <option value="blog_video">Blog / Video Story</option>
-                                </select>
+                <!-- Scrollable Body Content (2-Column Grid on Desktop) -->
+                <div id="videoReelScrollContainer" class="p-5 sm:p-6 overflow-y-auto flex-1 overscroll-contain">
+                    <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+                        
+                        <!-- LEFT COLUMN (col-span-7): Primary Video Info, Descriptions & Settings -->
+                        <div class="lg:col-span-7 space-y-4">
+                            
+                            <!-- 1. Title / Headline (Most Prominent - Always Visible) -->
+                            <div class="bg-red-50/40 border-2 border-red-200/80 rounded-2xl p-4 shadow-2xs">
+                                <label class="block text-xs font-bold text-stone-800 uppercase tracking-wider mb-1.5 flex items-center justify-between">
+                                    <span class="flex items-center gap-1.5">
+                                        <i class="fas fa-heading text-red-600 text-xs"></i>
+                                        <span>Title / Headline <span class="text-red-500">*</span></span>
+                                    </span>
+                                    <span class="text-[10px] text-stone-400 font-normal">Primary video title</span>
+                                </label>
+                                <input type="text" id="videoReelTitle" name="title" required placeholder="e.g. Crafting the Everlasting Sunflower" class="w-full bg-white border border-stone-200 rounded-xl px-4 py-2.5 text-sm font-bold text-stone-800 focus:outline-none focus:ring-2 focus:ring-red-500 transition-all shadow-2xs">
+                                <p class="text-[10px] text-stone-400 mt-1">If empty when selecting a video file, the file name will auto-populate as the title.</p>
                             </div>
-                            <div>
-                                <label class="block text-xs font-bold text-stone-600 uppercase tracking-wider mb-1">Category / Label <span class="text-red-500">*</span></label>
-                                <input type="text" id="videoReelCategory" name="category_name" required placeholder="e.g. Studio ASMR" class="w-full bg-stone-50 border border-stone-200 rounded-xl px-3.5 py-2.5 text-sm font-semibold text-stone-800 focus:bg-white focus:outline-none focus:ring-2 focus:ring-red-500">
-                                <div class="flex flex-wrap gap-1.5 mt-1.5">
-                                    <button type="button" onclick="setReelCategory('Studio ASMR')" class="text-[10px] bg-stone-100 hover:bg-red-50 hover:text-red-700 px-2 py-0.5 rounded-md font-semibold text-stone-600 transition-colors">Studio ASMR</button>
-                                    <button type="button" onclick="setReelCategory('Style Guide')" class="text-[10px] bg-stone-100 hover:bg-red-50 hover:text-red-700 px-2 py-0.5 rounded-md font-semibold text-stone-600 transition-colors">Style Guide</button>
-                                    <button type="button" onclick="setReelCategory('Behind the Scenes')" class="text-[10px] bg-stone-100 hover:bg-red-50 hover:text-red-700 px-2 py-0.5 rounded-md font-semibold text-stone-600 transition-colors">Behind the Scenes</button>
-                                    <button type="button" onclick="setReelCategory('Masterclass')" class="text-[10px] bg-stone-100 hover:bg-red-50 hover:text-red-700 px-2 py-0.5 rounded-md font-semibold text-stone-600 transition-colors">Masterclass</button>
+
+                            <!-- 2. Content Type & Category -->
+                            <div class="bg-stone-50/80 border border-stone-200/80 rounded-2xl p-4 space-y-3">
+                                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+                                    <div>
+                                        <label class="block text-xs font-bold text-stone-700 uppercase tracking-wider mb-1">Content Type <span class="text-red-500">*</span></label>
+                                        <select id="videoReelContentType" name="content_type" class="w-full bg-white border border-stone-200 rounded-xl px-3.5 py-2 text-xs font-semibold text-stone-800 focus:outline-none focus:ring-2 focus:ring-red-500">
+                                            <option value="reel">Reel (Vertical 9:16)</option>
+                                            <option value="video">Video (Standard / Adaptive)</option>
+                                            <option value="blog_video">Blog / Video Story</option>
+                                        </select>
+                                    </div>
+                                    <div>
+                                        <label class="block text-xs font-bold text-stone-700 uppercase tracking-wider mb-1">Category / Label <span class="text-red-500">*</span></label>
+                                        <input type="text" id="videoReelCategory" name="category_name" required placeholder="e.g. Studio ASMR" class="w-full bg-white border border-stone-200 rounded-xl px-3.5 py-2 text-xs font-semibold text-stone-800 focus:outline-none focus:ring-2 focus:ring-red-500">
+                                    </div>
+                                </div>
+                                <div class="flex flex-wrap gap-1.5 pt-0.5">
+                                    <button type="button" onclick="setReelCategory('Studio ASMR')" class="text-[10px] bg-white border border-stone-200 hover:bg-red-50 hover:text-red-700 px-2.5 py-1 rounded-lg font-semibold text-stone-600 transition-colors cursor-pointer">Studio ASMR</button>
+                                    <button type="button" onclick="setReelCategory('Style Guide')" class="text-[10px] bg-white border border-stone-200 hover:bg-red-50 hover:text-red-700 px-2.5 py-1 rounded-lg font-semibold text-stone-600 transition-colors cursor-pointer">Style Guide</button>
+                                    <button type="button" onclick="setReelCategory('Behind the Scenes')" class="text-[10px] bg-white border border-stone-200 hover:bg-red-50 hover:text-red-700 px-2.5 py-1 rounded-lg font-semibold text-stone-600 transition-colors cursor-pointer">Behind the Scenes</button>
+                                    <button type="button" onclick="setReelCategory('Masterclass')" class="text-[10px] bg-white border border-stone-200 hover:bg-red-50 hover:text-red-700 px-2.5 py-1 rounded-lg font-semibold text-stone-600 transition-colors cursor-pointer">Masterclass</button>
                                 </div>
                             </div>
-                        </div>
 
-                        <div>
-                            <label class="block text-xs font-bold text-stone-600 uppercase tracking-wider mb-1">Title / Headline <span class="text-red-500">*</span></label>
-                            <input type="text" id="videoReelTitle" name="title" required placeholder="e.g. Crafting the Everlasting Sunflower" class="w-full bg-stone-50 border border-stone-200 rounded-xl px-3.5 py-2.5 text-sm font-semibold text-stone-800 focus:bg-white focus:outline-none focus:ring-2 focus:ring-red-500">
-                        </div>
-
-                        <div>
-                            <label class="block text-xs font-bold text-stone-600 uppercase tracking-wider mb-1">Tagline / Subtitle</label>
-                            <input type="text" id="videoReelTagline" name="tagline" placeholder="e.g. Watch the petal-by-petal stitch technique & stem wiring" class="w-full bg-stone-50 border border-stone-200 rounded-xl px-3.5 py-2.5 text-sm font-semibold text-stone-800 focus:bg-white focus:outline-none focus:ring-2 focus:ring-red-500">
-                        </div>
-
-                        <div>
-                            <label class="block text-xs font-bold text-stone-600 uppercase tracking-wider mb-1">Description Paragraph / Story</label>
-                            <textarea id="videoReelDesc" name="description" rows="2" placeholder="Detailed description or story of this video/reel..." class="w-full bg-stone-50 border border-stone-200 rounded-xl px-3.5 py-2.5 text-sm font-semibold text-stone-800 focus:bg-white focus:outline-none focus:ring-2 focus:ring-red-500"></textarea>
-                        </div>
-                    </div>
-
-                    <!-- Section: Video File / URL & Live Player Preview -->
-                    <div class="space-y-3 pt-2">
-                        <div class="flex items-center gap-2 border-b border-stone-100 pb-1.5">
-                            <i class="fas fa-video text-red-600 text-xs"></i>
-                            <span class="text-xs font-bold text-stone-700 uppercase tracking-wider">Video Source & Live Player Preview</span>
-                        </div>
-
-                        <!-- Video File Dropzone -->
-                        <div class="bg-stone-50/80 border border-stone-200/90 rounded-2xl p-4 space-y-3">
-                            <div class="flex items-center justify-between">
-                                <span class="text-xs font-bold text-stone-800">Upload Video File (MP4, WEBM, MOV)</span>
-                                <span class="text-[10px] font-bold text-stone-400 bg-stone-200/70 px-2 py-0.5 rounded-md">Max 100MB</span>
-                            </div>
-
-                            <div class="border-2 border-dashed border-stone-200 rounded-xl p-3.5 text-center hover:border-red-400 hover:bg-red-50/20 transition-all cursor-pointer"
-                                 onclick="document.getElementById('videoReelFileInput').click()">
-                                <i class="fas fa-file-video text-red-500 text-xl mb-1"></i>
-                                <p class="text-xs font-bold text-stone-700" id="videoReelFileLabel">Click or drop MP4 / WEBM / MOV video file</p>
-                                <p class="text-[10px] text-stone-400">Stores directly in storage & saves path in database</p>
-                                <input type="file" id="videoReelFileInput" name="video_file" class="hidden" accept="video/mp4,video/webm,video/quicktime,video/ogg,video/x-matroska" onchange="handleVideoFileInputChange(this)">
-                            </div>
-
-                            <div class="relative flex py-1 items-center">
-                                <div class="flex-grow border-t border-stone-200"></div>
-                                <span class="flex-shrink mx-3 text-stone-400 text-[10px] font-bold uppercase tracking-wider">OR ENTER DIRECT VIDEO URL</span>
-                                <div class="flex-grow border-t border-stone-200"></div>
-                            </div>
-
-                            <div>
-                                <input type="text" id="videoReelUrlInput" name="video_url" oninput="handleVideoUrlInputChange(this.value)" placeholder="https://example.com/sample-video.mp4 or /storage/videos/..." class="w-full bg-white border border-stone-200 rounded-xl px-3.5 py-2 text-xs font-semibold text-stone-800 focus:outline-none focus:ring-2 focus:ring-red-500">
-                            </div>
-
-                            <!-- Live Video Player Preview Container -->
-                            <div id="videoPlayerPreviewContainer" class="bg-black rounded-2xl overflow-hidden border border-stone-800 p-2 text-center space-y-2">
-                                <div class="flex items-center justify-between px-2 text-stone-400 text-[10px] font-bold uppercase">
-                                    <span class="flex items-center gap-1.5"><i class="fas fa-play text-red-500"></i> Video Preview Player</span>
-                                    <span id="videoPlayerStatusBadge" class="text-emerald-400 font-normal">Ready to play</span>
+                            <!-- 3. Tagline & Story -->
+                            <div class="bg-stone-50/80 border border-stone-200/80 rounded-2xl p-4 space-y-3">
+                                <div>
+                                    <label class="block text-xs font-bold text-stone-700 uppercase tracking-wider mb-1">Tagline / Subtitle</label>
+                                    <input type="text" id="videoReelTagline" name="tagline" placeholder="e.g. Watch the petal-by-petal stitch technique" class="w-full bg-white border border-stone-200 rounded-xl px-3.5 py-2 text-xs font-semibold text-stone-800 focus:outline-none focus:ring-2 focus:ring-red-500">
                                 </div>
-                                <div class="relative w-full aspect-video max-h-56 bg-stone-900 rounded-xl overflow-hidden flex items-center justify-center">
-                                    <video id="videoReelPreviewPlayer" controls playsinline class="w-full h-full object-contain"></video>
-                                    <div id="videoPlayerEmptyState" class="absolute inset-0 flex flex-col items-center justify-center text-stone-500 bg-stone-900/90 pointer-events-none">
-                                        <i class="fas fa-film text-3xl mb-1.5 text-stone-600"></i>
-                                        <p class="text-xs font-medium">Select a video file or enter a video URL to preview</p>
+                                <div>
+                                    <label class="block text-xs font-bold text-stone-700 uppercase tracking-wider mb-1">Story / Description</label>
+                                    <textarea id="videoReelDesc" name="description" rows="2" placeholder="Story or description of this video..." class="w-full bg-white border border-stone-200 rounded-xl px-3.5 py-2 text-xs font-semibold text-stone-800 focus:outline-none focus:ring-2 focus:ring-red-500"></textarea>
+                                </div>
+                            </div>
+
+                            <!-- 4. Track Details & Settings -->
+                            <div class="bg-stone-50/80 border border-stone-200/80 rounded-2xl p-4 space-y-3">
+                                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                                    <div>
+                                        <label class="block text-xs font-bold text-stone-700 uppercase tracking-wider mb-1">Duration <span class="text-stone-400 font-normal">(e.g. 00:48)</span></label>
+                                        <input type="text" id="videoReelDuration" name="duration" value="00:48" class="w-full bg-white border border-stone-200 rounded-xl px-3.5 py-2 text-xs font-semibold text-stone-800 focus:outline-none focus:ring-2 focus:ring-red-500">
+                                    </div>
+                                    <div>
+                                        <label class="block text-xs font-bold text-stone-700 uppercase tracking-wider mb-1">Audio / Music Name</label>
+                                        <input type="text" id="videoReelAudioName" name="audio_name" placeholder="Original Audio • Knotelle" class="w-full bg-white border border-stone-200 rounded-xl px-3.5 py-2 text-xs font-semibold text-stone-800 focus:outline-none focus:ring-2 focus:ring-red-500">
+                                    </div>
+                                </div>
+
+                                <div class="grid grid-cols-3 gap-2.5 pt-1">
+                                    <div>
+                                        <label class="block text-[11px] font-bold text-stone-700 uppercase tracking-wider mb-1">Status</label>
+                                        <select id="videoReelStatus" name="status" class="w-full bg-white border border-stone-200 rounded-xl px-2.5 py-2 text-xs font-semibold text-stone-800 focus:outline-none focus:ring-2 focus:ring-red-500">
+                                            <option value="1">Active</option>
+                                            <option value="0">Inactive</option>
+                                        </select>
+                                    </div>
+                                    <div>
+                                        <label class="block text-[11px] font-bold text-stone-700 uppercase tracking-wider mb-1">Featured</label>
+                                        <select id="videoReelFeatured" name="is_featured" class="w-full bg-white border border-stone-200 rounded-xl px-2.5 py-2 text-xs font-semibold text-stone-800 focus:outline-none focus:ring-2 focus:ring-red-500">
+                                            <option value="1">Yes</option>
+                                            <option value="0">No</option>
+                                        </select>
+                                    </div>
+                                    <div>
+                                        <label class="block text-[11px] font-bold text-stone-700 uppercase tracking-wider mb-1">Sort Order</label>
+                                        <input type="number" id="videoReelSortOrder" name="sort_order" value="1" min="1" class="w-full bg-white border border-stone-200 rounded-xl px-2.5 py-2 text-xs font-semibold text-stone-800 focus:outline-none focus:ring-2 focus:ring-red-500">
                                     </div>
                                 </div>
                             </div>
-                        </div>
-                    </div>
 
-                    <!-- Section: Cover Thumbnail Imagery -->
-                    <div class="space-y-3 pt-2">
-                        <div class="flex items-center gap-2 border-b border-stone-100 pb-1.5">
-                            <i class="fas fa-image text-red-600 text-xs"></i>
-                            <span class="text-xs font-bold text-stone-700 uppercase tracking-wider">Cover Image / Thumbnail</span>
                         </div>
 
-                        <div class="bg-stone-50/80 border border-stone-200/90 rounded-2xl p-4 space-y-3">
-                            <div class="flex items-center justify-between">
-                                <div class="flex items-center gap-2">
-                                    <span class="text-xs font-bold text-stone-800">Thumbnail Cover <span class="text-red-500">*</span></span>
-                                    <span class="text-[10px] font-bold text-stone-400 bg-stone-200/70 px-2 py-0.5 rounded-md">800 × 1200 px (9:15)</span>
+                        <!-- RIGHT COLUMN (col-span-5): Video Upload, Live Player & Cover Thumbnail -->
+                        <div class="lg:col-span-5 space-y-4">
+                            
+                            <!-- Video Source Box -->
+                            <div class="bg-stone-50/80 border border-stone-200/80 rounded-2xl p-4 space-y-3">
+                                <div class="flex items-center justify-between">
+                                    <div class="flex items-center gap-1.5">
+                                        <i class="fas fa-video text-red-600 text-xs"></i>
+                                        <span class="text-xs font-bold text-stone-800 uppercase tracking-wider">Video Source</span>
+                                    </div>
+                                    <span class="text-[10px] font-bold text-stone-500 bg-stone-200/70 px-2 py-0.5 rounded-md">Max 40MB</span>
                                 </div>
-                                <button type="button" onclick="openMediaPicker('video_thumbnail')" class="px-2.5 py-1 rounded-lg bg-white hover:bg-stone-100 border border-stone-200 text-stone-700 text-[11px] font-bold transition-all flex items-center gap-1 cursor-pointer">
-                                    <i class="fas fa-photo-video text-xs text-red-500"></i>
-                                    <span>Select from Media Library</span>
-                                </button>
-                            </div>
 
-                            <div class="border-2 border-dashed border-stone-200 rounded-xl p-3.5 text-center hover:border-red-400 hover:bg-red-50/20 transition-all cursor-pointer"
-                                 onclick="document.getElementById('videoReelThumbnailInput').click()">
-                                <i class="fas fa-cloud-upload-alt text-red-500 text-base mb-1"></i>
-                                <p class="text-xs font-bold text-stone-700" id="videoReelThumbnailLabel">Upload Cover Thumbnail</p>
-                                <p class="text-[10px] text-stone-400">JPG, PNG, WEBP (Max 20MB)</p>
-                                <input type="file" id="videoReelThumbnailInput" name="thumbnail_file" class="hidden" accept=".jpg,.jpeg,.png,.webp,.svg" onchange="handleReelCoverInputChange(this)">
-                            </div>
-
-                            <!-- Live Thumbnail Preview Box -->
-                            <div id="videoReelThumbnailPreviewContainer" class="hidden bg-white rounded-xl p-2.5 border border-stone-200 flex items-center gap-3">
-                                <img id="videoReelThumbnailPreviewImg" src="" class="w-14 h-18 rounded-lg object-cover border border-stone-200">
-                                <div class="flex-1 min-w-0">
-                                    <p class="text-xs font-bold text-stone-800 truncate" id="videoReelThumbnailName">Thumbnail Selected</p>
-                                    <p class="text-[11px] text-emerald-600 font-semibold" id="videoReelThumbnailSize">Ready to save</p>
+                                <!-- File dropzone -->
+                                <div class="border-2 border-dashed border-stone-200 rounded-xl p-3.5 text-center hover:border-red-400 hover:bg-red-50/20 transition-all cursor-pointer bg-white"
+                                     onclick="document.getElementById('videoReelFileInput').click()">
+                                    <i class="fas fa-file-video text-red-500 text-xl mb-1"></i>
+                                    <p class="text-xs font-bold text-stone-700" id="videoReelFileLabel">Click or drop MP4 / WEBM / MOV</p>
+                                    <p class="text-[10px] text-stone-400">Uploads directly and streams on website</p>
+                                    <input type="file" id="videoReelFileInput" name="video_file" class="hidden" accept="video/mp4,video/webm,video/quicktime,video/ogg,video/x-matroska,.mp4,.webm,.mov" onchange="handleVideoFileInputChange(this)">
                                 </div>
-                                <button type="button" onclick="clearReelCoverInput()" class="text-stone-400 hover:text-red-600 p-1.5 cursor-pointer">
-                                    <i class="fas fa-times"></i>
-                                </button>
+
+                                <div class="relative flex py-0.5 items-center">
+                                    <div class="flex-grow border-t border-stone-200"></div>
+                                    <span class="flex-shrink mx-2 text-stone-400 text-[9px] font-bold uppercase tracking-wider">OR ENTER DIRECT URL</span>
+                                    <div class="flex-grow border-t border-stone-200"></div>
+                                </div>
+
+                                <div>
+                                    <input type="text" id="videoReelUrlInput" name="video_url" oninput="handleVideoUrlInputChange(this.value)" placeholder="https://assets.example.com/video.mp4 or /videos/reels/..." class="w-full bg-white border border-stone-200 rounded-xl px-3 py-2 text-xs font-semibold text-stone-800 focus:outline-none focus:ring-2 focus:ring-red-500">
+                                </div>
+
+                                <!-- Live Video Player Preview -->
+                                <div id="videoPlayerPreviewContainer" class="bg-black rounded-2xl overflow-hidden border border-stone-800 p-2 text-center space-y-2 shadow-sm">
+                                    <div class="flex items-center justify-between px-2 text-stone-400 text-[10px] font-bold uppercase">
+                                        <span class="flex items-center gap-1.5"><i class="fas fa-play text-red-500 text-xs"></i> Video Preview Player</span>
+                                        <span id="videoPlayerStatusBadge" class="text-stone-400 font-normal">No video selected</span>
+                                    </div>
+                                    <div class="relative w-full aspect-video max-h-48 bg-stone-900 rounded-xl overflow-hidden flex items-center justify-center">
+                                        <video id="videoReelPreviewPlayer" controls playsinline class="w-full h-full object-contain"
+                                               oncanplay="handleVideoPlayerCanPlay()"
+                                               onerror="handleVideoPlayerError()"></video>
+                                        <div id="videoPlayerEmptyState" class="absolute inset-0 flex flex-col items-center justify-center text-stone-500 bg-stone-900/90 pointer-events-none">
+                                            <i class="fas fa-film text-2xl mb-1 text-stone-600"></i>
+                                            <p class="text-[11px] font-medium">Select a video file or URL to preview</p>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
+
+                            <!-- Cover Image / Thumbnail Box -->
+                            <div class="bg-stone-50/80 border border-stone-200/80 rounded-2xl p-4 space-y-3">
+                                <div class="flex items-center justify-between">
+                                    <div class="flex items-center gap-1.5">
+                                        <i class="fas fa-image text-red-600 text-xs"></i>
+                                        <span class="text-xs font-bold text-stone-800 uppercase tracking-wider">Cover Thumbnail</span>
+                                    </div>
+                                    <button type="button" onclick="openMediaPicker('video_thumbnail')" class="px-2 py-0.5 rounded-lg bg-white hover:bg-stone-100 border border-stone-200 text-stone-700 text-[10px] font-bold transition-all flex items-center gap-1 cursor-pointer shadow-2xs">
+                                        <i class="fas fa-photo-video text-xs text-red-500"></i>
+                                        <span>Media Library</span>
+                                    </button>
+                                </div>
+
+                                <div class="border-2 border-dashed border-stone-200 rounded-xl p-3 text-center hover:border-red-400 hover:bg-red-50/20 transition-all cursor-pointer bg-white"
+                                     onclick="document.getElementById('videoReelThumbnailInput').click()">
+                                    <i class="fas fa-cloud-upload-alt text-red-500 text-lg mb-1"></i>
+                                    <p class="text-xs font-bold text-stone-700" id="videoReelThumbnailLabel">Upload Cover Image</p>
+                                    <p class="text-[10px] text-stone-400">JPG, PNG, WEBP (Default image used if empty)</p>
+                                    <input type="file" id="videoReelThumbnailInput" name="thumbnail_file" class="hidden" accept=".jpg,.jpeg,.png,.webp,.svg" onchange="handleReelCoverInputChange(this)">
+                                </div>
+
+                                <div id="videoReelThumbnailPreviewContainer" class="hidden bg-white rounded-xl p-2 border border-stone-200 flex items-center gap-3">
+                                    <img id="videoReelThumbnailPreviewImg" src="" class="w-12 h-16 rounded-lg object-cover border border-stone-200 shrink-0">
+                                    <div class="flex-1 min-w-0">
+                                        <p class="text-xs font-bold text-stone-800 truncate" id="videoReelThumbnailName">Thumbnail Selected</p>
+                                        <p class="text-[11px] text-emerald-600 font-semibold" id="videoReelThumbnailSize">Ready to save</p>
+                                    </div>
+                                    <button type="button" onclick="clearReelCoverInput()" class="text-stone-400 hover:text-red-600 p-1 cursor-pointer">
+                                        <i class="fas fa-times text-xs"></i>
+                                    </button>
+                                </div>
+                            </div>
+
+                            <!-- Social Counters (Compact Row) -->
+                            <div class="bg-stone-50/80 border border-stone-200/80 rounded-2xl p-3.5">
+                                <span class="block text-[11px] font-bold text-stone-700 uppercase tracking-wider mb-2">Display Counters</span>
+                                <div class="grid grid-cols-3 gap-2">
+                                    <div>
+                                        <label class="block text-[10px] text-stone-500 font-semibold mb-0.5">Likes</label>
+                                        <input type="number" id="videoReelLikes" name="likes" value="0" min="0" class="w-full bg-white border border-stone-200 rounded-lg px-2 py-1.5 text-xs font-semibold text-stone-800 focus:outline-none focus:ring-1 focus:ring-red-500">
+                                    </div>
+                                    <div>
+                                        <label class="block text-[10px] text-stone-500 font-semibold mb-0.5">Comments</label>
+                                        <input type="number" id="videoReelComments" name="comments" value="0" min="0" class="w-full bg-white border border-stone-200 rounded-lg px-2 py-1.5 text-xs font-semibold text-stone-800 focus:outline-none focus:ring-1 focus:ring-red-500">
+                                    </div>
+                                    <div>
+                                        <label class="block text-[10px] text-stone-500 font-semibold mb-0.5">Views</label>
+                                        <input type="number" id="videoReelViews" name="views" value="0" min="0" class="w-full bg-white border border-stone-200 rounded-lg px-2 py-1.5 text-xs font-semibold text-stone-800 focus:outline-none focus:ring-1 focus:ring-red-500">
+                                    </div>
+                                </div>
+                            </div>
+
                         </div>
+
                     </div>
-
-                    <!-- Section: Video Information & Audio -->
-                    <div class="space-y-3 pt-2">
-                        <div class="flex items-center gap-2 border-b border-stone-100 pb-1.5">
-                            <i class="fas fa-music text-red-600 text-xs"></i>
-                            <span class="text-xs font-bold text-stone-700 uppercase tracking-wider">Video Information & Track</span>
-                        </div>
-
-                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
-                            <div>
-                                <label class="block text-xs font-bold text-stone-600 uppercase tracking-wider mb-1">Duration <span class="text-stone-400 text-[10px]">(e.g. 00:48)</span></label>
-                                <input type="text" id="videoReelDuration" name="duration" value="00:48" placeholder="00:48" class="w-full bg-stone-50 border border-stone-200 rounded-xl px-3.5 py-2 text-sm font-semibold text-stone-800 focus:bg-white focus:outline-none focus:ring-2 focus:ring-red-500">
-                            </div>
-                            <div>
-                                <label class="block text-xs font-bold text-stone-600 uppercase tracking-wider mb-1">Audio / Music Name</label>
-                                <input type="text" id="videoReelAudioName" name="audio_name" placeholder="e.g. Original Audio • Acoustic Morning" class="w-full bg-stone-50 border border-stone-200 rounded-xl px-3.5 py-2 text-sm font-semibold text-stone-800 focus:bg-white focus:outline-none focus:ring-2 focus:ring-red-500">
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Section: Social Counters -->
-                    <div class="space-y-3 pt-2">
-                        <div class="flex items-center gap-2 border-b border-stone-100 pb-1.5">
-                            <i class="fas fa-chart-bar text-red-600 text-xs"></i>
-                            <span class="text-xs font-bold text-stone-700 uppercase tracking-wider">Social Information & Engagement</span>
-                        </div>
-
-                        <div class="grid grid-cols-3 gap-3">
-                            <div>
-                                <label class="block text-xs font-bold text-stone-600 uppercase tracking-wider mb-1">Likes Count</label>
-                                <input type="number" id="videoReelLikes" name="likes" value="0" min="0" class="w-full bg-stone-50 border border-stone-200 rounded-xl px-3.5 py-2 text-sm font-semibold text-stone-800 focus:bg-white focus:outline-none focus:ring-2 focus:ring-red-500">
-                            </div>
-                            <div>
-                                <label class="block text-xs font-bold text-stone-600 uppercase tracking-wider mb-1">Comments Count</label>
-                                <input type="number" id="videoReelComments" name="comments" value="0" min="0" class="w-full bg-stone-50 border border-stone-200 rounded-xl px-3.5 py-2 text-sm font-semibold text-stone-800 focus:bg-white focus:outline-none focus:ring-2 focus:ring-red-500">
-                            </div>
-                            <div>
-                                <label class="block text-xs font-bold text-stone-600 uppercase tracking-wider mb-1">Views Count</label>
-                                <input type="number" id="videoReelViews" name="views" value="0" min="0" class="w-full bg-stone-50 border border-stone-200 rounded-xl px-3.5 py-2 text-sm font-semibold text-stone-800 focus:bg-white focus:outline-none focus:ring-2 focus:ring-red-500">
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Section: Settings & Sort Order -->
-                    <div class="space-y-3 pt-2">
-                        <div class="flex items-center gap-2 border-b border-stone-100 pb-1.5">
-                            <i class="fas fa-sliders-h text-red-600 text-xs"></i>
-                            <span class="text-xs font-bold text-stone-700 uppercase tracking-wider">Settings & Sort Order</span>
-                        </div>
-
-                        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3.5">
-                            <div>
-                                <label class="block text-xs font-bold text-stone-600 uppercase tracking-wider mb-1">Status</label>
-                                <select id="videoReelStatus" name="status" class="w-full bg-stone-50 border border-stone-200 rounded-xl px-3.5 py-2.5 text-sm font-semibold text-stone-800 focus:bg-white focus:outline-none focus:ring-2 focus:ring-red-500">
-                                    <option value="1">Active (Live on Website)</option>
-                                    <option value="0">Inactive (Hidden)</option>
-                                </select>
-                            </div>
-                            <div>
-                                <label class="block text-xs font-bold text-stone-600 uppercase tracking-wider mb-1">Featured</label>
-                                <select id="videoReelFeatured" name="is_featured" class="w-full bg-stone-50 border border-stone-200 rounded-xl px-3.5 py-2.5 text-sm font-semibold text-stone-800 focus:bg-white focus:outline-none focus:ring-2 focus:ring-red-500">
-                                    <option value="1">Yes (Featured)</option>
-                                    <option value="0">No (Standard)</option>
-                                </select>
-                            </div>
-                            <div>
-                                <label class="block text-xs font-bold text-stone-600 uppercase tracking-wider mb-1">Display Sort Order</label>
-                                <input type="number" id="videoReelSortOrder" name="sort_order" value="1" min="1" class="w-full bg-stone-50 border border-stone-200 rounded-xl px-3.5 py-2 text-sm font-semibold text-stone-800 focus:bg-white focus:outline-none focus:ring-2 focus:ring-red-500">
-                            </div>
-                        </div>
-                    </div>
-
                 </div>
 
                 <!-- Sticky Footer with Action Buttons -->
-                <div class="p-4 px-6 bg-stone-50 border-t border-stone-100 shrink-0 flex items-center justify-end gap-3">
-                    <button type="button" onclick="closeVideoReelModal()" class="btn-secondary text-xs px-5 py-2.5 cursor-pointer">
-                        Cancel
-                    </button>
-                    <button type="submit" id="videoReelSubmitBtn" class="btn-primary text-xs px-6 py-2.5 flex items-center gap-2 shadow-sm cursor-pointer">
-                        <i class="fas fa-save"></i>
-                        <span id="videoReelSubmitBtnText">Save Video / Reel</span>
-                    </button>
+                <div class="p-4 px-6 bg-stone-50 border-t border-stone-100 shrink-0 flex items-center justify-between gap-3">
+                    <span class="text-xs text-stone-400 font-medium">All video changes sync to public website immediately</span>
+                    <div class="flex items-center gap-3">
+                        <button type="button" onclick="closeVideoReelModal()" class="btn-secondary text-xs px-5 py-2.5 cursor-pointer">
+                            Cancel
+                        </button>
+                        <button type="submit" id="videoReelSubmitBtn" class="btn-primary text-xs px-6 py-2.5 flex items-center gap-2 shadow-sm cursor-pointer">
+                            <i class="fas fa-save"></i>
+                            <span id="videoReelSubmitBtnText">Save Video / Reel</span>
+                        </button>
+                    </div>
                 </div>
 
             </form>
@@ -1420,25 +1379,6 @@
                                 <span class="text-[10px] font-bold text-stone-700">Smile</span>
                             </button>
                         </div>
-
-                        <!-- Or Upload Custom SVG / Image -->
-                        <div class="pt-2">
-                            <div class="text-[11px] font-bold text-stone-500 mb-1">Or Upload Custom Icon (SVG / PNG)</div>
-                            <div class="border-2 border-dashed border-stone-200 rounded-xl p-3 text-center hover:border-red-400 hover:bg-red-50/20 transition-all cursor-pointer" onclick="document.getElementById('craftPillarIconFileInput').click()">
-                                <i class="fas fa-upload text-stone-400 text-sm mb-0.5"></i>
-                                <p class="text-xs font-bold text-stone-700" id="craftPillarIconFileLabel">Upload SVG / Image Icon</p>
-                                <p class="text-[10px] text-stone-400">SVG, PNG, JPG (Max 5MB)</p>
-                                <input type="file" id="craftPillarIconFileInput" name="icon_file" class="hidden" accept=".svg,.png,.jpg,.jpeg,.webp" onchange="handlePillarIconFileChange(this)">
-                            </div>
-                            <div id="craftPillarIconPreviewContainer" class="hidden mt-2 bg-white rounded-xl p-2 border border-stone-200 flex items-center gap-3">
-                                <img id="craftPillarIconPreviewImg" src="" class="w-10 h-10 rounded-lg object-contain p-1 bg-stone-50 border border-stone-200">
-                                <div class="flex-1 min-w-0">
-                                    <p class="text-xs font-bold text-stone-800 truncate" id="craftPillarIconFileName">Custom Icon Uploaded</p>
-                                    <p class="text-[10px] text-emerald-600 font-semibold">Custom Icon Active</p>
-                                </div>
-                                <button type="button" onclick="clearPillarIconFileInput()" class="text-stone-400 hover:text-red-600 p-1 cursor-pointer"><i class="fas fa-times"></i></button>
-                            </div>
-                        </div>
                     </div>
 
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5 pt-1">
@@ -1462,6 +1402,67 @@
                     <button type="submit" id="craftPillarSubmitBtn" class="btn-primary text-xs px-6 py-2.5 flex items-center gap-2 shadow-sm cursor-pointer">
                         <i class="fas fa-save"></i>
                         <span id="craftPillarSubmitBtnText">Save Craft Pillar</span>
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- MODAL: CUSTOM ORDER ITEM / CATEGORY MODAL -->
+    <div id="customOrderItemModal" onclick="if(event.target === this) closeCustomOrderItemModal()" class="fixed inset-0 bg-stone-900/60 backdrop-blur-xs hidden items-center justify-center z-50 p-4">
+        <div class="bg-white rounded-3xl max-w-lg w-full max-h-[90vh] flex flex-col overflow-hidden shadow-2xl border border-stone-100 animate-fadeIn" onclick="event.stopPropagation()">
+            <!-- Pinned Header -->
+            <div class="p-5 px-6 border-b border-stone-100 flex items-center justify-between bg-stone-50/80 shrink-0">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-2xl bg-red-50 text-red-600 flex items-center justify-center font-bold text-base shadow-2xs">
+                        <i class="fas fa-seedling"></i>
+                    </div>
+                    <div>
+                        <h3 class="text-base font-bold text-stone-800" id="customOrderItemModalTitle">Add Custom Order Category</h3>
+                        <p class="text-xs text-stone-500 font-medium">Bespoke creation product type for Step 1</p>
+                    </div>
+                </div>
+                <button type="button" onclick="closeCustomOrderItemModal()" class="w-8 h-8 rounded-full bg-stone-100 hover:bg-stone-200 text-stone-500 flex items-center justify-center transition-colors cursor-pointer">
+                    <i class="fas fa-times text-xs"></i>
+                </button>
+            </div>
+
+            <!-- Modal Form -->
+            <form id="customOrderItemForm" onsubmit="handleCustomOrderItemSubmit(event)" class="flex flex-col flex-1 min-h-0 overflow-hidden">
+                <input type="hidden" id="customOrderItemId" name="id">
+
+                <div class="p-6 space-y-4 overflow-y-auto flex-1">
+                    <div>
+                        <label class="block text-xs font-bold text-stone-600 uppercase tracking-wider mb-1">Item Name / Category <span class="text-red-500">*</span></label>
+                        <input type="text" id="customOrderItemTitle" name="title" required placeholder="e.g. Bouquet, Soft Toys, Keychain" class="w-full bg-stone-50 border border-stone-200 rounded-xl px-3.5 py-2.5 text-sm font-semibold text-stone-800 focus:bg-white focus:outline-none focus:ring-2 focus:ring-red-500">
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-bold text-stone-600 uppercase tracking-wider mb-1">Subtitle / Note</label>
+                        <input type="text" id="customOrderItemSubtitle" name="subtitle" placeholder="e.g. Custom pattern, Hand-tied florals" class="w-full bg-stone-50 border border-stone-200 rounded-xl px-3.5 py-2.5 text-sm font-semibold text-stone-800 focus:bg-white focus:outline-none focus:ring-2 focus:ring-red-500">
+                    </div>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5 pt-1">
+                        <div>
+                            <label class="block text-xs font-bold text-stone-600 uppercase tracking-wider mb-1">Sort Order (Sequence)</label>
+                            <input type="number" id="customOrderItemSortOrder" name="sort_order" min="1" placeholder="e.g. 1" class="w-full bg-stone-50 border border-stone-200 rounded-xl px-3.5 py-2.5 text-sm font-semibold text-stone-800 focus:bg-white focus:outline-none focus:ring-2 focus:ring-red-500">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-stone-600 uppercase tracking-wider mb-1">Status</label>
+                            <div class="flex items-center gap-2 pt-2.5">
+                                <input type="checkbox" id="customOrderItemActive" name="is_active" checked class="w-4 h-4 rounded text-red-600 focus:ring-red-500">
+                                <label for="customOrderItemActive" class="text-xs font-bold text-stone-700">Active (Visible on Website)</label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Sticky Footer with Action Buttons -->
+                <div class="p-4 px-6 bg-stone-50 border-t border-stone-100 shrink-0 flex items-center justify-end gap-3">
+                    <button type="button" onclick="closeCustomOrderItemModal()" class="btn-secondary text-xs px-5 py-2.5 cursor-pointer">Cancel</button>
+                    <button type="submit" id="customOrderItemSubmitBtn" class="btn-primary text-xs px-6 py-2.5 flex items-center gap-2 shadow-sm cursor-pointer">
+                        <i class="fas fa-save"></i>
+                        <span id="customOrderItemSubmitBtnText">Save Category</span>
                     </button>
                 </div>
             </form>
@@ -2675,8 +2676,8 @@
                 `;
             } else if (section.is_blog_reels_section) {
                 // Dynamic Video & Reels Section (Behind the Stitches)
-                const reels = section.reels || [];
-                const secSettings = section.section_settings || {};
+                const reels = section.items || section.reels || [];
+                const secSettings = section.section_settings || section.metadata || {};
                 bodyContent = `
                     <div class="p-8">
                         <div class="bg-[#FFF9F6] border border-[#E7D1CC] rounded-2xl p-5 mb-6 flex flex-col md:flex-row md:items-center justify-between gap-4">
@@ -3028,6 +3029,73 @@
                         </div>
                     </div>
                 `;
+            } else if (section.is_custom_order_items_section) {
+                // Custom Order Items / Categories Dynamic Manager
+                const items = section.items || [];
+                bodyContent = `
+                    <div class="p-8">
+                        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6 bg-[#FFF9F6] border border-[#E7D1CC] p-5 rounded-2xl">
+                            <div>
+                                <div class="flex items-center gap-2 mb-1">
+                                    <span class="px-2.5 py-0.5 rounded-md text-[10px] font-bold bg-red-100 text-red-800">
+                                        Custom Order Form
+                                    </span>
+                                    <h4 class="font-bold text-stone-800 text-base">Step 1: Item Types & Categories</h4>
+                                    <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">
+                                        ${items.length} Active Options
+                                    </span>
+                                </div>
+                                <p class="text-xs text-stone-600 font-medium">Categories and items available for customers to choose when requesting bespoke creations.</p>
+                            </div>
+                            <div class="flex items-center gap-2.5">
+                                <button type="button" onclick="openAddCustomOrderItemModal()" class="px-4 py-2 rounded-xl bg-red-600 hover:bg-red-700 text-white text-xs font-bold shadow-xs hover:shadow-md transition-all flex items-center gap-1.5 active:scale-95 cursor-pointer">
+                                    <i class="fas fa-plus-circle text-xs"></i>
+                                    <span>+ Add Item Type</span>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Items Grid -->
+                        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                            ${items.length > 0 ? items.map(item => `
+                                <div class="bg-white border border-stone-200/90 rounded-2xl p-4 shadow-2xs hover:shadow-boutique transition-all flex flex-col justify-between group">
+                                    <div>
+                                        <div class="flex items-center justify-between gap-2 mb-3">
+                                            <div class="w-10 h-10 rounded-xl bg-red-50 border border-red-200 text-red-700 flex items-center justify-center font-bold text-base shadow-2xs shrink-0">
+                                                <i class="fas fa-seedling"></i>
+                                            </div>
+                                            <div class="flex items-center gap-1.5">
+                                                <span class="px-2 py-0.5 rounded-md text-[10px] font-bold bg-stone-100 text-stone-600">
+                                                    #${item.sort_order || 1}
+                                                </span>
+                                                <button type="button" onclick="toggleCustomOrderItem(${item.id})" class="px-2 py-0.5 rounded-full text-[10px] font-bold transition-colors cursor-pointer ${item.is_active ? 'bg-emerald-50 text-emerald-700 hover:bg-emerald-100 border border-emerald-200' : 'bg-stone-100 text-stone-500 hover:bg-stone-200 border border-stone-200'}" title="Click to toggle status">
+                                                    ${item.is_active ? '● Active' : '○ Hidden'}
+                                                </button>
+                                            </div>
+                                        </div>
+                                        <h5 class="font-bold text-stone-800 text-sm mb-0.5">${escapeHtml(item.title || item.name)}</h5>
+                                        <p class="text-xs text-stone-500 line-clamp-1 mb-3">${escapeHtml(item.subtitle || 'Custom pattern')}</p>
+                                    </div>
+                                    <div class="flex items-center justify-end gap-2 pt-2 border-t border-stone-100">
+                                        <button type="button" onclick="openEditCustomOrderItemModal(${item.id})" class="text-stone-600 hover:text-stone-900 text-xs font-bold px-2.5 py-1.5 rounded-lg hover:bg-stone-100 transition-colors flex items-center gap-1 cursor-pointer">
+                                            <i class="fas fa-edit text-xs text-stone-400"></i>
+                                            <span>Edit</span>
+                                        </button>
+                                        <button type="button" onclick="deleteCustomOrderItem(${item.id})" class="text-rose-600 hover:text-rose-700 text-xs font-bold px-2.5 py-1.5 rounded-lg hover:bg-rose-50 transition-colors flex items-center gap-1 cursor-pointer">
+                                            <i class="fas fa-trash-alt text-xs"></i>
+                                            <span>Delete</span>
+                                        </button>
+                                    </div>
+                                </div>
+                            `).join('') : `
+                                <div class="col-span-full py-12 text-center text-stone-400 bg-stone-50 rounded-2xl border border-dashed border-stone-200">
+                                    <p class="text-sm font-bold text-stone-600">No custom order categories found</p>
+                                    <p class="text-xs text-stone-400 mb-4">Click "+ Add Item Type" above to add your first category.</p>
+                                </div>
+                            `}
+                        </div>
+                    </div>
+                `;
             } else if (section.is_craft_pillars_section) {
                 // Our Craft Pillars Dynamic Manager
                 const meta = section.metadata || {};
@@ -3066,7 +3134,7 @@
                                     <div>
                                         <div class="flex items-center justify-between gap-2 mb-3.5">
                                             <div class="w-12 h-12 rounded-2xl bg-gradient-to-br from-red-50 to-rose-100 border border-red-200 text-red-700 flex items-center justify-center font-bold text-lg shadow-2xs shrink-0">
-                                                ${p.icon_url ? `<img src="${p.icon_url}" class="w-6 h-6 object-contain">` : `<i class="${getPillarIconFa(p.icon_name || p.icon || 'Leaf')}"></i>`}
+                                                <i class="${getPillarIconFa(p.icon_name || p.icon || 'Leaf')}"></i>
                                             </div>
                                             <div class="flex items-center gap-1.5">
                                                 <span class="px-2 py-0.5 rounded-md text-[10px] font-bold bg-stone-100 text-stone-600">
@@ -3882,9 +3950,185 @@
         return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#039;');
     }
 
+    const PAGE_SECTIONS_MAP = {
+        all: [
+            { id: 'all', name: 'All Sections' }
+        ],
+        homepage: [
+            { id: 'all', name: 'All Homepage Sections' },
+            { id: 'hero', name: 'Hero Banner' },
+            { id: 'categories', name: 'Shop by Category' },
+            { id: 'custom_crochet', name: 'Custom Crochet Banner' },
+            { id: 'brand_story', name: 'Brand Story' },
+            { id: 'bestsellers', name: 'Best Sellers' },
+            { id: 'trust_benefits', name: 'Trust & Benefits' },
+            { id: 'custom_order', name: 'Custom Order CTA' },
+            { id: 'newsletter', name: 'Newsletter' },
+            { id: 'blog_reels', name: 'Blog / Videos & Reels' },
+        ],
+        shop: [
+            { id: 'all', name: 'All Shop Sections' },
+            { id: 'shop_banner', name: 'Shop Header & Banner' },
+            { id: 'shop_promo', name: 'Shop Promo Banner' }
+        ],
+        custom_order: [
+            { id: 'all', name: 'All Custom Order Sections' },
+            { id: 'custom_order_items', name: 'Step 1: Item Types & Categories' },
+            { id: 'custom_order_header', name: 'Custom Order Header Banner' },
+            { id: 'custom_order_showcase', name: 'Craft Process Showcase' }
+        ],
+        about: [
+            { id: 'all', name: 'All About Page Sections' },
+            { id: 'about_story', name: 'The KNOTELLE Story' },
+            { id: 'craft_pillars', name: 'Our Craft Pillars' }
+        ],
+        contact: [
+            { id: 'all', name: 'All Contact Page Sections' },
+            { id: 'contact_intro', name: 'Contact Introduction / Hero' },
+            { id: 'contact_info', name: 'Contact Information & Atelier' },
+            { id: 'contact_form', name: 'Send Us a Message / Form' },
+            { id: 'contact_faqs', name: 'Frequently Asked Questions' }
+        ],
+        footer: [
+            { id: 'all', name: 'All Footer Sections' },
+            { id: 'footer', name: 'Footer Artwork & Navigation' }
+        ]
+    };
+
+    function onPageFilterChange() {
+        const page = document.getElementById('filterPage').value;
+        const sectionSelect = document.getElementById('filterSection');
+        const sections = PAGE_SECTIONS_MAP[page] || [{ id: 'all', name: 'All Sections' }];
+
+        sectionSelect.innerHTML = sections.map(s => `<option value="${s.id}">${escapeHtml(s.name)}</option>`).join('');
+        sectionSelect.value = 'all';
+
+        applyFilters();
+    }
+
     function applyFilters() {
         if (managerData) {
             renderSections(managerData);
+        }
+    }
+
+    function openAddCustomOrderItemModal() {
+        document.getElementById('customOrderItemForm').reset();
+        document.getElementById('customOrderItemId').value = '';
+        document.getElementById('customOrderItemModalTitle').innerText = 'Add Custom Order Category';
+        document.getElementById('customOrderItemSubmitBtnText').innerText = 'Save Category';
+        document.getElementById('customOrderItemActive').checked = true;
+
+        const modal = document.getElementById('customOrderItemModal');
+        modal.classList.remove('hidden');
+        modal.classList.add('flex');
+    }
+
+    async function openEditCustomOrderItemModal(id) {
+        try {
+            const res = await axios.get(`/admin/media/custom-order/items/${id}`);
+            if (!res.data.success || (!res.data.item && !res.data.data)) {
+                toastr.error('Category not found');
+                return;
+            }
+            const item = res.data.item || res.data.data;
+            document.getElementById('customOrderItemId').value = item.id;
+            document.getElementById('customOrderItemTitle').value = item.title || item.name || '';
+            document.getElementById('customOrderItemSubtitle').value = item.subtitle || '';
+            document.getElementById('customOrderItemSortOrder').value = item.sort_order || 1;
+            document.getElementById('customOrderItemActive').checked = item.is_active !== false;
+
+            document.getElementById('customOrderItemModalTitle').innerText = `Edit: ${item.title || item.name}`;
+            document.getElementById('customOrderItemSubmitBtnText').innerText = 'Update Category';
+
+            const modal = document.getElementById('customOrderItemModal');
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+        } catch (err) {
+            console.error('Failed to load category', err);
+            toastr.error('Failed to load item category details.');
+        }
+    }
+
+    function closeCustomOrderItemModal() {
+        const modal = document.getElementById('customOrderItemModal');
+        if (modal) {
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+        }
+    }
+
+    async function handleCustomOrderItemSubmit(event) {
+        event.preventDefault();
+        const id = document.getElementById('customOrderItemId').value;
+        const title = document.getElementById('customOrderItemTitle').value.trim();
+        const subtitle = document.getElementById('customOrderItemSubtitle').value.trim();
+        const sortOrder = document.getElementById('customOrderItemSortOrder').value;
+        const isActive = document.getElementById('customOrderItemActive').checked;
+
+        if (!title) {
+            toastr.error('Item name is required.');
+            return;
+        }
+
+        const submitBtn = document.getElementById('customOrderItemSubmitBtn');
+        submitBtn.disabled = true;
+
+        try {
+            const url = id ? `/admin/media/custom-order/items/${id}` : '/admin/media/custom-order/items';
+            const res = await axios.post(url, {
+                title: title,
+                subtitle: subtitle,
+                sort_order: sortOrder,
+                is_active: isActive
+            });
+
+            if (res.data.success) {
+                toastr.success(res.data.message || 'Saved successfully!');
+                closeCustomOrderItemModal();
+                loadManagerData();
+            } else {
+                toastr.error(res.data.message || 'Failed to save category.');
+            }
+        } catch (err) {
+            console.error('Failed to save custom order item', err);
+            toastr.error(err.response?.data?.message || 'Error saving category.');
+        } finally {
+            submitBtn.disabled = false;
+        }
+    }
+
+    async function deleteCustomOrderItem(id) {
+        if (!confirm('Are you sure you want to delete this custom order category?')) {
+            return;
+        }
+
+        try {
+            const res = await axios.delete(`/admin/media/custom-order/items/${id}`);
+            if (res.data.success) {
+                toastr.success('Category deleted successfully.');
+                loadManagerData();
+            } else {
+                toastr.error(res.data.message || 'Failed to delete category.');
+            }
+        } catch (err) {
+            console.error('Failed to delete category', err);
+            toastr.error('Error deleting category.');
+        }
+    }
+
+    async function toggleCustomOrderItem(id) {
+        try {
+            const res = await axios.post(`/admin/media/custom-order/items/${id}/toggle`);
+            if (res.data.success) {
+                toastr.success('Status updated.');
+                loadManagerData();
+            } else {
+                toastr.error(res.data.message || 'Failed to update status.');
+            }
+        } catch (err) {
+            console.error('Failed to toggle status', err);
+            toastr.error('Error updating status.');
         }
     }
 
@@ -4009,12 +4253,17 @@
         const timestamp = Date.now();
         try {
             localStorage.setItem('knotelle_media_updated', timestamp.toString());
+            localStorage.setItem('knotelle_media_sync', timestamp.toString());
+            localStorage.setItem('knotelle_contact_updated', timestamp.toString());
+            localStorage.setItem('knotelle_about_updated', timestamp.toString());
         } catch(e){}
         try {
             if ('BroadcastChannel' in window) {
                 const channel = new BroadcastChannel('knotelle_media_sync');
                 channel.postMessage({ type: 'MEDIA_UPDATED', timestamp: timestamp });
-                channel.close();
+                setTimeout(() => {
+                    try { channel.close(); } catch(e) {}
+                }, 200);
             }
         } catch(e){}
     }
@@ -4839,7 +5088,9 @@
     }
 
     function openAddVideoReelModal() {
-        document.getElementById('videoReelForm').reset();
+        const form = document.getElementById('videoReelForm');
+        if (form) form.reset();
+
         document.getElementById('videoReelId').value = '';
         document.getElementById('videoReelThumbnailMediaId').value = '';
         document.getElementById('videoReelThumbnailUrl').value = '';
@@ -4861,45 +5112,60 @@
         clearReelCoverInput();
         clearVideoPreviewPlayer();
 
+        const scrollContainer = document.getElementById('videoReelScrollContainer');
+        if (scrollContainer) {
+            scrollContainer.scrollTop = 0;
+        }
+
         const modal = document.getElementById('videoReelModal');
         modal.classList.remove('hidden');
         modal.classList.add('flex');
+
+        setTimeout(() => {
+            if (scrollContainer) scrollContainer.scrollTop = 0;
+            const titleInput = document.getElementById('videoReelTitle');
+            if (titleInput) {
+                titleInput.focus();
+            }
+        }, 60);
     }
 
     async function openEditVideoReelModal(id) {
         try {
             const res = await axios.get(`/admin/media/video-reel/${id}`);
-            if (!res.data.success || !res.data.reel) {
+            if (!res.data.success || (!res.data.reel && !res.data.data)) {
                 toastr.error('Video reel not found');
                 return;
             }
 
-            const reel = res.data.reel;
-            document.getElementById('videoReelForm').reset();
+            const reel = res.data.reel || res.data.data;
+            const form = document.getElementById('videoReelForm');
+            if (form) form.reset();
+
             document.getElementById('videoReelId').value = reel.id;
             document.getElementById('videoReelThumbnailMediaId').value = '';
-            document.getElementById('videoReelThumbnailUrl').value = reel.thumbnail_url || '';
+            document.getElementById('videoReelThumbnailUrl').value = reel.thumbnail_url || reel.thumbnail || '';
 
             document.getElementById('videoReelModalTitle').innerText = `Edit: ${reel.title}`;
-            document.getElementById('videoReelModalSubtitle').innerText = `ID #${reel.id} — ${reel.category_name || 'Reel'}`;
+            document.getElementById('videoReelModalSubtitle').innerText = `ID #${reel.id} — ${reel.category_name || reel.category || 'Reel'}`;
             document.getElementById('videoReelSubmitBtnText').innerText = 'Update Video / Reel';
 
             document.getElementById('videoReelContentType').value = reel.content_type || 'reel';
-            document.getElementById('videoReelCategory').value = reel.category_name || '';
+            document.getElementById('videoReelCategory').value = reel.category_name || reel.category || '';
             document.getElementById('videoReelTitle').value = reel.title || '';
-            document.getElementById('videoReelTagline').value = reel.tagline || '';
+            document.getElementById('videoReelTagline').value = reel.tagline || reel.subtitle || '';
             document.getElementById('videoReelDesc').value = reel.description || '';
             document.getElementById('videoReelUrlInput').value = reel.video_url || '';
-            document.getElementById('videoReelDuration').value = reel.duration || '';
-            document.getElementById('videoReelAudioName').value = reel.audio_name || '';
-            document.getElementById('videoReelLikes').value = reel.likes_count || 0;
-            document.getElementById('videoReelComments').value = reel.comments_count || 0;
-            document.getElementById('videoReelViews').value = reel.views_count || 0;
+            document.getElementById('videoReelDuration').value = reel.duration || '00:48';
+            document.getElementById('videoReelAudioName').value = reel.audio_name || 'Original Audio';
+            document.getElementById('videoReelLikes').value = reel.likes_count ?? (reel.likes ?? 0);
+            document.getElementById('videoReelComments').value = reel.comments_count ?? (reel.comments ?? 0);
+            document.getElementById('videoReelViews').value = reel.views_count ?? (reel.views ?? 0);
             document.getElementById('videoReelStatus').value = reel.is_active ? '1' : '0';
             document.getElementById('videoReelFeatured').value = reel.is_featured ? '1' : '0';
             document.getElementById('videoReelSortOrder').value = reel.sort_order || 1;
 
-            const thumbUrl = reel.thumbnail_url || reel.url;
+            const thumbUrl = reel.thumbnail_url || reel.thumbnail || reel.url;
             if (thumbUrl) {
                 document.getElementById('videoReelThumbnailPreviewImg').src = thumbUrl;
                 document.getElementById('videoReelThumbnailName').innerText = reel.title || 'Current Cover Image';
@@ -4909,16 +5175,29 @@
                 clearReelCoverInput();
             }
 
-            const videoSrc = reel.video_url || (reel.file_path ? `/storage/${reel.file_path}` : '');
+            const videoSrc = reel.video_url || reel.video_stream_url || (reel.file_path ? `/storage/${reel.file_path}` : '');
             if (videoSrc) {
                 loadVideoIntoPreviewPlayer(videoSrc);
             } else {
                 clearVideoPreviewPlayer();
             }
 
+            const scrollContainer = document.getElementById('videoReelScrollContainer');
+            if (scrollContainer) {
+                scrollContainer.scrollTop = 0;
+            }
+
             const modal = document.getElementById('videoReelModal');
             modal.classList.remove('hidden');
             modal.classList.add('flex');
+
+            setTimeout(() => {
+                if (scrollContainer) scrollContainer.scrollTop = 0;
+                const titleInput = document.getElementById('videoReelTitle');
+                if (titleInput) {
+                    titleInput.focus();
+                }
+            }, 60);
         } catch (err) {
             console.error('Failed to load video reel for editing', err);
             toastr.error('Failed to load video reel details.');
@@ -4934,10 +5213,42 @@
         }
     }
 
+    function handleVideoPlayerCanPlay() {
+        const statusBadge = document.getElementById('videoPlayerStatusBadge');
+        if (statusBadge) {
+            statusBadge.innerText = '✓ Video loaded & ready to play';
+            statusBadge.className = 'text-emerald-400 font-semibold';
+        }
+    }
+
+    function handleVideoPlayerError() {
+        const player = document.getElementById('videoReelPreviewPlayer');
+        const statusBadge = document.getElementById('videoPlayerStatusBadge');
+        if (player && player.src) {
+            console.warn('Video preview stream notice:', player.src);
+            if (statusBadge) {
+                statusBadge.innerText = 'Video link/file attached (Ready for saving)';
+                statusBadge.className = 'text-amber-400 font-medium';
+            }
+        }
+    }
+
     function handleVideoFileInputChange(input) {
         if (input.files && input.files[0]) {
             const file = input.files[0];
-            document.getElementById('videoReelFileLabel').innerText = `${file.name} (${(file.size / (1024 * 1024)).toFixed(1)} MB)`;
+            const sizeMb = (file.size / (1024 * 1024)).toFixed(1);
+            if (file.size > 40 * 1024 * 1024) {
+                toastr.warning(`Selected video is ${sizeMb} MB. Maximum recommended file size is 40 MB.`);
+            }
+            document.getElementById('videoReelFileLabel').innerText = `Selected: ${file.name} (${sizeMb} MB)`;
+            
+            // Auto-populate Title if empty so the user is never blocked
+            const titleInput = document.getElementById('videoReelTitle');
+            if (titleInput && !titleInput.value.trim()) {
+                let clean = file.name.replace(/\.[^/.]+$/, "").replace(/\d{4}-\d{2}-\d{2}.*$/, "").replace(/[-_]+/g, " ").trim();
+                titleInput.value = clean.length > 2 ? clean : 'Studio Video Reel';
+            }
+
             const fileUrl = URL.createObjectURL(file);
             loadVideoIntoPreviewPlayer(fileUrl);
         }
@@ -4947,22 +5258,35 @@
         if (val && val.trim().length > 3) {
             loadVideoIntoPreviewPlayer(val.trim());
         } else {
-            clearVideoPreviewPlayer();
+            const fileInput = document.getElementById('videoReelFileInput');
+            if (!fileInput || !fileInput.files || !fileInput.files[0]) {
+                clearVideoPreviewPlayer();
+            }
         }
     }
 
     function loadVideoIntoPreviewPlayer(src) {
+        if (!src) {
+            clearVideoPreviewPlayer();
+            return;
+        }
+
         const player = document.getElementById('videoReelPreviewPlayer');
         const emptyState = document.getElementById('videoPlayerEmptyState');
         const statusBadge = document.getElementById('videoPlayerStatusBadge');
         
+        let cleanSrc = src.trim();
+        if (!cleanSrc.startsWith('http://') && !cleanSrc.startsWith('https://') && !cleanSrc.startsWith('blob:') && !cleanSrc.startsWith('data:')) {
+            cleanSrc = cleanSrc.startsWith('/') ? cleanSrc : '/' + cleanSrc;
+        }
+
         if (player && emptyState) {
-            player.src = src;
+            player.src = cleanSrc;
             player.load();
             emptyState.classList.add('hidden');
             if (statusBadge) {
-                statusBadge.innerText = 'Video loaded & ready';
-                statusBadge.className = 'text-emerald-400 font-semibold';
+                statusBadge.innerText = 'Loading preview player...';
+                statusBadge.className = 'text-amber-300 font-normal';
             }
         }
     }
@@ -4984,7 +5308,7 @@
             statusBadge.innerText = 'No video selected';
             statusBadge.className = 'text-stone-400 font-normal';
         }
-        if (fileLabel) fileLabel.innerText = 'Click or drop MP4 / WEBM / MOV video file';
+        if (fileLabel) fileLabel.innerText = 'Click or drop MP4 / WEBM / MOV';
         if (fileInput) fileInput.value = '';
     }
 
@@ -5014,16 +5338,31 @@
         
         const form = document.getElementById('videoReelForm');
         const id = document.getElementById('videoReelId').value;
-        const title = document.getElementById('videoReelTitle').value.trim();
-        const category = document.getElementById('videoReelCategory').value.trim();
+        const titleInput = document.getElementById('videoReelTitle');
+        const categoryInput = document.getElementById('videoReelCategory');
         
+        // Auto-resolve title if empty so save is never blocked
+        let title = titleInput.value.trim();
         if (!title) {
-            toastr.error('Please enter a title for the video / reel.');
-            return;
+            const fileInput = document.getElementById('videoReelFileInput');
+            if (fileInput && fileInput.files && fileInput.files[0]) {
+                let clean = fileInput.files[0].name.replace(/\.[^/.]+$/, "").replace(/\d{4}-\d{2}-\d{2}.*$/, "").replace(/[-_]+/g, " ").trim();
+                title = clean.length > 2 ? clean : 'Handcrafted Video Reel';
+                titleInput.value = title;
+            } else if (id) {
+                title = 'Studio Reel #' + id;
+                titleInput.value = title;
+            } else {
+                title = 'Handcrafted Video Story';
+                titleInput.value = title;
+            }
         }
+
+        // Auto-resolve category if empty
+        let category = categoryInput.value.trim();
         if (!category) {
-            toastr.error('Please enter or select a category.');
-            return;
+            category = 'Studio ASMR';
+            categoryInput.value = category;
         }
 
         const formData = new FormData(form);
@@ -5054,7 +5393,14 @@
             }
         } catch (err) {
             console.error('Video reel save error', err);
-            toastr.error(err.response?.data?.message || 'Error saving video / reel.');
+            let errMsg = 'Error saving video / reel.';
+            if (err.response?.data?.errors) {
+                const errList = Object.values(err.response.data.errors).flat();
+                errMsg = errList.join(' • ');
+            } else if (err.response?.data?.message) {
+                errMsg = err.response.data.message;
+            }
+            toastr.error(errMsg);
         } finally {
             submitBtn.disabled = false;
             submitBtnText.innerText = originalText;
@@ -5523,26 +5869,6 @@
         });
     }
 
-    function handlePillarIconFileChange(input) {
-        if (input.files && input.files[0]) {
-            const file = input.files[0];
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                document.getElementById('craftPillarIconPreviewImg').src = e.target.result;
-                document.getElementById('craftPillarIconFileName').textContent = file.name;
-                document.getElementById('craftPillarIconPreviewContainer').classList.remove('hidden');
-                document.getElementById('craftPillarIconType').value = file.name.endsWith('.svg') ? 'svg' : 'image';
-            };
-            reader.readAsDataURL(file);
-        }
-    }
-
-    function clearPillarIconFileInput() {
-        document.getElementById('craftPillarIconFileInput').value = '';
-        document.getElementById('craftPillarIconPreviewContainer').classList.add('hidden');
-        document.getElementById('craftPillarIconType').value = 'preset';
-    }
-
     function openAddCraftPillarModal() {
         document.getElementById('craftPillarId').value = '';
         document.getElementById('craftPillarModalTitle').textContent = 'Add Craft Pillar';
@@ -5551,7 +5877,6 @@
         document.getElementById('craftPillarDescription').value = '';
         document.getElementById('craftPillarSortOrder').value = '';
         document.getElementById('craftPillarActive').checked = true;
-        clearPillarIconFileInput();
         selectPillarIcon('Leaf');
 
         document.getElementById('craftPillarModal').classList.remove('hidden');
@@ -5572,14 +5897,6 @@
                 document.getElementById('craftPillarActive').checked = p.is_active !== false;
                 
                 selectPillarIcon(p.icon_name || p.icon || 'Leaf');
-
-                if (p.icon_url) {
-                    document.getElementById('craftPillarIconPreviewImg').src = p.icon_url;
-                    document.getElementById('craftPillarIconPreviewContainer').classList.remove('hidden');
-                    document.getElementById('craftPillarIconType').value = p.icon_type || 'custom';
-                } else {
-                    clearPillarIconFileInput();
-                }
 
                 document.getElementById('craftPillarModal').classList.remove('hidden');
                 document.getElementById('craftPillarModal').classList.add('flex');

@@ -1,51 +1,48 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { Gift } from "lucide-react";
-import { CATEGORIES } from "@/data/categories";
-import { fetchCategories, ApiCategory } from "@/lib/api";
+import { useWebsiteMedia } from "@/context/MediaContext";
 
 export function CategoryGrid() {
-  const [categories, setCategories] = useState<any[]>(CATEGORIES);
+  const { media } = useWebsiteMedia();
+  const categories = media?.categories && media.categories.length > 0 ? media.categories : [];
+  const categorySection = media?.categorySection;
 
-  useEffect(() => {
-    let isMounted = true;
-    fetchCategories()
-      .then((liveCats) => {
-        if (isMounted && liveCats && liveCats.length > 0) {
-          setCategories(liveCats);
-        }
-      })
-      .catch((err) => console.warn("Live categories fetch notice:", err));
+  const sectionTitle = categorySection?.title || "Shop by Category";
+  const sectionSubtitle = categorySection?.subtitle || "Explore our wide range of handmade crochet products.";
+  const tagText = categorySection?.tag_text || "🌸";
+  const isActive = categorySection?.is_active !== false;
 
-    return () => {
-      isMounted = false;
-    };
-  }, []);
+  if (!isActive || categories.length === 0) {
+    return null;
+  }
 
   return (
     <section className="py-14 sm:py-18 bg-[#FFF9F6]">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         
-        {/* Header matching screenshot */}
+        {/* Dynamic Header */}
         <div className="text-center max-w-2xl mx-auto mb-10 sm:mb-12">
           <div className="flex items-center justify-center gap-2 mb-1.5">
             <span className="h-px w-10 bg-[#E7D1CC]" />
-            <span className="text-xs text-[#913638]">🌸</span>
+            <span className="text-xs text-[#913638]">{tagText}</span>
             <h2 className="font-serif-luxury text-2xl sm:text-3xl lg:text-4xl font-bold text-[#2E211E] tracking-tight">
-              Shop by Category
+              {sectionTitle}
             </h2>
-            <span className="text-xs text-[#913638]">🌸</span>
+            <span className="text-xs text-[#913638]">{tagText}</span>
             <span className="h-px w-10 bg-[#E7D1CC]" />
           </div>
-          <p className="text-xs sm:text-sm text-[#786864]">
-            Explore our wide range of handmade crochet products.
-          </p>
+          {sectionSubtitle && (
+            <p className="text-xs sm:text-sm text-[#786864]">
+              {sectionSubtitle}
+            </p>
+          )}
         </div>
 
-        {/* 2 Rows of 6 Categories (6 cols desktop, 4 cols tablet, 2-3 cols mobile) */}
+        {/* Dynamic Category Grid */}
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3 sm:gap-4 md:gap-6">
           {categories.map((category) => (
             <Link
@@ -57,7 +54,7 @@ export function CategoryGrid() {
               <div className="relative w-20 h-20 sm:w-24 sm:h-24 md:w-28 md:h-28 rounded-full overflow-hidden bg-[#FCE9E5] border-2 border-[#E7D1CC]/80 group-hover:border-[#913638] shadow-xs group-hover:shadow-md transition-all p-1 mb-2">
                 <div className="relative w-full h-full rounded-full overflow-hidden">
                   <Image
-                    src={category.image}
+                    src={category.image || "/images/logo/Logo_1.png"}
                     alt={category.name}
                     fill
                     sizes="(max-width: 640px) 80px, (max-width: 1024px) 110px, 140px"
@@ -66,18 +63,18 @@ export function CategoryGrid() {
                 </div>
               </div>
 
-              {/* Title & Starting Price */}
+              {/* Title & Item Count / Price */}
               <h3 className="font-serif-luxury text-xs sm:text-sm md:text-base font-bold text-[#2E211E] group-hover:text-[#913638] transition-colors line-clamp-1">
                 {category.name}
               </h3>
 
               <span className="text-[10px] sm:text-[11px] text-[#786864] group-hover:text-[#913638] font-medium mt-0.5 transition-colors">
-                {category.priceFrom}
+                {category.priceFrom || (category.itemCount > 0 ? `${category.itemCount} items` : "Explore →")}
               </span>
             </Link>
           ))}
 
-          {/* 12th Card: "More -> Explore All →" */}
+          {/* Explore All Card */}
           <Link
             href="/shop"
             className="group flex flex-col items-center text-center p-2 sm:p-3 rounded-2xl transition-all duration-300 transform hover:-translate-y-1"

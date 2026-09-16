@@ -8,7 +8,6 @@ use App\Models\Brand;
 use App\Models\Category;
 use App\Models\Product;
 use App\Models\ProductVariant;
-use App\Models\Tag;
 use App\Models\TaxClass;
 use Illuminate\Http\Request;
 
@@ -54,7 +53,6 @@ class ProductController extends Controller
         $categories = Category::with('children')->whereNull('parent_id')->get();
         $brands = Brand::where('status', 1)->get();
         $taxClasses = TaxClass::all();
-        $tags = Tag::all();
 
         $maxId = Product::max('id') ?? 0;
         $nextProductCode = 'prod-' . ($maxId + 1);
@@ -63,7 +61,7 @@ class ProductController extends Controller
             $nextProductCode = 'prod-' . ($maxId + 1);
         }
 
-        return view('admin.products.create', compact('categories', 'brands', 'taxClasses', 'tags', 'nextProductCode'));
+        return view('admin.products.create', compact('categories', 'brands', 'taxClasses', 'nextProductCode'));
     }
 
     public function store(Request $request)
@@ -165,26 +163,21 @@ class ProductController extends Controller
 
     public function edit($id)
     {
-        // Eager load everything needed for the view, mirroring Service logic but as Eloquent model
+        // Eager load everything needed for the view
         $product = Product::with([
-            'tags', 
             'categories', 
-            'defaultVariant.images', // For simple product data
+            'defaultVariant.images',
             'brand',
             'mainCategory',
             'variants.images',
             'variants.primaryImage.media',
-            'specifications' => function($q) {
-                $q->with('values'); 
-            }
         ])->findOrFail($id);
         
         $categories = Category::with('children')->whereNull('parent_id')->get();
         $brands = Brand::where('status', 1)->get();
         $taxClasses = TaxClass::all();
-        $tags = Tag::all();
         
-        return view('admin.products.edit', compact('product', 'categories', 'brands', 'taxClasses', 'tags'));
+        return view('admin.products.edit', compact('product', 'categories', 'brands', 'taxClasses'));
     }
 
     public function update(Request $request, $id)
@@ -238,49 +231,6 @@ class ProductController extends Controller
 
         $product->delete();
         return redirect()->route('admin.products.index')->with('success', 'Product deleted successfully.');
-    }
-
-    // AJAX Endpoints used by Blade Views (axios)
-    
-    public function getCategorySpecifications($categoryId)
-    {
-        try {
-            $specs = $this->productService->getCategorySpecifications($categoryId);
-            return response()->json([
-                'success' => true,
-                'data' => $specs
-            ]);
-        } catch (\Exception $e) {
-             return response()->json(['success' => false, 'message' => $e->getMessage()], 500);
-        }
-    }
-
-    public function getCategoryAttributes($categoryId)
-    {
-        try {
-            $attrs = $this->productService->getCategoryAttributes($categoryId);
-            return response()->json([
-                'success' => true,
-                'data' => $attrs
-            ]);
-        } catch (\Exception $e) {
-             return response()->json(['success' => false, 'message' => $e->getMessage()], 500);
-        }
-    }
-
-    public function attributes()
-    {
-        return view('admin.products.attributes');
-    }
-
-    public function specifications()
-    {
-        return view('admin.products.specifications');
-    }
-
-    public function tags()
-    {
-        return view('admin.products.tags');
     }
 
     public function search(Request $request)

@@ -5,7 +5,6 @@ namespace App\Services\Admin;
 use App\Models\Product;
 use App\Models\ProductVariant;
 use App\Models\Category;
-use App\Models\Attribute;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
@@ -56,13 +55,7 @@ class ProductService
             // 2. Sync categories
             $this->syncCategories($product, $data);
 
-            // 3. Sync tags
-            $this->syncTags($product, $data);
-
-            // 4. Handle specifications
-            $this->syncSpecifications($product, $data);
-
-            // 5. Handle product variants
+            // 3. Handle product variants
             if ($product->product_type === 'simple') {
                 $this->createSimpleProductVariant($product, $data);
             } else {
@@ -113,61 +106,6 @@ class ProductService
             }
             $product->categories()->sync($syncData);
             Log::info('Categories synced', ['product_id' => $product->id, 'category_ids' => $categoryIds]);
-        }
-    }
-
-    /**
-     * Sync tags for product
-     */
-    private function syncTags(Product $product, array $data): void
-    {
-        $tagIds = $data['tag_ids'] ?? [];
-        $product->tags()->sync($tagIds);
-        Log::info('Tags synced', ['product_id' => $product->id, 'tag_ids' => $tagIds]);
-    }
-
-    /**
-     * Sync specifications for product
-     */
-    private function syncSpecifications(Product $product, array $data): void
-    {
-        // Only sync if specifications are provided in the data array
-        // This prevents accidental deletion of specifications during partial updates
-        if (isset($data['specifications']) && is_array($data['specifications'])) {
-            // Detach all existing specifications first
-            $product->specifications()->detach();
-
-            foreach ($data['specifications'] as $specData) {
-                if (empty($specData['specification_id'])) {
-                    continue;
-                }
-
-                $specId = $specData['specification_id'];
-                $valId = $specData['specification_value_id'] ?? null;
-                $customVal = $specData['custom_value'] ?? null;
-                $valIds = $specData['custom_value_ids'] ?? null;
-
-                if (!empty($valIds) && is_array($valIds)) {
-                    // Handle multiselect from checkbox list - store IDs in custom_value as CSV
-                    $product->specifications()->attach($specId, [
-                        'specification_value_id' => null,
-                        'custom_value' => implode(',', $valIds)
-                    ]);
-                } elseif (is_array($valId)) {
-                    // Handle multiselect from standard select - store IDs in custom_value as CSV
-                    $product->specifications()->attach($specId, [
-                        'specification_value_id' => null,
-                        'custom_value' => implode(',', $valId)
-                    ]);
-                } else {
-                    // Handle single select or text input
-                    $product->specifications()->attach($specId, [
-                        'specification_value_id' => $valId,
-                        'custom_value' => $customVal
-                    ]);
-                }
-            }
-            Log::info('Specifications synced', ['product_id' => $product->id]);
         }
     }
 
@@ -227,18 +165,11 @@ class ProductService
 
             foreach ($data['variants'] as $index => $variantData) {
                 try {
-                    // Generate combination hash
-                    $combinationHash = null;
-                    if (isset($variantData['attributes']) && is_array($variantData['attributes'])) {
-                        $combinationHash = $this->generateCombinationHash($variantData['attributes']);
-                    }
-
                     $isDefault = ($index === 0 && !$defaultVariantSet) || !empty($variantData['is_default']);
 
                     $variant = ProductVariant::create([
                         'product_id' => $product->id,
                         'sku' => $variantData['sku'],
-                        'combination_hash' => $combinationHash,
                         'price' => $variantData['price'],
                         'compare_price' => $variantData['compare_price'] ?? null,
                         'cost_price' => $variantData['cost_price'] ?? null,
@@ -265,9 +196,6 @@ class ProductService
                         'is_default' => $variant->is_default
                     ]);
 
-                    // Handle variant attributes
-                    $this->syncVariantAttributes($variant, $variantData);
-
                     // Handle variant images
                     if ($isDefault && !empty($topLevelImageIds)) {
                         $this->syncVariantImages($variant, ['product_images' => $topLevelImageIds]);
@@ -286,8 +214,6 @@ class ProductService
             }
         }
     }
-
-
 
     public function updateProduct(Product $product, array $data): array
     {
@@ -330,13 +256,7 @@ class ProductService
             // 2. Sync categories
             $this->syncCategories($product, $data);
 
-            // 3. Sync tags
-            $this->syncTags($product, $data);
-
-            // 4. Handle specifications
-            $this->syncSpecifications($product, $data);
-
-            // 5. Handle variants
+            // 3. Handle variants
             $this->handleVariantsUpdate($product, $data);
 
             DB::commit();
@@ -365,22 +285,6 @@ class ProductService
     }
 
     /**
-     * Handle variants update - delete existing and create new
-     */
-    // private function handleVariantsUpdate(Product $product, array $data): void
-    // {
-    //     // Delete existing variants and their relations
-    //     $product->variants()->delete();
-
-    //     // Create new variants based on product type
-    //     if ($product->product_type === 'simple') {
-    //         $this->createSimpleProductVariant($product, $data);
-    //     } else {
-    //         $this->createConfigurableProductVariants($product, $data);
-    //     }
-    // }
-
-    /**
      * Get product data for edit form
      */
     public function getProductForEdit(Product $product): array
@@ -390,21 +294,9 @@ class ProductService
             'mainCategory:id,name',
             'categories:id,name',
             'taxClass:id,name,rate',
-            'tags:id,name',
-            'specifications' => function ($query) {
-                $query->with([
-                    'values:id,specification_id,value'
-                ]);
-            },
-
-
             'variants' => function ($query) {
                 $query->with([
-                    'attributes' => function ($q) {
-    $q->with(['attribute:id,name']);
-},
                    'images:id,path,full_url,thumb_url'
-
                 ])->orderBy('is_default', 'desc');
             }
         ]);
@@ -438,51 +330,12 @@ class ProductService
             'main_category' => $product->mainCategory,
             'categories' => $product->categories,
             'tax_class' => $product->taxClass,
-            'tags' => $product->tags,
-            'specifications' => $this->formatSpecifications($product->specifications),
             'variants' => $this->formatVariants($product->variants),
             'default_variant' => $defaultVariant ? $this->formatDefaultVariant($defaultVariant) : null,
             'main_image' => $this->getMainProductImage($product),
             'gallery_images' => $this->getGalleryImages($product),
         ];
     }
-
-    /**
-     * Format specifications for edit form
-     */
-    private function formatSpecifications($specifications): array
-    {
-        $formatted = [];
-
-        foreach ($specifications as $spec) {
-
-            $value = null;
-
-            // Priority 1: custom value
-            if (!empty($spec->pivot->custom_value)) {
-                $value = $spec->pivot->custom_value;
-            }
-
-            // Priority 2: selected specification value
-            elseif (!empty($spec->pivot->specification_value_id)) {
-                $selected = $spec->values
-                    ->firstWhere('id', $spec->pivot->specification_value_id);
-
-                $value = $selected?->value;
-            }
-
-            $formatted[] = [
-                'specification_id' => $spec->id,
-                'name' => $spec->name,
-                'input_type' => $spec->input_type,
-                'value' => $value,
-                'specification_value_id' => $spec->pivot->specification_value_id,
-            ];
-        }
-
-        return $formatted;
-    }
-
 
     /**
      * Format variants for edit form
@@ -501,19 +354,11 @@ class ProductService
                 'stock_status' => $variant->stock_status,
                 'status' => $variant->status,
                 'is_default' => (bool) $variant->is_default,
-                'attributes' => $variant->attributes->map(function ($attr) {
-                    return [
-                        'attribute_id' => $attr->pivot->attribute_id,
-                        'attribute_name' => $attr->name,
-                        'attribute_value_id' => $attr->pivot->attribute_value_id,
-                        'value' => $attr->value,
-                    ];
-                })->toArray(),
                 'images' => $variant->images->map(function ($image) {
                     return [
                         'id' => $image->id,
                         'media_id' => $image->media_id,
-'url' => $image->full_url ?? $image->path,
+                        'url' => $image->full_url ?? $image->path,
                         'is_primary' => (bool) $image->is_primary,
                     ];
                 })->toArray(),
@@ -540,7 +385,7 @@ class ProductService
                 return [
                     'id' => $image->id,
                     'media_id' => $image->media_id,
-'url' => $image->full_url ?? $image->path,
+                    'url' => $image->full_url ?? $image->path,
                     'is_primary' => (bool) $image->is_primary,
                 ];
             })->toArray(),
@@ -556,17 +401,16 @@ class ProductService
         if (!$defaultVariant) {
             return null;
         }
-$mainImage = $defaultVariant->images()
-    ->where('variant_images.is_primary', true)
-    ->first();
+        $mainImage = $defaultVariant->images()
+            ->where('variant_images.is_primary', true)
+            ->first();
 
-if ($mainImage) {
-    return [
-        'id' => $mainImage->id,
-        'url' => $mainImage->full_url ?? $mainImage->path,
-    ];
-}
-
+        if ($mainImage) {
+            return [
+                'id' => $mainImage->id,
+                'url' => $mainImage->full_url ?? $mainImage->path,
+            ];
+        }
 
         return null;
     }
@@ -583,43 +427,12 @@ if ($mainImage) {
 
         $galleryImages = $defaultVariant->images()->where('is_primary', false)->get();
 
-       return $galleryImages->map(function ($image) {
-    return [
-        'id' => $image->id,
-        'url' => $image->full_url ?? $image->path,
-    ];
-})->values()->toArray();
-
-    }
-
-
-    /**
-     * Sync variant attributes
-     */
-    private function syncVariantAttributes(ProductVariant $variant, array $variantData): void
-    {
-        if (isset($variantData['attributes']) && is_array($variantData['attributes'])) {
-            $attributesData = [];
-            foreach ($variantData['attributes'] as $attributeData) {
-                if (!empty($attributeData['attribute_id'])) {
-                    $attributesData[] = [
-                        'variant_id' => $variant->id,
-                        'attribute_id' => $attributeData['attribute_id'],
-                        'attribute_value_id' => $attributeData['attribute_value_id'] ?? null,
-                        'created_at' => now(),
-                        'updated_at' => now(),
-                    ];
-                }
-            }
-
-            if (!empty($attributesData)) {
-                DB::table('variant_attributes')->insert($attributesData);
-                Log::info('Variant attributes synced', [
-                    'variant_id' => $variant->id,
-                    'attributes_count' => count($attributesData)
-                ]);
-            }
-        }
+        return $galleryImages->map(function ($image) {
+            return [
+                'id' => $image->id,
+                'url' => $image->full_url ?? $image->path,
+            ];
+        })->values()->toArray();
     }
 
     /**
@@ -722,296 +535,6 @@ if ($mainImage) {
         ]);
     }
 
-
-    /**
-     * Generate combination hash for variant
-     */
-    private function generateCombinationHash(array $attributes): string
-    {
-        $data = [];
-        foreach ($attributes as $attribute) {
-            if (isset($attribute['attribute_id'])) {
-                $data[$attribute['attribute_id']] = $attribute['attribute_value_id'] ?? $attribute['value'] ?? null;
-            }
-        }
-        ksort($data);
-        return md5(json_encode($data));
-    }
-
-    /**
-     * Get category specifications with groups
-     */
-    public function getCategorySpecifications(int $categoryId): array
-    {
-        try {
-            Log::info('Getting category specifications', ['category_id' => $categoryId]);
-
-            $category = Category::where('status', 1)
-                ->with([
-                    'specificationGroups' => function ($q) {
-                        $q->where('status', 1)
-                            ->orderBy('sort_order')
-                            ->with([
-                                'specifications' => function ($q) {
-                                    $q->where('status', 1)
-                                        ->orderBy('sort_order')
-                                        ->with('values');
-                                }
-                            ]);
-                    }
-                ])
-                ->findOrFail($categoryId);
-
-            $result = [];
-
-            foreach ($category->specificationGroups as $group) {
-
-                if ($group->specifications->isEmpty()) {
-                    continue;
-                }
-
-                $groupData = [
-                    'group_id' => $group->id,
-                    'group_name' => $group->name,
-                    'group_sort_order' => $group->pivot->sort_order,
-                    'specifications' => []
-                ];
-
-                foreach ($group->specifications as $spec) {
-
-                    $groupData['specifications'][] = [
-                        'id' => $spec->id,
-                        'name' => $spec->name,
-                        'code' => $spec->code,
-                        'input_type' => $spec->input_type,
-                        'is_required' => (bool) $spec->is_required,
-                        'is_filterable' => (bool) $spec->is_filterable,
-                        'sort_order' => $spec->pivot->sort_order,
-
-                        // IMPORTANT LOGIC
-                        'values' => in_array($spec->input_type, ['select', 'multiselect', 'radio', 'checkbox'])
-                            ? $spec->values->map(fn($v) => [
-                                'id' => $v->id,
-                                'value' => $v->value,
-                                'sort_order' => $v->sort_order
-                            ])->values()
-                            : []
-                    ];
-                }
-
-                $result[] = $groupData;
-            }
-
-            return $result;
-
-        } catch (\Throwable $e) {
-            Log::error('Failed to get category specifications', [
-                'category_id' => $categoryId,
-                'error' => $e->getMessage()
-            ]);
-
-            throw $e;
-        }
-    }
-
-
-    /**
-     * Get category attributes for variants
-     */
-    public function getCategoryAttributes(int $categoryId): array
-    {
-        try {
-            Log::info('Getting category attributes', ['category_id' => $categoryId]);
-
-            $category = Category::where('status', 1)
-                ->with([
-                    'attributes' => function ($q) {
-                        $q->where('attributes.status', 1)
-                            ->where('attributes.is_variant', 1)
-                            ->orderBy('category_attributes.sort_order')
-                            ->with([
-                                'values.image'
-                            ]);
-                    }
-                ])
-                ->findOrFail($categoryId);
-
-            $result = [];
-
-            foreach ($category->attributes as $attribute) {
-
-                $options = $attribute->values->map(function ($value) {
-                    return [
-                        'id' => $value->id,
-                        'value' => $value->value,
-                        'label' => $value->label,
-                        'color_code' => $value->color_code,
-                        'image_id' => $value->image_id,
-                        'image_url' => $value->image
-                            ? ($value->image->full_url ?? $value->image->path)
-                            : null,
-                        'sort_order' => $value->sort_order,
-                    ];
-                })->values();
-
-                $result[] = [
-                    'id' => $attribute->id,
-                    'name' => $attribute->name,
-                    'code' => $attribute->code,
-                    'type' => $attribute->type,
-                    'input_type' => $attribute->type, // select / color / image / text
-                    'is_required' => (bool) $attribute->pivot->is_required,
-                    'is_variant' => (bool) $attribute->is_variant,
-                    'is_filterable' => (bool) $attribute->pivot->is_filterable,
-                    'category_sort_order' => $attribute->pivot->sort_order,
-                    'options' => $options,
-                ];
-            }
-
-            return $result;
-
-        } catch (\Throwable $e) {
-            Log::error('Failed to get category attributes', [
-                'category_id' => $categoryId,
-                'error' => $e->getMessage()
-            ]);
-            throw $e;
-        }
-    }
-
-    /**
-     * Generate variants based on selected attributes
-     */
-    public function generateVariants(array $data): array
-    {
-        try {
-            Log::info('Generating variants', ['data' => $data]);
-
-            $attributes = $data['attributes'] ?? [];
-            $baseSku = $data['base_sku'] ?? 'PROD';
-            $basePrice = $data['base_price'] ?? 0;
-
-            if (empty($attributes)) {
-                throw new \Exception('No attributes provided');
-            }
-
-            // Prepare attribute values for combination
-            $attributeValues = [];
-            foreach ($attributes as $attribute) {
-                if (isset($attribute['values']) && count($attribute['values']) > 0) {
-                    $attrValues = [];
-                    foreach ($attribute['values'] as $value) {
-                        $attrValues[] = [
-                            'attribute_id' => $attribute['attribute_id'],
-                            'attribute_name' => $attribute['attribute_name'],
-                            'value_id' => $value['id'] ?? null,
-                            'value' => $value['value'] ?? '',
-                            'label' => $value['label'] ?? $value['value'] ?? '',
-                        ];
-                    }
-                    $attributeValues[] = $attrValues;
-                }
-            }
-
-            // Generate all combinations
-            $combinations = $this->generateAllCombinations($attributeValues);
-            Log::info('Generated combinations', ['count' => count($combinations)]);
-
-            // Generate variants from combinations
-            $variants = [];
-            $skuCounter = 1;
-
-            foreach ($combinations as $combination) {
-                $combinationData = [];
-                $combinationDisplay = [];
-                $variantAttributes = [];
-                $variantNameParts = [];
-
-                foreach ($combination as $attr) {
-                    $combinationData[] = $attr;
-                    $combinationDisplay[] = $attr['attribute_name'] . ': ' . $attr['label'];
-
-                    // Prepare attributes for variant_attributes table
-                    $variantAttributes[] = [
-                        'attribute_id' => $attr['attribute_id'],
-                        'attribute_value_id' => $attr['value_id'],
-                        'value' => $attr['value']
-                    ];
-
-                    $variantNameParts[] = $attr['label'];
-                }
-
-                // Create SKU: base + first letters of each attribute value
-                $skuSuffix = '';
-                foreach ($combination as $attr) {
-                    $cleanValue = preg_replace('/[^a-z0-9]/i', '', $attr['value']);
-                    $skuSuffix .= '-' . strtoupper(substr($cleanValue, 0, 3));
-                }
-
-                $sku = $baseSku . $skuSuffix . '-' . str_pad($skuCounter, 3, '0', STR_PAD_LEFT);
-
-                $variants[] = [
-                    'combination' => $combinationData,
-                    'attributes' => $variantAttributes,
-                    'combination_display' => implode(' | ', $combinationDisplay),
-                    'variant_name' => implode(' ', $variantNameParts),
-                    'sku' => $sku,
-                    'price' => $basePrice,
-                    'compare_price' => null,
-                    'cost_price' => null,
-                    'stock_quantity' => 0,
-                    'status' => 'active',
-                    'is_default' => $skuCounter === 1,
-                ];
-
-                $skuCounter++;
-            }
-
-            Log::info('Variants generated successfully', ['variant_count' => count($variants)]);
-
-            return [
-                'success' => true,
-                'variants' => $variants,
-                'total_variants' => count($variants),
-                'message' => count($variants) . ' variants generated successfully',
-            ];
-
-        } catch (\Exception $e) {
-            Log::error('Failed to generate variants', [
-                'error' => $e->getMessage(),
-                'data' => $data
-            ]);
-
-            return [
-                'success' => false,
-                'error' => $e->getMessage()
-            ];
-        }
-    }
-
-    /**
-     * Generate all combinations of attribute values
-     */
-    private function generateAllCombinations(array $attributeValues): array
-    {
-        if (empty($attributeValues)) {
-            return [];
-        }
-
-        $result = [[]];
-
-        foreach ($attributeValues as $values) {
-            $temp = [];
-            foreach ($result as $item) {
-                foreach ($values as $value) {
-                    $temp[] = array_merge($item, [$value]);
-                }
-            }
-            $result = $temp;
-        }
-
-        return $result;
-    }
     /**
      * Handle variants update (Create/Update/Delete)
      */
@@ -1105,10 +628,6 @@ if ($mainImage) {
                 ]);
                 $submittedVariantIds[] = $variant->id;
                 Log::debug('New variant created during update', ['variant_id' => $variant->id, 'sku' => $variant->sku]);
-                
-                if (isset($variantData['attributes'])) {
-                    $this->syncVariantAttributes($variant, $variantData);
-                }
             }
 
             // Sync images:

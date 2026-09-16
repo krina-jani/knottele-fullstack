@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
@@ -73,11 +73,10 @@ const DEFAULT_HERO_SLIDES = [
 export function Hero() {
   const { media } = useWebsiteMedia();
   const [currentSlide, setCurrentSlide] = useState(0);
-  const [slides, setSlides] = useState(DEFAULT_HERO_SLIDES);
 
-  useEffect(() => {
+  const slides = useMemo(() => {
     if (media?.hero?.slides && media.hero.slides.length > 0) {
-      const dynamicSlides = media.hero.slides.map((s, idx) => {
+      return media.hero.slides.map((s, idx) => {
         const fallback = DEFAULT_HERO_SLIDES[idx % DEFAULT_HERO_SLIDES.length];
         const words = (s.title || fallback.titleHighlight).trim().split(/\s+/);
         let line1 = words[0] || fallback.titleLine1;
@@ -100,8 +99,8 @@ export function Hero() {
           scriptAccent: s.tagline || s.tag_text || fallback.scriptAccent,
         };
       });
-      setSlides(dynamicSlides);
     }
+    return DEFAULT_HERO_SLIDES;
   }, [media?.hero?.slides]);
 
   // Auto-play every 2.5 seconds

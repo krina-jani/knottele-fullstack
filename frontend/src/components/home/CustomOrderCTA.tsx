@@ -10,12 +10,13 @@ export function CustomOrderCTA() {
   const { media } = useWebsiteMedia();
   const [index, setIndex] = useState(0);
   const [isFading, setIsFading] = useState(false);
-  const [ctaText, setCtaText] = useState("Start a Custom Order");
-  const [ctaLink, setCtaLink] = useState("/custom-order");
-  const [isActive, setIsActive] = useState(true);
+
+  const custom = media?.customOrder;
+  const ctaText = custom?.cta_text || "Start a Custom Order";
+  const ctaLink = custom?.cta_link || "/custom-order";
+  const isActive = custom?.is_active !== false;
 
   const rotatingTitles = useMemo(() => {
-    const custom = media?.customOrder;
     return [
       {
         badge: custom?.badge || "Bespoke Handcrafting",
@@ -42,18 +43,7 @@ export function CustomOrderCTA() {
         desc: "Custom color matching, personalized embroidery tags, and bespoke crochet designs crafted exclusively for your moments.",
       },
     ];
-  }, [media?.customOrder]);
-
-  useEffect(() => {
-    if (!media?.customOrder) return;
-    if (media.customOrder.is_active === false) {
-      setIsActive(false);
-      return;
-    }
-    setIsActive(true);
-    if (media.customOrder.cta_text) setCtaText(media.customOrder.cta_text);
-    if (media.customOrder.cta_link) setCtaLink(media.customOrder.cta_link);
-  }, [media?.customOrder]);
+  }, [custom]);
 
   // Rotate title every 2.5 seconds with smooth crossfade
   useEffect(() => {

@@ -135,8 +135,6 @@
     let selectedMediaId = null;
     let selectedMediaUrl = null;
     let categoryData = null;
-    let allAttributes = [];
-    let allSpecGroups = [];
     let parentCategories = [];
 
     // Initialize page
@@ -156,9 +154,7 @@
 
                 // Load other data in parallel
                 await Promise.all([
-                    loadParentCategories(),
-                    loadAttributes(),
-                    loadSpecificationGroups()
+                    loadParentCategories()
                 ]);
 
                 // Render form
@@ -202,36 +198,6 @@
         } catch (error) {
             console.error('Error loading parent categories:', error);
             parentCategories = [];
-        }
-    }
-
-    // Load attributes
-    async function loadAttributes() {
-        try {
-            const response = await axiosInstance.get('/attributes/dropdown');
-
-            if (response.data.success) {
-                allAttributes = response.data.data || [];
-                console.log('Attributes loaded:', allAttributes.length);
-            }
-        } catch (error) {
-            console.error('Error loading attributes:', error);
-            allAttributes = [];
-        }
-    }
-
-    // Load specification groups
-    async function loadSpecificationGroups() {
-        try {
-            const response = await axiosInstance.get('/specification-groups/dropdown');
-
-            if (response.data.success) {
-                allSpecGroups = response.data.data || [];
-                console.log('Spec groups loaded:', allSpecGroups.length);
-            }
-        } catch (error) {
-            console.error('Error loading specification groups:', error);
-            allSpecGroups = [];
         }
     }
 
@@ -330,75 +296,7 @@
                             </div>
                         </div>
 
-                        <!-- Specification Groups Card -->
-                        <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
-                            <div class="px-6 py-4 border-b border-gray-200">
-                                <h3 class="text-lg font-semibold text-gray-800">Specification Groups</h3>
-                            </div>
-                            <div class="p-6">
-                                <p class="text-sm text-gray-600 mb-4">Select specification groups to assign to this category</p>
 
-                                <div class="mb-4">
-                                    <div class="relative">
-                                        <input type="text" id="specGroupSearch" placeholder="Search specification groups..."
-                                            class="pl-10 pr-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent w-full"
-                                            onkeyup="filterSpecGroups()">
-                                        <i class="fas fa-search absolute left-3 top-3 text-gray-400"></i>
-                                    </div>
-                                </div>
-
-                                <div class="space-y-3 max-h-96 overflow-y-auto p-4 border rounded-lg bg-gray-50" id="specificationGroupsContainer">
-                                    ${renderSpecificationGroups()}
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Attributes Card -->
-                        <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
-                            <div class="px-6 py-4 border-b border-gray-200">
-                                <h3 class="text-lg font-semibold text-gray-800">Attributes</h3>
-                            </div>
-                            <div class="p-6">
-                                <p class="text-sm text-gray-600 mb-4">Select attributes for variant creation (size, color, etc.)</p>
-
-                                <div class="mb-4">
-                                    <div class="relative">
-                                        <input type="text" id="attributeSearch" placeholder="Search attributes..."
-                                            class="pl-10 pr-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent w-full"
-                                            onkeyup="filterAttributes()">
-                                        <i class="fas fa-search absolute left-3 top-3 text-gray-400"></i>
-                                    </div>
-                                </div>
-
-                                <div class="overflow-x-auto">
-                                    <table class="min-w-full divide-y divide-gray-200">
-                                        <thead class="bg-gray-50">
-                                            <tr>
-                                                <th scope="col" class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                                    <input type="checkbox" id="selectAllAttributes" class="rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"
-                                                           onchange="toggleAllAttributes(this.checked)">
-                                                </th>
-                                                <th scope="col" class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                                    Attribute
-                                                </th>
-                                                <th scope="col" class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                                    Required
-                                                </th>
-                                                <th scope="col" class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                                    Filterable
-                                                </th>
-                                                <th scope="col" class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                                    Sort Order
-                                                </th>
-                                            </tr>
-                                        </thead>
-                                        <tbody class="bg-white divide-y divide-gray-200" id="attributesContainer">
-                                            ${renderAttributes()}
-                                        </tbody>
-                                    </table>
-                                </div>
-                            </div>
-                        </div>
                     </div>
 
                     <!-- Right Column -->
@@ -544,182 +442,7 @@
         return options;
     }
 
-    // Render specification groups
-    function renderSpecificationGroups() {
-        if (allSpecGroups.length === 0) {
-            return `
-                <div class="text-center py-8 text-gray-500">
-                    No specification groups found. Create groups first.
-                </div>
-            `;
-        }
 
-        const selectedGroups = categoryData.spec_group_ids || [];
-
-        return allSpecGroups.map(group => `
-            <div class="spec-group-item flex items-center p-3 bg-white rounded-lg border hover:border-indigo-300 transition-colors">
-                <input type="checkbox"
-                       id="spec_group_${group.id}"
-                       name="spec_group_ids[]"
-                       value="${group.id}"
-                       class="spec-group-checkbox rounded border-gray-300 text-indigo-600 focus:ring-indigo-500 mr-3"
-                       ${selectedGroups.includes(group.id) ? 'checked' : ''}>
-                <label for="spec_group_${group.id}" class="flex-1 cursor-pointer">
-                    <div class="font-medium text-gray-900">${group.name}</div>
-                </label>
-            </div>
-        `).join('');
-    }
-
-    // Render attributes
-    function renderAttributes() {
-        if (allAttributes.length === 0) {
-            return `
-                <tr id="attributesLoading">
-                    <td colspan="5" class="px-4 py-8 text-center text-gray-500">
-                        No attributes found. Create attributes first.
-                    </td>
-                </tr>
-            `;
-        }
-
-        const categoryAttributes = categoryData.attributes || [];
-
-        return allAttributes.map(attribute => {
-            const categoryAttr = categoryAttributes.find(ca => ca.id == attribute.id);
-            const isSelected = !!categoryAttr;
-            const isRequired = categoryAttr ? categoryAttr.pivot.is_required : false;
-            const isFilterable = categoryAttr ? categoryAttr.pivot.is_filterable : false;
-            const sortOrder = categoryAttr ? categoryAttr.pivot.sort_order : 0;
-
-            return `
-                <tr class="attribute-item">
-                    <td class="px-4 py-3 whitespace-nowrap">
-                        <input type="checkbox"
-                               id="attribute_${attribute.id}"
-                               data-id="${attribute.id}"
-                               class="attribute-checkbox rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"
-                               ${isSelected ? 'checked' : ''}
-                               onchange="toggleAttributeOptions('${attribute.id}', this.checked)">
-                    </td>
-                    <td class="px-4 py-3 whitespace-nowrap">
-                        <div class="flex items-center">
-                            <div class="text-sm font-medium text-gray-900">${attribute.name}</div>
-                            <div class="ml-2 text-xs text-gray-500">(${attribute.code})</div>
-                        </div>
-                    </td>
-                    <td class="px-4 py-3 whitespace-nowrap">
-                        <input type="checkbox"
-                               id="attribute_${attribute.id}_required"
-                               class="rounded border-gray-300 text-indigo-600 focus:ring-indigo-500 attribute-required"
-                               ${isSelected ? '' : 'disabled'}
-                               ${isRequired ? 'checked' : ''}>
-                    </td>
-                    <td class="px-4 py-3 whitespace-nowrap">
-                        <input type="checkbox"
-                               id="attribute_${attribute.id}_filterable"
-                               class="rounded border-gray-300 text-indigo-600 focus:ring-indigo-500 attribute-filterable"
-                               ${isSelected ? '' : 'disabled'}
-                               ${isFilterable ? 'checked' : ''}>
-                    </td>
-                    <td class="px-4 py-3 whitespace-nowrap">
-                        <input type="number"
-                               id="attribute_${attribute.id}_order"
-                               value="${sortOrder}"
-                               min="0"
-                               class="attribute-sort-order w-20 border border-gray-300 rounded px-2 py-1 text-sm"
-                               ${isSelected ? '' : 'disabled'}>
-                    </td>
-                </tr>
-            `;
-        }).join('');
-    }
-
-    // Setup event listeners
-    function setupEventListeners() {
-        const form = document.getElementById('categoryForm');
-        if (form) {
-            form.addEventListener('submit', updateCategory);
-        }
-
-        // Auto-generate slug from name
-        const nameInput = document.getElementById('name');
-        if (nameInput) {
-            nameInput.addEventListener('blur', generateSlug);
-        }
-
-        // Clear errors on input
-        ['name', 'slug'].forEach(fieldId => {
-            const element = document.getElementById(fieldId);
-            if (element) {
-                element.addEventListener('input', function() {
-                    const errorElement = document.getElementById(fieldId + 'Error');
-                    if (errorElement) {
-                        errorElement.classList.add('hidden');
-                        errorElement.textContent = '';
-                    }
-                });
-            }
-        });
-    }
-
-    // Generate slug from name
-    function generateSlug() {
-        const nameInput = document.getElementById('name');
-        const slugInput = document.getElementById('slug');
-
-        if (nameInput && slugInput && nameInput.value && (!slugInput.value || slugInput.value === '')) {
-            const slug = nameInput.value.toLowerCase()
-                .replace(/[^a-z0-9 -]/g, '')
-                .replace(/\s+/g, '-')
-                .replace(/-+/g, '-')
-                .replace(/^-+|-+$/g, '');
-            slugInput.value = slug;
-        }
-    }
-
-    // Toggle all attributes
-    function toggleAllAttributes(isChecked) {
-        document.querySelectorAll('.attribute-checkbox').forEach(checkbox => {
-            checkbox.checked = isChecked;
-            toggleAttributeOptions(checkbox.dataset.id, isChecked);
-        });
-    }
-
-    // Toggle attribute options
-    function toggleAttributeOptions(attributeId, isChecked) {
-        const requiredCheckbox = document.getElementById(`attribute_${attributeId}_required`);
-        const filterableCheckbox = document.getElementById(`attribute_${attributeId}_filterable`);
-        const sortOrderInput = document.getElementById(`attribute_${attributeId}_order`);
-
-        if (requiredCheckbox) requiredCheckbox.disabled = !isChecked;
-        if (filterableCheckbox) filterableCheckbox.disabled = !isChecked;
-        if (sortOrderInput) sortOrderInput.disabled = !isChecked;
-
-        if (!isChecked) {
-            if (requiredCheckbox) requiredCheckbox.checked = false;
-            if (filterableCheckbox) filterableCheckbox.checked = false;
-            if (sortOrderInput) sortOrderInput.value = '0';
-        }
-    }
-
-    // Filter attributes
-    function filterAttributes() {
-        const searchTerm = document.getElementById('attributeSearch').value.toLowerCase();
-        document.querySelectorAll('.attribute-item').forEach(row => {
-            const text = row.textContent.toLowerCase();
-            row.style.display = text.includes(searchTerm) ? '' : 'none';
-        });
-    }
-
-    // Filter specification groups
-    function filterSpecGroups() {
-        const searchTerm = document.getElementById('specGroupSearch').value.toLowerCase();
-        document.querySelectorAll('.spec-group-item').forEach(item => {
-            const text = item.textContent.toLowerCase();
-            item.style.display = text.includes(searchTerm) ? '' : 'none';
-        });
-    }
 
     // =============== MEDIA MANAGEMENT FUNCTIONS ===============
 
@@ -984,24 +707,7 @@
             status: document.getElementById('status').checked ? 1 : 0,
             featured: document.getElementById('featured').checked ? 1 : 0,
             show_in_nav: document.getElementById('show_in_nav').checked ? 1 : 0,
-            spec_group_ids: [],
-            attributes: {}
-        };
 
-        // Collect specification groups
-        document.querySelectorAll('.spec-group-checkbox:checked').forEach(checkbox => {
-            formData.spec_group_ids.push(parseInt(checkbox.value));
-        });
-
-        // Collect attributes
-        document.querySelectorAll('.attribute-checkbox:checked').forEach(checkbox => {
-            const attributeId = checkbox.dataset.id;
-            formData.attributes[attributeId] = {
-                is_required: document.getElementById(`attribute_${attributeId}_required`).checked ? 1 : 0,
-                is_filterable: document.getElementById(`attribute_${attributeId}_filterable`).checked ? 1 : 0,
-                sort_order: parseInt(document.getElementById(`attribute_${attributeId}_order`).value) || 0
-            };
-        });
 
         // Show loading state
         const submitBtn = e.target.querySelector('button[type="submit"]');

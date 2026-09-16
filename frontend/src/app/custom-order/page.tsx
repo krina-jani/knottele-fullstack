@@ -19,10 +19,10 @@ import {
   Plus,
   X,
 } from "lucide-react";
-import { CATEGORIES } from "@/data/categories";
 import { FlowerIcon } from "@/components/ui/BotanicalDecorations";
 import { Breadcrumbs } from "@/components/ui/Breadcrumbs";
 import { useToast } from "@/context/ToastContext";
+import { useWebsiteMedia } from "@/context/MediaContext";
 
 const PALETTE_OPTIONS = [
   { name: "Blush Garden", colors: ["#F4C7C1", "#8F3032", "#FFF8F5", "#9CAF88"] },
@@ -73,6 +73,10 @@ const EXPANDED_YARN_SWATCHES = [
 ];
 
 export default function CustomOrderPage() {
+  const { media } = useWebsiteMedia();
+  const categories = (media?.customOrderItems && media.customOrderItems.length > 0)
+    ? media.customOrderItems
+    : (media?.categories && media.categories.length > 0 ? media.categories : []);
   const { showToast } = useToast();
   const colorInputRef = useRef<HTMLInputElement>(null);
   const [step, setStep] = useState(1);
@@ -269,39 +273,45 @@ export default function CustomOrderPage() {
                   </div>
 
                   <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3 sm:gap-4">
-                    {CATEGORIES.map((cat) => (
+                    {categories.map((cat: any) => {
+                      const itemName = cat.name || cat.title || "";
+                      const itemSub = cat.subtitle || "Custom pattern";
+                      return (
+                        <button
+                          type="button"
+                          key={cat.id || cat.slug || itemName}
+                          onClick={() => setCategory(itemName)}
+                          className={`p-3.5 sm:p-4 rounded-2xl border text-left transition-all flex flex-col items-center sm:items-start text-center sm:text-left cursor-pointer ${
+                            category === itemName
+                              ? "border-[#913638] bg-[#FCE9E5] ring-2 ring-[#913638]/25 text-[#913638] font-bold"
+                              : "border-[#E7D1CC] bg-[#FFF9F6] hover:bg-white text-[#2E211E]"
+                          }`}
+                        >
+                          <FlowerIcon className="w-5 h-5 sm:w-6 sm:h-6 text-[#913638] mb-2" />
+                          <span className="text-xs font-bold">{itemName}</span>
+                          <span className="text-[10px] text-[#786864] mt-0.5 line-clamp-1">
+                            {itemSub}
+                          </span>
+                        </button>
+                      );
+                    })}
+                    {!categories.some((c: any) => (c.name || c.title) === "Custom Concept" || (c.name || c.title) === "Something Completely New") && (
                       <button
                         type="button"
-                        key={cat.id}
-                        onClick={() => setCategory(cat.name)}
+                        onClick={() => setCategory("Something Completely New")}
                         className={`p-3.5 sm:p-4 rounded-2xl border text-left transition-all flex flex-col items-center sm:items-start text-center sm:text-left cursor-pointer ${
-                          category === cat.name
+                          category === "Something Completely New"
                             ? "border-[#913638] bg-[#FCE9E5] ring-2 ring-[#913638]/25 text-[#913638] font-bold"
                             : "border-[#E7D1CC] bg-[#FFF9F6] hover:bg-white text-[#2E211E]"
                         }`}
                       >
-                        <FlowerIcon className="w-5 h-5 sm:w-6 sm:h-6 text-[#913638] mb-2" />
-                        <span className="text-xs font-bold">{cat.name}</span>
-                        <span className="text-[10px] text-[#786864] mt-0.5 line-clamp-1">
-                          Custom pattern
+                        <Sparkles className="w-5 h-5 sm:w-6 sm:h-6 text-[#C89B61] mb-2" />
+                        <span className="text-xs font-bold">Custom Concept</span>
+                        <span className="text-[10px] text-[#786864] mt-0.5">
+                          Brand new idea
                         </span>
                       </button>
-                    ))}
-                    <button
-                      type="button"
-                      onClick={() => setCategory("Something Completely New")}
-                      className={`p-3.5 sm:p-4 rounded-2xl border text-left transition-all flex flex-col items-center sm:items-start text-center sm:text-left cursor-pointer ${
-                        category === "Something Completely New"
-                          ? "border-[#913638] bg-[#FCE9E5] ring-2 ring-[#913638]/25 text-[#913638] font-bold"
-                          : "border-[#E7D1CC] bg-[#FFF9F6] hover:bg-white text-[#2E211E]"
-                      }`}
-                    >
-                      <Sparkles className="w-5 h-5 sm:w-6 sm:h-6 text-[#C89B61] mb-2" />
-                      <span className="text-xs font-bold">Custom Concept</span>
-                      <span className="text-[10px] text-[#786864] mt-0.5">
-                        Brand new idea
-                      </span>
-                    </button>
+                    )}
                   </div>
 
                   <div className="flex justify-end pt-4">

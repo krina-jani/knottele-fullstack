@@ -4,19 +4,28 @@ import React, { useState, useEffect, useMemo } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { Filter, X, SlidersHorizontal, ArrowUpDown, Sparkles, RotateCcw } from "lucide-react";
-import { PRODUCTS } from "@/data/products";
-import { CATEGORIES } from "@/data/categories";
 import { Product } from "@/types/product";
 import { fetchProducts, fetchCategories, normalizeImageUrl, ApiCategory } from "@/lib/api";
 import { ProductCard } from "@/components/ui/ProductCard";
 import { Breadcrumbs } from "@/components/ui/Breadcrumbs";
 import { StarRating } from "@/components/ui/StarRating";
 import { useWebsiteMedia } from "@/context/MediaContext";
+import { getLocalCache, setLocalCache, setupAdminSyncListener } from "@/lib/cache";
+
+const PRODUCTS_CACHE_KEY = "knotelle_cache_products";
+const CATEGORIES_CACHE_KEY = "knotelle_cache_categories";
 
 export default function ShopPage() {
   const { media } = useWebsiteMedia();
-  const [productsList, setProductsList] = useState<Product[]>(PRODUCTS);
-  const [categoriesList, setCategoriesList] = useState<any[]>(CATEGORIES);
+  const [productsList, setProductsList] = useState<Product[]>(() =>
+    getLocalCache<Product[]>(PRODUCTS_CACHE_KEY, [])
+  );
+  const [categoriesList, setCategoriesList] = useState<any[]>(() =>
+    media?.categories && media.categories.length > 0
+      ? media.categories
+      : getLocalCache<any[]>(CATEGORIES_CACHE_KEY, [])
+  );
+  const [isLoading, setIsLoading] = useState<boolean>(() => productsList.length === 0);
   const [selectedCategory, setSelectedCategory] = useState<string>("all");
   const [priceRange, setPriceRange] = useState<number>(6000);
   const [selectedColors, setSelectedColors] = useState<string[]>([]);
@@ -24,59 +33,60 @@ export default function ShopPage() {
   const [availabilityOnly, setAvailabilityOnly] = useState<boolean>(false);
   const [sortBy, setSortBy] = useState<string>("featured");
   const [isMobileFiltersOpen, setIsMobileFiltersOpen] = useState<boolean>(false);
-  const [shopMedia, setShopMedia] = useState<{
-    desktop?: string | null;
-    mobile?: string | null;
-    title: string;
-    subtitle: string;
-    tag_text: string;
-    cta_text?: string | null;
-    cta_link?: string | null;
-  }>({
-    title: "Artisanal Handcrafted Creations",
-    subtitle: "Discover unique crochet treasures woven with love, patience, and 100% natural cotton fibers.",
-    tag_text: "Handmade with Love",
-  });
 
-  // Sync shop banner whenever media updates live
-  useEffect(() => {
-    if (media?.shop?.banner) {
-      setShopMedia({
-        desktop: media.shop.banner.desktop,
-        mobile: media.shop.banner.mobile,
-        title: media.shop.banner.title || "Artisanal Handcrafted Creations",
-        subtitle: media.shop.banner.subtitle || "Discover unique crochet treasures woven with love, patience, and 100% natural cotton fibers.",
-        tag_text: media.shop.banner.tag_text || "Handmade with Love",
-        cta_text: media.shop.banner.cta_text,
-        cta_link: media.shop.banner.cta_link,
-      });
-    }
-  }, [media?.shop?.banner]);
+  // Directly derive shop banner from media for instant zero-delay rendering
+  const banner = media?.shop?.banner;
+  const shopMedia = {
+    desktop: banner?.desktop || null,
+    mobile: banner?.mobile || null,
+    title: banner?.title || "Artisanal Handcrafted Creations",
+    subtitle: banner?.subtitle || "Discover unique crochet treasures woven with love, patience, and 100% natural cotton fibers.",
+    tag_text: banner?.tag_text || "Handmade with Love",
+    cta_text: banner?.cta_text || null,
+    cta_link: banner?.cta_link || null,
+  };
 
-  // Fetch live products & categories on mount
+  // Fetch live products & categories on mount + admin sync
   useEffect(() => {
     let isMounted = true;
 
-    fetchProducts({ per_page: 100 })
-      .then((res) => {
-        if (isMounted && res.products && res.products.length > 0) {
-          setProductsList(res.products);
-        }
-      })
-      .catch((err) => console.warn("Live shop products fetch notice:", err));
+    const loadData = () => {
+      fetchProducts({ per_page: 100 })
+        .then((res) => {
+          if (isMounted && res.products && res.products.length > 0) {
+            setProductsList(res.products);
+            setLocalCache(PRODUCTS_CACHE_KEY, res.products);
+          }
+        })
+        .catch((err) => console.warn("Live shop products fetch notice:", err))
+        .finally(() => {
+          if (isMounted) setIsLoading(false);
+        });
 
-    fetchCategories()
-      .then((cats) => {
-        if (isMounted && cats && cats.length > 0) {
-          setCategoriesList(cats);
-        }
-      })
-      .catch((err) => console.warn("Live categories fetch notice:", err));
+      fetchCategories()
+        .then((cats) => {
+          if (isMounted && cats && cats.length > 0) {
+            setCategoriesList(cats);
+            setLocalCache(CATEGORIES_CACHE_KEY, cats);
+          }
+        })
+        .catch((err) => console.warn("Live categories fetch notice:", err));
+    };
+
+    loadData();
+    const cleanupListeners = setupAdminSyncListener(loadData);
 
     return () => {
       isMounted = false;
+      cleanupListeners();
     };
   }, []);
+
+  useEffect(() => {
+    if (media?.categories && media.categories.length > 0) {
+      setCategoriesList(media.categories);
+    }
+  }, [media?.categories]);
 
   // Available unique color swatches from all products
   const allColorSwatches = useMemo(() => {

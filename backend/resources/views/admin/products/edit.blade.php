@@ -233,12 +233,7 @@
                             @foreach($product->variants as $idx => $variant)
                                 <tr id="variant-row-{{ $idx }}">
                                     <td class="px-3 py-2 whitespace-nowrap text-sm text-gray-700">
-                                        @php
-                                            $name = $variant->attributes->map(function($a) {
-                                                return $a->value ?? $a->label ?? '';
-                                            })->filter()->join(' / ');
-                                        @endphp
-                                        <div class="font-medium text-stone-800">{{ $name ?: 'Variant #' . ($idx + 1) }}</div>
+                                        <div class="font-medium text-stone-800">{{ 'Variant #' . ($idx + 1) }}</div>
                                         <input type="hidden" name="variants[{{ $idx }}][id]" value="{{ $variant->id }}">
                                     </td>
                                     <td class="px-3 py-2">
@@ -289,13 +284,7 @@
             </div>
             @endif
 
-            <!-- Dynamic Specifications -->
-            <div id="specifications-wrapper" class="bg-white rounded-xl shadow-sm p-6 border border-stone-100">
-                <h3 class="text-lg font-semibold text-stone-800 mb-4 pb-2 border-b">Specifications</h3>
-                <div id="specifications-container" class="space-y-6">
-                    <!-- Loaded via JS -->
-                </div>
-            </div>
+
 
         </div>
 
@@ -368,24 +357,7 @@
                         </select>
                     </div>
 
-                    <div>
-                        <label for="tag_ids" class="block text-sm font-medium text-stone-700 mb-2">Tags</label>
-                        <div class="space-y-2 max-h-48 overflow-y-auto p-3 border border-stone-300 rounded-lg bg-stone-50/50">
-                            @php
-                                $selectedTags = old('tag_ids', $product->tags->pluck('id')->toArray());
-                            @endphp
-                            @foreach($tags as $tag)
-                                <label class="flex items-center group cursor-pointer">
-                                    <div class="relative flex items-center">
-                                        <input type="checkbox" name="tag_ids[]" value="{{ $tag->id }}" 
-                                            {{ in_array($tag->id, $selectedTags) ? 'checked' : '' }}
-                                            class="w-4 h-4 rounded border-stone-300 text-red-500 focus:ring-red-500 transition cursor-pointer">
-                                    </div>
-                                    <span class="ml-3 text-sm text-stone-600 group-hover:text-stone-800 transition">{{ $tag->name }}</span>
-                                </label>
-                            @endforeach
-                        </div>
-                    </div>
+
 
                     <div>
                         <label for="sort_order" class="block text-sm font-medium text-stone-700 mb-1">Sort Order</label>
@@ -502,14 +474,7 @@
 
 @push('scripts')
 <script>
-    // Prepare existing specs mapping
-    const existingSpecs = @json($product->specifications->map(function($s){ 
-       return [
-           'specification_id' => $s->id, 
-           'specification_value_id' => $s->pivot->specification_value_id,
-           'custom_value' => $s->pivot->custom_value
-       ];
-    }));
+
 
     document.getElementById('name').addEventListener('input', function() {
         let slug = this.value.toLowerCase()
@@ -518,126 +483,7 @@
         document.getElementById('slug').value = slug;
     });
 
-    async function fetchSpecifications(categoryId) {
-        if (!categoryId) return;
-        
-        const container = document.getElementById('specifications-container');
-        container.innerHTML = '<p class="text-gray-500">Loading specifications...</p>';
 
-        try {
-            const response = await axios.get(`{{ route('admin.products.category.specifications', ':id') }}`.replace(':id', categoryId));
-            
-            if(response.data.success) {
-                renderSpecifications(response.data.data);
-            } else {
-                container.innerHTML = '<p class="text-red-500">Failed to load specifications.</p>';
-            }
-        } catch (error) {
-            console.error('Spec fetch error:', error);
-            container.innerHTML = '<p class="text-red-500">Error loading specifications.</p>';
-        }
-    }
-
-    function renderSpecifications(groups) {
-         const container = document.getElementById('specifications-container');
-         container.innerHTML = '';
-
-         if (!groups || groups.length === 0) {
-             container.innerHTML = '<p class="text-gray-500">No specifications found for this category.</p>';
-             return;
-         }
-
-         let html = '';
-         let specIndex = 0;
-
-         groups.forEach(group => {
-             html += `<div class="mb-6">`;
-             html += `<h4 class="font-medium text-gray-700 mb-3 bg-gray-50 p-2 rounded">${group.group_name}</h4>`;
-             html += `<div class="grid grid-cols-1 md:grid-cols-2 gap-4">`;
-             
-             group.specifications.forEach(spec => {
-                 const fieldName = `specifications[${specIndex}]`;
-                 
-                 const match = existingSpecs.find(s => s.specification_id === spec.id);
-                 const existingValId = match ? match.specification_value_id : null;
-                 const existingCustom = match ? match.custom_value : '';
-
-                 html += `<div>`;
-                 html += `<input type="hidden" name="${fieldName}[specification_id]" value="${spec.id}">`;
-                 html += `<label class="block text-sm text-gray-600 mb-1">${spec.name} ${spec.is_required ? '<span class="text-red-500">*</span>' : ''}</label>`;
-                 
-                 // Normalize input type
-                 const inputType = (spec.input_type || '').toLowerCase().trim();
-                 
-                 if (['select', 'multiselect', 'multi-select', 'radio'].includes(inputType)) {
-                     const isMulti = inputType === 'multiselect' || inputType === 'multi-select';
-                     
-                     if (isMulti) {
-                         html += `<div class="space-y-2 max-h-40 overflow-y-auto p-3 border rounded-lg bg-gray-50/30">`;
-                         
-                         let selectedIds = [];
-                         if (match && match.custom_value) {
-                             selectedIds = match.custom_value.split(',').map(v => v.trim());
-                         }
-
-                         if(spec.values) {
-                             spec.values.forEach(val => {
-                                 let isChecked = selectedIds.includes(val.id.toString()) ? 'checked' : '';
-                                 html += `
-                                    <label class="flex items-center group cursor-pointer">
-                                        <input type="checkbox" name="${fieldName}[custom_value_ids][]" value="${val.id}" ${isChecked}
-                                            class="w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-red-500 transition cursor-pointer">
-                                        <span class="ml-2 text-sm text-gray-600 group-hover:text-gray-800 transition">${val.value}</span>
-                                    </label>
-                                 `;
-                             });
-                         }
-                         html += `</div>`;
-                     } else {
-                         html += `<select name="${fieldName}[specification_value_id]" class="w-full px-3 py-2 border rounded-lg outline-none focus:ring-1 focus:ring-red-500 select2-spec">`;
-                         html += `<option value="">Select ${spec.name}</option>`;
-                         html += `<option value="">None</option>`;
-                         
-                         if(spec.values) {
-                             spec.values.forEach(val => {
-                                 let selected = (existingValId && existingValId.toString() === val.id.toString()) ? 'selected' : '';
-                                 html += `<option value="${val.id}" ${selected}>${val.value}</option>`;
-                             });
-                         }
-                         html += `</select>`;
-                     }
-                 } else if (inputType === 'textarea') {
-                     const val = existingCustom || '';
-                     html += `<textarea name="${fieldName}[custom_value]" rows="3" class="w-full px-3 py-2 border rounded-lg outline-none focus:ring-1 focus:ring-red-500">${val}</textarea>`;
-                 } else if (inputType === 'checkbox') {
-                     const checked = existingCustom == '1' ? 'checked' : '';
-                     html += `
-                        <div class="flex items-center mt-2">
-                            <input type="hidden" name="${fieldName}[custom_value]" value="0">
-                            <input type="checkbox" name="${fieldName}[custom_value]" value="1" ${checked} class="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-red-500">
-                            <span class="ml-2 text-sm text-gray-600">Yes</span>
-                        </div>
-                     `;
-                 } else {
-                     const val = existingCustom || '';
-                     html += `<input type="text" name="${fieldName}[custom_value]" value="${val}" class="w-full px-3 py-2 border rounded-lg outline-none focus:ring-1 focus:ring-red-500">`;
-                 }
-                 
-                 html += `</div>`;
-                 specIndex++;
-             });
-             
-             html += `</div></div>`;
-         });
-
-         container.innerHTML = html;
-    }
-    
-    // Initial Load
-    const initialCategory = document.getElementById('main_category_id').value;
-    if(initialCategory) {
-        fetchSpecifications(initialCategory);
-    }
 
     // Media Manager (5 Slots + Variants)
     let currentMode = 'slot-0';

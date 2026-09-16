@@ -127,6 +127,22 @@ class MediaController extends Controller
                 'description' => 'Circular category thumbnails displayed on the homepage and catalog.',
                 'badge' => 'Category-Driven',
                 'is_category_section' => true,
+                'metadata' => (function() {
+                    $m = Media::where('page', 'homepage')->where('section', 'categories')->first();
+                    return [
+                        'id' => $m ? $m->id : null,
+                        'page' => 'homepage',
+                        'section' => 'categories',
+                        'slot' => 'section_settings',
+                        'tag_text' => $m && $m->tag_text ? $m->tag_text : '🌸',
+                        'badge' => $m && $m->tag_text ? $m->tag_text : '🌸',
+                        'title' => $m && $m->title ? $m->title : 'Shop by Category',
+                        'title_line1' => $m && $m->title ? $m->title : 'Shop by Category',
+                        'subtitle' => $m && $m->subtitle ? $m->subtitle : 'Explore our wide range of handmade crochet products.',
+                        'description' => $m && $m->description ? $m->description : 'Explore our wide range of handmade crochet products.',
+                        'is_active' => $m ? (bool)$m->is_active : true,
+                    ];
+                })(),
             ],
             [
                 'id' => 'custom_crochet',
@@ -274,46 +290,107 @@ class MediaController extends Controller
                         'is_active' => $m ? (bool)$m->is_active : true,
                     ];
                 })(),
-                'items' => Media::where('page', 'homepage')
-                    ->where('section', 'blog_reels')
-                    ->where('slot', '!=', 'section_settings')
-                    ->orderBy('sort_order', 'asc')
-                    ->get()
-                    ->map(function ($item) {
-                        return [
-                            'id' => $item->id,
-                            'title' => $item->title,
-                            'tagline' => $item->tag_text ?: $item->subtitle,
-                            'subtitle' => $item->subtitle,
-                            'description' => $item->description,
-                            'content_type' => $item->content_type ?: 'reel',
-                            'category' => $item->category_name ?: 'Studio ASMR',
-                            'category_name' => $item->category_name ?: 'Studio ASMR',
-                            'thumbnail' => $item->desktop_image_url ?: $item->url,
-                            'thumbnail_url' => $item->desktop_image_url ?: $item->url,
-                            'mobile_thumbnail' => $item->mobile_image_url ?: ($item->desktop_image_url ?: $item->url),
-                            'video_url' => $item->video_stream_url ?: $item->video_url,
-                            'video_path' => $item->video_url,
-                            'duration' => $item->duration ?: '00:48',
-                            'audio_name' => $item->audio_name ?: 'Original Sound',
-                            'audio_track' => $item->audio_name ?: 'Original Sound',
-                            'likes' => $item->likes_count ?: 0,
-                            'likes_formatted' => $item->formatted_likes,
-                            'comments' => $item->comments_count ?: 0,
-                            'views' => $item->views_count ?: 0,
-                            'views_formatted' => $item->formatted_views,
-                            'is_featured' => (bool)$item->is_featured,
-                            'is_active' => (bool)$item->is_active,
-                            'status' => (bool)$item->is_active,
-                            'sort_order' => (int)$item->sort_order,
-                            'file_size_formatted' => $this->formatSize($item->file_size ?: 0),
-                            'updated_at_formatted' => $item->updated_at ? $item->updated_at->format('M d, Y') : '',
-                        ];
-                    }),
+                'section_settings' => (function() {
+                    $m = Media::where('page', 'homepage')->where('section', 'blog_reels')->where('slot', 'section_settings')->first();
+                    return [
+                        'id' => $m ? $m->id : null,
+                        'page' => 'homepage',
+                        'section' => 'blog_reels',
+                        'slot' => 'section_settings',
+                        'title' => $m && $m->title ? $m->title : 'Behind the Stitches',
+                        'subtitle' => $m && $m->subtitle ? $m->subtitle : 'Watch our artisans hand-craft each creation, styling guides, and cozy studio ASMR unboxings.',
+                        'tag_text' => $m && $m->tag_text ? $m->tag_text : 'Studio Journal & Video Reels',
+                        'cta_text' => $m && $m->cta_text ? $m->cta_text : 'Follow @knotelleindia',
+                        'cta_link' => $m && $m->cta_link ? $m->cta_link : 'https://instagram.com/knotelleindia',
+                        'is_active' => $m ? (bool)$m->is_active : true,
+                    ];
+                })(),
+                'items' => (function() {
+                    return Media::where('page', 'homepage')
+                        ->where('section', 'blog_reels')
+                        ->where('slot', '!=', 'section_settings')
+                        ->orderBy('sort_order', 'asc')
+                        ->get()
+                        ->map(function ($item) {
+                            return [
+                                'id' => $item->id,
+                                'title' => $item->title,
+                                'tagline' => $item->tag_text ?: $item->subtitle,
+                                'subtitle' => $item->subtitle,
+                                'description' => $item->description,
+                                'content_type' => $item->content_type ?: 'reel',
+                                'category' => $item->category_name ?: 'Studio ASMR',
+                                'category_name' => $item->category_name ?: 'Studio ASMR',
+                                'thumbnail' => $item->desktop_image_url ?: $item->url,
+                                'thumbnail_url' => $item->desktop_image_url ?: $item->url,
+                                'mobile_thumbnail' => $item->mobile_image_url ?: ($item->desktop_image_url ?: $item->url),
+                                'video_url' => $item->video_stream_url ?: $item->video_url,
+                                'video_path' => $item->video_url,
+                                'duration' => $item->duration ?: '00:48',
+                                'audio_name' => $item->audio_name ?: 'Original Sound',
+                                'audio_track' => $item->audio_name ?: 'Original Sound',
+                                'likes' => $item->likes_count ?: 0,
+                                'likes_count' => $item->likes_count ?: 0,
+                                'likes_formatted' => $item->formatted_likes,
+                                'comments' => $item->comments_count ?: 0,
+                                'comments_count' => $item->comments_count ?: 0,
+                                'views' => $item->views_count ?: 0,
+                                'views_count' => $item->views_count ?: 0,
+                                'views_formatted' => $item->formatted_views,
+                                'is_featured' => (bool)$item->is_featured,
+                                'is_active' => (bool)$item->is_active,
+                                'status' => (bool)$item->is_active,
+                                'sort_order' => (int)$item->sort_order,
+                                'file_size_formatted' => $this->formatSize($item->file_size ?: 0),
+                                'updated_at_formatted' => $item->updated_at ? $item->updated_at->format('M d, Y') : '',
+                            ];
+                        });
+                })(),
+                'reels' => (function() {
+                    return Media::where('page', 'homepage')
+                        ->where('section', 'blog_reels')
+                        ->where('slot', '!=', 'section_settings')
+                        ->orderBy('sort_order', 'asc')
+                        ->get()
+                        ->map(function ($item) {
+                            return [
+                                'id' => $item->id,
+                                'title' => $item->title,
+                                'tagline' => $item->tag_text ?: $item->subtitle,
+                                'subtitle' => $item->subtitle,
+                                'description' => $item->description,
+                                'content_type' => $item->content_type ?: 'reel',
+                                'category' => $item->category_name ?: 'Studio ASMR',
+                                'category_name' => $item->category_name ?: 'Studio ASMR',
+                                'thumbnail' => $item->desktop_image_url ?: $item->url,
+                                'thumbnail_url' => $item->desktop_image_url ?: $item->url,
+                                'mobile_thumbnail' => $item->mobile_image_url ?: ($item->desktop_image_url ?: $item->url),
+                                'video_url' => $item->video_stream_url ?: $item->video_url,
+                                'video_path' => $item->video_url,
+                                'duration' => $item->duration ?: '00:48',
+                                'audio_name' => $item->audio_name ?: 'Original Sound',
+                                'audio_track' => $item->audio_name ?: 'Original Sound',
+                                'likes' => $item->likes_count ?: 0,
+                                'likes_count' => $item->likes_count ?: 0,
+                                'likes_formatted' => $item->formatted_likes,
+                                'comments' => $item->comments_count ?: 0,
+                                'comments_count' => $item->comments_count ?: 0,
+                                'views' => $item->views_count ?: 0,
+                                'views_count' => $item->views_count ?: 0,
+                                'views_formatted' => $item->formatted_views,
+                                'is_featured' => (bool)$item->is_featured,
+                                'is_active' => (bool)$item->is_active,
+                                'status' => (bool)$item->is_active,
+                                'sort_order' => (int)$item->sort_order,
+                                'file_size_formatted' => $this->formatSize($item->file_size ?: 0),
+                                'updated_at_formatted' => $item->updated_at ? $item->updated_at->format('M d, Y') : '',
+                            ];
+                        });
+                })(),
             ],
             [
                 'id' => 'footer',
-                'page' => 'homepage',
+                'page' => 'footer',
                 'title' => 'Footer Artwork & Navigation',
                 'description' => 'Full-width panoramic boutique footer artwork, 3 navigation columns, social channels, contact info, and copyright note.',
                 'badge' => 'Footer & Links',
@@ -375,7 +452,7 @@ class MediaController extends Controller
                         'description' => 'Full-width panoramic background artwork image in footer across the entire store.',
                         'recommended_dimensions' => '1920 × 600',
                         'device' => 'all',
-                        'page' => 'homepage',
+                        'page' => 'footer',
                         'section' => 'footer',
                         'sort_order' => 1,
                     ],
@@ -553,6 +630,67 @@ class MediaController extends Controller
                         'sort_order' => 1,
                     ],
                 ]
+            ],
+            [
+                'id' => 'custom_order_items',
+                'page' => 'custom_order',
+                'title' => 'Custom Order Items / Categories',
+                'description' => 'Manage handmade creation categories selectable by customers in Step 1 of the Custom Order wizard.',
+                'badge' => 'Step 1 Item Types',
+                'is_custom_order_items_section' => true,
+                'items' => (function() {
+                    $count = Media::where('page', 'custom_order')->where('section', 'custom_order_items')->count();
+                    if ($count === 0) {
+                        $defaults = [
+                            ['title' => 'Keychain', 'subtitle' => 'Custom pattern', 'sort_order' => 1],
+                            ['title' => 'Bouquet', 'subtitle' => 'Hand-tied florals', 'sort_order' => 2],
+                            ['title' => 'Soft Toys', 'subtitle' => 'Amigurumi plushies', 'sort_order' => 3],
+                            ['title' => 'Bags', 'subtitle' => 'Tote & clutch styles', 'sort_order' => 4],
+                            ['title' => 'Coin Purse', 'subtitle' => 'Pocket essentials', 'sort_order' => 5],
+                            ['title' => 'Flower pot', 'subtitle' => 'Evergreen decor', 'sort_order' => 6],
+                            ['title' => 'Phone Cover', 'subtitle' => 'Sleeve & case wrap', 'sort_order' => 7],
+                            ['title' => 'Cup', 'subtitle' => 'Cozy mug hugger', 'sort_order' => 8],
+                            ['title' => 'Bookmark', 'subtitle' => 'Loom stitched', 'sort_order' => 9],
+                            ['title' => 'Hair Accessories', 'subtitle' => 'Scrunchies & clips', 'sort_order' => 10],
+                            ['title' => 'Clothing', 'subtitle' => 'Cardigans & tops', 'sort_order' => 11],
+                            ['title' => 'Custom Concept', 'subtitle' => 'Brand new idea', 'sort_order' => 12],
+                        ];
+                        foreach ($defaults as $d) {
+                            Media::create([
+                                'page' => 'custom_order',
+                                'section' => 'custom_order_items',
+                                'slot' => 'item_' . \Illuminate\Support\Str::slug($d['title']),
+                                'title' => $d['title'],
+                                'subtitle' => $d['subtitle'],
+                                'tag_text' => 'Flower2',
+                                'sort_order' => $d['sort_order'],
+                                'is_active' => true,
+                                'uploaded_by' => 1,
+                                'uploader_type' => 'admin',
+                                'file_name' => 'custom_order.png',
+                                'file_path' => 'images/categories/categories_bg.png',
+                                'mime_type' => 'image/png',
+                                'disk' => 'local'
+                            ]);
+                        }
+                    }
+
+                    return Media::where('page', 'custom_order')
+                        ->where('section', 'custom_order_items')
+                        ->orderBy('sort_order', 'asc')
+                        ->get()
+                        ->map(function ($item) {
+                            return [
+                                'id' => $item->id,
+                                'name' => $item->title,
+                                'title' => $item->title,
+                                'subtitle' => $item->subtitle ?: 'Custom pattern',
+                                'icon' => $item->tag_text ?: 'Flower2',
+                                'sort_order' => (int)$item->sort_order,
+                                'is_active' => (bool)$item->is_active,
+                            ];
+                        });
+                })(),
             ],
 
             // ABOUT PAGE SECTIONS
@@ -2010,7 +2148,7 @@ class MediaController extends Controller
             'status' => 'nullable',
             'is_active' => 'nullable',
             'sort_order' => 'nullable|integer|min:1',
-            'video_file' => 'nullable|file|mimetypes:video/mp4,video/webm,video/quicktime,video/ogg,video/x-matroska,video/x-msvideo|max:102400',
+            'video_file' => 'nullable|file|mimes:mp4,webm,mov,ogg,mkv,avi,qt|max:40960',
             'video_url' => 'nullable|string|max:500',
             'thumbnail_file' => 'nullable|file|image|max:20480',
             'thumbnail_media_id' => 'nullable',
@@ -2056,14 +2194,14 @@ class MediaController extends Controller
             }
 
             $vFile->move($targetDir, $vUniqueName);
-            $videoUrl = 'videos/reels/' . $vUniqueName;
+            $videoUrl = '/videos/reels/' . $vUniqueName;
             $mimeType = $vFile->getClientMimeType() ?: ('video/' . ($vExt === 'mov' ? 'quicktime' : $vExt));
             $fileSize = file_exists($targetDir . '/' . $vUniqueName) ? filesize($targetDir . '/' . $vUniqueName) : 0;
             $originalFileName = $vOriginal;
         }
 
         // 2. Handle Thumbnail Image Upload / Media Library
-        $thumbnailPath = 'images/homepage/middleimg.png';
+        $thumbnailPath = '/images/homepage/middleimg.png';
         $thumbDir = public_path('images/reels');
         if (!File::isDirectory($thumbDir)) {
             File::makeDirectory($thumbDir, 0755, true, true);
@@ -2074,7 +2212,7 @@ class MediaController extends Controller
             $tExt = strtolower($tFile->getClientOriginalExtension() ?: 'jpg');
             $tUniqueName = 'cover_' . $sortOrder . '_' . time() . '_' . Str::random(4) . '.' . $tExt;
             $tFile->move($thumbDir, $tUniqueName);
-            $thumbnailPath = 'images/reels/' . $tUniqueName;
+            $thumbnailPath = '/images/reels/' . $tUniqueName;
         } elseif ($request->filled('thumbnail_media_id') && is_numeric($request->input('thumbnail_media_id'))) {
             $chosen = Media::find($request->input('thumbnail_media_id'));
             if ($chosen) {
@@ -2128,25 +2266,41 @@ class MediaController extends Controller
             'uploader_type' => 'admin',
         ]);
 
+        $reelData = [
+            'id' => $media->id,
+            'title' => $media->title,
+            'tagline' => $media->tag_text ?: $media->subtitle,
+            'subtitle' => $media->subtitle,
+            'description' => $media->description,
+            'content_type' => $media->content_type ?: 'reel',
+            'category' => $media->category_name ?: 'Studio ASMR',
+            'category_name' => $media->category_name ?: 'Studio ASMR',
+            'thumbnail' => $media->desktop_image_url ?: $media->url,
+            'thumbnail_url' => $media->desktop_image_url ?: $media->url,
+            'thumbnail_path' => $media->file_path,
+            'mobile_thumbnail' => $media->mobile_image_url ?: ($media->desktop_image_url ?: $media->url),
+            'mobile_thumbnail_path' => $media->mobile_image_path,
+            'video_url' => $media->video_stream_url ?: $media->video_url,
+            'video_path' => $media->video_url,
+            'duration' => $media->duration ?: '00:48',
+            'audio_name' => $media->audio_name ?: 'Original Sound',
+            'likes' => (int)$media->likes_count,
+            'likes_count' => (int)$media->likes_count,
+            'comments' => (int)$media->comments_count,
+            'comments_count' => (int)$media->comments_count,
+            'views' => (int)$media->views_count,
+            'views_count' => (int)$media->views_count,
+            'is_featured' => (bool)$media->is_featured,
+            'status' => (bool)$media->is_active,
+            'is_active' => (bool)$media->is_active,
+            'sort_order' => (int)$media->sort_order,
+        ];
+
         return response()->json([
             'success' => true,
             'message' => 'Video / Reel content created successfully!',
-            'data' => [
-                'id' => $media->id,
-                'title' => $media->title,
-                'content_type' => $media->content_type,
-                'category' => $media->category_name,
-                'video_url' => $media->video_stream_url,
-                'thumbnail' => $media->desktop_image_url,
-                'mobile_thumbnail' => $media->mobile_image_url,
-                'duration' => $media->duration,
-                'likes' => $media->likes_count,
-                'comments' => $media->comments_count,
-                'views' => $media->views_count,
-                'is_featured' => (bool)$media->is_featured,
-                'status' => (bool)$media->is_active,
-                'sort_order' => $media->sort_order,
-            ]
+            'reel' => $reelData,
+            'data' => $reelData
         ]);
     }
 
@@ -2168,34 +2322,40 @@ class MediaController extends Controller
             return response()->json(['success' => false, 'message' => 'Video/Reel not found.'], 404);
         }
 
+        $reelData = [
+            'id' => $media->id,
+            'title' => $media->title,
+            'tagline' => $media->tag_text ?: $media->subtitle,
+            'subtitle' => $media->subtitle,
+            'description' => $media->description,
+            'content_type' => $media->content_type ?: 'reel',
+            'category' => $media->category_name ?: 'Studio ASMR',
+            'category_name' => $media->category_name ?: 'Studio ASMR',
+            'thumbnail' => $media->desktop_image_url ?: $media->url,
+            'thumbnail_url' => $media->desktop_image_url ?: $media->url,
+            'thumbnail_path' => $media->file_path,
+            'mobile_thumbnail' => $media->mobile_image_url ?: ($media->desktop_image_url ?: $media->url),
+            'mobile_thumbnail_path' => $media->mobile_image_path,
+            'video_url' => $media->video_stream_url ?: $media->video_url,
+            'video_path' => $media->video_url,
+            'duration' => $media->duration ?: '00:48',
+            'audio_name' => $media->audio_name ?: 'Original Audio',
+            'likes' => (int)$media->likes_count,
+            'likes_count' => (int)$media->likes_count,
+            'comments' => (int)$media->comments_count,
+            'comments_count' => (int)$media->comments_count,
+            'views' => (int)$media->views_count,
+            'views_count' => (int)$media->views_count,
+            'is_featured' => (bool)$media->is_featured,
+            'status' => (bool)$media->is_active,
+            'is_active' => (bool)$media->is_active,
+            'sort_order' => (int)$media->sort_order,
+        ];
+
         return response()->json([
             'success' => true,
-            'data' => [
-                'id' => $media->id,
-                'title' => $media->title,
-                'tagline' => $media->tag_text ?: $media->subtitle,
-                'subtitle' => $media->subtitle,
-                'description' => $media->description,
-                'content_type' => $media->content_type ?: 'reel',
-                'category' => $media->category_name ?: 'Studio ASMR',
-                'category_name' => $media->category_name ?: 'Studio ASMR',
-                'thumbnail' => $media->desktop_image_url ?: $media->url,
-                'thumbnail_url' => $media->desktop_image_url ?: $media->url,
-                'thumbnail_path' => $media->file_path,
-                'mobile_thumbnail' => $media->mobile_image_url ?: ($media->desktop_image_url ?: $media->url),
-                'mobile_thumbnail_path' => $media->mobile_image_path,
-                'video_url' => $media->video_stream_url ?: $media->video_url,
-                'video_path' => $media->video_url,
-                'duration' => $media->duration ?: '00:48',
-                'audio_name' => $media->audio_name ?: 'Original Audio',
-                'likes' => (int)$media->likes_count,
-                'comments' => (int)$media->comments_count,
-                'views' => (int)$media->views_count,
-                'is_featured' => (bool)$media->is_featured,
-                'status' => (bool)$media->is_active,
-                'is_active' => (bool)$media->is_active,
-                'sort_order' => (int)$media->sort_order,
-            ]
+            'reel' => $reelData,
+            'data' => $reelData
         ]);
     }
 
@@ -2234,7 +2394,7 @@ class MediaController extends Controller
             'status' => 'nullable',
             'is_active' => 'nullable',
             'sort_order' => 'nullable|integer|min:1',
-            'video_file' => 'nullable|file|mimetypes:video/mp4,video/webm,video/quicktime,video/ogg,video/x-matroska,video/x-msvideo|max:102400',
+            'video_file' => 'nullable|file|mimes:mp4,webm,mov,ogg,mkv,avi,qt|max:40960',
             'video_url' => 'nullable|string|max:500',
             'thumbnail_file' => 'nullable|file|image|max:20480',
             'thumbnail_media_id' => 'nullable',
@@ -2254,12 +2414,13 @@ class MediaController extends Controller
             }
 
             // Remove previous custom video if local
-            if ($media->video_url && str_starts_with($media->video_url, 'videos/reels/') && file_exists(public_path($media->video_url))) {
-                @unlink(public_path($media->video_url));
+            $oldPath = ltrim($media->video_url ?? '', '/');
+            if ($oldPath && str_starts_with($oldPath, 'videos/reels/') && file_exists(public_path($oldPath))) {
+                @unlink(public_path($oldPath));
             }
 
             $vFile->move($targetDir, $vUniqueName);
-            $media->video_url = 'videos/reels/' . $vUniqueName;
+            $media->video_url = '/videos/reels/' . $vUniqueName;
             $media->mime_type = $vFile->getClientMimeType() ?: ('video/' . ($vExt === 'mov' ? 'quicktime' : $vExt));
             $media->file_size = file_exists($targetDir . '/' . $vUniqueName) ? filesize($targetDir . '/' . $vUniqueName) : 0;
             $media->file_name = $vFile->getClientOriginalName();
@@ -2278,12 +2439,13 @@ class MediaController extends Controller
             $tExt = strtolower($tFile->getClientOriginalExtension() ?: 'jpg');
             $tUniqueName = 'cover_' . ($media->sort_order ?: $media->id) . '_' . time() . '_' . Str::random(4) . '.' . $tExt;
             
-            if ($media->file_path && str_starts_with($media->file_path, 'images/reels/') && file_exists(public_path($media->file_path))) {
-                @unlink(public_path($media->file_path));
+            $oldThumb = ltrim($media->file_path ?? '', '/');
+            if ($oldThumb && str_starts_with($oldThumb, 'images/reels/') && file_exists(public_path($oldThumb))) {
+                @unlink(public_path($oldThumb));
             }
 
             $tFile->move($thumbDir, $tUniqueName);
-            $media->file_path = 'images/reels/' . $tUniqueName;
+            $media->file_path = '/images/reels/' . $tUniqueName;
         } elseif ($request->filled('thumbnail_media_id') && is_numeric($request->input('thumbnail_media_id'))) {
             $chosen = Media::find($request->input('thumbnail_media_id'));
             if ($chosen) {
@@ -2344,25 +2506,41 @@ class MediaController extends Controller
 
         $media->save();
 
+        $reelData = [
+            'id' => $media->id,
+            'title' => $media->title,
+            'tagline' => $media->tag_text ?: $media->subtitle,
+            'subtitle' => $media->subtitle,
+            'description' => $media->description,
+            'content_type' => $media->content_type ?: 'reel',
+            'category' => $media->category_name ?: 'Studio ASMR',
+            'category_name' => $media->category_name ?: 'Studio ASMR',
+            'thumbnail' => $media->desktop_image_url ?: $media->url,
+            'thumbnail_url' => $media->desktop_image_url ?: $media->url,
+            'thumbnail_path' => $media->file_path,
+            'mobile_thumbnail' => $media->mobile_image_url ?: ($media->desktop_image_url ?: $media->url),
+            'mobile_thumbnail_path' => $media->mobile_image_path,
+            'video_url' => $media->video_stream_url ?: $media->video_url,
+            'video_path' => $media->video_url,
+            'duration' => $media->duration ?: '00:48',
+            'audio_name' => $media->audio_name ?: 'Original Audio',
+            'likes' => (int)$media->likes_count,
+            'likes_count' => (int)$media->likes_count,
+            'comments' => (int)$media->comments_count,
+            'comments_count' => (int)$media->comments_count,
+            'views' => (int)$media->views_count,
+            'views_count' => (int)$media->views_count,
+            'is_featured' => (bool)$media->is_featured,
+            'status' => (bool)$media->is_active,
+            'is_active' => (bool)$media->is_active,
+            'sort_order' => (int)$media->sort_order,
+        ];
+
         return response()->json([
             'success' => true,
             'message' => 'Video / Reel updated successfully!',
-            'data' => [
-                'id' => $media->id,
-                'title' => $media->title,
-                'content_type' => $media->content_type,
-                'category' => $media->category_name,
-                'video_url' => $media->video_stream_url,
-                'thumbnail' => $media->desktop_image_url,
-                'mobile_thumbnail' => $media->mobile_image_url,
-                'duration' => $media->duration,
-                'likes' => $media->likes_count,
-                'comments' => $media->comments_count,
-                'views' => $media->views_count,
-                'is_featured' => (bool)$media->is_featured,
-                'status' => (bool)$media->is_active,
-                'sort_order' => $media->sort_order,
-            ]
+            'reel' => $reelData,
+            'data' => $reelData
         ]);
     }
 
@@ -2814,8 +2992,7 @@ class MediaController extends Controller
             'title' => 'required|string|max:255',
             'description' => 'required|string',
             'icon_name' => 'nullable|string|max:100',
-            'icon_type' => 'nullable|string|in:preset,svg,image,custom',
-            'icon_file' => 'nullable|file|mimes:jpeg,png,jpg,webp,svg|max:5120',
+            'icon_type' => 'nullable|string|in:preset',
             'sort_order' => 'nullable|integer',
             'is_active' => 'nullable',
         ]);
@@ -2826,25 +3003,7 @@ class MediaController extends Controller
             ->max('sort_order') ?: 0;
 
         $iconName = $request->input('icon_name', 'Leaf');
-        $iconType = $request->input('icon_type', 'preset');
         $filePath = 'icon_' . Str::slug($iconName);
-        $fileName = 'pillar_icon.png';
-        $mimeType = 'image/png';
-
-        if ($request->hasFile('icon_file')) {
-            $file = $request->file('icon_file');
-            $ext = strtolower($file->getClientOriginalExtension() ?: 'svg');
-            $uniqueName = 'pillar_' . time() . '_' . Str::random(4) . '.' . $ext;
-            $targetDir = public_path('images/about/pillars');
-            if (!File::isDirectory($targetDir)) {
-                File::makeDirectory($targetDir, 0755, true, true);
-            }
-            $file->move($targetDir, $uniqueName);
-            $filePath = 'images/about/pillars/' . $uniqueName;
-            $fileName = $file->getClientOriginalName();
-            $mimeType = $ext === 'svg' ? 'image/svg+xml' : 'image/' . $ext;
-            $iconType = $ext === 'svg' ? 'svg' : 'image';
-        }
 
         $pillar = Media::create([
             'page' => 'about',
@@ -2853,10 +3012,10 @@ class MediaController extends Controller
             'title' => $request->input('title'),
             'description' => $request->input('description'),
             'tag_text' => $iconName,
-            'file_name' => $fileName,
+            'file_name' => 'pillar_icon.png',
             'file_path' => $filePath,
             'disk' => 'local',
-            'mime_type' => $mimeType,
+            'mime_type' => 'image/png',
             'file_type' => 'image',
             'sort_order' => $request->filled('sort_order') ? (int)$request->input('sort_order') : ($maxSort + 1),
             'is_active' => $request->has('is_active') ? filter_var($request->input('is_active'), FILTER_VALIDATE_BOOLEAN) : true,
@@ -2864,7 +3023,7 @@ class MediaController extends Controller
             'uploader_type' => 'admin',
             'metadata' => [
                 'icon_name' => $iconName,
-                'icon_type' => $iconType,
+                'icon_type' => 'preset',
             ],
         ]);
 
@@ -2877,8 +3036,7 @@ class MediaController extends Controller
                 'description' => $pillar->description,
                 'icon' => $iconName,
                 'icon_name' => $iconName,
-                'icon_type' => $iconType,
-                'icon_url' => str_starts_with($pillar->file_path, 'images/') ? $pillar->url : null,
+                'icon_type' => 'preset',
                 'sort_order' => (int)$pillar->sort_order,
                 'is_active' => (bool)$pillar->is_active,
             ]
@@ -2898,19 +3056,21 @@ class MediaController extends Controller
         $meta = $pillar->metadata ?: [];
         $iconName = $pillar->tag_text ?: ($meta['icon_name'] ?? 'Leaf');
 
+        $payload = [
+            'id' => $pillar->id,
+            'title' => $pillar->title,
+            'description' => $pillar->description,
+            'icon' => $iconName,
+            'icon_name' => $iconName,
+            'icon_type' => 'preset',
+            'sort_order' => (int)$pillar->sort_order,
+            'is_active' => (bool)$pillar->is_active,
+        ];
+
         return response()->json([
             'success' => true,
-            'data' => [
-                'id' => $pillar->id,
-                'title' => $pillar->title,
-                'description' => $pillar->description,
-                'icon' => $iconName,
-                'icon_name' => $iconName,
-                'icon_type' => $meta['icon_type'] ?? (str_starts_with($pillar->file_path, 'images/') ? 'custom' : 'preset'),
-                'icon_url' => str_starts_with($pillar->file_path, 'images/') ? $pillar->url : null,
-                'sort_order' => (int)$pillar->sort_order,
-                'is_active' => (bool)$pillar->is_active,
-            ]
+            'data' => $payload,
+            'pillar' => $payload,
         ]);
     }
 
@@ -2928,33 +3088,16 @@ class MediaController extends Controller
             'title' => 'required|string|max:255',
             'description' => 'required|string',
             'icon_name' => 'nullable|string|max:100',
-            'icon_type' => 'nullable|string|in:preset,svg,image,custom',
-            'icon_file' => 'nullable|file|mimes:jpeg,png,jpg,webp,svg|max:5120',
+            'icon_type' => 'nullable|string|in:preset',
             'sort_order' => 'nullable|integer',
             'is_active' => 'nullable',
         ]);
 
         $meta = $pillar->metadata ?: [];
         $iconName = $request->input('icon_name', $pillar->tag_text ?: ($meta['icon_name'] ?? 'Leaf'));
-        $iconType = $request->input('icon_type', $meta['icon_type'] ?? 'preset');
-
-        if ($request->hasFile('icon_file')) {
-            $file = $request->file('icon_file');
-            $ext = strtolower($file->getClientOriginalExtension() ?: 'svg');
-            $uniqueName = 'pillar_' . time() . '_' . Str::random(4) . '.' . $ext;
-            $targetDir = public_path('images/about/pillars');
-            if (!File::isDirectory($targetDir)) {
-                File::makeDirectory($targetDir, 0755, true, true);
-            }
-            $file->move($targetDir, $uniqueName);
-            $pillar->file_path = 'images/about/pillars/' . $uniqueName;
-            $pillar->file_name = $file->getClientOriginalName();
-            $pillar->mime_type = $ext === 'svg' ? 'image/svg+xml' : 'image/' . $ext;
-            $iconType = $ext === 'svg' ? 'svg' : 'image';
-        }
 
         $meta['icon_name'] = $iconName;
-        $meta['icon_type'] = $iconType;
+        $meta['icon_type'] = 'preset';
 
         $pillar->title = $request->input('title');
         $pillar->description = $request->input('description');
@@ -2977,8 +3120,7 @@ class MediaController extends Controller
                 'description' => $pillar->description,
                 'icon' => $iconName,
                 'icon_name' => $iconName,
-                'icon_type' => $iconType,
-                'icon_url' => str_starts_with($pillar->file_path, 'images/') ? $pillar->url : null,
+                'icon_type' => 'preset',
                 'sort_order' => (int)$pillar->sort_order,
                 'is_active' => (bool)$pillar->is_active,
             ]
@@ -4064,6 +4206,190 @@ class MediaController extends Controller
             'success' => true,
             'message' => 'Navbar settings updated successfully!',
             'data' => $media,
+        ]);
+    }
+
+    /**
+     * Add a Custom Order Item / Category
+     */
+    public function addCustomOrderItem(Request $request): JsonResponse
+    {
+        $request->validate([
+            'title' => 'required|string|max:100',
+            'subtitle' => 'nullable|string|max:150',
+            'sort_order' => 'nullable|integer',
+        ]);
+
+        $maxSort = Media::where('page', 'custom_order')->where('section', 'custom_order_items')->max('sort_order') ?: 0;
+
+        $item = Media::create([
+            'page' => 'custom_order',
+            'section' => 'custom_order_items',
+            'slot' => 'item_' . \Illuminate\Support\Str::slug($request->title) . '_' . time(),
+            'title' => $request->title,
+            'subtitle' => $request->subtitle ?: 'Custom pattern',
+            'tag_text' => 'Flower2',
+            'sort_order' => $request->filled('sort_order') ? (int)$request->sort_order : ($maxSort + 1),
+            'is_active' => true,
+            'uploaded_by' => auth()->id() ?: 1,
+            'uploader_type' => 'admin',
+            'file_name' => 'custom_order.png',
+            'file_path' => 'images/categories/categories_bg.png',
+            'mime_type' => 'image/png',
+            'disk' => 'local'
+        ]);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Custom order item created successfully!',
+            'item' => [
+                'id' => $item->id,
+                'name' => $item->title,
+                'title' => $item->title,
+                'subtitle' => $item->subtitle,
+                'sort_order' => (int)$item->sort_order,
+                'is_active' => (bool)$item->is_active,
+            ],
+            'data' => $item
+        ]);
+    }
+
+    /**
+     * Get single Custom Order Item
+     */
+    public function getCustomOrderItem($id): JsonResponse
+    {
+        $item = Media::where('page', 'custom_order')
+            ->where('section', 'custom_order_items')
+            ->where('id', $id)
+            ->first();
+
+        if (!$item) {
+            $item = Media::find($id);
+        }
+
+        if (!$item) {
+            return response()->json(['success' => false, 'message' => 'Custom order item not found.'], 404);
+        }
+
+        $itemData = [
+            'id' => $item->id,
+            'name' => $item->title,
+            'title' => $item->title,
+            'subtitle' => $item->subtitle ?: 'Custom pattern',
+            'sort_order' => (int)$item->sort_order,
+            'is_active' => (bool)$item->is_active,
+        ];
+
+        return response()->json([
+            'success' => true,
+            'item' => $itemData,
+            'data' => $itemData
+        ]);
+    }
+
+    /**
+     * Update an existing Custom Order Item
+     */
+    public function updateCustomOrderItem(Request $request, $id): JsonResponse
+    {
+        $item = Media::where('page', 'custom_order')
+            ->where('section', 'custom_order_items')
+            ->where('id', $id)
+            ->first();
+
+        if (!$item) {
+            $item = Media::find($id);
+        }
+
+        if (!$item) {
+            return response()->json(['success' => false, 'message' => 'Custom order item not found.'], 404);
+        }
+
+        $request->validate([
+            'title' => 'required|string|max:100',
+            'subtitle' => 'nullable|string|max:150',
+            'sort_order' => 'nullable|integer',
+        ]);
+
+        $item->title = $request->title;
+        if ($request->has('subtitle')) {
+            $item->subtitle = $request->subtitle;
+        }
+        if ($request->filled('sort_order')) {
+            $item->sort_order = (int)$request->sort_order;
+        }
+        if ($request->has('is_active')) {
+            $item->is_active = filter_var($request->input('is_active'), FILTER_VALIDATE_BOOLEAN);
+        }
+        $item->save();
+
+        $itemData = [
+            'id' => $item->id,
+            'name' => $item->title,
+            'title' => $item->title,
+            'subtitle' => $item->subtitle,
+            'sort_order' => (int)$item->sort_order,
+            'is_active' => (bool)$item->is_active,
+        ];
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Custom order item updated successfully!',
+            'item' => $itemData,
+            'data' => $itemData
+        ]);
+    }
+
+    /**
+     * Delete a Custom Order Item
+     */
+    public function deleteCustomOrderItem($id): JsonResponse
+    {
+        $item = Media::where('page', 'custom_order')
+            ->where('section', 'custom_order_items')
+            ->where('id', $id)
+            ->first();
+
+        if (!$item) {
+            $item = Media::find($id);
+        }
+
+        if ($item) {
+            $item->delete();
+        }
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Custom order item deleted successfully!'
+        ]);
+    }
+
+    /**
+     * Toggle status for Custom Order Item
+     */
+    public function toggleCustomOrderItem($id): JsonResponse
+    {
+        $item = Media::where('page', 'custom_order')
+            ->where('section', 'custom_order_items')
+            ->where('id', $id)
+            ->first();
+
+        if (!$item) {
+            $item = Media::find($id);
+        }
+
+        if (!$item) {
+            return response()->json(['success' => false, 'message' => 'Custom order item not found.'], 404);
+        }
+
+        $item->is_active = !$item->is_active;
+        $item->save();
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Status updated successfully.',
+            'is_active' => (bool)$item->is_active,
         ]);
     }
 }

@@ -44,20 +44,38 @@ export const metadata: Metadata = {
     locale: "en_IN",
     type: "website",
   },
+  icons: {
+    icon: [
+      { url: "/favicon.ico", sizes: "any" },
+      { url: "/icon.png", type: "image/png" },
+    ],
+    shortcut: "/favicon.ico",
+    apple: "/apple-icon.png",
+  },
 };
 
-export default function RootLayout({
+import { fetchHomepageMedia } from "@/lib/api";
+
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const initialMedia = await fetchHomepageMedia();
+
   return (
     <html
       lang="en"
+      suppressHydrationWarning
       className={`${serifFont.variable} ${sansFont.variable} ${scriptFont.variable} h-full antialiased`}
     >
-      <body className="min-h-full flex flex-col bg-[#FFF8F5] text-[#2C201D] font-sans">
-        <MediaProvider>
+      <head>
+        <link rel="icon" href="/favicon.ico" sizes="any" />
+        <link rel="icon" href="/icon.png" type="image/png" />
+        <link rel="apple-touch-icon" href="/apple-icon.png" />
+      </head>
+      <body suppressHydrationWarning className="min-h-full flex flex-col bg-[#FFF8F5] text-[#2C201D] font-sans">
+        <MediaProvider initialMedia={initialMedia}>
           <ToastProvider>
             <CartProvider>
               <WishlistProvider>

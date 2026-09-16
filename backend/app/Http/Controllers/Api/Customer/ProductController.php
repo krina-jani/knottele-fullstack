@@ -71,7 +71,7 @@ class ProductController extends Controller
                 'defaultVariant.images',
                 'variants' => function ($query) {
                     $query->select('id', 'product_id', 'price', 'compare_price', 'stock_quantity', 'is_default', 'sku')
-                          ->with('images', 'attributes');
+                          ->with('images');
                 }
             ])->where('products.status', 'active'); // Specify table name
 
@@ -95,6 +95,7 @@ class ProductController extends Controller
                 $query->where('products.main_category_id', $categoryId);
             }
 
+            // Brand filter
             if ($brandId) {
                 $query->where('products.brand_id', $brandId);
             }
@@ -109,14 +110,6 @@ class ProductController extends Controller
 
             if ($isBestseller !== null) {
                 $query->where('products.is_bestseller', filter_var($isBestseller, FILTER_VALIDATE_BOOLEAN));
-            }
-
-            // Material filter (assuming you have a material field or attribute)
-            if ($material) {
-                $query->whereHas('specifications', function ($q) use ($material) {
-                    $q->where('name', 'material')
-                      ->where('value', 'LIKE', "%{$material}%");
-                });
             }
 
             // Price range filter
@@ -269,17 +262,13 @@ class ProductController extends Controller
                     'variants_count' => $product->variants->count(),
                     'variants' => $product->variants->map(function($v) {
                         $size = 'Standard';
-                        if ($v->attributes && $v->attributes->first()) {
-                            $size = $v->attributes->first()->value;
-                        } else {
-                            // Infer size from SKU if attributes are missing
-                            if (str_ends_with($v->sku, '-08')) $size = '8 Sachets';
-                            elseif (str_ends_with($v->sku, '-16')) $size = '16 Sachets';
-                            elseif (str_ends_with($v->sku, '-32')) $size = '32 Sachets';
-                            elseif (str_ends_with($v->sku, '-250')) $size = '250g';
-                            elseif (str_ends_with($v->sku, '-500')) $size = '500g';
-                            elseif (str_ends_with($v->sku, '-1KG')) $size = '1 Kg';
-                        }
+                        // Infer size from SKU if attributes are missing
+                        if (str_ends_with($v->sku, '-08')) $size = '8 Sachets';
+                        elseif (str_ends_with($v->sku, '-16')) $size = '16 Sachets';
+                        elseif (str_ends_with($v->sku, '-32')) $size = '32 Sachets';
+                        elseif (str_ends_with($v->sku, '-250')) $size = '250g';
+                        elseif (str_ends_with($v->sku, '-500')) $size = '500g';
+                        elseif (str_ends_with($v->sku, '-1KG')) $size = '1 Kg';
 
                         return [
                             'id' => $v->id,
@@ -315,66 +304,44 @@ class ProductController extends Controller
                     ['value' => 'featured', 'label' => 'Featured'],
                     ['value' => 'price_asc', 'label' => 'Price: Low to High'],
                     ['value' => 'price_desc', 'label' => 'Price: High to Low'],
-                    ['value' => 'name_asc', 'label' => 'Name: A to Z'],
-                    ['value' => 'name_desc', 'label' => 'Name: Z to A'],
-                    ['value' => 'popular', 'label' => 'Best Selling'],
                 ]
             ], 'Products retrieved successfully');
 
         } catch (\Exception $e) {
-            Log::error('Customer Product index error: ' . $e->getMessage());
-            return $this->apiResponse(false, null, 'Failed to retrieve products', 500);
+            Log::error('Customer Product API Error: ' . $e->getMessage());
+            return $this->apiResponse(false, null, 'Failed to fetch products', 500);
         }
     }
 
     /**
-     * Get available filters based on current query
+     * Get available filter options based on the current product set
      */
-    private function getAvailableFilters($baseQuery)
+    private function getAvailableFilters($query): array
     {
         $filters = [];
 
-        // Get categories from the base query
-        $categoryQuery = clone $baseQuery;
-        $categoryIds = $categoryQuery->pluck('main_category_id')->filter()->unique();
-
-        $filters['categories'] = Category::where('status', 'active')
-            ->whereIn('id', $categoryIds)
-            ->select('id', 'name', 'slug')
+        // Categories with counts
+        $categories = Category::where('status', 1)
+            ->whereNull('parent_id')
             ->withCount(['products' => function ($q) {
                 $q->where('status', 'active');
             }])
-            ->get()
-            ->map(function ($category) {
-                return [
-                    'id' => $category->id,
-                    'name' => $category->name,
-                    'slug' => $category->slug,
-                    'count' => $category->products_count
-                ];
-            });
+            ->get(['id', 'name', 'slug']);
 
-        // Get brands from the base query
-        $brandQuery = clone $baseQuery;
-        $brandIds = $brandQuery->pluck('brand_id')->filter()->unique();
+        $filters['categories'] = $categories;
 
-        $filters['brands'] = Brand::where('status', 'active')
-            ->whereIn('id', $brandIds)
-            ->select('id', 'name')
+        // Brands with counts
+        $brands = Brand::where('status', 1)
             ->withCount(['products' => function ($q) {
                 $q->where('status', 'active');
             }])
-            ->get()
-            ->map(function ($brand) {
-                return [
-                    'id' => $brand->id,
-                    'name' => $brand->name,
-                    'count' => $brand->products_count
-                ];
-            });
+            ->get(['id', 'name']);
 
-        // Price range - CORRECTED: Use product_variants table (not variants)
-        $priceRange = Product::where('products.status', 'active') // Specify table name
+        $filters['brands'] = $brands;
+
+        // Price range
+        $priceRange = DB::table('products')
+            ->where('products.status', 'active')
             ->join('product_variants', function ($join) {
                 $join->on('products.id', '=', 'product_variants.product_id')
                      ->where('product_variants.is_default', true);
@@ -387,33 +354,7 @@ class ProductController extends Controller
             'max' => $priceRange->max_price ?? 100000,
         ];
 
-        // Get unique materials from product specifications (if you have this table)
-        // This is an example - adjust based on your actual implementation
-        try {
-            $materials = DB::table('product_specifications')
-                ->join('specifications', 'product_specifications.specification_id', '=', 'specifications.id')
-                ->where('specifications.name', 'material')
-                ->select('product_specifications.custom_value as name', DB::raw('COUNT(*) as count'))
-                ->groupBy('product_specifications.custom_value')
-                ->get()
-                ->map(function ($item) {
-                    return [
-                        'name' => $item->name,
-                        'count' => $item->count
-                    ];
-                });
-
-            $filters['materials'] = $materials;
-        } catch (\Exception $e) {
-            // Fallback if specification system is not implemented yet
-            $filters['materials'] = [
-                ['name' => 'Gold', 'count' => 85],
-                ['name' => 'Silver', 'count' => 120],
-                ['name' => 'Platinum', 'count' => 75],
-                ['name' => 'Diamond', 'count' => 65],
-                ['name' => 'Pearl', 'count' => 45],
-            ];
-        }
+        $filters['materials'] = [];
 
         return $filters;
     }
@@ -467,11 +408,6 @@ public function show($slug): JsonResponse
             'taxClass.rates',
             'approvedReviews',
             'variants.images',
-            'variants.attributes.attribute',
-            'variants' => function ($query) {
-                // Load variants with their images
-                $query->with(['images']);
-            }
         ])->where('slug', $slug)
           ->where('status', 'active')
           ->firstOrFail();
@@ -587,16 +523,12 @@ public function show($slug): JsonResponse
                 })->sortBy('sort_order')->values();
 
                     $size = 'Standard';
-                    if ($variant->attributes && $variant->attributes->first()) {
-                        $size = $variant->attributes->first()->value;
-                    } else {
-                        if (str_ends_with($variant->sku, '-08')) $size = '8 Sachets';
-                        elseif (str_ends_with($variant->sku, '-16')) $size = '16 Sachets';
-                        elseif (str_ends_with($variant->sku, '-32')) $size = '32 Sachets';
-                        elseif (str_ends_with($variant->sku, '-250')) $size = '250g';
-                        elseif (str_ends_with($variant->sku, '-500')) $size = '500g';
-                        elseif (str_ends_with($variant->sku, '-1KG')) $size = '1 Kg';
-                    }
+                    if (str_ends_with($variant->sku, '-08')) $size = '8 Sachets';
+                    elseif (str_ends_with($variant->sku, '-16')) $size = '16 Sachets';
+                    elseif (str_ends_with($variant->sku, '-32')) $size = '32 Sachets';
+                    elseif (str_ends_with($variant->sku, '-250')) $size = '250g';
+                    elseif (str_ends_with($variant->sku, '-500')) $size = '500g';
+                    elseif (str_ends_with($variant->sku, '-1KG')) $size = '1 Kg';
 
                     return [
                         'id' => $variant->id,
@@ -606,19 +538,10 @@ public function show($slug): JsonResponse
                         'stock_quantity' => $variant->stock_quantity,
                         'stock' => $variant->stock_quantity,
                         'size' => $size,
-                    'stock_status' => $variant->stock_status,
-                    'is_default' => (bool) $variant->is_default,
-                    'images' => $images,
-                    'attributes' => $variant->attributes->map(function ($attribute) {
-                        return [
-                            'id' => $attribute->id,
-                            'attribute_id' => $attribute->attribute->id ?? null,
-                            'attribute_name' => $attribute->attribute->name ?? null,
-                            'value' => $attribute->value,
-                            'label' => $attribute->label,
-                            'color_code' => $attribute->color_code
-                        ];
-                    })
+                        'stock_status' => $variant->stock_status,
+                        'is_default' => (bool) $variant->is_default,
+                        'images' => $images,
+                        'attributes' => []
                 ];
             }),
             'reviews_data' => $product->approvedReviews->map(function ($review) {
@@ -705,7 +628,7 @@ public function show($slug): JsonResponse
     {
         try {
             $self = $this;
-            $variants = ProductVariant::with(['images', 'attributes.attribute'])
+            $variants = ProductVariant::with(['images'])
                 ->where('product_id', $productId)
                 ->where('status', 1)
                 ->get()
@@ -728,16 +651,7 @@ public function show($slug): JsonResponse
                         'stock_status' => $variant->stock_status,
                         'is_default' => (bool) $variant->is_default,
                         'images' => $images,
-                        'attributes' => $variant->attributes->map(function ($attribute) {
-                            return [
-                                'id' => $attribute->id,
-                                'attribute_id' => $attribute->attribute->id ?? null,
-                                'attribute_name' => $attribute->attribute->name ?? null,
-                                'value' => $attribute->value,
-                                'label' => $attribute->label,
-                                'color_code' => $attribute->color_code
-                            ];
-                        })
+                        'attributes' => []
                     ];
                 });
 

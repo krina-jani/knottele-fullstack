@@ -112,13 +112,6 @@ Route::prefix('admin')->group(function () {
             Route::delete('/{product}', [AdminProduct::class, 'destroy'])->name('admin.products.destroy');
 
 
-            Route::get('/attributes', [AdminProduct::class, 'attributes'])->name('admin.products.attributes');
-            Route::get('/specifications', [AdminProduct::class, 'specifications'])->name('admin.products.specifications');
-            Route::get('/tags', [AdminProduct::class, 'tags'])->name('admin.products.tags');
-
-            Route::get('/variants', [AdminProduct::class, 'variants'])->name('admin.products.variants');
-            Route::get('/category/{category}/specifications', [AdminProduct::class, 'getCategorySpecifications'])->name('admin.products.category.specifications');
-            Route::get('/category/{category}/attributes', [AdminProduct::class, 'getCategoryAttributes'])->name('admin.products.category.attributes');
             Route::get('/search', [AdminProduct::class, 'search'])->name('admin.products.search');
         });
 
@@ -232,6 +225,13 @@ Route::prefix('admin')->group(function () {
             // Navbar Settings Routes
             Route::get('/navbar/settings', [AdminMedia::class, 'getNavbarSettings'])->name('admin.media.navbar.settings.get');
             Route::post('/navbar/settings', [AdminMedia::class, 'saveNavbarSettings'])->name('admin.media.navbar.settings.save');
+
+            // Custom Order Items Routes
+            Route::post('/custom-order/items', [AdminMedia::class, 'addCustomOrderItem'])->name('admin.media.custom-order.items.add');
+            Route::get('/custom-order/items/{id}', [AdminMedia::class, 'getCustomOrderItem'])->name('admin.media.custom-order.items.get');
+            Route::post('/custom-order/items/{id}', [AdminMedia::class, 'updateCustomOrderItem'])->name('admin.media.custom-order.items.update');
+            Route::delete('/custom-order/items/{id}', [AdminMedia::class, 'deleteCustomOrderItem'])->name('admin.media.custom-order.items.delete');
+            Route::post('/custom-order/items/{id}/toggle', [AdminMedia::class, 'toggleCustomOrderItem'])->name('admin.media.custom-order.items.toggle');
 
             Route::delete('/{id}', [AdminMedia::class, 'destroy'])->name('admin.media.destroy');
         });

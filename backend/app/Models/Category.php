@@ -66,44 +66,6 @@ class Category extends Model
             ->wherePivot('is_primary', true);
     }
 
-    public function attributes()
-    {
-        return $this->belongsToMany(
-            Attribute::class,
-            'category_attributes',
-            'category_id',
-            'attribute_id'
-        )
-        ->withPivot(['is_required', 'is_filterable', 'sort_order'])
-        ->orderBy('category_attributes.sort_order');
-    }
-
-   public function specGroups()
-    {
-        return $this->belongsToMany(
-            SpecificationGroup::class,
-            'category_spec_groups',
-            'category_id',
-            'spec_group_id'
-        )->withPivot('sort_order')
-         ->withTimestamps()
-         ->using(CategorySpecGroup::class)
-         ->orderBy('pivot_sort_order');
-    }
-
-    // Alias for compatibility
-     public function specificationGroups()
-    {
-        return $this->belongsToMany(
-            SpecificationGroup::class,
-            'category_spec_groups',
-            'category_id',      // FK on pivot pointing to Category
-            'spec_group_id'     // FK on pivot pointing to SpecGroup
-        )
-        ->withPivot('sort_order')
-        ->orderBy('category_spec_groups.sort_order');
-    }
-
 
 
     public function ancestors()

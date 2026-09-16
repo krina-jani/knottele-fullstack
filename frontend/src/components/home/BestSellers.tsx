@@ -3,29 +3,42 @@
 import React, { useState, useEffect, useMemo } from "react";
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
-import { PRODUCTS } from "@/data/products";
 import { Product } from "@/types/product";
 import { fetchProducts } from "@/lib/api";
 import { ProductCard } from "@/components/ui/ProductCard";
+import { useWebsiteMedia } from "@/context/MediaContext";
+import { getLocalCache, setLocalCache, setupAdminSyncListener } from "@/lib/cache";
+
+const PRODUCTS_CACHE_KEY = "knotelle_cache_products";
 
 export function BestSellers() {
-  const [productsList, setProductsList] = useState<Product[]>(PRODUCTS);
+  const { media } = useWebsiteMedia();
+  const [productsList, setProductsList] = useState<Product[]>(() =>
+    getLocalCache<Product[]>(PRODUCTS_CACHE_KEY, [])
+  );
   const [activeTab, setActiveTab] = useState<string>("all");
   const [startIndex, setStartIndex] = useState<number>(0);
   const [isFading, setIsFading] = useState<boolean>(false);
 
   useEffect(() => {
     let isMounted = true;
-    fetchProducts({ per_page: 100 })
-      .then((res) => {
-        if (isMounted && res.products && res.products.length > 0) {
-          setProductsList(res.products);
-        }
-      })
-      .catch((err) => console.warn("Live bestsellers fetch notice:", err));
+    const loadProducts = () => {
+      fetchProducts({ per_page: 100 })
+        .then((res) => {
+          if (isMounted && res.products && res.products.length > 0) {
+            setProductsList(res.products);
+            setLocalCache(PRODUCTS_CACHE_KEY, res.products);
+          }
+        })
+        .catch((err) => console.warn("Live bestsellers fetch notice:", err));
+    };
+
+    loadProducts();
+    const cleanupListeners = setupAdminSyncListener(loadProducts);
 
     return () => {
       isMounted = false;
+      cleanupListeners();
     };
   }, []);
 
@@ -34,23 +47,23 @@ export function BestSellers() {
     return list.length > 0 ? list : productsList;
   }, [productsList]);
 
-  const categories = [
-    { id: "all", label: "All" },
-    { id: "keychain", label: "Keychains" },
-    { id: "flower", label: "Flowers" },
-    { id: "soft-toys", label: "Soft Toys" },
-    { id: "bags", label: "Bags" },
-  ];
+  const categories = useMemo(() => {
+    const defaultTabs = [{ id: "all", label: "All" }];
+    if (media?.categories && media.categories.length > 0) {
+      const dbTabs = media.categories.slice(0, 5).map((c) => ({
+        id: c.slug,
+        label: c.name,
+      }));
+      return [...defaultTabs, ...dbTabs];
+    }
+    return defaultTabs;
+  }, [media?.categories]);
 
   const filteredProducts = useMemo(() => {
     if (activeTab === "all") return bestSellers;
-    if (activeTab === "flower") {
-      return bestSellers.filter((p) => p.categorySlug === "flower" || p.categorySlug === "bouquet");
-    }
-    if (activeTab === "bags") {
-      return bestSellers.filter((p) => p.categorySlug === "bags" || p.categorySlug === "coin-purse");
-    }
-    return bestSellers.filter((p) => p.categorySlug === activeTab);
+    return bestSellers.filter(
+      (p) => p.categorySlug === activeTab || p.category.toLowerCase().includes(activeTab.toLowerCase())
+    );
   }, [activeTab, bestSellers]);
 
   // Auto-advance products every 2 seconds (2000ms) with smooth transition

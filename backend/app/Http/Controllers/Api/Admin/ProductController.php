@@ -204,13 +204,7 @@ class ProductController extends Controller
      */
     public function getCategorySpecifications($categoryId): JsonResponse
     {
-        try {
-            $specifications = $this->productService->getCategorySpecifications($categoryId);
-            return $this->apiResponse(true, $specifications, 'Category specifications retrieved successfully');
-        } catch (\Exception $e) {
-            Log::error('Category specifications error: ' . $e->getMessage());
-            return $this->apiResponse(false, null, 'Failed to retrieve category specifications: ' . $e->getMessage(), 500);
-        }
+        return $this->apiResponse(true, [], 'Category specifications retrieved successfully');
     }
 
     /**
@@ -218,13 +212,7 @@ class ProductController extends Controller
      */
     public function getCategoryAttributes($categoryId): JsonResponse
     {
-        try {
-            $attributes = $this->productService->getCategoryAttributes($categoryId);
-            return $this->apiResponse(true, $attributes, 'Variant attributes retrieved successfully');
-        } catch (\Exception $e) {
-            Log::error('Category attributes error: ' . $e->getMessage());
-            return $this->apiResponse(false, null, 'Failed to retrieve category attributes: ' . $e->getMessage(), 500);
-        }
+        return $this->apiResponse(true, [], 'Variant attributes retrieved successfully');
     }
 
     /**
@@ -263,22 +251,7 @@ class ProductController extends Controller
                 'mainCategory:id,name,slug',
                 'taxClass:id,name',
                 'categories:id,name,slug',
-                'tags:id,name,color',
-                'specifications' => function ($query) {
-                    $query->with([
-                        'values:id,specification_id,value'
-                    ]);
-                },
-
-                'variants' => function ($query) {
-                    $query->with([
-                        'attributes' => function ($q) {
-                            $q->with(['attribute:id,name']);
-                        },
-                        'images'
-
-                    ]);
-                }
+                'variants.images'
             ])->find($id);
 
             if (!$product) {
@@ -341,34 +314,8 @@ class ProductController extends Controller
                 'meta_keywords' => $product->meta_keywords,
                 'canonical_url' => $product->canonical_url,
                 'product_code' => $product->product_code,
-                'tags' => $product->tags->map(function ($tag) {
-                    return [
-                        'id' => $tag->id,
-                        'name' => $tag->name,
-                        'color' => $tag->color,
-                    ];
-                }),
-                'specifications' => $product->specifications->map(function ($spec) {
-
-                    $value = null;
-
-                    if (!empty($spec->pivot->custom_value)) {
-                        $value = $spec->pivot->custom_value;
-                    } elseif (!empty($spec->pivot->specification_value_id)) {
-                        $selected = $spec->values
-                            ->firstWhere('id', $spec->pivot->specification_value_id);
-
-                        $value = $selected?->value;
-                    }
-
-                    return [
-                        'specification_id' => $spec->id,
-                        'specification_name' => $spec->name,
-                        'specification_unit' => $spec->unit,
-                        'value' => $value,
-                        'display_value' => $value,
-                    ];
-                }),
+                'tags' => [],
+                'specifications' => [],
 
                 'variants' => $product->variants->map(function ($variant) {
                     return [
@@ -383,17 +330,8 @@ class ProductController extends Controller
                         'stock_status' => $variant->stock_status,
                         'is_default' => (bool) $variant->is_default,
                         'status' => (bool) $variant->status,
-                        'attributes' => $variant->attributes->map(function ($attr) {
-                            return [
-                                'attribute_id' => $attr->id,
-                                'attribute_name' => $attr->name,
-                                'attribute_value_id' => $attr->pivot->attribute_value_id,
-                                'attribute_value' => $attr->value,
-                                'label' => $attr->label,
-                                'color_code' => $attr->color_code,
-                            ];
-                        }),
-                        'combination_display' => $this->getCombinationDisplay($variant),
+                        'attributes' => [],
+                        'combination_display' => 'Default',
                         'images' => $variant->images->map(function ($image) {
                             return [
                                 'id' => $image->id,
@@ -797,16 +735,6 @@ class ProductController extends Controller
      */
     private function getCombinationDisplay(ProductVariant $variant): string
     {
-        $attributes = $variant->attributes;
-        if ($attributes->isEmpty()) {
-            return 'Default';
-        }
-
-        $display = [];
-        foreach ($attributes as $attribute) {
-            $display[] = $attribute->name . ': ' . $attribute->value;
-        }
-
-        return implode(' | ', $display);
+        return 'Default';
     }
 }

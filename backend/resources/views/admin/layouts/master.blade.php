@@ -101,10 +101,32 @@
 
 
 
+    <script>
+        function broadcastMediaUpdate() {
+            const timestamp = Date.now();
+            try {
+                localStorage.setItem('knotelle_media_updated', timestamp.toString());
+                localStorage.setItem('knotelle_media_sync', timestamp.toString());
+                localStorage.setItem('knotelle_contact_updated', timestamp.toString());
+                localStorage.setItem('knotelle_about_updated', timestamp.toString());
+            } catch(e){}
+            try {
+                if ('BroadcastChannel' in window) {
+                    const channel = new BroadcastChannel('knotelle_media_sync');
+                    channel.postMessage({ type: 'MEDIA_UPDATED', timestamp: timestamp });
+                    setTimeout(() => {
+                        try { channel.close(); } catch(e) {}
+                    }, 200);
+                }
+            } catch(e){}
+        }
+    </script>
+
     @if(session('success'))
     <script>
         document.addEventListener("DOMContentLoaded", function () {
             toastr.success("{{ session('success') }}");
+            broadcastMediaUpdate();
         });
     </script>
     @endif

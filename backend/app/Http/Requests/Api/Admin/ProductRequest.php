@@ -70,20 +70,10 @@ class ProductRequest extends FormRequest
             'meta_keywords' => 'nullable|string|max:255',
             'canonical_url' => 'nullable|url|max:500',
 
-            // Tags
-            'tag_ids' => 'nullable|array',
-            'tag_ids.*' => 'exists:tags,id',
-
             // Images
             'main_image_id' => 'nullable|exists:media,id',
             'gallery_image_ids' => 'nullable|array',
             'gallery_image_ids.*' => 'exists:media,id',
-
-            // Specifications
-            'specifications' => 'nullable|array',
-            'specifications.*.specification_id' => 'required|exists:specifications,id',
-            'specifications.*.specification_value_id' => 'nullable|exists:specification_values,id',
-            'specifications.*.custom_value' => 'nullable|string',
         ];
 
         // Simple product validation
@@ -139,12 +129,6 @@ class ProductRequest extends FormRequest
                 $rules["variants.{$index}.status"] = 'required|in:active,inactive';
                 $rules["variants.{$index}.is_default"] = 'sometimes|boolean';
                 $rules["variants.{$index}.combination"] = 'nullable|array';
-
-                // Variant attributes
-                $rules["variants.{$index}.attributes"] = 'nullable|array';
-                $rules["variants.{$index}.attributes.*.attribute_id"] = 'required|exists:attributes,id';
-                $rules["variants.{$index}.attributes.*.attribute_value_id"] = 'required|exists:attribute_values,id';
-                $rules["variants.{$index}.attributes.*.value"] = 'nullable|string';
 
                 // Variant images
                 $rules["variants.{$index}.main_image_id"] = 'nullable|exists:media,id';

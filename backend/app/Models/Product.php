@@ -118,12 +118,6 @@ class Product extends Model
         return $this->belongsTo(Category::class, 'main_category_id');
     }
 
-    public function tags(): BelongsToMany
-    {
-        return $this->belongsToMany(Tag::class, 'product_tags')
-            ->withTimestamps();
-    }
-
     public function relatedProducts(): BelongsToMany
     {
         return $this->belongsToMany(self::class, 'related_products', 'product_id', 'related_product_id')
@@ -143,18 +137,6 @@ class Product extends Model
         return $this->belongsToMany(self::class, 'upsell_products', 'product_id', 'upsell_product_id')
             ->withPivot('sort_order')
             ->withTimestamps();
-    }
-
-    public function specifications(): BelongsToMany
-    {
-        return $this->belongsToMany(Specification::class, 'product_specifications')
-            ->withPivot('specification_value_id', 'custom_value')
-            ->withTimestamps();
-    }
-
-    public function productSpecifications(): HasMany
-    {
-        return $this->hasMany(ProductSpecification::class);
     }
 
 
