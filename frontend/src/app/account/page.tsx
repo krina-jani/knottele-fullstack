@@ -34,7 +34,7 @@ export default function AccountDashboardPage() {
             <span>KNOTELLE Member Atelier</span>
           </div>
           <h1 className="font-serif-luxury text-2xl sm:text-3xl font-bold text-[#2E211E]">
-            Welcome back, {user?.name || "Ananya"}!
+            Welcome back, {user?.name ? user.name.split(" ")[0] : "Member"}!
           </h1>
           <p className="text-xs sm:text-sm text-[#786864] mt-1">
             Manage your bespoke crochet orders, track artisan progress, and saved favorites.

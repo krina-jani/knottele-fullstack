@@ -33,9 +33,9 @@ export default function CheckoutPage() {
   const [isSummaryCollapsedMobile, setIsSummaryCollapsedMobile] = useState(true);
 
   // Form State: 01 Information
-  const [fullName, setFullName] = useState(user?.name || "Ananya Sharma");
-  const [email, setEmail] = useState(user?.email || "ananya.sharma@example.com");
-  const [phone, setPhone] = useState(user?.phone || "+91 98765 43210");
+  const [fullName, setFullName] = useState(user?.name || "");
+  const [email, setEmail] = useState(user?.email || "");
+  const [phone, setPhone] = useState(user?.phone || "");
 
   // Form State: 02 Delivery
   const [addressLine1, setAddressLine1] = useState(

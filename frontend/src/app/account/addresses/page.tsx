@@ -10,9 +10,9 @@ export default function AddressesPage() {
   const [isAddingNew, setIsAddingNew] = useState(false);
 
   // New Address Form State
-  const [fullName, setFullName] = useState(user?.name || "Ananya Sharma");
-  const [email, setEmail] = useState(user?.email || "ananya.sharma@example.com");
-  const [phone, setPhone] = useState(user?.phone || "+91 98765 43210");
+  const [fullName, setFullName] = useState(user?.name || "");
+  const [email, setEmail] = useState(user?.email || "");
+  const [phone, setPhone] = useState(user?.phone || "");
   const [addressLine1, setAddressLine1] = useState("");
   const [addressLine2, setAddressLine2] = useState("");
   const [city, setCity] = useState("");

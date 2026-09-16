@@ -252,12 +252,9 @@
     };
 
     // Helper function to replace route parameters
-    function getRoute(routeName, params) {
-        let url = routeTemplates[routeName];
-        for (const key in params) {
-            url = url.replace(`:${key}`, params[key]);
-        }
-        return url;
+    function getRoute(routeName, id) {
+        let url = routeTemplates[routeName] || '';
+        return url.replace(/%3Aid|%253Aid|:id/gi, id);
     }
 
     let currentPage = 1;
@@ -433,10 +430,10 @@
                         <button onclick="viewOrder(${order.id})" class="p-2 bg-red-50 text-red-600 rounded-lg hover:bg-red-100 transition-colors" title="View Details">
                             <i class="fas fa-eye"></i>
                         </button>
-                        <button onclick="updateOrderStatus(${order.id})" class="p-2 bg-amber-50 text-amber-600 rounded-lg hover:bg-amber-100 transition-colors" title="Update Status">
+                        <button onclick="updateOrderStatus(${order.id}, '${order.status}')" class="p-2 bg-amber-50 text-amber-600 rounded-lg hover:bg-amber-100 transition-colors" title="Update Status">
                             <i class="fas fa-edit"></i>
                         </button>
-                        <button onclick="updatePaymentStatus(${order.id})" class="p-2 bg-red-50 text-red-600 rounded-lg hover:bg-red-100 transition-colors" title="Update Payment">
+                        <button onclick="updatePaymentStatus(${order.id}, '${order.payment_status}')" class="p-2 bg-red-50 text-red-600 rounded-lg hover:bg-red-100 transition-colors" title="Update Payment">
                             <i class="fas fa-credit-card"></i>
                         </button>
                         <button onclick="updateTracking(${order.id})" class="p-2 bg-blue-50 text-blue-600 rounded-lg hover:bg-blue-100 transition-colors" title="Add Tracking">
@@ -540,11 +537,22 @@
     }
 
     function viewOrder(id) {
-        const url = routeTemplates.view.replace(':id', id);
+        const url = getRoute('view', id);
         window.location.href = url;
     }
 
-    function updateOrderStatus(id) {
+    function updateOrderStatus(id, currentStatus = 'pending') {
+        const statuses = [
+            { val: 'pending', label: 'Pending' },
+            { val: 'confirmed', label: 'Confirmed' },
+            { val: 'processing', label: 'Processing' },
+            { val: 'shipped', label: 'Shipped' },
+            { val: 'delivered', label: 'Delivered' },
+            { val: 'cancelled', label: 'Cancelled' },
+            { val: 'refunded', label: 'Refunded' },
+        ];
+        const optionsHtml = statuses.map(s => `<option value="${s.val}" ${s.val === currentStatus ? 'selected' : ''}>${s.label}</option>`).join('');
+
         Swal.fire({
             title: 'Update Order Status',
             html: `
@@ -552,13 +560,7 @@
                     <div>
                         <label class="block text-sm font-medium text-stone-700 mb-2">Order Status</label>
                         <select id="orderStatus" class="w-full border border-stone-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-red-500">
-                            <option value="pending">Pending</option>
-                            <option value="confirmed">Confirmed</option>
-                            <option value="processing">Processing</option>
-                            <option value="shipped">Shipped</option>
-                            <option value="delivered">Delivered</option>
-                            <option value="cancelled">Cancelled</option>
-                            <option value="refunded">Refunded</option>
+                            ${optionsHtml}
                         </select>
                     </div>
                     <div>
@@ -584,7 +586,7 @@
             if (result.isConfirmed) {
                 showLoading();
 
-                const url = routeTemplates.updateStatus.replace(':id', id);
+                const url = getRoute('updateStatus', id);
                 fetch(url, {
                     method: 'POST',
                     headers: {
@@ -613,7 +615,16 @@
         });
     }
 
-    function updatePaymentStatus(id) {
+    function updatePaymentStatus(id, currentPaymentStatus = 'pending') {
+        const paymentStatuses = [
+            { val: 'pending', label: 'Pending' },
+            { val: 'paid', label: 'Paid' },
+            { val: 'partially_paid', label: 'Partially Paid' },
+            { val: 'failed', label: 'Failed' },
+            { val: 'refunded', label: 'Refunded' },
+        ];
+        const optionsHtml = paymentStatuses.map(s => `<option value="${s.val}" ${s.val === currentPaymentStatus ? 'selected' : ''}>${s.label}</option>`).join('');
+
         Swal.fire({
             title: 'Update Payment Status',
             html: `
@@ -621,11 +632,7 @@
                     <div>
                         <label class="block text-sm font-medium text-stone-700 mb-2">Payment Status</label>
                         <select id="paymentStatus" class="w-full border border-stone-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-red-500">
-                            <option value="pending">Pending</option>
-                            <option value="paid">Paid</option>
-                            <option value="partially_paid">Partially Paid</option>
-                            <option value="failed">Failed</option>
-                            <option value="refunded">Refunded</option>
+                            ${optionsHtml}
                         </select>
                     </div>
                     <div>
@@ -651,7 +658,7 @@
             if (result.isConfirmed) {
                 showLoading();
 
-                const url = routeTemplates.updatePaymentStatus.replace(':id', id);
+                const url = getRoute('updatePaymentStatus', id);
                 fetch(url, {
                     method: 'POST',
                     headers: {
@@ -722,7 +729,7 @@
             if (result.isConfirmed) {
                 showLoading();
 
-                const url = routeTemplates.updateTracking.replace(':id', id);
+                const url = getRoute('updateTracking', id);
                 fetch(url, {
                     method: 'POST',
                     headers: {
@@ -752,7 +759,7 @@
     }
 
     function printInvoice(id) {
-        const url = routeTemplates.invoice.replace(':id', id);
+        const url = getRoute('invoice', id);
         window.open(url, '_blank');
     }
 
@@ -775,7 +782,7 @@
             if (result.isConfirmed) {
                 showLoading();
 
-                const url = routeTemplates.destroy.replace(':id', id);
+                const url = getRoute('destroy', id);
                 fetch(url, {
                     method: 'DELETE',
                     headers: {

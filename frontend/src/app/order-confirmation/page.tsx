@@ -8,8 +8,8 @@ import { BotanicalFlourish, FlowerIcon } from "@/components/ui/BotanicalDecorati
 
 function ConfirmationContent() {
   const searchParams = useSearchParams();
-  const orderNumber = searchParams.get("orderNumber") || "KNT-8092-IN";
-  const orderId = searchParams.get("orderId") || "ord-8092";
+  const orderNumber = searchParams.get("orderNumber") || "KN-ORDER";
+  const orderId = searchParams.get("orderId") || "";
 
   return (
     <div className="bg-[#FFF9F6] min-h-screen py-10 lg:py-16">

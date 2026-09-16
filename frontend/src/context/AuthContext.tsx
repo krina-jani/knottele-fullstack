@@ -18,7 +18,7 @@ interface AuthContextType {
   user: UserProfile | null;
   isLoggedIn: boolean;
   orders: Order[];
-  login: (email: string) => void;
+  login: (email: string, userData?: Partial<UserProfile>, token?: string) => void;
   logout: () => void;
   updateProfile: (data: Partial<UserProfile>) => void;
   addAddress: (address: Omit<ShippingAddress, "id">) => void;
@@ -32,7 +32,7 @@ const DEFAULT_USER: UserProfile = {
   name: "Ananya Sharma",
   email: "ananya.sharma@example.com",
   phone: "+91 98765 43210",
-  avatar: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=80&w=200&auto=format&fit=crop",
+  avatar: "",
   addresses: [
     {
       id: "addr-1",
@@ -66,42 +66,94 @@ const DEFAULT_USER: UserProfile = {
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
-  const [user, setUser] = useState<UserProfile | null>(DEFAULT_USER);
+  const [user, setUser] = useState<UserProfile | null>(null);
   const [orders, setOrders] = useState<Order[]>([]);
   const { showToast } = useToast();
 
+  useEffect(() => {
+    try {
+      const stored = localStorage.getItem("knotelle_customer_user");
+      if (stored) {
+        const parsed = JSON.parse(stored);
+        if (parsed.avatar && parsed.avatar.includes("unsplash.com")) {
+          parsed.avatar = "";
+          localStorage.setItem("knotelle_customer_user", JSON.stringify(parsed));
+        }
+        setUser(parsed);
+      }
+    } catch {
+      // ignore JSON parse error
+    }
+  }, []);
+
   const refetchOrders = useCallback(async () => {
-    const emailToUse = user?.email || "ananya.sharma@example.com";
-    const liveOrders = await fetchCustomerOrders(emailToUse);
-    if (Array.isArray(liveOrders) && liveOrders.length > 0) {
+    if (!user?.email) {
+      setOrders([]);
+      return;
+    }
+    const liveOrders = await fetchCustomerOrders(user.email);
+    if (Array.isArray(liveOrders)) {
       setOrders(liveOrders);
     } else {
-      setOrders((prev) => (prev.length > 0 ? prev : INITIAL_ORDERS));
+      setOrders([]);
     }
   }, [user?.email]);
 
   useEffect(() => {
-    refetchOrders();
-    const interval = setInterval(refetchOrders, 4000);
-    const handleFocus = () => refetchOrders();
-    window.addEventListener("focus", handleFocus);
-    return () => {
-      clearInterval(interval);
-      window.removeEventListener("focus", handleFocus);
-    };
-  }, [refetchOrders]);
+    if (user?.email) {
+      refetchOrders();
+      const interval = setInterval(refetchOrders, 4000);
+      const handleFocus = () => refetchOrders();
+      window.addEventListener("focus", handleFocus);
+      return () => {
+        clearInterval(interval);
+        window.removeEventListener("focus", handleFocus);
+      };
+    } else {
+      setOrders([]);
+    }
+  }, [refetchOrders, user?.email]);
 
-  const login = (email: string) => {
-    setUser({
-      ...DEFAULT_USER,
-      email,
-      name: email.split("@")[0].replace(".", " ").replace(/(^\w|\s\w)/g, (m) => m.toUpperCase()),
-    });
-    showToast("Welcome back! ✨", "You are now logged in to KNOTELLE.", "success");
+  const login = (email: string, userData?: Partial<UserProfile>, token?: string) => {
+    const nameToUse = userData?.name || email.split("@")[0].replace(".", " ").replace(/(^\w|\s\w)/g, (m) => m.toUpperCase());
+    const newUser: UserProfile = {
+      name: nameToUse,
+      email: email,
+      phone: userData?.phone || "+91 98765 43210",
+      avatar: userData?.avatar || "",
+      addresses: userData?.addresses || [
+        {
+          id: "addr-1",
+          fullName: nameToUse,
+          email: email,
+          phone: userData?.phone || "+91 98765 43210",
+          addressLine1: "Flat 402, Rosewood Residency",
+          addressLine2: "12th Main, 4th Cross, Indiranagar",
+          city: "Bengaluru",
+          state: "Karnataka",
+          pincode: "560038",
+          country: "India",
+          isDefault: true,
+        },
+      ],
+    };
+
+    setUser(newUser);
+    if (typeof window !== "undefined") {
+      localStorage.setItem("knotelle_customer_user", JSON.stringify(newUser));
+      if (token) {
+        localStorage.setItem("knotelle_customer_token", token);
+      }
+    }
+    showToast("Welcome! ✨", "You are now logged in to KNOTELLE.", "success");
   };
 
   const logout = () => {
     setUser(null);
+    if (typeof window !== "undefined") {
+      localStorage.removeItem("knotelle_customer_user");
+      localStorage.removeItem("knotelle_customer_token");
+    }
     showToast("Logged out", "You have been signed out.", "info");
   };
 

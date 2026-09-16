@@ -127,6 +127,11 @@ class OrderController extends Controller
             $oldStatus = $order->status;
             $order->status = $validated['status'];
 
+            // Sync payment status when refunded
+            if ($validated['status'] === 'refunded') {
+                $order->payment_status = 'refunded';
+            }
+
             // Set timestamps based on status
             switch ($validated['status']) {
                 case 'confirmed':
@@ -191,6 +196,12 @@ class OrderController extends Controller
 
             $oldPaymentStatus = $order->payment_status;
             $order->payment_status = $validated['payment_status'];
+
+            // Sync order status when payment is set to refunded
+            if ($validated['payment_status'] === 'refunded') {
+                $order->status = 'refunded';
+            }
+
             $order->save();
 
             DB::commit();

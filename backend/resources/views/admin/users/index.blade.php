@@ -186,12 +186,9 @@
     };
 
     // Helper function to replace route parameters
-    function getRoute(routeName, params) {
-        let url = routeTemplates[routeName];
-        for (const key in params) {
-            url = url.replace(`:${key}`, params[key]);
-        }
-        return url;
+    function getRoute(routeName, id) {
+        let url = routeTemplates[routeName] || '';
+        return url.replace(/%3Aid|%253Aid|:id/gi, id);
     }
 
     let currentPage = 1;
@@ -572,7 +569,7 @@
     function viewCustomer(id) {
         showLoading();
 
-        const url = routeTemplates.view.replace(':id', id);
+        const url = getRoute('view', id);
 
         fetch(url, {
             headers: {
@@ -658,8 +655,7 @@
     }
 
     function editCustomer(id) {
-        // Using route template with parameter replacement
-        const editUrl = routeTemplates.edit.replace(':id', id);
+        const editUrl = getRoute('edit', id);
         window.location.href = editUrl;
     }
 
@@ -679,7 +675,7 @@
             if (result.isConfirmed) {
                 showLoading();
 
-                const url = routeTemplates.toggleBlock.replace(':id', id);
+                const url = getRoute('toggleBlock', id);
                 fetch(url, {
                     method: 'POST',
                     headers: {
@@ -726,7 +722,7 @@
             if (result.isConfirmed) {
                 showLoading();
 
-                const url = routeTemplates.destroy.replace(':id', id);
+                const url = getRoute('destroy', id);
                 fetch(url, {
                     method: 'DELETE',
                     headers: {

@@ -294,13 +294,29 @@ class OrderController extends Controller
 
             $grandTotal = $subtotal - $discountTotal + $shippingTotal + $totalTaxAmount;
 
-            // Associate customer ID if authenticated or matching email found
+            // Associate customer ID if authenticated or matching email found (or create new customer profile)
             $customerId = auth('customer_api')->id();
             $customerEmail = $request->shipping_address['email'] ?? null;
+            $customerName = $request->shipping_address['name'] ?? 'Customer';
+            $customerPhone = $request->shipping_address['phone'] ?? null;
+
             if (!$customerId && $customerEmail) {
                 $existingCust = \App\Models\Customer::where('email', $customerEmail)->first();
                 if ($existingCust) {
                     $customerId = $existingCust->id;
+                } else {
+                    try {
+                        $newCust = \App\Models\Customer::create([
+                            'name' => $customerName,
+                            'email' => $customerEmail,
+                            'mobile' => $customerPhone,
+                            'password' => \Illuminate\Support\Facades\Hash::make(\Illuminate\Support\Str::random(12)),
+                            'status' => true,
+                        ]);
+                        $customerId = $newCust->id;
+                    } catch (\Exception $e) {
+                        Log::warning('Customer auto-create on order placement fallback:', ['error' => $e->getMessage()]);
+                    }
                 }
             }
 

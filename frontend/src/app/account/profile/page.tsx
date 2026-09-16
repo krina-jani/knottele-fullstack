@@ -7,11 +7,11 @@ import { User, Mail, Phone, Lock, CheckCircle2 } from "lucide-react";
 export default function ProfilePage() {
   const { user, updateProfile } = useAuth();
 
-  const nameParts = (user?.name || "Ananya Sharma").split(" ");
-  const [firstName, setFirstName] = useState(nameParts[0] || "Ananya");
-  const [lastName, setLastName] = useState(nameParts.slice(1).join(" ") || "Sharma");
-  const [email, setEmail] = useState(user?.email || "ananya.sharma@example.com");
-  const [phone, setPhone] = useState(user?.phone || "+91 98765 43210");
+  const nameParts = (user?.name || "").split(" ");
+  const [firstName, setFirstName] = useState(nameParts[0] || "");
+  const [lastName, setLastName] = useState(nameParts.slice(1).join(" ") || "");
+  const [email, setEmail] = useState(user?.email || "");
+  const [phone, setPhone] = useState(user?.phone || "");
   const [currentPassword, setCurrentPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
 

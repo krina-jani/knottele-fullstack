@@ -730,6 +730,78 @@ export async function submitOrder(
 }
 
 /**
+ * Register Customer to Laravel Backend API
+ */
+export async function registerCustomer(payload: {
+  name: string;
+  email: string;
+  password: string;
+  mobile?: string;
+}): Promise<{ success: boolean; token?: string; user?: any; message?: string }> {
+  try {
+    const response = await fetch(`${getApiBaseUrl()}/customer/register`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Accept: "application/json",
+      },
+      body: JSON.stringify(payload),
+    });
+    const result = await response.json();
+    if (response.ok && result.success) {
+      return {
+        success: true,
+        token: result.token,
+        user: result.user,
+        message: result.message || "Registration successful!",
+      };
+    }
+    return {
+      success: false,
+      message: result.message || (result.errors ? Object.values(result.errors).flat().join(", ") : "Registration failed."),
+    };
+  } catch (error) {
+    console.warn("Register customer error:", error);
+    return { success: false, message: "Connection error. Please try again." };
+  }
+}
+
+/**
+ * Login Customer to Laravel Backend API
+ */
+export async function loginCustomer(payload: {
+  email: string;
+  password: string;
+}): Promise<{ success: boolean; token?: string; user?: any; message?: string }> {
+  try {
+    const response = await fetch(`${getApiBaseUrl()}/customer/login`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Accept: "application/json",
+      },
+      body: JSON.stringify(payload),
+    });
+    const result = await response.json();
+    if (response.ok && result.success) {
+      return {
+        success: true,
+        token: result.token,
+        user: result.user,
+        message: result.message || "Login successful!",
+      };
+    }
+    return {
+      success: false,
+      message: result.message || "Invalid email or password.",
+    };
+  } catch (error) {
+    console.warn("Login customer error:", error);
+    return { success: false, message: "Connection error. Please try again." };
+  }
+}
+
+/**
  * Fetch Structured Homepage & Global Media (Always Live in Browser, Static-friendly on Server)
  */
 export async function fetchHomepageMedia(): Promise<HomepageMedia | null> {

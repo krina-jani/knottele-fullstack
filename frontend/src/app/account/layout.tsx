@@ -16,6 +16,7 @@ import {
 import { useAuth } from "@/context/AuthContext";
 import { useWishlist } from "@/context/WishlistContext";
 import { Breadcrumbs } from "@/components/ui/Breadcrumbs";
+import { AuthCard } from "@/components/auth/AuthCard";
 
 export default function AccountLayout({
   children,
@@ -25,6 +26,14 @@ export default function AccountLayout({
   const pathname = usePathname();
   const { user, logout } = useAuth();
   const { wishlistCount } = useWishlist();
+
+  if (!user) {
+    return (
+      <div className="bg-[#FFF9F6] min-h-screen py-8 lg:py-16 flex items-center justify-center px-4">
+        <AuthCard defaultMode="signup" onSuccessRedirect="/account" />
+      </div>
+    );
+  }
 
   const navItems = [
     { name: "Overview", href: "/account", icon: LayoutDashboard },
@@ -54,15 +63,21 @@ export default function AccountLayout({
             
             {/* User Greeting Card */}
             <div className="flex items-center gap-4 pb-6 border-b border-[#E7D1CC]">
-              <div className="relative w-14 h-14 rounded-full overflow-hidden border-2 border-[#913638] shrink-0 bg-[#FFF9F6]">
-                <Image
-                  src={user?.avatar || "https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=80&w=200&auto=format&fit=crop"}
-                  alt={user?.name || "User"}
-                  fill
-                  sizes="56px"
-                  className="object-cover"
-                />
-              </div>
+              {user?.avatar && !user.avatar.includes("unsplash.com") ? (
+                <div className="relative w-14 h-14 rounded-full overflow-hidden border-2 border-[#913638] shrink-0 bg-[#FFF9F6]">
+                  <Image
+                    src={user.avatar}
+                    alt={user?.name || "User"}
+                    fill
+                    sizes="56px"
+                    className="object-cover"
+                  />
+                </div>
+              ) : (
+                <div className="w-14 h-14 rounded-full bg-gradient-to-br from-[#913638] to-[#74292B] border-2 border-[#E7D1CC] shrink-0 flex items-center justify-center text-white font-serif-luxury font-bold text-xl shadow-sm uppercase">
+                  {(user?.name || "K").charAt(0)}
+                </div>
+              )}
               <div className="min-w-0">
                 <div className="flex items-center gap-1.5">
                   <span className="text-[10px] uppercase font-bold text-[#913638] tracking-wider bg-[#FCE9E5] px-2.5 py-0.5 rounded-full">
@@ -70,9 +85,9 @@ export default function AccountLayout({
                   </span>
                 </div>
                 <h3 className="font-serif-luxury text-lg font-bold text-[#2E211E] truncate mt-1">
-                  {user?.name || "Ananya Sharma"}
+                  {user?.name || "Member"}
                 </h3>
-                <p className="text-xs text-[#786864] truncate">{user?.email || "ananya@example.com"}</p>
+                <p className="text-xs text-[#786864] truncate">{user?.email || ""}</p>
               </div>
             </div>
 
