@@ -165,18 +165,6 @@ $navItems = [
         'route' => 'admin.reviews.index',
     ],
 
-    'testimonials' => [
-        'title' => 'Testimonials',
-        'icon' => 'fas fa-quote-right',
-        'route' => 'admin.testimonials.index',
-    ],
-
-    'contact_messages' => [
-        'title' => 'Contact Msgs',
-        'icon' => 'fas fa-envelope',
-        'route' => 'admin.contact-messages.index',
-    ],
-
     'settings' => [
         'title' => 'Settings',
         'icon' => 'fas fa-cog',

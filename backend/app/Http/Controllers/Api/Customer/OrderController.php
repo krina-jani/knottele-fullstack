@@ -182,6 +182,9 @@ class OrderController extends Controller
 
             'payment_method' => 'required|string|in:razorpay,online,upi,card,netbanking,cod',
             'offer_code' => 'nullable|string',
+            'discount_total' => 'nullable|numeric',
+            'discount_amount' => 'nullable|numeric',
+            'discount' => 'nullable|numeric',
         ]);
 
         try {
@@ -255,22 +258,37 @@ class OrderController extends Controller
             $discountTotal = 0;
             $appliedOfferId = null;
             if ($request->filled('offer_code')) {
-                $offer = Offer::active()->where('code', $request->offer_code)->first();
+                $code = trim($request->offer_code);
+                $offer = Offer::active()
+                    ->where(function ($q) use ($code) {
+                        $q->where('code', $code)
+                          ->orWhereRaw('LOWER(code) = ?', [strtolower($code)]);
+                    })
+                    ->first();
+
                 if ($offer && (!$offer->min_cart_amount || $subtotal >= $offer->min_cart_amount)) {
                     if (!$offer->max_uses || $offer->used_count < $offer->max_uses) {
                         if ($offer->offer_type === 'percentage') {
-                            $discountTotal = ($subtotal * $offer->discount_value) / 100;
+                            $discountTotal = ($subtotal * (float) $offer->discount_value) / 100;
                             if ($offer->max_discount && $discountTotal > $offer->max_discount) {
-                                $discountTotal = $offer->max_discount;
+                                $discountTotal = (float) $offer->max_discount;
                             }
                         } elseif ($offer->offer_type === 'fixed') {
-                            $discountTotal = $offer->discount_value;
+                            $discountTotal = (float) $offer->discount_value;
                         }
                         if ($discountTotal > $subtotal) {
                             $discountTotal = $subtotal;
                         }
                         $appliedOfferId = $offer->id;
                     }
+                }
+            }
+
+            // Fallback: If discount value is explicitly sent from frontend
+            if ($discountTotal == 0 && ($request->filled('discount_total') || $request->filled('discount_amount') || $request->filled('discount'))) {
+                $discountTotal = (float) ($request->discount_total ?? $request->discount_amount ?? $request->discount ?? 0);
+                if ($discountTotal > $subtotal) {
+                    $discountTotal = $subtotal;
                 }
             }
 

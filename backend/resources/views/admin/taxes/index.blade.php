@@ -229,13 +229,13 @@
                     </button>
                 </div>
 
-                <form id="taxRateForm">
+                <form id="taxRateForm" novalidate>
                     <input type="hidden" id="taxRateId" name="id">
 
                     <div class="space-y-4">
                         <div>
                             <label class="block text-sm font-medium text-stone-700 mb-1">Tax Name *</label>
-                            <input type="text" id="taxRateName" name="name" required
+                            <input type="text" id="taxRateName" name="name"
                                 class="w-full border border-stone-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent"
                                 placeholder="e.g., GST, SGST, CGST">
                         </div>
@@ -258,7 +258,7 @@
                         <div class="grid grid-cols-2 gap-4">
                             <div>
                                 <label class="block text-sm font-medium text-stone-700 mb-1">Rate (%) *</label>
-                                <input type="number" id="taxRateRate" name="rate" required step="0.01"
+                                <input type="number" id="taxRateRate" name="rate" step="0.01"
                                     min="0" max="100"
                                     class="w-full border border-stone-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent"
                                     placeholder="18.00">
@@ -266,7 +266,7 @@
 
                             <div>
                                 <label class="block text-sm font-medium text-stone-700 mb-1">Type *</label>
-                                <select id="taxRateType" name="type" required
+                                <select id="taxRateType" name="type"
                                     class="w-full border border-stone-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent">
                                     <option value="">Select Type</option>
                                 </select>
@@ -276,7 +276,7 @@
                         <div class="grid grid-cols-2 gap-4">
                             <div>
                                 <label class="block text-sm font-medium text-stone-700 mb-1">Scope *</label>
-                                <select id="taxRateScope" name="scope" required onchange="toggleTaxRateState()"
+                                <select id="taxRateScope" name="scope" onchange="toggleTaxRateState()"
                                     class="w-full border border-stone-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent">
                                     <option value="">Select Scope</option>
                                 </select>
@@ -356,13 +356,13 @@
                     </button>
                 </div>
 
-                <form id="taxClassForm">
+                <form id="taxClassForm" novalidate>
                     <input type="hidden" id="taxClassId" name="id">
 
                     <div class="space-y-4">
                         <div>
                             <label class="block text-sm font-medium text-stone-700 mb-1">Class Name *</label>
-                            <input type="text" id="taxClassName" name="name" required
+                            <input type="text" id="taxClassName" name="name"
                                 class="w-full border border-stone-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent"
                                 placeholder="e.g., Standard, Reduced, Zero">
                         </div>

@@ -133,7 +133,7 @@
                 </button>
             </div>
 
-            <form id="categoryForm">
+            <form id="categoryForm" novalidate>
                 <input type="hidden" id="categoryId" name="id">
 
                 <div class="space-y-6">
@@ -160,14 +160,14 @@
                         <div>
                             <label for="name" class="block text-sm font-medium text-stone-700 mb-1">Category Name
                                 *</label>
-                            <input type="text" id="name" name="name" required
+                            <input type="text" id="name" name="name"
                                 class="w-full border border-stone-300 rounded-lg px-4 py-2 focus:ring-red-500 focus:border-red-500 text-stone-900">
                             <div id="nameError" class="hidden mt-1 text-sm text-rose-600"></div>
                         </div>
 
                         <div>
                             <label for="slug" class="block text-sm font-medium text-stone-700 mb-1">Slug *</label>
-                            <input type="text" id="slug" name="slug" required
+                            <input type="text" id="slug" name="slug"
                                 class="w-full border border-stone-300 rounded-lg px-4 py-2 focus:ring-red-500 focus:border-red-500 text-stone-900">
                             <div id="slugError" class="hidden mt-1 text-sm text-rose-600"></div>
                         </div>

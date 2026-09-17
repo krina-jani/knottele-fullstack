@@ -188,8 +188,8 @@ export default function CheckoutPage() {
       showToast("Missing City", "Please enter your city.", "error");
       return;
     }
-    if (!cleanPin) {
-      showToast("Missing Pincode", "Please enter your 6-digit postal pincode.", "error");
+    if (!cleanPin || cleanPin.length !== 6 || !/^\d{6}$/.test(cleanPin)) {
+      showToast("Invalid Pincode", "Please enter a valid 6-digit postal pincode (digits only).", "error");
       return;
     }
 
@@ -278,6 +278,7 @@ export default function CheckoutPage() {
                 payment_method: "razorpay",
                 payment_status: "paid",
                 offer_code: promoCode || undefined,
+                discount_total: discount || 0,
               });
 
               if (!res || !res.success) {
@@ -384,6 +385,7 @@ export default function CheckoutPage() {
         },
         payment_method: "cod",
         offer_code: promoCode || undefined,
+        discount_total: discount || 0,
       });
 
       if (!res || !res.success) {
@@ -910,9 +912,14 @@ export default function CheckoutPage() {
                         </label>
                         <input
                           type="text"
+                          required
+                          inputMode="numeric"
+                          pattern="[0-9]{6}"
+                          maxLength={6}
                           value={pincode}
                           onChange={(e) => {
-                            setPincode(e.target.value);
+                            const val = e.target.value.replace(/\D/g, "").slice(0, 6);
+                            setPincode(val);
                             if (selectedAddressId !== "new") setSelectedAddressId("new");
                           }}
                           placeholder="6-digit Pincode"
@@ -933,8 +940,9 @@ export default function CheckoutPage() {
                     <button
                       type="button"
                       onClick={() => {
-                        if (!addressLine1.trim() || !city.trim() || !pincode.trim()) {
-                          showToast("Missing Address Fields", "Please complete required street, city, and pincode.", "error");
+                        const cleanPin = pincode.replace(/\D/g, "").slice(0, 6);
+                        if (!addressLine1.trim() || !city.trim() || cleanPin.length !== 6 || !/^\d{6}$/.test(cleanPin)) {
+                          showToast("Invalid Address or Pincode", "Please enter valid street address, city, and a 6-digit numeric pincode.", "error");
                           return;
                         }
                         // Save address to user's database if it's new
@@ -947,7 +955,7 @@ export default function CheckoutPage() {
                             addressLine2: addressLine2.trim(),
                             city: city.trim(),
                             state: state.trim() || "Gujarat",
-                            pincode: pincode.trim(),
+                            pincode: cleanPin,
                             country: "India",
                           });
                         }

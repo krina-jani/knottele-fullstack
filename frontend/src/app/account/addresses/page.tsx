@@ -163,8 +163,12 @@ export default function AddressesPage() {
               <input
                 type="text"
                 required
+                inputMode="numeric"
+                pattern="[0-9]{6}"
+                maxLength={6}
                 value={pincode}
-                onChange={(e) => setPincode(e.target.value)}
+                onChange={(e) => setPincode(e.target.value.replace(/\D/g, "").slice(0, 6))}
+                placeholder="6-digit Pincode"
                 className="w-full px-3 py-2 rounded-xl bg-white border border-[#E7D1CC] text-xs text-[#2E211E] focus:outline-none focus:border-[#913638] transition-colors"
               />
             </div>

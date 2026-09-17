@@ -173,7 +173,7 @@
                 </button>
             </div>
 
-            <form id="offerForm">
+            <form id="offerForm" novalidate>
                 <input type="hidden" id="offerId" name="id">
 
                 <div class="space-y-6 max-h-[70vh] overflow-y-auto pr-2">
@@ -181,7 +181,7 @@
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div>
                             <label for="name" class="block text-sm font-medium text-gray-700 mb-1">Offer Name *</label>
-                            <input type="text" id="name" name="name" required
+                            <input type="text" id="name" name="name"
                                 class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-indigo-500 focus:border-indigo-500">
                             <div id="nameError" class="hidden mt-1 text-sm text-rose-600"></div>
                         </div>

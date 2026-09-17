@@ -146,7 +146,7 @@
             </div>
 
             <!-- Form Wrapper -->
-            <form id="slotUploadForm" onsubmit="handleSlotUploadSubmit(event)" class="flex flex-col flex-1 min-h-0 overflow-hidden">
+            <form id="slotUploadForm" novalidate onsubmit="handleSlotUploadSubmit(event)" class="flex flex-col flex-1 min-h-0 overflow-hidden">
                 <input type="hidden" id="targetPage" name="page">
                 <input type="hidden" id="targetSection" name="section">
                 <input type="hidden" id="targetSlot" name="slot">
@@ -316,7 +316,7 @@
             </div>
 
             <!-- Form Wrapper -->
-            <form id="editMetadataForm" onsubmit="handleMetadataSubmit(event)" class="flex flex-col flex-1 min-h-0 overflow-hidden">
+            <form id="editMetadataForm" novalidate onsubmit="handleMetadataSubmit(event)" class="flex flex-col flex-1 min-h-0 overflow-hidden">
                 <input type="hidden" id="editMediaId">
                 <input type="hidden" id="editMediaPage">
                 <input type="hidden" id="editMediaSection">
@@ -757,7 +757,7 @@
                                     </span>
                                     <span class="text-[10px] text-stone-400 font-normal">Primary video title</span>
                                 </label>
-                                <input type="text" id="videoReelTitle" name="title" required placeholder="e.g. Crafting the Everlasting Sunflower" class="w-full bg-white border border-stone-200 rounded-xl px-4 py-2.5 text-sm font-bold text-stone-800 focus:outline-none focus:ring-2 focus:ring-red-500 transition-all shadow-2xs">
+                                <input type="text" id="videoReelTitle" name="title" placeholder="e.g. Crafting the Everlasting Sunflower" class="w-full bg-white border border-stone-200 rounded-xl px-4 py-2.5 text-sm font-bold text-stone-800 focus:outline-none focus:ring-2 focus:ring-red-500 transition-all shadow-2xs">
                                 <p class="text-[10px] text-stone-400 mt-1">If empty when selecting a video file, the file name will auto-populate as the title.</p>
                             </div>
 
@@ -774,7 +774,7 @@
                                     </div>
                                     <div>
                                         <label class="block text-xs font-bold text-stone-700 uppercase tracking-wider mb-1">Category / Label <span class="text-red-500">*</span></label>
-                                        <input type="text" id="videoReelCategory" name="category_name" required placeholder="e.g. Studio ASMR" class="w-full bg-white border border-stone-200 rounded-xl px-3.5 py-2 text-xs font-semibold text-stone-800 focus:outline-none focus:ring-2 focus:ring-red-500">
+                                        <input type="text" id="videoReelCategory" name="category_name" placeholder="e.g. Studio ASMR" class="w-full bg-white border border-stone-200 rounded-xl px-3.5 py-2 text-xs font-semibold text-stone-800 focus:outline-none focus:ring-2 focus:ring-red-500">
                                     </div>
                                 </div>
                                 <div class="flex flex-wrap gap-1.5 pt-0.5">
@@ -979,11 +979,11 @@
             </div>
 
             <!-- Form Wrapper -->
-            <form id="blogReelsSettingsForm" onsubmit="handleBlogReelsSettingsSubmit(event)" class="flex flex-col flex-1 min-h-0 overflow-hidden">
+            <form id="blogReelsSettingsForm" novalidate onsubmit="handleBlogReelsSettingsSubmit(event)" class="flex flex-col flex-1 min-h-0 overflow-hidden">
                 <div class="p-6 space-y-4 overflow-y-auto flex-1 overscroll-contain">
                     <div>
                         <label class="block text-xs font-bold text-stone-600 uppercase tracking-wider mb-1">Section Title <span class="text-red-500">*</span></label>
-                        <input type="text" id="blogReelsSettingsTitle" name="title" required value="Behind the Stitches" placeholder="e.g. Behind the Stitches" class="w-full bg-stone-50 border border-stone-200 rounded-xl px-3.5 py-2.5 text-sm font-semibold text-stone-800 focus:bg-white focus:outline-none focus:ring-2 focus:ring-red-500">
+                        <input type="text" id="blogReelsSettingsTitle" name="title" value="Behind the Stitches" placeholder="e.g. Behind the Stitches" class="w-full bg-stone-50 border border-stone-200 rounded-xl px-3.5 py-2.5 text-sm font-semibold text-stone-800 focus:bg-white focus:outline-none focus:ring-2 focus:ring-red-500">
                     </div>
 
                     <div>
@@ -1045,7 +1045,7 @@
             </div>
 
             <!-- Form Wrapper -->
-            <form id="aboutStoryForm" onsubmit="handleAboutStorySubmit(event)" class="flex flex-col flex-1 min-h-0 overflow-hidden">
+            <form id="aboutStoryForm" novalidate onsubmit="handleAboutStorySubmit(event)" class="flex flex-col flex-1 min-h-0 overflow-hidden">
                 <input type="hidden" id="aboutStoryDesktopUrl" name="desktop_image_url" value="">
                 <input type="hidden" id="aboutStoryMobileUrl" name="mobile_image_url" value="">
 
@@ -1060,11 +1060,11 @@
                         <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
                             <div>
                                 <label class="block text-xs font-bold text-stone-600 uppercase tracking-wider mb-1">Eyebrow Badge <span class="text-red-500">*</span></label>
-                                <input type="text" id="aboutStoryTagText" name="tag_text" required placeholder="e.g. The KNOTELLE Story" class="w-full bg-stone-50 border border-stone-200 rounded-xl px-3.5 py-2.5 text-sm font-semibold text-stone-800 focus:bg-white focus:outline-none focus:ring-2 focus:ring-red-500">
+                                <input type="text" id="aboutStoryTagText" name="tag_text" placeholder="e.g. The KNOTELLE Story" class="w-full bg-stone-50 border border-stone-200 rounded-xl px-3.5 py-2.5 text-sm font-semibold text-stone-800 focus:bg-white focus:outline-none focus:ring-2 focus:ring-red-500">
                             </div>
                             <div>
                                 <label class="block text-xs font-bold text-stone-600 uppercase tracking-wider mb-1">Main Headline Title <span class="text-red-500">*</span></label>
-                                <input type="text" id="aboutStoryTitle" name="title" required placeholder="e.g. Every Loop Tells a Story" class="w-full bg-stone-50 border border-stone-200 rounded-xl px-3.5 py-2.5 text-sm font-semibold text-stone-800 focus:bg-white focus:outline-none focus:ring-2 focus:ring-red-500">
+                                <input type="text" id="aboutStoryTitle" name="title" placeholder="e.g. Every Loop Tells a Story" class="w-full bg-stone-50 border border-stone-200 rounded-xl px-3.5 py-2.5 text-sm font-semibold text-stone-800 focus:bg-white focus:outline-none focus:ring-2 focus:ring-red-500">
                             </div>
                         </div>
 
@@ -1083,7 +1083,7 @@
 
                         <div>
                             <label class="block text-xs font-bold text-stone-600 uppercase tracking-wider mb-1">Paragraph 1 (Primary Narrative) <span class="text-red-500">*</span></label>
-                            <textarea id="aboutStoryDescription" name="description" rows="3" required placeholder="In a world flooded with disposable factory goods..." class="w-full bg-stone-50 border border-stone-200 rounded-xl px-3.5 py-2.5 text-sm font-semibold text-stone-800 focus:bg-white focus:outline-none focus:ring-2 focus:ring-red-500"></textarea>
+                            <textarea id="aboutStoryDescription" name="description" rows="3" placeholder="In a world flooded with disposable factory goods..." class="w-full bg-stone-50 border border-stone-200 rounded-xl px-3.5 py-2.5 text-sm font-semibold text-stone-800 focus:bg-white focus:outline-none focus:ring-2 focus:ring-red-500"></textarea>
                         </div>
 
                         <div>
@@ -1250,34 +1250,26 @@
                     </div>
                 </div>
                 <button type="button" onclick="closeCraftPillarsHeaderModal()" class="w-8 h-8 rounded-full bg-stone-100 text-stone-400 hover:text-stone-700 flex items-center justify-center transition-colors cursor-pointer">
-                    <i class="fas fa-times text-sm"></i>
-                </button>
-            </div>
-
-            <!-- Form Wrapper -->
-            <form id="craftPillarsHeaderForm" onsubmit="handleCraftPillarsHeaderSubmit(event)" class="flex flex-col flex-1 min-h-0 overflow-hidden">
+                          <!-- Form Wrapper -->
+            <form id="craftPillarsHeaderForm" novalidate onsubmit="handleCraftPillarsHeaderSubmit(event)" class="flex flex-col flex-1 min-h-0 overflow-hidden">
                 <div class="p-6 space-y-4 overflow-y-auto flex-1 overscroll-contain">
                     <div>
                         <label class="block text-xs font-bold text-stone-600 uppercase tracking-wider mb-1">Section Title <span class="text-red-500">*</span></label>
-                        <input type="text" id="craftPillarsHeaderTitle" name="title" required value="Our Craft Pillars" placeholder="e.g. Our Craft Pillars" class="w-full bg-stone-50 border border-stone-200 rounded-xl px-3.5 py-2.5 text-sm font-semibold text-stone-800 focus:bg-white focus:outline-none focus:ring-2 focus:ring-red-500">
+                        <input type="text" id="craftPillarsHeaderTitle" name="title" value="Our Craft Pillars" placeholder="e.g. Our Craft Pillars" class="w-full bg-stone-50 border border-stone-200 rounded-xl px-3.5 py-2.5 text-sm font-semibold text-stone-800 focus:bg-white focus:outline-none focus:ring-2 focus:ring-red-500">
                     </div>
-
                     <div>
                         <label class="block text-xs font-bold text-stone-600 uppercase tracking-wider mb-1">Eyebrow Badge Text</label>
                         <input type="text" id="craftPillarsHeaderTagText" name="tag_text" value="Artisan Standards" placeholder="e.g. Artisan Standards" class="w-full bg-stone-50 border border-stone-200 rounded-xl px-3.5 py-2.5 text-sm font-semibold text-stone-800 focus:bg-white focus:outline-none focus:ring-2 focus:ring-red-500">
                     </div>
-
                     <div>
                         <label class="block text-xs font-bold text-stone-600 uppercase tracking-wider mb-1">Section Subtitle / Description</label>
                         <textarea id="craftPillarsHeaderSubtitle" name="subtitle" rows="3" placeholder="Guiding principles behind every stitch we make..." class="w-full bg-stone-50 border border-stone-200 rounded-xl px-3.5 py-2.5 text-sm font-semibold text-stone-800 focus:bg-white focus:outline-none focus:ring-2 focus:ring-red-500">Guiding principles behind every stitch we make.</textarea>
                     </div>
-
                     <div class="flex items-center gap-2 pt-2">
                         <input type="checkbox" id="craftPillarsHeaderActive" name="is_active" checked class="w-4 h-4 rounded text-red-600 focus:ring-red-500">
                         <label for="craftPillarsHeaderActive" class="text-xs font-bold text-stone-700">Section Active (Visible on About Page)</label>
                     </div>
                 </div>
-
                 <!-- Sticky Footer with Action Buttons -->
                 <div class="p-4 px-6 bg-stone-50 border-t border-stone-100 shrink-0 flex items-center justify-end gap-3">
                     <button type="button" onclick="closeCraftPillarsHeaderModal()" class="btn-secondary text-xs px-5 py-2.5 cursor-pointer">Cancel</button>
@@ -1310,7 +1302,7 @@
             </div>
 
             <!-- Form Wrapper -->
-            <form id="craftPillarForm" onsubmit="handleCraftPillarSubmit(event)" class="flex flex-col flex-1 min-h-0 overflow-hidden">
+            <form id="craftPillarForm" novalidate onsubmit="handleCraftPillarSubmit(event)" class="flex flex-col flex-1 min-h-0 overflow-hidden">
                 <input type="hidden" id="craftPillarId" name="id" value="">
                 <input type="hidden" id="craftPillarIconName" name="icon_name" value="Leaf">
                 <input type="hidden" id="craftPillarIconType" name="icon_type" value="preset">
@@ -1318,12 +1310,13 @@
                 <div class="p-6 space-y-4 overflow-y-auto flex-1 overscroll-contain">
                     <div>
                         <label class="block text-xs font-bold text-stone-600 uppercase tracking-wider mb-1">Pillar Title <span class="text-red-500">*</span></label>
-                        <input type="text" id="craftPillarTitle" name="title" required placeholder="e.g. Natural Materials" class="w-full bg-stone-50 border border-stone-200 rounded-xl px-3.5 py-2.5 text-sm font-semibold text-stone-800 focus:bg-white focus:outline-none focus:ring-2 focus:ring-red-500">
+                        <input type="text" id="craftPillarTitle" name="title" placeholder="e.g. Natural Materials" class="w-full bg-stone-50 border border-stone-200 rounded-xl px-3.5 py-2.5 text-sm font-semibold text-stone-800 focus:bg-white focus:outline-none focus:ring-2 focus:ring-red-500">
                     </div>
 
                     <div>
                         <label class="block text-xs font-bold text-stone-600 uppercase tracking-wider mb-1">Pillar Description <span class="text-red-500">*</span></label>
-                        <textarea id="craftPillarDescription" name="description" rows="3" required placeholder="We use 100% pure milk cotton and mercerized organic fibers..." class="w-full bg-stone-50 border border-stone-200 rounded-xl px-3.5 py-2.5 text-sm font-semibold text-stone-800 focus:bg-white focus:outline-none focus:ring-2 focus:ring-red-500"></textarea>
+                        <textarea id="craftPillarDescription" name="description" rows="3" placeholder="We use 100% pure milk cotton and mercerized organic fibers..." class="w-full bg-stone-50 border border-stone-200 rounded-xl px-3.5 py-2.5 text-sm font-semibold text-stone-800 focus:bg-white focus:outline-none focus:ring-2 focus:ring-red-500"></textarea>
+                    </div>ocus:outline-none focus:ring-2 focus:ring-red-500"></textarea>
                     </div>
 
                     <!-- Icon Selector -->
@@ -1619,7 +1612,7 @@
             </div>
 
             <!-- Form Wrapper -->
-            <form id="contactInfoHeaderForm" onsubmit="handleContactInfoHeaderSubmit(event)" class="flex flex-col flex-1 min-h-0 overflow-hidden">
+            <form id="contactInfoHeaderForm" novalidate onsubmit="handleContactInfoHeaderSubmit(event)" class="flex flex-col flex-1 min-h-0 overflow-hidden">
                 <div class="p-6 space-y-4 overflow-y-auto flex-1 overscroll-contain">
                     <div>
                         <label class="block text-xs font-bold text-stone-600 uppercase tracking-wider mb-1">Studio Eyebrow Badge</label>
@@ -1628,7 +1621,7 @@
 
                     <div>
                         <label class="block text-xs font-bold text-stone-600 uppercase tracking-wider mb-1">Studio Name / Headline <span class="text-red-500">*</span></label>
-                        <input type="text" id="contactInfoTitleInput" name="title" required value="KNOTELLE Studio" placeholder="e.g. KNOTELLE Studio" class="w-full bg-stone-50 border border-stone-200 rounded-xl px-3.5 py-2.5 text-sm font-semibold text-stone-800 focus:bg-white focus:outline-none focus:ring-2 focus:ring-red-500">
+                        <input type="text" id="contactInfoTitleInput" name="title" value="KNOTELLE Studio" placeholder="e.g. KNOTELLE Studio" class="w-full bg-stone-50 border border-stone-200 rounded-xl px-3.5 py-2.5 text-sm font-semibold text-stone-800 focus:bg-white focus:outline-none focus:ring-2 focus:ring-red-500">
                     </div>
 
                     <div>
@@ -1705,19 +1698,19 @@
             </div>
 
             <!-- Form Wrapper -->
-            <form id="contactInfoItemForm" onsubmit="handleContactInfoItemSubmit(event)" class="flex flex-col flex-1 min-h-0 overflow-hidden">
+            <form id="contactInfoItemForm" novalidate onsubmit="handleContactInfoItemSubmit(event)" class="flex flex-col flex-1 min-h-0 overflow-hidden">
                 <input type="hidden" id="contactInfoItemId" name="id" value="">
                 <input type="hidden" id="contactInfoItemIcon" name="icon" value="MapPin">
 
                 <div class="p-6 space-y-4 overflow-y-auto flex-1 overscroll-contain">
                     <div>
                         <label class="block text-xs font-bold text-stone-600 uppercase tracking-wider mb-1">Title / Label <span class="text-red-500">*</span></label>
-                        <input type="text" id="contactInfoItemTitle" name="title" required placeholder="e.g. Visit Our Studio, Call / WhatsApp Us, Write to Us" class="w-full bg-stone-50 border border-stone-200 rounded-xl px-3.5 py-2.5 text-sm font-semibold text-stone-800 focus:bg-white focus:outline-none focus:ring-2 focus:ring-red-500">
+                        <input type="text" id="contactInfoItemTitle" name="title" placeholder="e.g. Visit Our Studio, Call / WhatsApp Us, Write to Us" class="w-full bg-stone-50 border border-stone-200 rounded-xl px-3.5 py-2.5 text-sm font-semibold text-stone-800 focus:bg-white focus:outline-none focus:ring-2 focus:ring-red-500">
                     </div>
 
                     <div>
                         <label class="block text-xs font-bold text-stone-600 uppercase tracking-wider mb-1">Primary Value / Line 1 <span class="text-red-500">*</span></label>
-                        <input type="text" id="contactInfoItemValue" name="value" required placeholder="e.g. +91 98765 43210, hello@knotelle.com, 12th Main Road" class="w-full bg-stone-50 border border-stone-200 rounded-xl px-3.5 py-2.5 text-sm font-semibold text-stone-800 focus:bg-white focus:outline-none focus:ring-2 focus:ring-red-500">
+                        <input type="text" id="contactInfoItemValue" name="value" placeholder="e.g. +91 98765 43210, hello@knotelle.com, 12th Main Road" class="w-full bg-stone-50 border border-stone-200 rounded-xl px-3.5 py-2.5 text-sm font-semibold text-stone-800 focus:bg-white focus:outline-none focus:ring-2 focus:ring-red-500">
                     </div>
 
                     <div>
@@ -1825,7 +1818,7 @@
             </div>
 
             <!-- Form Wrapper -->
-            <form id="contactFormSettingsForm" onsubmit="handleContactFormSubmit(event)" class="flex flex-col flex-1 min-h-0 overflow-hidden">
+            <form id="contactFormSettingsForm" novalidate onsubmit="handleContactFormSubmit(event)" class="flex flex-col flex-1 min-h-0 overflow-hidden">
                 <div class="p-6 space-y-5 overflow-y-auto flex-1 overscroll-contain">
                     <!-- Headings Group -->
                     <div class="space-y-3">
@@ -1841,7 +1834,7 @@
                             </div>
                             <div>
                                 <label class="block text-xs font-bold text-stone-600 uppercase tracking-wider mb-1">Section Title <span class="text-red-500">*</span></label>
-                                <input type="text" id="contactFormTitle" name="title" required value="Send Us a Message" placeholder="e.g. Send Us a Message" class="w-full bg-stone-50 border border-stone-200 rounded-xl px-3.5 py-2.5 text-sm font-semibold text-stone-800 focus:bg-white focus:outline-none focus:ring-2 focus:ring-red-500">
+                                <input type="text" id="contactFormTitle" name="title" value="Send Us a Message" placeholder="e.g. Send Us a Message" class="w-full bg-stone-50 border border-stone-200 rounded-xl px-3.5 py-2.5 text-sm font-semibold text-stone-800 focus:bg-white focus:outline-none focus:ring-2 focus:ring-red-500">
                             </div>
                         </div>
 
@@ -1852,7 +1845,7 @@
                             </div>
                             <div>
                                 <label class="block text-xs font-bold text-stone-600 uppercase tracking-wider mb-1">Submit Button Text <span class="text-red-500">*</span></label>
-                                <input type="text" id="contactFormCtaText" name="cta_text" required value="Send Message" placeholder="e.g. Send Message" class="w-full bg-stone-50 border border-stone-200 rounded-xl px-3.5 py-2.5 text-sm font-semibold text-stone-800 focus:bg-white focus:outline-none focus:ring-2 focus:ring-red-500">
+                                <input type="text" id="contactFormCtaText" name="cta_text" value="Send Message" placeholder="e.g. Send Message" class="w-full bg-stone-50 border border-stone-200 rounded-xl px-3.5 py-2.5 text-sm font-semibold text-stone-800 focus:bg-white focus:outline-none focus:ring-2 focus:ring-red-500">
                             </div>
                         </div>
                     </div>
@@ -2004,12 +1997,8 @@
                     </div>
                 </div>
                 <button type="button" onclick="closeContactFaqsHeaderModal()" class="w-8 h-8 rounded-full bg-stone-100 text-stone-400 hover:text-stone-700 flex items-center justify-center transition-colors cursor-pointer">
-                    <i class="fas fa-times text-sm"></i>
-                </button>
-            </div>
-
-            <!-- Form Wrapper -->
-            <form id="contactFaqsHeaderForm" onsubmit="handleContactFaqsHeaderSubmit(event)" class="flex flex-col flex-1 min-h-0 overflow-hidden">
+                     <!-- Form Wrapper -->
+            <form id="contactFaqsHeaderForm" novalidate onsubmit="handleContactFaqsHeaderSubmit(event)" class="flex flex-col flex-1 min-h-0 overflow-hidden">
                 <div class="p-6 space-y-4 overflow-y-auto flex-1 overscroll-contain">
                     <div>
                         <label class="block text-xs font-bold text-stone-600 uppercase tracking-wider mb-1">Eyebrow Badge</label>
@@ -2018,9 +2007,8 @@
 
                     <div>
                         <label class="block text-xs font-bold text-stone-600 uppercase tracking-wider mb-1">Section Title <span class="text-red-500">*</span></label>
-                        <input type="text" id="contactFaqsHeaderTitle" name="title" required value="Frequently Asked Questions" placeholder="e.g. Frequently Asked Questions" class="w-full bg-stone-50 border border-stone-200 rounded-xl px-3.5 py-2.5 text-sm font-semibold text-stone-800 focus:bg-white focus:outline-none focus:ring-2 focus:ring-red-500">
+                        <input type="text" id="contactFaqsHeaderTitle" name="title" value="Frequently Asked Questions" placeholder="e.g. Frequently Asked Questions" class="w-full bg-stone-50 border border-stone-200 rounded-xl px-3.5 py-2.5 text-sm font-semibold text-stone-800 focus:bg-white focus:outline-none focus:ring-2 focus:ring-red-500">
                     </div>
-
                     <div>
                         <label class="block text-xs font-bold text-stone-600 uppercase tracking-wider mb-1">Section Subtitle / Help Text</label>
                         <textarea id="contactFaqsHeaderSubtitle" name="subtitle" rows="3" placeholder="Quick answers about our handmade creations, custom orders, and delivery..." class="w-full bg-stone-50 border border-stone-200 rounded-xl px-3.5 py-2.5 text-sm font-semibold text-stone-800 focus:bg-white focus:outline-none focus:ring-2 focus:ring-red-500">Quick answers about our handmade creations, custom orders, and delivery.</textarea>
@@ -2064,18 +2052,19 @@
             </div>
 
             <!-- Form Wrapper -->
-            <form id="contactFaqForm" onsubmit="handleContactFaqSubmit(event)" class="flex flex-col flex-1 min-h-0 overflow-hidden">
+            <form id="contactFaqForm" novalidate onsubmit="handleContactFaqSubmit(event)" class="flex flex-col flex-1 min-h-0 overflow-hidden">
                 <input type="hidden" id="contactFaqId" name="id" value="">
 
                 <div class="p-6 space-y-4 overflow-y-auto flex-1 overscroll-contain">
                     <div>
                         <label class="block text-xs font-bold text-stone-600 uppercase tracking-wider mb-1">Question <span class="text-red-500">*</span></label>
-                        <input type="text" id="contactFaqQuestion" name="question" required placeholder="e.g. How long does a custom order take?" class="w-full bg-stone-50 border border-stone-200 rounded-xl px-3.5 py-2.5 text-sm font-semibold text-stone-800 focus:bg-white focus:outline-none focus:ring-2 focus:ring-red-500">
+                        <input type="text" id="contactFaqQuestion" name="question" placeholder="e.g. How long does a custom order take?" class="w-full bg-stone-50 border border-stone-200 rounded-xl px-3.5 py-2.5 text-sm font-semibold text-stone-800 focus:bg-white focus:outline-none focus:ring-2 focus:ring-red-500">
                     </div>
 
                     <div>
                         <label class="block text-xs font-bold text-stone-600 uppercase tracking-wider mb-1">Answer <span class="text-red-500">*</span></label>
-                        <textarea id="contactFaqAnswer" name="answer" rows="4" required placeholder="e.g. Custom orders usually take 7–14 working days depending on complexity..." class="w-full bg-stone-50 border border-stone-200 rounded-xl px-3.5 py-2.5 text-sm font-semibold text-stone-800 focus:bg-white focus:outline-none focus:ring-2 focus:ring-red-500"></textarea>
+                        <textarea id="contactFaqAnswer" name="answer" rows="4" placeholder="e.g. Custom orders usually take 7–14 working days depending on complexity..." class="w-full bg-stone-50 border border-stone-200 rounded-xl px-3.5 py-2.5 text-sm font-semibold text-stone-800 focus:bg-white focus:outline-none focus:ring-2 focus:ring-red-500"></textarea>
+                    </div>white focus:outline-none focus:ring-2 focus:ring-red-500"></textarea>
                     </div>
 
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5 pt-1">
@@ -2125,7 +2114,7 @@
             </div>
 
             <!-- Form Wrapper -->
-            <form id="customCrochetForm" onsubmit="handleCustomCrochetSubmit(event)" class="flex flex-col flex-1 min-h-0 overflow-hidden">
+            <form id="customCrochetForm" novalidate onsubmit="handleCustomCrochetSubmit(event)" class="flex flex-col flex-1 min-h-0 overflow-hidden">
                 <input type="hidden" id="customCrochetImageUrl" name="image_url" value="">
 
                 <div class="p-6 space-y-5 overflow-y-auto flex-1 overscroll-contain">
@@ -2139,7 +2128,7 @@
                         <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
                             <div>
                                 <label class="block text-xs font-bold text-stone-600 uppercase tracking-wider mb-1">Main Headline <span class="text-red-500">*</span></label>
-                                <input type="text" id="customCrochetTitle" name="title" required placeholder="e.g. Custom Crochet" class="w-full bg-stone-50 border border-stone-200 rounded-xl px-3.5 py-2.5 text-sm font-semibold text-stone-800 focus:bg-white focus:outline-none focus:ring-2 focus:ring-red-500">
+                                <input type="text" id="customCrochetTitle" name="title" placeholder="e.g. Custom Crochet" class="w-full bg-stone-50 border border-stone-200 rounded-xl px-3.5 py-2.5 text-sm font-semibold text-stone-800 focus:bg-white focus:outline-none focus:ring-2 focus:ring-red-500">
                             </div>
                             <div>
                                 <label class="block text-xs font-bold text-stone-600 uppercase tracking-wider mb-1">Italic Highlight Subtitle</label>
@@ -2149,7 +2138,7 @@
 
                         <div>
                             <label class="block text-xs font-bold text-stone-600 uppercase tracking-wider mb-1">Description Narrative <span class="text-red-500">*</span></label>
-                            <textarea id="customCrochetDescription" name="description" rows="2" required placeholder="e.g. Your imagination, our yarn. Let's create something special together." class="w-full bg-stone-50 border border-stone-200 rounded-xl px-3.5 py-2.5 text-sm font-semibold text-stone-800 focus:bg-white focus:outline-none focus:ring-2 focus:ring-red-500"></textarea>
+                            <textarea id="customCrochetDescription" name="description" rows="2" placeholder="e.g. Your imagination, our yarn. Let's create something special together." class="w-full bg-stone-50 border border-stone-200 rounded-xl px-3.5 py-2.5 text-sm font-semibold text-stone-800 focus:bg-white focus:outline-none focus:ring-2 focus:ring-red-500"></textarea>
                         </div>
                     </div>
 
