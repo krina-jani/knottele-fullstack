@@ -3,7 +3,7 @@ import { PRODUCTS } from "@/data/products";
 import { fetchProducts } from "@/lib/api";
 import ProductDetailView from "./ProductDetailView";
 
-export const dynamicParams = true;
+export const dynamicParams = false;
 
 interface ProductPageProps {
   params: Promise<{

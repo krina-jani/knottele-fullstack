@@ -46,6 +46,12 @@ Route::prefix('customer')->group(function () {
         Route::get('profile', [CustomerApiAuthController::class, 'profile']);
         Route::post('logout', [CustomerApiAuthController::class, 'logout']);
         Route::get('orders', [\App\Http\Controllers\Api\Customer\OrderController::class, 'index']);
-        // Add more protected routes here
+        Route::get('orders/{id}', [\App\Http\Controllers\Api\Customer\OrderController::class, 'show']);
+
+        // Wishlist routes
+        Route::get('wishlist', [\App\Http\Controllers\Api\Customer\WishlistController::class, 'index']);
+        Route::post('wishlist/sync', [\App\Http\Controllers\Api\Customer\WishlistController::class, 'sync']);
+        Route::post('wishlist/{productId}', [\App\Http\Controllers\Api\Customer\WishlistController::class, 'toggle']);
+        Route::delete('wishlist/{productId}', [\App\Http\Controllers\Api\Customer\WishlistController::class, 'remove']);
     });
 });

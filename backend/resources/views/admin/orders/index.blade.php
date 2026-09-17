@@ -543,11 +543,11 @@
 
     function updateOrderStatus(id, currentStatus = 'pending') {
         const statuses = [
-            { val: 'pending', label: 'Pending' },
-            { val: 'confirmed', label: 'Confirmed' },
-            { val: 'processing', label: 'Processing' },
-            { val: 'shipped', label: 'Shipped' },
-            { val: 'delivered', label: 'Delivered' },
+            { val: 'pending', label: '1. Order Placed' },
+            { val: 'confirmed', label: '2. Order Confirmed' },
+            { val: 'processing', label: '3. Crafting Your Order' },
+            { val: 'shipped', label: '4. Shipped' },
+            { val: 'delivered', label: '5. Delivered' },
             { val: 'cancelled', label: 'Cancelled' },
             { val: 'refunded', label: 'Refunded' },
         ];
@@ -694,11 +694,21 @@
                 <div class="text-left space-y-4">
                     <div>
                         <label class="block text-sm font-medium text-stone-700 mb-2">Tracking Number *</label>
-                        <input type="text" id="trackingNumber" class="w-full border border-stone-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-red-500" required>
+                        <input type="text" id="trackingNumber" class="w-full border border-stone-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-red-500" required placeholder="e.g. TRK987654321">
                     </div>
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-2">Carrier</label>
-                        <input type="text" id="carrier" class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500" placeholder="e.g., FedEx, UPS, DHL">
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Carrier / Courier</label>
+                        <input type="text" id="carrier" class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500" placeholder="e.g., Delhivery, BlueDart, FedEx">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-stone-700 mb-2">Order Stage</label>
+                        <select id="trackingStatus" class="w-full border border-stone-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-red-500">
+                            <option value="shipped" selected>4. Shipped</option>
+                            <option value="delivered">5. Delivered</option>
+                            <option value="processing">3. Crafting Your Order</option>
+                            <option value="confirmed">2. Order Confirmed</option>
+                            <option value="pending">1. Order Placed</option>
+                        </select>
                     </div>
                     <div>
                         <label class="block text-sm font-medium text-gray-700 mb-2">Notes (Optional)</label>
@@ -722,6 +732,7 @@
                 return {
                     tracking_number: trackingNumber,
                     carrier: document.getElementById('carrier').value,
+                    status: document.getElementById('trackingStatus').value,
                     notes: document.getElementById('trackingNotes').value
                 };
             }

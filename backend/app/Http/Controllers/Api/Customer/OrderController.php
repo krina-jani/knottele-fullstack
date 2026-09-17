@@ -51,122 +51,35 @@ class OrderController extends Controller
     public function index(Request $request)
     {
         try {
-            $customerId = auth('customer_api')->id();
+            $customer = auth('customer_api')->user();
             $email = trim($request->query('email') ?? '');
+
+            if (!$customer && empty($email)) {
+                return response()->json([
+                    'success' => true,
+                    'data' => []
+                ]);
+            }
 
             $query = Order::with(['items.variant.product', 'items.variant.images'])
                 ->orderBy('created_at', 'desc');
 
-            if ($customerId) {
-                $query->where(function ($q) use ($customerId, $email) {
+            if ($customer) {
+                $customerId = $customer->id;
+                $customerEmail = strtolower($customer->email);
+                $query->where(function ($q) use ($customerId, $customerEmail) {
                     $q->where('customer_id', $customerId);
-                    if ($email) {
-                        $q->orWhere('shipping_address->email', 'like', "%{$email}%");
+                    if ($customerEmail) {
+                        $q->orWhere('shipping_address->email', $customerEmail);
                     }
                 });
-            } elseif (!empty($email)) {
-                $query->where('shipping_address->email', 'like', "%{$email}%");
+            } else {
+                $query->where('shipping_address->email', $email);
             }
 
             $orders = $query->get();
 
-            // Format for frontend consumption
-            $formattedOrders = $orders->map(function ($order) {
-                $statusLabel = match (strtolower($order->status)) {
-                    'pending' => 'Order Placed',
-                    'confirmed' => 'Order Confirmed',
-                    'processing' => 'Crafting Your Order',
-                    'shipped' => 'Shipped',
-                    'delivered' => 'Delivered',
-                    'cancelled' => 'Cancelled',
-                    'refunded' => 'Refunded',
-                    default => ucfirst($order->status ?? 'Order Placed'),
-                };
-
-                return [
-                    'id' => (string) $order->id,
-                    'orderNumber' => $order->order_number,
-                    'orderDate' => $order->created_at ? $order->created_at->format('d M Y') : '',
-                    'estimatedDelivery' => $order->created_at ? $order->created_at->addDays(6)->format('d M Y') : '',
-                    'items' => $order->items->map(function ($item) {
-                        return [
-                            'id' => (string) $item->id,
-                            'productId' => (string) ($item->product_variant_id ?? 'prod-1'),
-                            'product' => [
-                                'id' => (string) ($item->product_variant_id ?? 'prod-1'),
-                                'name' => $item->product_name ?? 'Handmade Product',
-                                'price' => (float) $item->unit_price,
-                                'images' => [$item->variant->product->main_image ?? '/images/products/rose-bouquet.png'],
-                                'category' => 'Handmade Crochet',
-                                'slug' => $item->variant->product->slug ?? 'product',
-                            ],
-                            'quantity' => (int) $item->quantity,
-                            'price' => (float) $item->unit_price,
-                        ];
-                    }),
-                    'shippingAddress' => [
-                        'fullName' => $order->shipping_address['name'] ?? 'Customer',
-                        'email' => $order->shipping_address['email'] ?? '',
-                        'phone' => $order->shipping_address['phone'] ?? '',
-                        'addressLine1' => $order->shipping_address['address_line_1'] ?? '',
-                        'addressLine2' => $order->shipping_address['address_line_2'] ?? '',
-                        'city' => $order->shipping_address['city'] ?? '',
-                        'state' => $order->shipping_address['state'] ?? '',
-                        'pincode' => $order->shipping_address['pin_code'] ?? '',
-                        'country' => 'India',
-                    ],
-                    'paymentMethod' => match ($order->payment_method) {
-                        'cod' => 'Cash on Delivery',
-                        'upi' => 'UPI',
-                        'card' => 'Credit/Debit Card',
-                        'netbanking' => 'Net Banking',
-                        default => ucfirst($order->payment_method ?? 'UPI'),
-                    },
-                    'paymentStatus' => ucfirst($order->payment_status ?? 'Pending'),
-                    'subtotal' => (float) $order->subtotal,
-                    'shipping' => (float) $order->shipping_total,
-                    'discount' => (float) $order->discount_total,
-                    'total' => (float) $order->grand_total,
-                    'status' => $statusLabel,
-                    'timeline' => [
-                        [
-                            'status' => 'Order Placed',
-                            'date' => $order->created_at ? $order->created_at->format('d M Y, h:i A') : 'Just now',
-                            'description' => 'Order received and queued for artisan assignment.',
-                            'completed' => true,
-                            'current' => $order->status === 'pending',
-                        ],
-                        [
-                            'status' => 'Order Confirmed',
-                            'date' => $order->confirmed_at ? $order->confirmed_at->format('d M Y') : 'Upcoming',
-                            'description' => 'Natural cotton yarns prepared for crafting.',
-                            'completed' => in_array($order->status, ['confirmed', 'processing', 'shipped', 'delivered']),
-                            'current' => $order->status === 'confirmed',
-                        ],
-                        [
-                            'status' => 'Crafting Your Order',
-                            'date' => $order->processing_at ? $order->processing_at->format('d M Y') : 'Upcoming',
-                            'description' => 'Master artisan is hand-crocheting your order.',
-                            'completed' => in_array($order->status, ['processing', 'shipped', 'delivered']),
-                            'current' => $order->status === 'processing',
-                        ],
-                        [
-                            'status' => 'Shipped',
-                            'date' => $order->shipped_at ? $order->shipped_at->format('d M Y') : 'Upcoming',
-                            'description' => 'Handed over to express courier.',
-                            'completed' => in_array($order->status, ['shipped', 'delivered']),
-                            'current' => $order->status === 'shipped',
-                        ],
-                        [
-                            'status' => 'Delivered',
-                            'date' => $order->delivered_at ? $order->delivered_at->format('d M Y') : 'Upcoming',
-                            'description' => 'Delivered to your doorstep.',
-                            'completed' => $order->status === 'delivered',
-                            'current' => $order->status === 'delivered',
-                        ],
-                    ]
-                ];
-            });
+            $formattedOrders = $orders->map(fn($order) => $this->formatOrder($order));
 
             return response()->json([
                 'success' => true,
@@ -177,6 +90,74 @@ class OrderController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'Failed to fetch orders.'
+            ], 500);
+        }
+    }
+
+    /**
+     * Get single order details for the authenticated customer.
+     *
+     * @param \Illuminate\Http\Request $request
+     * @param string|int $id
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function show(Request $request, $id)
+    {
+        try {
+            $customer = auth('customer_api')->user();
+            $email = trim($request->query('email') ?? '');
+
+            if (!$customer && empty($email)) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Unauthorized access.'
+                ], 401);
+            }
+
+            $order = Order::with(['items.variant.product', 'items.variant.images'])
+                ->where(function ($q) use ($id) {
+                    $q->where('id', $id)->orWhere('order_number', $id);
+                })
+                ->first();
+
+            if (!$order) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Order not found.'
+                ], 404);
+            }
+
+            // Security check: Order MUST belong to the authenticated customer
+            if ($customer) {
+                $orderCustomerEmail = strtolower($order->shipping_address['email'] ?? '');
+                $authCustomerEmail = strtolower($customer->email);
+                $isOwner = ($order->customer_id == $customer->id) || ($orderCustomerEmail && $orderCustomerEmail === $authCustomerEmail);
+
+                if (!$isOwner) {
+                    return response()->json([
+                        'success' => false,
+                        'message' => 'Forbidden. You cannot view orders belonging to another account.'
+                    ], 403);
+                }
+            } elseif (!empty($email)) {
+                $orderCustomerEmail = strtolower($order->shipping_address['email'] ?? '');
+                if ($orderCustomerEmail !== strtolower($email)) {
+                    return response()->json([
+                        'success' => false,
+                        'message' => 'Forbidden.'
+                    ], 403);
+                }
+            }
+
+            return response()->json([
+                'success' => true,
+                'data' => $this->formatOrder($order)
+            ]);
+        } catch (\Exception $e) {
+            Log::error('Error fetching order detail: ' . $e->getMessage());
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to fetch order details.'
             ], 500);
         }
     }
@@ -295,10 +276,11 @@ class OrderController extends Controller
             $grandTotal = $subtotal - $discountTotal + $shippingTotal + $totalTaxAmount;
 
             // Associate customer ID if authenticated or matching email found (or create new customer profile)
-            $customerId = auth('customer_api')->id();
-            $customerEmail = $request->shipping_address['email'] ?? null;
-            $customerName = $request->shipping_address['name'] ?? 'Customer';
-            $customerPhone = $request->shipping_address['phone'] ?? null;
+            $authCustomer = auth('customer_api')->user();
+            $customerId = $authCustomer ? $authCustomer->id : null;
+            $customerEmail = $request->shipping_address['email'] ?? ($authCustomer ? $authCustomer->email : null);
+            $customerName = $request->shipping_address['name'] ?? ($authCustomer ? $authCustomer->name : 'Customer');
+            $customerPhone = $request->shipping_address['phone'] ?? ($authCustomer ? $authCustomer->mobile : null);
 
             if (!$customerId && $customerEmail) {
                 $existingCust = \App\Models\Customer::where('email', $customerEmail)->first();
@@ -379,5 +361,106 @@ class OrderController extends Controller
                 'error' => $e->getMessage()
             ], 500);
         }
+    }
+
+    /**
+     * Helper to format an Order model for frontend consumption.
+     */
+    protected function formatOrder(Order $order): array
+    {
+        $statusLabel = match (strtolower($order->status)) {
+            'pending' => 'Order Placed',
+            'confirmed' => 'Order Confirmed',
+            'processing' => 'Crafting Your Order',
+            'shipped' => 'Shipped',
+            'delivered' => 'Delivered',
+            'cancelled' => 'Cancelled',
+            'refunded' => 'Refunded',
+            default => ucfirst($order->status ?? 'Order Placed'),
+        };
+
+        return [
+            'id' => (string) $order->id,
+            'orderNumber' => $order->order_number,
+            'orderDate' => $order->created_at ? $order->created_at->format('d M Y') : '',
+            'estimatedDelivery' => $order->created_at ? $order->created_at->addDays(6)->format('d M Y') : '',
+            'items' => $order->items->map(function ($item) {
+                return [
+                    'id' => (string) $item->id,
+                    'productId' => (string) ($item->product_variant_id ?? 'prod-1'),
+                    'product' => [
+                        'id' => (string) ($item->product_variant_id ?? 'prod-1'),
+                        'name' => $item->product_name ?? 'Handmade Product',
+                        'price' => (float) $item->unit_price,
+                        'images' => [$item->variant->product->main_image ?? '/images/products/rose-bouquet.png'],
+                        'category' => 'Handmade Crochet',
+                        'slug' => $item->variant->product->slug ?? 'product',
+                    ],
+                    'quantity' => (int) $item->quantity,
+                    'price' => (float) $item->unit_price,
+                ];
+            })->values()->toArray(),
+            'shippingAddress' => [
+                'fullName' => $order->shipping_address['name'] ?? 'Customer',
+                'email' => $order->shipping_address['email'] ?? '',
+                'phone' => $order->shipping_address['phone'] ?? '',
+                'addressLine1' => $order->shipping_address['address_line_1'] ?? '',
+                'addressLine2' => $order->shipping_address['address_line_2'] ?? '',
+                'city' => $order->shipping_address['city'] ?? '',
+                'state' => $order->shipping_address['state'] ?? '',
+                'pincode' => $order->shipping_address['pin_code'] ?? '',
+                'country' => 'India',
+            ],
+            'paymentMethod' => match ($order->payment_method) {
+                'cod' => 'Cash on Delivery',
+                'upi' => 'UPI',
+                'card' => 'Credit/Debit Card',
+                'netbanking' => 'Net Banking',
+                default => ucfirst($order->payment_method ?? 'UPI'),
+            },
+            'paymentStatus' => ucfirst($order->payment_status ?? 'Pending'),
+            'subtotal' => (float) $order->subtotal,
+            'shipping' => (float) $order->shipping_total,
+            'discount' => (float) $order->discount_total,
+            'total' => (float) $order->grand_total,
+            'status' => $statusLabel,
+            'timeline' => [
+                [
+                    'status' => 'Order Placed',
+                    'date' => $order->created_at ? $order->created_at->format('d M Y, h:i A') : 'Just now',
+                    'description' => 'Order received and queued for artisan assignment.',
+                    'completed' => true,
+                    'current' => $order->status === 'pending',
+                ],
+                [
+                    'status' => 'Order Confirmed',
+                    'date' => $order->confirmed_at ? $order->confirmed_at->format('d M Y') : 'Upcoming',
+                    'description' => 'Natural cotton yarns prepared for crafting.',
+                    'completed' => in_array($order->status, ['confirmed', 'processing', 'shipped', 'delivered']),
+                    'current' => $order->status === 'confirmed',
+                ],
+                [
+                    'status' => 'Crafting Your Order',
+                    'date' => $order->processing_at ? $order->processing_at->format('d M Y') : 'Upcoming',
+                    'description' => 'Master artisan is hand-crocheting your order.',
+                    'completed' => in_array($order->status, ['processing', 'shipped', 'delivered']),
+                    'current' => $order->status === 'processing',
+                ],
+                [
+                    'status' => 'Shipped',
+                    'date' => $order->shipped_at ? $order->shipped_at->format('d M Y') : 'Upcoming',
+                    'description' => 'Handed over to express courier.',
+                    'completed' => in_array($order->status, ['shipped', 'delivered']),
+                    'current' => $order->status === 'shipped',
+                ],
+                [
+                    'status' => 'Delivered',
+                    'date' => $order->delivered_at ? $order->delivered_at->format('d M Y') : 'Upcoming',
+                    'description' => 'Delivered to your doorstep.',
+                    'completed' => $order->status === 'delivered',
+                    'current' => $order->status === 'delivered',
+                ],
+            ]
+        ];
     }
 }

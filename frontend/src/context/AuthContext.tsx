@@ -150,9 +150,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const logout = () => {
     setUser(null);
+    setOrders([]);
     if (typeof window !== "undefined") {
       localStorage.removeItem("knotelle_customer_user");
       localStorage.removeItem("knotelle_customer_token");
+      localStorage.removeItem("knotelle_wishlist");
+      localStorage.removeItem("knotelle_cart");
     }
     showToast("Logged out", "You have been signed out.", "info");
   };

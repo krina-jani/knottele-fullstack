@@ -178,6 +178,16 @@ export function Navbar() {
                   )}
                 </button>
               )}
+
+              {/* Menu Drawer Toggle Button (Hamburger icon) */}
+              <button
+                onClick={() => setIsMobileMenuOpen(true)}
+                className="p-2 rounded-full text-[#2E211E] hover:text-[#913638] hover:bg-[#FCE9E5] transition-colors flex items-center justify-center cursor-pointer ml-0.5 sm:ml-1 border border-[#E7D1CC]/60"
+                aria-label="Open Menu"
+                title="Open Navigation Menu"
+              >
+                <Menu className="w-5 h-5 text-[#913638]" />
+              </button>
             </div>
 
           </div>

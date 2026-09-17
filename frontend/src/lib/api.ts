@@ -678,13 +678,18 @@ export async function submitContactForm(
 
 export async function fetchCustomerOrders(email?: string): Promise<any[]> {
   try {
+    const token = typeof window !== "undefined" ? localStorage.getItem("knotelle_customer_token") : null;
     const url = email
       ? `${getApiBaseUrl()}/customer/orders?email=${encodeURIComponent(email)}`
       : `${getApiBaseUrl()}/customer/orders`;
+    const headers: Record<string, string> = {
+      Accept: "application/json",
+    };
+    if (token) {
+      headers["Authorization"] = `Bearer ${token}`;
+    }
     const response = await fetch(url, {
-      headers: {
-        Accept: "application/json",
-      },
+      headers,
       cache: "no-store",
     });
     const result = await response.json();
@@ -705,12 +710,17 @@ export async function submitOrder(
   orderPayload: Record<string, unknown>
 ): Promise<{ success: boolean; orderId?: string; orderNumber?: string; message?: string }> {
   try {
+    const token = typeof window !== "undefined" ? localStorage.getItem("knotelle_customer_token") : null;
+    const headers: Record<string, string> = {
+      "Content-Type": "application/json",
+      Accept: "application/json",
+    };
+    if (token) {
+      headers["Authorization"] = `Bearer ${token}`;
+    }
     const response = await fetch(`${getApiBaseUrl()}/customer/orders`, {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Accept: "application/json",
-      },
+      headers,
       body: JSON.stringify(orderPayload),
     });
     const result = await response.json();
@@ -1067,6 +1077,110 @@ export async function fetchContactPageData(): Promise<ContactPageData | null> {
     return null;
   } catch (error) {
     console.warn("Fetch contact page data error:", error);
+    return null;
+  }
+}
+
+/**
+ * Customer Wishlist APIs
+ */
+export async function fetchCustomerWishlist(): Promise<{ products: Product[]; product_ids: string[] } | null> {
+  try {
+    const token = typeof window !== "undefined" ? localStorage.getItem("knotelle_customer_token") : null;
+    if (!token) return null;
+
+    const res = await fetch(`${getApiBaseUrl()}/customer/wishlist`, {
+      headers: {
+        Accept: "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+      cache: "no-store",
+    });
+    const data = await res.json();
+    if (data.success) {
+      return {
+        products: data.data || [],
+        product_ids: data.product_ids || [],
+      };
+    }
+    return null;
+  } catch (err) {
+    console.warn("Fetch wishlist error:", err);
+    return null;
+  }
+}
+
+export async function toggleCustomerWishlist(productId: string): Promise<{ in_wishlist: boolean; count: number } | null> {
+  try {
+    const token = typeof window !== "undefined" ? localStorage.getItem("knotelle_customer_token") : null;
+    if (!token) return null;
+
+    const res = await fetch(`${getApiBaseUrl()}/customer/wishlist/${productId}`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Accept: "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    const data = await res.json();
+    if (data.success) {
+      return {
+        in_wishlist: data.in_wishlist,
+        count: data.count,
+      };
+    }
+    return null;
+  } catch (err) {
+    console.warn("Toggle wishlist error:", err);
+    return null;
+  }
+}
+
+export async function removeFromCustomerWishlist(productId: string): Promise<{ count: number } | null> {
+  try {
+    const token = typeof window !== "undefined" ? localStorage.getItem("knotelle_customer_token") : null;
+    if (!token) return null;
+
+    const res = await fetch(`${getApiBaseUrl()}/customer/wishlist/${productId}`, {
+      method: "DELETE",
+      headers: {
+        Accept: "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    const data = await res.json();
+    if (data.success) {
+      return { count: data.count };
+    }
+    return null;
+  } catch (err) {
+    console.warn("Remove wishlist error:", err);
+    return null;
+  }
+}
+
+export async function syncCustomerWishlist(productIds: string[]): Promise<Product[] | null> {
+  try {
+    const token = typeof window !== "undefined" ? localStorage.getItem("knotelle_customer_token") : null;
+    if (!token) return null;
+
+    const res = await fetch(`${getApiBaseUrl()}/customer/wishlist/sync`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Accept: "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify({ product_ids: productIds }),
+    });
+    const data = await res.json();
+    if (data.success) {
+      return data.data || [];
+    }
+    return null;
+  } catch (err) {
+    console.warn("Sync wishlist error:", err);
     return null;
   }
 }

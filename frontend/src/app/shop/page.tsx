@@ -1,6 +1,7 @@
 "use client";
 
-import React, { useState, useEffect, useMemo } from "react";
+import React, { useState, useEffect, useMemo, Suspense } from "react";
+import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
 import { Filter, X, SlidersHorizontal, ArrowUpDown, Sparkles, RotateCcw } from "lucide-react";
@@ -15,7 +16,11 @@ import { getLocalCache, setLocalCache, setupAdminSyncListener } from "@/lib/cach
 const PRODUCTS_CACHE_KEY = "knotelle_cache_products";
 const CATEGORIES_CACHE_KEY = "knotelle_cache_categories";
 
-export default function ShopPage() {
+function ShopContent() {
+  const searchParams = useSearchParams();
+  const paramSort = searchParams.get("sort");
+  const paramCategory = searchParams.get("category") || searchParams.get("filter");
+
   const { media } = useWebsiteMedia();
   const [productsList, setProductsList] = useState<Product[]>([]);
   const [categoriesList, setCategoriesList] = useState<any[]>([]);
@@ -27,6 +32,15 @@ export default function ShopPage() {
   const [availabilityOnly, setAvailabilityOnly] = useState<boolean>(false);
   const [sortBy, setSortBy] = useState<string>("featured");
   const [isMobileFiltersOpen, setIsMobileFiltersOpen] = useState<boolean>(false);
+
+  useEffect(() => {
+    if (paramSort) {
+      setSortBy(paramSort);
+    }
+    if (paramCategory) {
+      setSelectedCategory(paramCategory);
+    }
+  }, [paramSort, paramCategory]);
 
   // Directly derive shop banner from media for instant zero-delay rendering
   const banner = media?.shop?.banner;
@@ -462,5 +476,19 @@ export default function ShopPage() {
         </div>
       )}
     </div>
+  );
+}
+
+export default function ShopPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="min-h-screen bg-[#FFF8F5] flex items-center justify-center">
+          <div className="w-8 h-8 border-2 border-[#8F3032] border-t-transparent rounded-full animate-spin" />
+        </div>
+      }
+    >
+      <ShopContent />
+    </Suspense>
   );
 }

@@ -394,35 +394,61 @@ class OrderController extends Controller
         $validated = $request->validate([
             'tracking_number' => 'required|string|max:100',
             'carrier' => 'nullable|string|max:50',
+            'status' => 'nullable|string|in:pending,confirmed,processing,shipped,delivered,cancelled,refunded',
             'notes' => 'nullable|string|max:500',
         ]);
 
         try {
             DB::beginTransaction();
 
-            // Create or update shipment
-            $shipment = $order->shipments()->create([
-                'tracking_number' => $validated['tracking_number'],
-                'carrier' => $validated['carrier'] ?? 'Standard',
-                'status' => 'shipped',
-                'shipped_at' => now(),
-                'notes' => $validated['notes'] ?? null,
-            ]);
-
-            // Add all order items to shipment
-            foreach ($order->items as $item) {
-                $shipment->items()->create([
-                    'order_item_id' => $item->id,
-                    'quantity' => $item->quantity,
-                ]);
+            $statusToSet = $validated['status'] ?? 'shipped';
+            $order->status = $statusToSet;
+            if ($statusToSet === 'shipped' && !$order->shipped_at) {
+                $order->shipped_at = now();
             }
+            $order->save();
+
+            // Find existing shipment or create new one safely
+            $shipment = $order->shipments()->first();
+            if ($shipment) {
+                $shipment->update([
+                    'tracking_number' => $validated['tracking_number'],
+                    'carrier' => $validated['carrier'] ?? $shipment->carrier ?? 'Standard',
+                    'status' => $statusToSet,
+                    'shipped_at' => $shipment->shipped_at ?? now(),
+                    'delivery_notes' => $validated['notes'] ?? $shipment->delivery_notes,
+                ]);
+            } else {
+                $shipment = $order->shipments()->create([
+                    'tracking_number' => $validated['tracking_number'],
+                    'carrier' => $validated['carrier'] ?? 'Standard',
+                    'status' => $statusToSet,
+                    'shipped_at' => now(),
+                    'delivery_notes' => $validated['notes'] ?? null,
+                ]);
+
+                foreach ($order->items as $item) {
+                    $shipment->items()->create([
+                        'order_item_id' => $item->id,
+                        'quantity' => $item->quantity,
+                    ]);
+                }
+            }
+
+            // Record status history
+            $order->statusHistory()->create([
+                'status' => $statusToSet,
+                'notes' => 'Tracking updated: ' . $validated['tracking_number'],
+                'admin_id' => auth('admin')->id(),
+            ]);
 
             DB::commit();
 
             return response()->json([
                 'success' => true,
-                'message' => 'Tracking number updated successfully!',
+                'message' => 'Tracking information updated successfully!',
                 'tracking_number' => $validated['tracking_number'],
+                'status' => $order->status,
             ]);
 
         } catch (\Exception $e) {
@@ -431,7 +457,7 @@ class OrderController extends Controller
 
             return response()->json([
                 'success' => false,
-                'message' => 'Error updating tracking number. Please try again.',
+                'message' => 'Error updating tracking information. Please try again.',
                 'error' => config('app.debug') ? $e->getMessage() : null
             ], 500);
         }

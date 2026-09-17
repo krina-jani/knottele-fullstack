@@ -15,10 +15,12 @@ import {
   ChevronDown,
   ChevronUp,
   Sparkles,
+  Heart,
 } from "lucide-react";
 import confetti from "canvas-confetti";
 import { useCart } from "@/context/CartContext";
 import { useAuth } from "@/context/AuthContext";
+import { useWishlist } from "@/context/WishlistContext";
 import { Order, OrderStatus } from "@/types/order";
 import { Breadcrumbs } from "@/components/ui/Breadcrumbs";
 import { FlowerIcon } from "@/components/ui/BotanicalDecorations";
@@ -28,6 +30,7 @@ export default function CheckoutPage() {
   const router = useRouter();
   const { items, subtotal, shipping, discount, total, clearCart } = useCart();
   const { user, addOrder } = useAuth();
+  const { toggleWishlist, isInWishlist } = useWishlist();
 
   const [activeStep, setActiveStep] = useState(1);
   const [isSummaryCollapsedMobile, setIsSummaryCollapsedMobile] = useState(true);
@@ -634,35 +637,46 @@ export default function CheckoutPage() {
               </h3>
 
               <div className="divide-y divide-[#E7D1CC]/60 max-h-72 overflow-y-auto pr-1">
-                {items.map((item) => (
-                  <div key={item.id} className="py-3 first:pt-0 last:pb-0 flex items-center gap-3">
-                    <div className="relative w-14 h-14 rounded-xl overflow-hidden bg-[#FFF9F6] shrink-0 border border-[#E7D1CC]">
-                      <Image
-                        src={item.product.images[0]}
-                        alt={item.product.name}
-                        fill
-                        sizes="56px"
-                        className="object-cover"
-                      />
-                      <span className="absolute top-0 right-0 bg-[#913638] text-white text-[10px] font-bold w-4 h-4 rounded-bl flex items-center justify-center">
-                        {item.quantity}
+                {items.map((item) => {
+                  const isSaved = isInWishlist(item.product.id);
+                  return (
+                    <div key={item.id} className="py-3 first:pt-0 last:pb-0 flex items-center gap-3">
+                      <div className="relative w-14 h-14 rounded-xl overflow-hidden bg-[#FFF9F6] shrink-0 border border-[#E7D1CC]">
+                        <Image
+                          src={item.product.images[0]}
+                          alt={item.product.name}
+                          fill
+                          sizes="56px"
+                          className="object-cover"
+                        />
+                        <span className="absolute top-0 right-0 bg-[#913638] text-white text-[10px] font-bold w-4 h-4 rounded-bl flex items-center justify-center">
+                          {item.quantity}
+                        </span>
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-xs font-bold text-[#2E211E] truncate">
+                          {item.product.name}
+                        </p>
+                        {item.customization?.color && (
+                          <p className="text-[10px] text-[#786864]">
+                            {item.customization.color.name}
+                          </p>
+                        )}
+                        <button
+                          type="button"
+                          onClick={() => toggleWishlist(item.product)}
+                          className="mt-0.5 inline-flex items-center gap-1 text-[10px] font-semibold text-[#913638] hover:underline cursor-pointer"
+                        >
+                          <Heart className={`w-3 h-3 ${isSaved ? "fill-[#913638] text-[#913638]" : ""}`} />
+                          <span>{isSaved ? "Remove Wishlist" : "Add Wishlist"}</span>
+                        </button>
+                      </div>
+                      <span className="text-xs font-bold text-[#913638]">
+                        ₹{(item.price * item.quantity).toLocaleString("en-IN")}
                       </span>
                     </div>
-                    <div className="flex-1 min-w-0">
-                      <p className="text-xs font-bold text-[#2E211E] truncate">
-                        {item.product.name}
-                      </p>
-                      {item.customization?.color && (
-                        <p className="text-[10px] text-[#786864]">
-                          {item.customization.color.name}
-                        </p>
-                      )}
-                    </div>
-                    <span className="text-xs font-bold text-[#913638]">
-                      ₹{(item.price * item.quantity).toLocaleString("en-IN")}
-                    </span>
-                  </div>
-                ))}
+                  );
+                })}
               </div>
 
               {/* Price Details */}

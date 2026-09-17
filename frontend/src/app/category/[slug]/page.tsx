@@ -3,7 +3,7 @@ import { fetchCategories } from "@/lib/api";
 import { CATEGORIES } from "@/data/categories";
 import CategoryPageView from "./CategoryPageView";
 
-export const dynamicParams = true;
+export const dynamicParams = false;
 
 interface CategoryPageProps {
   params: Promise<{

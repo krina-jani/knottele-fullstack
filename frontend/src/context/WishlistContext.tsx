@@ -1,60 +1,139 @@
 "use client";
 
-import React, { createContext, useContext, useState, useEffect } from "react";
+import React, { createContext, useContext, useState, useEffect, useCallback } from "react";
 import { Product } from "@/types/product";
 import { PRODUCTS } from "@/data/products";
 import { useToast } from "./ToastContext";
+import { useAuth } from "./AuthContext";
+import {
+  fetchCustomerWishlist,
+  toggleCustomerWishlist,
+  removeFromCustomerWishlist,
+  syncCustomerWishlist,
+} from "@/lib/api";
 
 interface WishlistContextType {
   wishlistIds: string[];
   wishlistItems: Product[];
   toggleWishlist: (product: Product) => void;
+  removeFromWishlist: (productId: string) => void;
   isInWishlist: (productId: string) => boolean;
   wishlistCount: number;
+  refetchWishlist: () => Promise<void>;
 }
 
 const WishlistContext = createContext<WishlistContextType | undefined>(undefined);
 
 export function WishlistProvider({ children }: { children: React.ReactNode }) {
-  const [wishlistIds, setWishlistIds] = useState<string[]>(["prod-1", "prod-3"]); // default sample saved
-  const [isInitialized, setIsInitialized] = useState(false);
+  const { isLoggedIn, user } = useAuth();
   const { showToast } = useToast();
+  const [wishlistIds, setWishlistIds] = useState<string[]>([]);
+  const [wishlistItems, setWishlistItems] = useState<Product[]>([]);
+  const [isInitialized, setIsInitialized] = useState(false);
 
-  useEffect(() => {
-    try {
-      const saved = localStorage.getItem("knotelle_wishlist");
-      if (saved) {
-        setWishlistIds(JSON.parse(saved));
+  const refetchWishlist = useCallback(async () => {
+    if (isLoggedIn) {
+      const live = await fetchCustomerWishlist();
+      if (live) {
+        setWishlistItems(live.products || []);
+        setWishlistIds(live.product_ids || []);
+        if (typeof window !== "undefined") {
+          localStorage.setItem("knotelle_wishlist", JSON.stringify(live.product_ids || []));
+        }
+        return;
       }
-    } catch (e) {
-      console.error("Failed to load wishlist from localStorage", e);
-    } finally {
-      setIsInitialized(true);
     }
-  }, []);
-
-  useEffect(() => {
-    if (!isInitialized) return;
+    
+    // Fallback for logged out guests: check localStorage
     try {
-      localStorage.setItem("knotelle_wishlist", JSON.stringify(wishlistIds));
-    } catch (e) {
-      console.error("Failed to save wishlist to localStorage", e);
+      const savedIds = localStorage.getItem("knotelle_wishlist");
+      if (savedIds) {
+        const parsed = JSON.parse(savedIds);
+        setWishlistIds(parsed);
+        const filtered = PRODUCTS.filter((p) => parsed.includes(p.id) || parsed.includes(String(p.db_id || p.id)));
+        setWishlistItems(filtered);
+      } else {
+        setWishlistIds([]);
+        setWishlistItems([]);
+      }
+    } catch {
+      setWishlistIds([]);
+      setWishlistItems([]);
     }
-  }, [wishlistIds, isInitialized]);
+  }, [isLoggedIn]);
 
-  const isInWishlist = (productId: string) => wishlistIds.includes(productId);
-
-  const toggleWishlist = (product: Product) => {
-    if (isInWishlist(product.id)) {
-      setWishlistIds((prev) => prev.filter((id) => id !== product.id));
-      showToast("Removed from Wishlist", `${product.name} removed from your saved items.`, "info");
+  // Load wishlist when authentication state or user changes
+  useEffect(() => {
+    if (!isLoggedIn) {
+      // Complete User Isolation: clear state on logout
+      setWishlistIds([]);
+      setWishlistItems([]);
+      if (typeof window !== "undefined") {
+        localStorage.removeItem("knotelle_wishlist");
+      }
     } else {
-      setWishlistIds((prev) => [...prev, product.id]);
+      refetchWishlist();
+    }
+    setIsInitialized(true);
+  }, [isLoggedIn, user?.email, refetchWishlist]);
+
+  const isInWishlist = (productId: string | number) => {
+    const pStr = String(productId);
+    const cleanStr = pStr.replace("prod-", "");
+    return wishlistIds.some((id) => {
+      const idStr = String(id);
+      return idStr === pStr || idStr === cleanStr || idStr === `prod-${cleanStr}`;
+    });
+  };
+
+  const toggleWishlist = async (product: Product) => {
+    const pId = String(product.db_id || product.id);
+    const isCurrentlySaved = isInWishlist(pId);
+
+    if (isCurrentlySaved) {
+      // Optimistic update
+      setWishlistIds((prev) => prev.filter((id) => String(id) !== pId && String(id) !== `prod-${pId}`));
+      setWishlistItems((prev) => prev.filter((item) => String(item.db_id || item.id) !== pId));
+      showToast("Removed from Wishlist", `${product.name} removed from your saved items.`, "info");
+
+      if (isLoggedIn) {
+        await toggleCustomerWishlist(pId);
+        refetchWishlist();
+      } else if (typeof window !== "undefined") {
+        const updated = wishlistIds.filter((id) => String(id) !== pId && String(id) !== `prod-${pId}`);
+        localStorage.setItem("knotelle_wishlist", JSON.stringify(updated));
+      }
+    } else {
+      // Optimistic update
+      setWishlistIds((prev) => [...prev, pId, `prod-${pId}`]);
+      setWishlistItems((prev) => [product, ...prev]);
       showToast("Saved to Wishlist 💕", `${product.name} added to your favorites.`, "wishlist");
+
+      if (isLoggedIn) {
+        await toggleCustomerWishlist(pId);
+        refetchWishlist();
+      } else if (typeof window !== "undefined") {
+        const updated = [...wishlistIds, pId];
+        localStorage.setItem("knotelle_wishlist", JSON.stringify(updated));
+      }
     }
   };
 
-  const wishlistItems = PRODUCTS.filter((p) => wishlistIds.includes(p.id));
+  const removeFromWishlist = async (productId: string | number) => {
+    const pId = String(productId);
+    const cleanId = pId.replace("prod-", "");
+    
+    setWishlistIds((prev) => prev.filter((id) => String(id) !== pId && String(id) !== cleanId));
+    setWishlistItems((prev) => prev.filter((item) => String(item.db_id || item.id) !== cleanId && String(item.id) !== pId));
+
+    if (isLoggedIn) {
+      await removeFromCustomerWishlist(cleanId);
+      refetchWishlist();
+    } else if (typeof window !== "undefined") {
+      const updated = wishlistIds.filter((id) => String(id) !== pId && String(id) !== cleanId);
+      localStorage.setItem("knotelle_wishlist", JSON.stringify(updated));
+    }
+  };
 
   return (
     <WishlistContext.Provider
@@ -62,8 +141,10 @@ export function WishlistProvider({ children }: { children: React.ReactNode }) {
         wishlistIds,
         wishlistItems,
         toggleWishlist,
+        removeFromWishlist,
         isInWishlist,
-        wishlistCount: wishlistIds.length,
+        wishlistCount: wishlistItems.length,
+        refetchWishlist,
       }}
     >
       {children}

@@ -36,10 +36,8 @@ export default function AccountLayout({
   }
 
   const navItems = [
-    { name: "Overview", href: "/account", icon: LayoutDashboard },
     { name: "My Orders", href: "/account/orders", icon: Package },
     { name: "Wishlist", href: "/account/wishlist", icon: Heart, badge: wishlistCount },
-    { name: "Profile Settings", href: "/account/profile", icon: User },
     { name: "My Addresses", href: "/account/addresses", icon: MapPin },
   ];
 

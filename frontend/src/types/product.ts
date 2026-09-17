@@ -15,13 +15,16 @@ export interface ProductReview {
 
 export interface Product {
   id: string;
+  db_id?: number;
   slug: string;
   name: string;
   category: string;
   categorySlug: string;
   price: number;
   comparePrice?: number;
+  compareAtPrice?: number;
   images: string[];
+  main_image?: string;
   description: string;
   shortDescription: string;
   materials?: string[];
@@ -36,6 +39,7 @@ export interface Product {
   rating: number;
   reviewCount: number;
   stock: number;
+  inStock?: boolean;
   tags: string[];
   reviews?: ProductReview[];
 }

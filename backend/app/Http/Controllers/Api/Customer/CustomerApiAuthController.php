@@ -32,7 +32,7 @@ class CustomerApiAuthController extends Controller
         }
 
         if (!$customer || !Hash::check($request->password, $customer->password)) {
-            return response()->json(['message' => 'Invalid credentials'], 401);
+            return response()->json(['message' => 'Invalid email or password.'], 401);
         }
 
         $token = $customer->createToken('customer_api')->plainTextToken;
