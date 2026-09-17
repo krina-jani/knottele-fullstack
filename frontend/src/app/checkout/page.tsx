@@ -24,7 +24,7 @@ import { useWishlist } from "@/context/WishlistContext";
 import { Order, OrderStatus } from "@/types/order";
 import { Breadcrumbs } from "@/components/ui/Breadcrumbs";
 import { FlowerIcon } from "@/components/ui/BotanicalDecorations";
-import { submitOrder } from "@/lib/api";
+import { submitOrder, normalizeImageUrl } from "@/lib/api";
 
 export default function CheckoutPage() {
   const router = useRouter();
@@ -643,7 +643,7 @@ export default function CheckoutPage() {
                     <div key={item.id} className="py-3 first:pt-0 last:pb-0 flex items-center gap-3">
                       <div className="relative w-14 h-14 rounded-xl overflow-hidden bg-[#FFF9F6] shrink-0 border border-[#E7D1CC]">
                         <Image
-                          src={item.product.images[0]}
+                          src={normalizeImageUrl(item.product.main_image || item.product.images?.[0], "/images/products/bunny-keychain.jpg")}
                           alt={item.product.name}
                           fill
                           sizes="56px"

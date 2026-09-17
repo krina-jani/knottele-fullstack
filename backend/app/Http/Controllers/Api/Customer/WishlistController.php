@@ -30,7 +30,6 @@ class WishlistController extends Controller
                 if ($variant) return $variant;
             }
         } else {
-            // Strip string prefixes like 'prod-' if present
             $cleanId = str_replace('prod-', '', $productId);
             if (is_numeric($cleanId)) {
                 $product = Product::with(['variants', 'defaultVariant'])->find($cleanId);
@@ -46,14 +45,81 @@ class WishlistController extends Controller
         return $product->defaultVariant ?? $product->variants->first();
     }
 
-    private function formatWishlistProduct($product, $variant)
+    private function resolveProductImage($product, $variant)
     {
-        $mainImage = asset('images/placeholder.jpg');
         if ($variant && $variant->images && $variant->images->isNotEmpty()) {
             $img = $variant->images->first();
-            $filePath = $img->file_path ?? '';
-            $mainImage = str_starts_with($filePath, 'http') ? $filePath : asset(str_starts_with($filePath, 'storage/') ? $filePath : 'images/' . ltrim($filePath, '/'));
+            if (!empty($img->file_path)) {
+                $filePath = $img->file_path;
+                if (str_starts_with($filePath, 'http://') || str_starts_with($filePath, 'https://')) {
+                    return $filePath;
+                }
+                return '/' . ltrim($filePath, '/');
+            }
         }
+
+        if ($product && $product->variants) {
+            foreach ($product->variants as $v) {
+                if ($v->images && $v->images->isNotEmpty()) {
+                    $img = $v->images->first();
+                    if (!empty($img->file_path)) {
+                        $filePath = $img->file_path;
+                        if (str_starts_with($filePath, 'http://') || str_starts_with($filePath, 'https://')) {
+                            return $filePath;
+                        }
+                        return '/' . ltrim($filePath, '/');
+                    }
+                }
+            }
+        }
+
+        // Map by slug or category if database has no image attachment
+        $slug = strtolower($product->slug ?? '');
+        $cat = strtolower($product->mainCategory->slug ?? $product->mainCategory->name ?? '');
+
+        if (str_contains($slug, 'bunny') || str_contains($slug, 'keychain') || str_contains($cat, 'keychain')) {
+            return '/images/products/bunny-keychain.jpg';
+        }
+        if (str_contains($slug, 'phone') || str_contains($slug, 'daisy') || str_contains($cat, 'phone')) {
+            return '/images/products/daisy-phone-cover.jpg';
+        }
+        if (str_contains($slug, 'bag') || str_contains($slug, 'tote') || str_contains($cat, 'bag')) {
+            return '/images/products/granny-square-bag.jpg';
+        }
+        if (str_contains($slug, 'scrunchie') || str_contains($cat, 'hair')) {
+            return '/images/products/floral-scrunchies.jpg';
+        }
+        if (str_contains($slug, 'rose') || str_contains($slug, 'bouquet') || str_contains($cat, 'bouquet')) {
+            return '/images/products/rose-bouquet.jpg';
+        }
+        if (str_contains($slug, 'sunflower') || str_contains($cat, 'flower')) {
+            return '/images/products/sunflower-stem.jpg';
+        }
+        if (str_contains($slug, 'toy') || str_contains($slug, 'bear') || str_contains($cat, 'soft-toy')) {
+            return '/images/products/teddy-bear.jpg';
+        }
+        if (str_contains($slug, 'vest') || str_contains($slug, 'clothing') || str_contains($cat, 'clothing')) {
+            return '/images/products/crochet-vest.jpg';
+        }
+        if (str_contains($slug, 'tulip') || str_contains($slug, 'potted')) {
+            return '/images/products/potted-tulips.jpg';
+        }
+        if (str_contains($slug, 'bookmark') || str_contains($cat, 'bookmark')) {
+            return '/images/products/sprout-bookmark.jpg';
+        }
+        if (str_contains($slug, 'purse') || str_contains($cat, 'coin-purse')) {
+            return '/images/products/strawberry-coin-purse.jpg';
+        }
+        if (str_contains($slug, 'mug') || str_contains($slug, 'cup') || str_contains($cat, 'cup')) {
+            return '/images/products/tulip-mug-cozy.jpg';
+        }
+
+        return '/images/products/bunny-keychain.jpg';
+    }
+
+    private function formatWishlistProduct($product, $variant)
+    {
+        $mainImage = $this->resolveProductImage($product, $variant);
 
         return [
             'id' => (string) $product->id,

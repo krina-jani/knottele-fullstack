@@ -3,13 +3,12 @@
 import React, { useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Search, Heart, User, ShoppingBag, Menu, Sparkles, ArrowRight } from "lucide-react";
+import { Search, Heart, User, ShoppingBag, Sparkles, ArrowRight } from "lucide-react";
 import { KnotelleCrownLogo } from "@/components/ui/BotanicalDecorations";
 import { useCart } from "@/context/CartContext";
 import { useWishlist } from "@/context/WishlistContext";
 import { useWebsiteMedia } from "@/context/MediaContext";
 import { SearchModal } from "./SearchModal";
-import { MobileDrawer } from "./MobileDrawer";
 
 export function Navbar() {
   const pathname = usePathname();
@@ -17,7 +16,6 @@ export function Navbar() {
   const { totalItemsCount, setIsCartOpen } = useCart();
   const { wishlistCount } = useWishlist();
   const [isSearchOpen, setIsSearchOpen] = useState(false);
-  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   const navbar = media?.navbar;
   const announcement = navbar?.announcement;
@@ -65,17 +63,6 @@ export function Navbar() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-20">
             
-            {/* Mobile: Hamburger Button */}
-            <div className="flex items-center lg:hidden">
-              <button
-                onClick={() => setIsMobileMenuOpen(true)}
-                className="p-2 rounded-full text-[#2E211E] hover:bg-[#FCE9E5] transition-colors cursor-pointer"
-                aria-label="Open mobile menu"
-              >
-                <Menu className="w-6 h-6" />
-              </button>
-            </div>
-
             {/* Left: KNOTELLE Logo */}
             <div className="flex items-center">
               <Link href="/" className="flex items-center group py-1" aria-label="KNOTELLE Home">
@@ -142,7 +129,7 @@ export function Navbar() {
               {showWishlist && (
                 <Link
                   href="/account/wishlist"
-                  className="relative p-2.5 rounded-full text-[#2E211E] hover:text-[#913638] hover:bg-[#FCE9E5] transition-colors hidden sm:flex items-center justify-center"
+                  className="relative p-2.5 rounded-full text-[#2E211E] hover:text-[#913638] hover:bg-[#FCE9E5] transition-colors flex items-center justify-center"
                   aria-label="View wishlist"
                 >
                   <Heart className="w-5 h-5" />
@@ -157,7 +144,7 @@ export function Navbar() {
               {showAccount && (
                 <Link
                   href="/account"
-                  className="p-2.5 rounded-full text-[#2E211E] hover:text-[#913638] hover:bg-[#FCE9E5] transition-colors hidden sm:flex items-center justify-center"
+                  className="p-2.5 rounded-full text-[#2E211E] hover:text-[#913638] hover:bg-[#FCE9E5] transition-colors flex items-center justify-center"
                   aria-label="My Account"
                 >
                   <User className="w-5 h-5" />
@@ -178,34 +165,16 @@ export function Navbar() {
                   )}
                 </button>
               )}
-
-              {/* Menu Drawer Toggle Button (Hamburger icon) */}
-              <button
-                onClick={() => setIsMobileMenuOpen(true)}
-                className="p-2 rounded-full text-[#2E211E] hover:text-[#913638] hover:bg-[#FCE9E5] transition-colors flex items-center justify-center cursor-pointer ml-0.5 sm:ml-1 border border-[#E7D1CC]/60"
-                aria-label="Open Menu"
-                title="Open Navigation Menu"
-              >
-                <Menu className="w-5 h-5 text-[#913638]" />
-              </button>
             </div>
 
           </div>
         </div>
       </header>
 
-      {/* Search Modal & Mobile Drawer */}
+      {/* Search Modal */}
       <SearchModal
         isOpen={isSearchOpen}
         onClose={() => setIsSearchOpen(false)}
-      />
-      <MobileDrawer
-        isOpen={isMobileMenuOpen}
-        onClose={() => setIsMobileMenuOpen(false)}
-        onOpenSearch={() => {
-          setIsMobileMenuOpen(false);
-          setIsSearchOpen(true);
-        }}
       />
     </>
   );

@@ -18,6 +18,7 @@ import {
 import { useCart } from "@/context/CartContext";
 import { useWishlist } from "@/context/WishlistContext";
 import { Breadcrumbs } from "@/components/ui/Breadcrumbs";
+import { normalizeImageUrl } from "@/lib/api";
 import { BotanicalFlourish, FlowerIcon } from "@/components/ui/BotanicalDecorations";
 
 export default function CartPage() {
@@ -147,7 +148,7 @@ export default function CartPage() {
                         className="relative w-20 h-20 sm:w-28 sm:h-28 rounded-2xl overflow-hidden bg-[#FFF9F6] shrink-0 border border-[#E7D1CC]"
                       >
                         <Image
-                          src={item.product.images[0]}
+                          src={normalizeImageUrl(item.product.main_image || item.product.images?.[0], "/images/products/bunny-keychain.jpg")}
                           alt={item.product.name}
                           fill
                           sizes="112px"

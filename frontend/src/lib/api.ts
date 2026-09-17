@@ -300,15 +300,20 @@ export interface HomepageMedia {
   }>;
 }
 
-export function normalizeImageUrl(url?: string | null, fallback = "/images/logo/Logo_1.png"): string {
+export function normalizeImageUrl(url?: string | null, fallback = "/images/products/bunny-keychain.jpg"): string {
   if (!url) return fallback;
+
+  // Convert backend 8000 /images/ URLs to relative /images/ paths so Next.js serves from public/images
+  if (url.includes("127.0.0.1:8000/images/") || url.includes("localhost:8000/images/")) {
+    const idx = url.indexOf("/images/");
+    if (idx !== -1) return url.substring(idx);
+  }
+
   if (url.startsWith("http://") || url.startsWith("https://") || url.startsWith("data:")) {
     return url;
   }
+
   const clean = url.startsWith("/") ? url : `/${url}`;
-  if (clean.startsWith("/images/") && typeof window !== "undefined" && !window.location.origin.includes(":8000")) {
-    return `http://127.0.0.1:8000${clean}`;
-  }
   return clean;
 }
 

@@ -5,6 +5,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { X, Trash2, Plus, Minus, ShoppingBag, ArrowRight, Sparkles, Truck } from "lucide-react";
 import { useCart } from "@/context/CartContext";
+import { normalizeImageUrl } from "@/lib/api";
 
 export function CartDrawer() {
   const {
@@ -129,7 +130,7 @@ export function CartDrawer() {
                     className="relative w-20 h-20 rounded-xl overflow-hidden bg-white shrink-0 border border-[#E7D1CC]"
                   >
                     <Image
-                      src={item.product.images[0]}
+                      src={normalizeImageUrl(item.product.main_image || item.product.images?.[0], "/images/products/bunny-keychain.jpg")}
                       alt={item.product.name}
                       fill
                       sizes="80px"

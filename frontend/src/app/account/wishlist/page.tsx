@@ -6,6 +6,7 @@ import Link from "next/link";
 import { Heart, ShoppingBag, Trash2 } from "lucide-react";
 import { useWishlist } from "@/context/WishlistContext";
 import { useCart } from "@/context/CartContext";
+import { normalizeImageUrl } from "@/lib/api";
 
 export default function WishlistPage() {
   const { wishlistItems, removeFromWishlist } = useWishlist();
@@ -55,7 +56,8 @@ export default function WishlistPage() {
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
           {wishlistItems.map((product) => {
             const isStock = product.inStock !== false && (product.stock ?? 10) > 0;
-            const imgSrc = product.main_image || (product.images && product.images[0]) || "/images/placeholder.jpg";
+            const rawImg = product.main_image || (product.images && product.images[0]);
+            const imgSrc = normalizeImageUrl(rawImg, "/images/products/bunny-keychain.jpg");
 
             return (
               <div

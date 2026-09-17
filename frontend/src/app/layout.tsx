@@ -77,17 +77,17 @@ export default async function RootLayout({
       <body suppressHydrationWarning className="min-h-full flex flex-col bg-[#FFF8F5] text-[#2C201D] font-sans">
         <MediaProvider initialMedia={initialMedia}>
           <ToastProvider>
-            <CartProvider>
-              <WishlistProvider>
-                <AuthProvider>
+            <AuthProvider>
+              <CartProvider>
+                <WishlistProvider>
                   <AnnouncementBar />
                   <Navbar />
                   <main className="flex-1">{children}</main>
                   <Footer />
                   <CartDrawer />
-                </AuthProvider>
-              </WishlistProvider>
-            </CartProvider>
+                </WishlistProvider>
+              </CartProvider>
+            </AuthProvider>
           </ToastProvider>
         </MediaProvider>
       </body>

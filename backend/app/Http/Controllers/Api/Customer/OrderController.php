@@ -201,17 +201,29 @@ class OrderController extends Controller
 
             foreach ($request->items as $item) {
                 $variant = null;
+                $itemName = trim($item['name'] ?? '');
                 
                 if (!empty($item['variant_id']) && is_numeric($item['variant_id'])) {
-                    $variant = ProductVariant::with('product.taxClass')->find($item['variant_id']);
+                    $foundVariant = ProductVariant::with('product.taxClass')->find($item['variant_id']);
+                    if ($foundVariant && ($foundVariant->product && (!empty($itemName) ? (strcasecmp(trim($foundVariant->product->name), $itemName) === 0) : true))) {
+                        $variant = $foundVariant;
+                    }
                 }
 
                 if (!$variant && !empty($item['product_id'])) {
                     $code = $item['product_id'];
-                    $product = \App\Models\Product::where('product_code', $code)->first();
-                    if (!$product && is_numeric($code)) {
-                        $product = \App\Models\Product::find($code);
+                    $product = \App\Models\Product::where('product_code', $code)->orWhere('id', $code)->orWhere('slug', $code)->first();
+                    if ($product) {
+                        $variant = ProductVariant::with('product.taxClass')
+                            ->where('product_id', $product->id)
+                            ->first();
                     }
+                }
+
+                if (!$variant && !empty($itemName)) {
+                    $product = \App\Models\Product::where('name', $itemName)
+                        ->orWhere('name', 'LIKE', '%' . $itemName . '%')
+                        ->first();
                     if ($product) {
                         $variant = ProductVariant::with('product.taxClass')
                             ->where('product_id', $product->id)
@@ -225,7 +237,7 @@ class OrderController extends Controller
 
                 $quantity = (int) $item['quantity'];
                 $unitPrice = isset($item['unit_price']) ? (float) $item['unit_price'] : ($variant ? (float) $variant->price : 0);
-                $productName = $item['name'] ?? ($variant->product->name ?? 'Handmade Product');
+                $productName = !empty($itemName) ? $itemName : ($variant->product->name ?? 'Handmade Product');
 
                 $total = $unitPrice * $quantity;
                 $subtotal += $total;
@@ -364,6 +376,78 @@ class OrderController extends Controller
     }
 
     /**
+     * Helper to resolve product & image for an order item dynamically.
+     */
+    protected function resolveProductAndImageForItem($item): array
+    {
+        $productName = trim($item->product_name ?? '');
+        $product = null;
+
+        if ($item->variant && $item->variant->product) {
+            $variantProduct = $item->variant->product;
+            if (empty($productName) || 
+                strcasecmp(trim($variantProduct->name), $productName) === 0 || 
+                str_contains(strtolower($productName), strtolower($variantProduct->name)) || 
+                str_contains(strtolower($variantProduct->name), strtolower($productName))) {
+                $product = $variantProduct;
+            }
+        }
+
+        if (!$product && !empty($productName)) {
+            $product = \App\Models\Product::where('name', $productName)
+                ->orWhere('name', 'LIKE', '%' . $productName . '%')
+                ->first();
+        }
+
+        if (!$product && !empty($productName)) {
+            $slug = \Illuminate\Support\Str::slug($productName);
+            $product = \App\Models\Product::where('slug', $slug)->first();
+        }
+
+        $image = null;
+        if ($product) {
+            $image = $product->main_image;
+        }
+
+        if (!$image || (str_contains($image, 'bunny-keychain') && !str_contains(strtolower($productName), 'bunny'))) {
+            $lowerName = strtolower($productName);
+            if (str_contains($lowerName, 'sunflower')) {
+                $image = '/images/products/sunflower-stem.jpg';
+            } elseif (str_contains($lowerName, 'bunny') || str_contains($lowerName, 'amigurumi')) {
+                $image = '/images/products/bunny-keychain.jpg';
+            } elseif (str_contains($lowerName, 'rose') || str_contains($lowerName, 'bouquet') || str_contains($lowerName, 'tulip wrap')) {
+                $image = '/images/products/rose-bouquet.jpg';
+            } elseif (str_contains($lowerName, 'teddy') || str_contains($lowerName, 'bear')) {
+                $image = '/images/products/teddy-bear.jpg';
+            } elseif (str_contains($lowerName, 'phone') || str_contains($lowerName, 'sleeve') || str_contains($lowerName, 'daisy crossbody')) {
+                $image = '/images/products/daisy-phone-cover.jpg';
+            } elseif (str_contains($lowerName, 'tote') || str_contains($lowerName, 'bag') || str_contains($lowerName, 'granny')) {
+                $image = '/images/products/granny-square-bag.jpg';
+            } elseif (str_contains($lowerName, 'purse') || str_contains($lowerName, 'coin') || str_contains($lowerName, 'strawberry')) {
+                $image = '/images/products/strawberry-coin-purse.jpg';
+            } elseif (str_contains($lowerName, 'cozy') || str_contains($lowerName, 'mug') || str_contains($lowerName, 'coaster')) {
+                $image = '/images/products/tulip-mug-cozy.jpg';
+            } elseif (str_contains($lowerName, 'bookmark') || str_contains($lowerName, 'sprout')) {
+                $image = '/images/products/sprout-bookmark.jpg';
+            } elseif (str_contains($lowerName, 'scrunchie') || str_contains($lowerName, 'hair') || str_contains($lowerName, 'clip')) {
+                $image = '/images/products/floral-scrunchies.jpg';
+            } elseif (str_contains($lowerName, 'vest')) {
+                $image = '/images/products/crochet-vest.jpg';
+            } elseif (str_contains($lowerName, 'potted') || str_contains($lowerName, 'plant')) {
+                $image = '/images/products/potted-tulips.jpg';
+            } else {
+                $image = '/images/products/bunny-keychain.jpg';
+            }
+        }
+
+        return [
+            'product' => $product,
+            'image' => $image,
+            'slug' => $product ? $product->slug : \Illuminate\Support\Str::slug($productName ?: 'product'),
+        ];
+    }
+
+    /**
      * Helper to format an Order model for frontend consumption.
      */
     protected function formatOrder(Order $order): array
@@ -385,16 +469,22 @@ class OrderController extends Controller
             'orderDate' => $order->created_at ? $order->created_at->format('d M Y') : '',
             'estimatedDelivery' => $order->created_at ? $order->created_at->addDays(6)->format('d M Y') : '',
             'items' => $order->items->map(function ($item) {
+                $resolved = $this->resolveProductAndImageForItem($item);
+                $productObj = $resolved['product'];
+                $itemImage = $resolved['image'];
+                $itemSlug = $resolved['slug'];
+
                 return [
                     'id' => (string) $item->id,
-                    'productId' => (string) ($item->product_variant_id ?? 'prod-1'),
+                    'productId' => (string) ($productObj ? $productObj->id : ($item->product_variant_id ?? 'prod-1')),
                     'product' => [
-                        'id' => (string) ($item->product_variant_id ?? 'prod-1'),
+                        'id' => (string) ($productObj ? $productObj->id : ($item->product_variant_id ?? 'prod-1')),
                         'name' => $item->product_name ?? 'Handmade Product',
                         'price' => (float) $item->unit_price,
-                        'images' => [$item->variant->product->main_image ?? '/images/products/rose-bouquet.png'],
+                        'main_image' => $itemImage,
+                        'images' => [$itemImage],
                         'category' => 'Handmade Crochet',
-                        'slug' => $item->variant->product->slug ?? 'product',
+                        'slug' => $itemSlug,
                     ],
                     'quantity' => (int) $item->quantity,
                     'price' => (float) $item->unit_price,

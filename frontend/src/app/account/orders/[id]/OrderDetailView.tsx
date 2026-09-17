@@ -10,6 +10,7 @@ import {
   Sparkles,
 } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
+import { normalizeImageUrl } from "@/lib/api";
 
 interface OrderDetailViewProps {
   id: string;
@@ -151,7 +152,7 @@ export default function OrderDetailView({ id }: OrderDetailViewProps) {
               <div key={item.id} className="pt-3 first:pt-0 flex gap-4 items-center">
                 <div className="relative w-16 h-16 rounded-xl overflow-hidden bg-[#FFF9F6] shrink-0 border border-[#E7D1CC]">
                   <Image
-                    src={item.product.images[0]}
+                    src={normalizeImageUrl(item.product.main_image || item.product.images?.[0], "/images/products/bunny-keychain.jpg")}
                     alt={item.product.name}
                     fill
                     sizes="64px"
