@@ -300,21 +300,46 @@ export interface HomepageMedia {
   }>;
 }
 
+const STATIC_PRODUCT_IMAGES = new Set([
+  "bunny-keychain.jpg",
+  "sunflower-stem.jpg",
+  "rose-bouquet.jpg",
+  "teddy-bear.jpg",
+  "daisy-phone-cover.jpg",
+  "granny-square-bag.jpg",
+  "strawberry-coin-purse.jpg",
+  "tulip-mug-cozy.jpg",
+  "sprout-bookmark.jpg",
+  "floral-scrunchies.jpg",
+  "crochet-vest.jpg",
+  "potted-tulips.jpg",
+]);
+
 export function normalizeImageUrl(url?: string | null, fallback = "/images/products/bunny-keychain.jpg"): string {
   if (!url) return fallback;
 
-  // Convert backend 8000 /images/ URLs to relative /images/ paths so Next.js serves from public/images
-  if (url.includes("127.0.0.1:8000/images/") || url.includes("localhost:8000/images/")) {
-    const idx = url.indexOf("/images/");
-    if (idx !== -1) return url.substring(idx);
+  const cleanUrl = url.trim();
+  const filename = cleanUrl.split("/").pop()?.split("?")[0] || "";
+
+  // If it's one of the 12 bundled static images, serve relative from Next.js public/images/products
+  if (STATIC_PRODUCT_IMAGES.has(filename)) {
+    return `/images/products/${filename}`;
   }
 
-  if (url.startsWith("http://") || url.startsWith("https://") || url.startsWith("data:")) {
-    return url;
+  // If it's a full backend URL (http://127.0.0.1:8000 or http://localhost:8000)
+  if (cleanUrl.includes("127.0.0.1:8000") || cleanUrl.includes("localhost:8000")) {
+    return cleanUrl.replace("localhost:8000", "127.0.0.1:8000");
   }
 
-  const clean = url.startsWith("/") ? url : `/${url}`;
-  return clean;
+  // If it's an external HTTP/HTTPS URL
+  if (cleanUrl.startsWith("http://") || cleanUrl.startsWith("https://") || cleanUrl.startsWith("data:")) {
+    return cleanUrl;
+  }
+
+  // For newly uploaded admin panel images with relative paths (/images/products/...)
+  const backendBase = "http://127.0.0.1:8000";
+  const path = cleanUrl.startsWith("/") ? cleanUrl : `/${cleanUrl}`;
+  return `${backendBase}${path}`;
 }
 
 export interface ApiProduct {
@@ -364,7 +389,7 @@ export interface ApiProduct {
  * Transforms an ApiProduct from Laravel into the standard frontend Product interface.
  */
 export function transformApiProductToProduct(apiProduct: ApiProduct): Product {
-  const mainImage =
+  const rawMain =
     apiProduct.main_image ||
     (apiProduct.images && apiProduct.images.length > 0
       ? typeof apiProduct.images[0] === "string"
@@ -372,10 +397,14 @@ export function transformApiProductToProduct(apiProduct: ApiProduct): Product {
         : apiProduct.images[0].url
       : "/images/logo/Logo_1.png");
 
-  const allImages: string[] =
+  const mainImage = normalizeImageUrl(rawMain);
+
+  const rawImages: string[] =
     apiProduct.images && apiProduct.images.length > 0
       ? apiProduct.images.map((img) => (typeof img === "string" ? img : img.url))
-      : [mainImage];
+      : [rawMain];
+
+  const allImages: string[] = rawImages.map((img) => normalizeImageUrl(img));
 
   // Extract category name & slug
   const categoryName =
@@ -683,9 +712,22 @@ export async function submitContactForm(
 
 export async function fetchCustomerOrders(email?: string): Promise<any[]> {
   try {
+    let emailToUse = email;
+    if (!emailToUse && typeof window !== "undefined") {
+      const storedUser = localStorage.getItem("knotelle_customer_user");
+      if (storedUser) {
+        try {
+          const parsed = JSON.parse(storedUser);
+          if (parsed.email) emailToUse = parsed.email;
+        } catch {}
+      }
+      if (!emailToUse) {
+        emailToUse = localStorage.getItem("knotelle_guest_email") || undefined;
+      }
+    }
     const token = typeof window !== "undefined" ? localStorage.getItem("knotelle_customer_token") : null;
-    const url = email
-      ? `${getApiBaseUrl()}/customer/orders?email=${encodeURIComponent(email)}`
+    const url = emailToUse
+      ? `${getApiBaseUrl()}/customer/orders?email=${encodeURIComponent(emailToUse)}`
       : `${getApiBaseUrl()}/customer/orders`;
     const headers: Record<string, string> = {
       Accept: "application/json",
@@ -705,6 +747,114 @@ export async function fetchCustomerOrders(email?: string): Promise<any[]> {
   } catch (error) {
     console.warn("Failed to fetch customer orders:", error);
     return [];
+  }
+}
+
+/**
+ * Fetch Single Order by ID or Order Number
+ */
+export async function fetchOrderById(id: string, email?: string): Promise<any | null> {
+  try {
+    let emailToUse = email;
+    if (!emailToUse && typeof window !== "undefined") {
+      const storedUser = localStorage.getItem("knotelle_customer_user");
+      if (storedUser) {
+        try {
+          const parsed = JSON.parse(storedUser);
+          if (parsed.email) emailToUse = parsed.email;
+        } catch {}
+      }
+      if (!emailToUse) {
+        emailToUse = localStorage.getItem("knotelle_guest_email") || undefined;
+      }
+    }
+    const token = typeof window !== "undefined" ? localStorage.getItem("knotelle_customer_token") : null;
+    const query = emailToUse ? `?email=${encodeURIComponent(emailToUse)}` : "";
+    const url = `${getApiBaseUrl()}/customer/orders/${encodeURIComponent(id)}${query}`;
+    const headers: Record<string, string> = {
+      Accept: "application/json",
+    };
+    if (token) {
+      headers["Authorization"] = `Bearer ${token}`;
+    }
+    const response = await fetch(url, { headers, cache: "no-store" });
+    const result = await response.json();
+    if (result.success && result.data) {
+      return result.data;
+    }
+    return null;
+  } catch (error) {
+    console.warn("Failed to fetch order detail by id:", error);
+    return null;
+  }
+}
+
+/**
+ * Fetch Active Offers/Coupons from Laravel Backend API
+ */
+export async function fetchActiveOffers(): Promise<Array<{
+  id: number;
+  name: string;
+  code: string;
+  offer_type: string;
+  discount_value: string | number;
+  min_cart_amount?: string | number | null;
+  ends_at?: string | null;
+}>> {
+  try {
+    const url = `${getApiBaseUrl()}/customer/offers/active?_t=${Date.now()}`;
+    const response = await fetch(url, {
+      headers: { Accept: "application/json" },
+      cache: "no-store",
+    });
+    const result = await response.json();
+    if (result.success && Array.isArray(result.data)) {
+      return result.data;
+    }
+    return [];
+  } catch (error) {
+    console.warn("Failed to fetch active offers:", error);
+    return [];
+  }
+}
+
+/**
+ * Validate an Offer/Coupon Code against Subtotal with Backend API
+ */
+export async function validateOfferCode(code: string, subtotal: number): Promise<{
+  success: boolean;
+  message?: string;
+  discount_amount?: number;
+  offer?: any;
+}> {
+  try {
+    const response = await fetch(`${getApiBaseUrl()}/customer/offers/validate`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Accept: "application/json",
+      },
+      body: JSON.stringify({ code: code.trim().toUpperCase(), subtotal }),
+    });
+    const result = await response.json();
+    if (response.ok && result.success && result.data) {
+      return {
+        success: true,
+        discount_amount: result.data.discount_amount,
+        offer: result.data.offer,
+        message: result.message,
+      };
+    }
+    return {
+      success: false,
+      message: result.message || "Invalid or expired coupon code.",
+    };
+  } catch (error) {
+    console.warn("Validate offer error:", error);
+    return {
+      success: false,
+      message: "Connection error validating offer code.",
+    };
   }
 }
 
@@ -812,6 +962,123 @@ export async function loginCustomer(payload: {
     };
   } catch (error) {
     console.warn("Login customer error:", error);
+    return { success: false, message: "Connection error. Please try again." };
+  }
+}
+
+/**
+ * Fetch Current Customer Profile from Laravel Backend API
+ */
+export async function fetchCustomerProfile(): Promise<{ success: boolean; user?: any; message?: string }> {
+  try {
+    const token = typeof window !== "undefined" ? localStorage.getItem("knotelle_customer_token") : null;
+    if (!token) return { success: false, message: "No token" };
+
+    const response = await fetch(`${getApiBaseUrl()}/customer/profile?_t=${Date.now()}`, {
+      headers: {
+        Accept: "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+      cache: "no-store",
+    });
+    const result = await response.json();
+    if (response.ok && result.success && result.user) {
+      return {
+        success: true,
+        user: result.user,
+      };
+    }
+    return {
+      success: false,
+      message: result.message || "Unauthenticated.",
+    };
+  } catch (error) {
+    console.warn("Fetch customer profile error:", error);
+    return { success: false, message: "Connection error." };
+  }
+}
+
+/**
+ * Request Password Reset Email/Code
+ */
+export async function forgotCustomerPassword(email: string): Promise<{ success: boolean; message?: string }> {
+  try {
+    const response = await fetch(`${getApiBaseUrl()}/customer/forgot-password`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Accept: "application/json",
+      },
+      body: JSON.stringify({ email }),
+    });
+    const result = await response.json();
+    return {
+      success: response.ok && result.success,
+      message: result.message || "If that email is registered, instructions have been sent.",
+    };
+  } catch (error) {
+    console.warn("Forgot password error:", error);
+    return { success: false, message: "Connection error. Please try again." };
+  }
+}
+
+/**
+ * Reset Customer Password
+ */
+export async function resetCustomerPassword(payload: { email: string; password: string }): Promise<{ success: boolean; message?: string }> {
+  try {
+    const response = await fetch(`${getApiBaseUrl()}/customer/reset-password`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Accept: "application/json",
+      },
+      body: JSON.stringify(payload),
+    });
+    const result = await response.json();
+    return {
+      success: response.ok && result.success,
+      message: result.message || "Password update failed.",
+    };
+  } catch (error) {
+    console.warn("Reset password error:", error);
+    return { success: false, message: "Connection error. Please try again." };
+  }
+}
+
+/**
+ * Update Customer Profile (Name & Mobile Number only) in Laravel Backend API
+ */
+export async function updateCustomerProfile(payload: {
+  email: string;
+  name: string;
+  mobile: string;
+}): Promise<{ success: boolean; user?: any; message?: string }> {
+  try {
+    const token = typeof window !== "undefined" ? localStorage.getItem("knotelle_customer_token") : null;
+    const response = await fetch(`${getApiBaseUrl()}/customer/update-profile`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Accept: "application/json",
+        ...(token ? { Authorization: `Bearer ${token}` } : {}),
+      },
+      body: JSON.stringify(payload),
+    });
+    const result = await response.json();
+    if (response.ok && result.success) {
+      return {
+        success: true,
+        user: result.user,
+        message: result.message || "Profile updated successfully!",
+      };
+    }
+    return {
+      success: false,
+      message: result.message || (result.errors ? Object.values(result.errors).flat().join(", ") : "Failed to update profile."),
+    };
+  } catch (error) {
+    console.warn("Update customer profile error:", error);
     return { success: false, message: "Connection error. Please try again." };
   }
 }
@@ -1189,3 +1456,168 @@ export async function syncCustomerWishlist(productIds: string[]): Promise<Produc
     return null;
   }
 }
+
+/**
+ * Customer Addresses APIs
+ */
+export async function fetchCustomerAddresses(): Promise<any[] | null> {
+  try {
+    const token = typeof window !== "undefined" ? localStorage.getItem("knotelle_customer_token") : null;
+    if (!token) return null;
+
+    const res = await fetch(`${getApiBaseUrl()}/customer/addresses?_t=${Date.now()}`, {
+      headers: {
+        Accept: "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+      cache: "no-store",
+    });
+    const data = await res.json();
+    if (data.success && Array.isArray(data.addresses)) {
+      return data.addresses;
+    }
+    return [];
+  } catch (err) {
+    console.warn("Fetch addresses error:", err);
+    return null;
+  }
+}
+
+export async function saveCustomerAddress(addressData: Record<string, any>): Promise<{ success: boolean; address?: any; message?: string }> {
+  try {
+    const token = typeof window !== "undefined" ? localStorage.getItem("knotelle_customer_token") : null;
+    if (!token) return { success: false, message: "Unauthenticated" };
+
+    const res = await fetch(`${getApiBaseUrl()}/customer/addresses`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Accept: "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify(addressData),
+    });
+    const data = await res.json();
+    if (res.ok && data.success) {
+      return { success: true, address: data.address, message: data.message };
+    }
+    return { success: false, message: data.message || "Failed to save address." };
+  } catch (err) {
+    console.warn("Save address error:", err);
+    return { success: false, message: "Connection error. Please try again." };
+  }
+}
+
+export async function updateCustomerAddress(id: string, addressData: Record<string, any>): Promise<{ success: boolean; address?: any; message?: string }> {
+  try {
+    const token = typeof window !== "undefined" ? localStorage.getItem("knotelle_customer_token") : null;
+    if (!token) return { success: false, message: "Unauthenticated" };
+
+    const res = await fetch(`${getApiBaseUrl()}/customer/addresses/${encodeURIComponent(id)}`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+        Accept: "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify(addressData),
+    });
+    const data = await res.json();
+    if (res.ok && data.success) {
+      return { success: true, address: data.address, message: data.message };
+    }
+    return { success: false, message: data.message || "Failed to update address." };
+  } catch (err) {
+    console.warn("Update address error:", err);
+    return { success: false, message: "Connection error. Please try again." };
+  }
+}
+
+export async function deleteCustomerAddress(id: string): Promise<{ success: boolean; message?: string }> {
+  try {
+    const token = typeof window !== "undefined" ? localStorage.getItem("knotelle_customer_token") : null;
+    if (!token) return { success: false, message: "Unauthenticated" };
+
+    const res = await fetch(`${getApiBaseUrl()}/customer/addresses/${encodeURIComponent(id)}`, {
+      method: "DELETE",
+      headers: {
+        Accept: "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    const data = await res.json();
+    return { success: res.ok && data.success, message: data.message };
+  } catch (err) {
+    console.warn("Delete address error:", err);
+    return { success: false, message: "Connection error." };
+  }
+}
+
+export async function setDefaultCustomerAddress(id: string): Promise<{ success: boolean; message?: string }> {
+  try {
+    const token = typeof window !== "undefined" ? localStorage.getItem("knotelle_customer_token") : null;
+    if (!token) return { success: false, message: "Unauthenticated" };
+
+    const res = await fetch(`${getApiBaseUrl()}/customer/addresses/${encodeURIComponent(id)}/default`, {
+      method: "POST",
+      headers: {
+        Accept: "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    const data = await res.json();
+    return { success: res.ok && data.success, message: data.message };
+  } catch (err) {
+    console.warn("Set default address error:", err);
+    return { success: false, message: "Connection error." };
+  }
+}
+
+export async function createRazorpayOrder(amount: number): Promise<{
+  success: boolean;
+  order_id?: string;
+  key_id?: string;
+  amount?: number;
+  currency?: string;
+  message?: string;
+}> {
+  try {
+    const res = await fetch(`${getApiBaseUrl()}/customer/payment/razorpay/order`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Accept: "application/json",
+      },
+      body: JSON.stringify({ amount }),
+    });
+    const data = await res.json();
+    return data;
+  } catch (err) {
+    console.error("Create Razorpay Order error:", err);
+    return { success: false, message: "Network error creating Razorpay order." };
+  }
+}
+
+export async function verifyRazorpayPayment(payload: {
+  razorpay_payment_id: string;
+  razorpay_order_id: string;
+  razorpay_signature: string;
+}): Promise<{ success: boolean; message?: string }> {
+  try {
+    const res = await fetch(`${getApiBaseUrl()}/customer/payment/razorpay/verify`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Accept: "application/json",
+      },
+      body: JSON.stringify(payload),
+    });
+    const data = await res.json();
+    return data;
+  } catch (err) {
+    console.error("Verify Razorpay Payment error:", err);
+    return { success: false, message: "Network error verifying Razorpay payment." };
+  }
+}
+
+

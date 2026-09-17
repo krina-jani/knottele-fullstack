@@ -107,13 +107,6 @@ class OrderController extends Controller
             $customer = auth('customer_api')->user();
             $email = trim($request->query('email') ?? '');
 
-            if (!$customer && empty($email)) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Unauthorized access.'
-                ], 401);
-            }
-
             $order = Order::with(['items.variant.product', 'items.variant.images'])
                 ->where(function ($q) use ($id) {
                     $q->where('id', $id)->orWhere('order_number', $id);
@@ -127,7 +120,7 @@ class OrderController extends Controller
                 ], 404);
             }
 
-            // Security check: Order MUST belong to the authenticated customer
+            // Security check: Order MUST belong to the authenticated customer if customer is logged in
             if ($customer) {
                 $orderCustomerEmail = strtolower($order->shipping_address['email'] ?? '');
                 $authCustomerEmail = strtolower($customer->email);
@@ -187,7 +180,7 @@ class OrderController extends Controller
             'shipping_address.city' => 'required|string',
             'shipping_address.pin_code' => 'required|string',
 
-            'payment_method' => 'required|string|in:upi,card,netbanking,cod',
+            'payment_method' => 'required|string|in:razorpay,online,upi,card,netbanking,cod',
             'offer_code' => 'nullable|string',
         ]);
 
@@ -284,8 +277,7 @@ class OrderController extends Controller
             // Shipping rule: 99rs shipping for order subtotal < 999rs; Free (0rs) for subtotal >= 999rs or 0rs
             $effectiveSubtotal = max(0, $subtotal - $discountTotal);
             $shippingTotal = ($subtotal == 0 || $effectiveSubtotal >= 999) ? 0 : 99;
-
-            $grandTotal = $subtotal - $discountTotal + $shippingTotal + $totalTaxAmount;
+            $grandTotal = max(0, $subtotal - $discountTotal + $shippingTotal);
 
             // Associate customer ID if authenticated or matching email found (or create new customer profile)
             $authCustomer = auth('customer_api')->user();
@@ -503,16 +495,17 @@ class OrderController extends Controller
             ],
             'paymentMethod' => match ($order->payment_method) {
                 'cod' => 'Cash on Delivery',
+                'razorpay', 'online' => 'Razorpay Online Payment',
                 'upi' => 'UPI',
                 'card' => 'Credit/Debit Card',
                 'netbanking' => 'Net Banking',
-                default => ucfirst($order->payment_method ?? 'UPI'),
+                default => ucfirst($order->payment_method ?? 'Razorpay'),
             },
             'paymentStatus' => ucfirst($order->payment_status ?? 'Pending'),
             'subtotal' => (float) $order->subtotal,
             'shipping' => (float) $order->shipping_total,
             'discount' => (float) $order->discount_total,
-            'total' => (float) $order->grand_total,
+            'total' => (float) max(0, (float) $order->subtotal - (float) $order->discount_total + (float) $order->shipping_total),
             'status' => $statusLabel,
             'timeline' => [
                 [

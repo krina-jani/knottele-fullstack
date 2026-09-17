@@ -3,7 +3,7 @@
 import React, { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { Eye, EyeOff, Lock, Mail, User as UserIcon, ArrowRight, Check } from "lucide-react";
+import { Eye, EyeOff, Lock, Mail, Phone, User as UserIcon, ArrowRight, Check } from "lucide-react";
 import { KnotelleCrownLogo, BotanicalFlourish } from "@/components/ui/BotanicalDecorations";
 import { useAuth } from "@/context/AuthContext";
 import { useToast } from "@/context/ToastContext";
@@ -26,6 +26,7 @@ export function AuthCard({ defaultMode = "signup", onSuccessRedirect = "/account
   // Form Fields - Sign Up & Log In
   const [fullName, setFullName] = useState("");
   const [email, setEmail] = useState("");
+  const [mobile, setMobile] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
@@ -54,6 +55,15 @@ export function AuthCard({ defaultMode = "signup", onSuccessRedirect = "/account
         setErrorMsg("Please enter a valid email address.");
         return;
       }
+      const cleanedMobile = mobile.replace(/\D/g, "");
+      if (!cleanedMobile) {
+        setErrorMsg("Please enter your 10-digit mobile number.");
+        return;
+      }
+      if (cleanedMobile.length !== 10) {
+        setErrorMsg("Mobile number must be exactly 10 digits.");
+        return;
+      }
       if (!password) {
         setErrorMsg("Please enter a password.");
         return;
@@ -73,15 +83,17 @@ export function AuthCard({ defaultMode = "signup", onSuccessRedirect = "/account
 
       setLoading(true);
       try {
+        const formattedMobile = `+91 ${cleanedMobile}`;
         const result = await registerCustomer({
           name: fullName.trim(),
           email: email.trim().toLowerCase(),
+          mobile: formattedMobile,
           password: password,
         });
 
         if (result.success) {
           showToast("Account Created! 🌸", "Welcome to the Knotelle Crochet community.", "success");
-          login(email.trim().toLowerCase(), result.user || { name: fullName, email }, result.token);
+          login(email.trim().toLowerCase(), result.user || { name: fullName, email, mobile: formattedMobile }, result.token);
           router.push(onSuccessRedirect);
         } else {
           setErrorMsg(result.message || "Failed to create account. Please try again.");
@@ -95,7 +107,7 @@ export function AuthCard({ defaultMode = "signup", onSuccessRedirect = "/account
     } else {
       // Log In
       if (!email.trim()) {
-        setErrorMsg("Please enter your email address.");
+        setErrorMsg("Please enter your email address or mobile number.");
         return;
       }
       if (!password) {
@@ -115,7 +127,7 @@ export function AuthCard({ defaultMode = "signup", onSuccessRedirect = "/account
           login(email.trim().toLowerCase(), result.user, result.token);
           router.push(onSuccessRedirect);
         } else {
-          setErrorMsg(result.message || "Invalid email or password.");
+          setErrorMsg(result.message || "Invalid email/phone or password.");
           showToast("Login Failed", result.message || "Invalid credentials.", "error");
         }
       } catch (err: any) {
@@ -208,6 +220,32 @@ export function AuthCard({ defaultMode = "signup", onSuccessRedirect = "/account
               </div>
             </div>
 
+            {/* MOBILE NUMBER (+91) */}
+            <div className="space-y-1">
+              <label className="text-[11px] font-bold tracking-wider text-[#2E211E] uppercase block">
+                MOBILE NUMBER
+              </label>
+              <div className="relative flex items-center">
+                <div className="absolute left-3.5 top-1/2 -translate-y-1/2 flex items-center gap-1 text-xs font-bold text-[#913638] pointer-events-none select-none">
+                  <Phone className="w-3.5 h-3.5 text-[#786864]" />
+                  <span>+91</span>
+                  <span className="text-[#E7D1CC] ml-0.5">|</span>
+                </div>
+                <input
+                  type="tel"
+                  required
+                  maxLength={10}
+                  value={mobile}
+                  onChange={(e) => {
+                    const val = e.target.value.replace(/\D/g, "");
+                    if (val.length <= 10) setMobile(val);
+                  }}
+                  placeholder="Enter 10-digit mobile number"
+                  className="w-full pl-20 pr-4 py-2.5 rounded-xl bg-[#FFF9F6] border border-[#E7D1CC] text-xs font-medium text-[#2E211E] placeholder-[#786864]/50 focus:outline-none focus:border-[#913638] focus:ring-1 focus:ring-[#913638] transition-colors"
+                />
+              </div>
+            </div>
+
             {/* PASSWORD */}
             <div className="space-y-1">
               <label className="text-[11px] font-bold tracking-wider text-[#2E211E] uppercase block">
@@ -285,18 +323,18 @@ export function AuthCard({ defaultMode = "signup", onSuccessRedirect = "/account
         {/* LOG IN FORM FIELDS */}
         {mode === "login" && (
           <>
-            {/* EMAIL ADDRESS */}
+            {/* EMAIL OR MOBILE NUMBER */}
             <div className="space-y-1">
               <label className="text-[11px] font-bold tracking-wider text-[#2E211E] uppercase block">
-                EMAIL ADDRESS
+                EMAIL ADDRESS OR MOBILE NUMBER
               </label>
               <div className="relative">
                 <input
-                  type="email"
+                  type="text"
                   required
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  placeholder="Enter your email address"
+                  placeholder="Enter your email or 10-digit mobile number"
                   className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-[#FFF9F6] border border-[#E7D1CC] text-xs text-[#2E211E] placeholder-[#786864]/50 focus:outline-none focus:border-[#913638] focus:ring-1 focus:ring-[#913638] transition-colors"
                 />
                 <Mail className="w-4 h-4 text-[#786864] absolute left-3.5 top-1/2 -translate-y-1/2" />

@@ -72,6 +72,17 @@ export function WishlistProvider({ children }: { children: React.ReactNode }) {
         localStorage.removeItem("knotelle_wishlist");
       }
     } else {
+      if (typeof window !== "undefined") {
+        const pending = localStorage.getItem("knotelle_pending_wishlist");
+        if (pending) {
+          localStorage.removeItem("knotelle_pending_wishlist");
+          toggleCustomerWishlist(pending).then(() => {
+            refetchWishlist();
+          });
+          setIsInitialized(true);
+          return;
+        }
+      }
       refetchWishlist();
     }
     setIsInitialized(true);
@@ -88,6 +99,16 @@ export function WishlistProvider({ children }: { children: React.ReactNode }) {
 
   const toggleWishlist = async (product: Product) => {
     const pId = String(product.db_id || product.id);
+
+    if (!isLoggedIn) {
+      showToast("Sign In Required 🌸", "Please log in to save items to your personal wishlist.", "info");
+      if (typeof window !== "undefined") {
+        localStorage.setItem("knotelle_pending_wishlist", pId);
+        window.location.href = `/login?redirectTo=${encodeURIComponent(window.location.pathname)}`;
+      }
+      return;
+    }
+
     const isCurrentlySaved = isInWishlist(pId);
 
     if (isCurrentlySaved) {
@@ -96,26 +117,16 @@ export function WishlistProvider({ children }: { children: React.ReactNode }) {
       setWishlistItems((prev) => prev.filter((item) => String(item.db_id || item.id) !== pId));
       showToast("Removed from Wishlist", `${product.name} removed from your saved items.`, "info");
 
-      if (isLoggedIn) {
-        await toggleCustomerWishlist(pId);
-        refetchWishlist();
-      } else if (typeof window !== "undefined") {
-        const updated = wishlistIds.filter((id) => String(id) !== pId && String(id) !== `prod-${pId}`);
-        localStorage.setItem("knotelle_wishlist", JSON.stringify(updated));
-      }
+      await toggleCustomerWishlist(pId);
+      refetchWishlist();
     } else {
       // Optimistic update
       setWishlistIds((prev) => [...prev, pId, `prod-${pId}`]);
       setWishlistItems((prev) => [product, ...prev]);
       showToast("Saved to Wishlist 💕", `${product.name} added to your favorites.`, "wishlist");
 
-      if (isLoggedIn) {
-        await toggleCustomerWishlist(pId);
-        refetchWishlist();
-      } else if (typeof window !== "undefined") {
-        const updated = [...wishlistIds, pId];
-        localStorage.setItem("knotelle_wishlist", JSON.stringify(updated));
-      }
+      await toggleCustomerWishlist(pId);
+      refetchWishlist();
     }
   };
 

@@ -873,13 +873,23 @@ export default function CustomOrderPage() {
                       <label className="text-xs font-semibold text-[#2E211E] block">
                         WhatsApp Phone Number *
                       </label>
-                      <input
-                        type="tel"
-                        required
-                        value={customerPhone}
-                        onChange={(e) => setCustomerPhone(e.target.value)}
-                        className="w-full px-4 py-3 rounded-2xl bg-[#FFF9F6] border border-[#E7D1CC] text-xs text-[#2E211E] focus:outline-none focus:border-[#913638]"
-                      />
+                      <div className="relative flex items-center rounded-2xl bg-[#FFF9F6] border border-[#E7D1CC] focus-within:border-[#913638] focus-within:ring-1 focus-within:ring-[#913638] transition-all overflow-hidden">
+                        <div className="flex items-center gap-1.5 px-3.5 py-3 bg-[#FCE9E5] border-r border-[#E7D1CC] text-xs font-bold text-[#913638] shrink-0 select-none">
+                          <span className="text-sm leading-none">🇮🇳</span>
+                          <span>+91</span>
+                        </div>
+                        <input
+                          type="tel"
+                          required
+                          inputMode="numeric"
+                          pattern="[0-9]{10}"
+                          maxLength={10}
+                          value={customerPhone.replace(/^\+91\s*/, "").replace(/\D/g, "").slice(0, 10)}
+                          onChange={(e) => setCustomerPhone(e.target.value.replace(/\D/g, "").slice(0, 10))}
+                          placeholder="98765 43210"
+                          className="w-full px-3.5 py-3 bg-transparent text-xs text-[#2E211E] placeholder-[#786864]/50 focus:outline-none"
+                        />
+                      </div>
                     </div>
 
                     <div className="space-y-1.5">

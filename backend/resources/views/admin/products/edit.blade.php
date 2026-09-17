@@ -574,7 +574,6 @@
             const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
             const response = await axios.post('{{ route("admin.media.upload") }}', formData, {
                 headers: { 
-                    'Content-Type': 'multipart/form-data',
                     'X-CSRF-TOKEN': csrfToken
                 }
             });
@@ -610,7 +609,6 @@
             const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
             const response = await axios.post('{{ route("admin.media.upload") }}', formData, {
                 headers: { 
-                    'Content-Type': 'multipart/form-data',
                     'X-CSRF-TOKEN': csrfToken
                 }
             });
@@ -846,7 +844,6 @@
             const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
             const response = await axios.post('{{ route("admin.media.upload") }}', formData, {
                 headers: { 
-                    'Content-Type': 'multipart/form-data',
                     'X-CSRF-TOKEN': csrfToken
                 }
             });

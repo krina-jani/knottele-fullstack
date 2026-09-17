@@ -187,8 +187,9 @@
         }
 
         try {
+            const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
             await axios.post('{{ route("admin.media.upload") }}', formData, {
-                headers: { 'Content-Type': 'multipart/form-data' }
+                headers: { 'X-CSRF-TOKEN': csrfToken }
             });
             loadMedia(1);
         } catch (error) {

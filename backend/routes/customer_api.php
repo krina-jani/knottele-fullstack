@@ -15,6 +15,12 @@ Route::prefix('customer')->group(function () {
     Route::post('media/video/{id}/view', [\App\Http\Controllers\Api\Customer\MediaController::class, 'incrementView']);
     Route::post('login', [CustomerApiAuthController::class, 'login']);
     Route::post('register', [CustomerApiAuthController::class, 'register']);
+    Route::post('forgot-password', [CustomerApiAuthController::class, 'forgotPassword']);
+    Route::post('reset-password', [CustomerApiAuthController::class, 'resetPassword']);
+
+    // Public payment routes (Razorpay)
+    Route::post('payment/razorpay/order', [\App\Http\Controllers\Api\Customer\RazorpayPaymentController::class, 'createOrder']);
+    Route::post('payment/razorpay/verify', [\App\Http\Controllers\Api\Customer\RazorpayPaymentController::class, 'verifyPayment']);
 
     // Public offers routes
     Route::get('offers/active', [OfferController::class, 'getActiveOffers']);
@@ -42,6 +48,7 @@ Route::prefix('customer')->group(function () {
     Route::post('cart/validate', [\App\Http\Controllers\Api\Customer\OrderController::class, 'validateCart']);
 
     // Protected routes (require authentication)
+    Route::post('update-profile', [CustomerApiAuthController::class, 'updateProfile']);
     Route::middleware('auth:customer_api')->group(function () {
         Route::get('profile', [CustomerApiAuthController::class, 'profile']);
         Route::post('logout', [CustomerApiAuthController::class, 'logout']);
@@ -53,5 +60,12 @@ Route::prefix('customer')->group(function () {
         Route::post('wishlist/sync', [\App\Http\Controllers\Api\Customer\WishlistController::class, 'sync']);
         Route::post('wishlist/{productId}', [\App\Http\Controllers\Api\Customer\WishlistController::class, 'toggle']);
         Route::delete('wishlist/{productId}', [\App\Http\Controllers\Api\Customer\WishlistController::class, 'remove']);
+        // Address routes
+        Route::get('addresses', [\App\Http\Controllers\Api\Customer\AddressController::class, 'index']);
+        Route::post('addresses', [\App\Http\Controllers\Api\Customer\AddressController::class, 'store']);
+        Route::put('addresses/{id}', [\App\Http\Controllers\Api\Customer\AddressController::class, 'update']);
+        Route::delete('addresses/{id}', [\App\Http\Controllers\Api\Customer\AddressController::class, 'destroy']);
+        Route::post('addresses/{id}/default', [\App\Http\Controllers\Api\Customer\AddressController::class, 'setDefault']);
     });
 });
+

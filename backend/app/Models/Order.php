@@ -61,6 +61,17 @@ class Order extends Model
         'delivered_at' => 'datetime',
     ];
 
+    /**
+     * Always calculate grand_total as subtotal - discount_total + shipping_total.
+     */
+    public function getGrandTotalAttribute($value)
+    {
+        $sub = (float) ($this->attributes['subtotal'] ?? 0);
+        $disc = (float) ($this->attributes['discount_total'] ?? 0);
+        $ship = (float) ($this->attributes['shipping_total'] ?? 0);
+        return max(0, round($sub - $disc + $ship, 2));
+    }
+
     // Relationships
     public function customer(): BelongsTo
     {

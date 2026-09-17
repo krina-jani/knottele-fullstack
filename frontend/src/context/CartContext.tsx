@@ -4,6 +4,7 @@ import React, { createContext, useContext, useState, useEffect } from "react";
 import { CartItem, CartItemCustomization } from "@/types/cart";
 import { Product } from "@/types/product";
 import { useToast } from "./ToastContext";
+import { validateOfferCode } from "@/lib/api";
 
 interface CartContextType {
   items: CartItem[];
@@ -19,7 +20,7 @@ interface CartContextType {
   discount: number;
   total: number;
   promoCode: string;
-  applyPromoCode: (code: string) => boolean;
+  applyPromoCode: (code: string) => Promise<boolean>;
   removePromoCode: () => void;
   freeShippingThreshold: number;
   amountToFreeShipping: number;
@@ -125,8 +126,37 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     localStorage.removeItem("knotelle_promo");
   };
 
-  const applyPromoCode = (code: string): boolean => {
+  const applyPromoCode = async (code: string): Promise<boolean> => {
     const cleanCode = code.trim().toUpperCase();
+    if (!cleanCode) return false;
+
+    // Calculate current subtotal for validation
+    const currentSubtotal = items.reduce((sum, item) => sum + item.price * item.quantity, 0);
+
+    // 1. Try Backend API Validation
+    try {
+      const apiResult = await validateOfferCode(cleanCode, currentSubtotal);
+      if (apiResult && apiResult.success) {
+        setPromoCode(cleanCode);
+        let pct = 10;
+        if (apiResult.offer?.offer_type === "percentage" && apiResult.offer?.discount_value) {
+          pct = Number(apiResult.offer.discount_value);
+        } else if (apiResult.discount_amount && currentSubtotal > 0) {
+          pct = Math.round((apiResult.discount_amount / currentSubtotal) * 100);
+        }
+        setDiscountPercent(pct);
+        localStorage.setItem("knotelle_promo", JSON.stringify({ code: cleanCode, discount: pct }));
+        showToast("Coupon Applied! 🎉", apiResult.message || `${cleanCode} discount applied.`, "success");
+        return true;
+      } else if (apiResult && apiResult.message && !apiResult.message.includes("Connection error")) {
+        showToast("Coupon Error", apiResult.message, "error");
+        return false;
+      }
+    } catch (err) {
+      console.warn("Backend offer validation network fallback", err);
+    }
+
+    // 2. Client Fallback Coupons
     if (cleanCode === "KNOTELLE10" || cleanCode === "WELCOME10") {
       setPromoCode(cleanCode);
       setDiscountPercent(10);
@@ -140,7 +170,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
       showToast("Special Discount! ✨", "20% discount applied to your order.", "success");
       return true;
     } else {
-      showToast("Invalid Coupon Code", "Please check the code and try again (try KNOTELLE10)", "error");
+      showToast("Invalid Coupon Code", "Please check the code and try again.", "error");
       return false;
     }
   };

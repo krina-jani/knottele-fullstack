@@ -128,8 +128,8 @@
                             <div class="relative aspect-square w-full rounded-xl overflow-hidden bg-white border border-stone-200/80 flex items-center justify-center shadow-inner group/thumb mb-3">
                                 <img id="slot-img-{{ $i }}" src="{{ $slotOldUrl ?: '/images/logo/Logo_1.png' }}" class="{{ $slotOldUrl ? '' : 'hidden' }} w-full h-full object-cover">
                                 
-                                <div id="slot-empty-{{ $i }}" class="{{ $slotOldUrl ? 'hidden' : 'flex' }} flex-col items-center justify-center p-3 text-center">
-                                    <div class="w-10 h-10 rounded-full bg-stone-100 flex items-center justify-center text-stone-400 mb-1">
+                                <div id="slot-empty-{{ $i }}" class="{{ $slotOldUrl ? 'hidden' : 'flex' }} flex-col items-center justify-center p-3 text-center cursor-pointer group/slot-empty w-full h-full" onclick="document.getElementById('slot-file-input-{{ $i }}').click()">
+                                    <div class="w-10 h-10 rounded-full bg-stone-100 flex items-center justify-center text-stone-400 mb-1 group-hover/slot-empty:bg-red-50 group-hover/slot-empty:text-red-500 transition">
                                         <i class="fas fa-image text-lg"></i>
                                     </div>
                                     <span class="text-xs font-semibold text-stone-600">Empty Slot</span>
@@ -153,7 +153,7 @@
                                 <label class="cursor-pointer flex items-center justify-center gap-1 text-[11px] font-bold text-stone-700 bg-white hover:bg-stone-100 border border-stone-200/90 py-1.5 px-2 rounded-lg shadow-2xs transition active:scale-95">
                                     <i class="fas fa-upload text-stone-500 text-[10px]"></i>
                                     <span>Upload</span>
-                                    <input type="file" accept="image/*" class="hidden" onchange="uploadSingleSlot(event, {{ $i }})">
+                                    <input type="file" id="slot-file-input-{{ $i }}" accept="image/*" class="hidden" onchange="uploadSingleSlot(event, {{ $i }})">
                                 </label>
 
                                 <button type="button" onclick="openMediaModalForSlot({{ $i }})" class="flex items-center justify-center gap-1 text-[11px] font-bold text-stone-700 bg-white hover:bg-stone-100 border border-stone-200/90 py-1.5 px-2 rounded-lg shadow-2xs transition active:scale-95">
@@ -795,7 +795,6 @@
             const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
             const response = await axios.post('{{ route("admin.media.upload") }}', formData, {
                 headers: { 
-                    'Content-Type': 'multipart/form-data',
                     'X-CSRF-TOKEN': csrfToken
                 }
             });
@@ -831,7 +830,6 @@
             const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
             const response = await axios.post('{{ route("admin.media.upload") }}', formData, {
                 headers: { 
-                    'Content-Type': 'multipart/form-data',
                     'X-CSRF-TOKEN': csrfToken
                 }
             });
@@ -1099,7 +1097,6 @@
             const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
             const response = await axios.post('{{ route("admin.media.upload") }}', formData, {
                 headers: { 
-                    'Content-Type': 'multipart/form-data',
                     'X-CSRF-TOKEN': csrfToken
                 }
             });

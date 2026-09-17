@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useState, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
@@ -8,9 +8,11 @@ import {
   Clock,
   ArrowLeft,
   Sparkles,
+  Loader2,
 } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
-import { normalizeImageUrl } from "@/lib/api";
+import { normalizeImageUrl, fetchOrderById } from "@/lib/api";
+import { Order } from "@/types/order";
 
 interface OrderDetailViewProps {
   id: string;
@@ -18,9 +20,11 @@ interface OrderDetailViewProps {
 
 export default function OrderDetailView({ id }: OrderDetailViewProps) {
   const { orders } = useAuth();
+  const [apiOrder, setApiOrder] = useState<Order | null>(null);
+  const [loading, setLoading] = useState(false);
 
   const cleanId = decodeURIComponent(id || "");
-  const order = orders.find(
+  const contextOrder = orders.find(
     (o) =>
       o.id === cleanId ||
       o.orderNumber === cleanId ||
@@ -28,6 +32,30 @@ export default function OrderDetailView({ id }: OrderDetailViewProps) {
       o.id === cleanId.replace("ord-", "") ||
       o.orderNumber.toLowerCase() === cleanId.toLowerCase()
   );
+
+  const order = contextOrder || apiOrder;
+
+  useEffect(() => {
+    if (!contextOrder && cleanId) {
+      setLoading(true);
+      fetchOrderById(cleanId)
+        .then((fetched) => {
+          if (fetched) {
+            setApiOrder(fetched);
+          }
+        })
+        .finally(() => setLoading(false));
+    }
+  }, [cleanId, contextOrder]);
+
+  if (loading && !order) {
+    return (
+      <div className="bg-white rounded-3xl border border-[#E7D1CC] p-12 text-center space-y-4">
+        <Loader2 className="w-8 h-8 text-[#913638] animate-spin mx-auto" />
+        <p className="text-xs text-[#786864]">Fetching tracking & order details...</p>
+      </div>
+    );
+  }
 
   if (!order) {
     return (
@@ -224,7 +252,7 @@ export default function OrderDetailView({ id }: OrderDetailViewProps) {
               </div>
               <div className="flex justify-between text-sm font-bold text-[#2E211E] pt-2 border-t border-[#E7D1CC]">
                 <span>Total Paid:</span>
-                <span className="text-[#913638]">₹{order.total.toLocaleString("en-IN")}</span>
+                <span className="text-[#913638]">₹{Math.max(0, (order.subtotal || 0) - (order.discount || 0) + (order.shipping || 0)).toLocaleString("en-IN")}</span>
               </div>
               <p className="text-[10px] text-[#786864] pt-1">
                 Mode: {order.paymentMethod} ({order.paymentStatus})

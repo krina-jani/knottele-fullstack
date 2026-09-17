@@ -3,12 +3,13 @@
 import React, { useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Search, Heart, User, ShoppingBag, Sparkles, ArrowRight } from "lucide-react";
+import { Search, Heart, User, ShoppingBag, Sparkles, ArrowRight, Menu } from "lucide-react";
 import { KnotelleCrownLogo } from "@/components/ui/BotanicalDecorations";
 import { useCart } from "@/context/CartContext";
 import { useWishlist } from "@/context/WishlistContext";
 import { useWebsiteMedia } from "@/context/MediaContext";
 import { SearchModal } from "./SearchModal";
+import { MobileDrawer } from "./MobileDrawer";
 
 export function Navbar() {
   const pathname = usePathname();
@@ -16,6 +17,7 @@ export function Navbar() {
   const { totalItemsCount, setIsCartOpen } = useCart();
   const { wishlistCount } = useWishlist();
   const [isSearchOpen, setIsSearchOpen] = useState(false);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   const navbar = media?.navbar;
   const announcement = navbar?.announcement;
@@ -63,10 +65,18 @@ export function Navbar() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-20">
             
-            {/* Left: KNOTELLE Logo */}
-            <div className="flex items-center">
+            {/* Left: Mobile Menu Button + KNOTELLE Logo */}
+            <div className="flex items-center gap-1.5 sm:gap-2">
+              <button
+                onClick={() => setIsMobileMenuOpen(true)}
+                className="lg:hidden p-2.5 rounded-full text-[#2E211E] hover:text-[#913638] hover:bg-[#FCE9E5] transition-colors cursor-pointer"
+                aria-label="Open mobile menu"
+              >
+                <Menu className="w-6 h-6 text-[#2E211E]" />
+              </button>
+
               <Link href="/" className="flex items-center group py-1" aria-label="KNOTELLE Home">
-                <KnotelleCrownLogo className="h-14 sm:h-16 w-auto" />
+                <KnotelleCrownLogo className="h-12 sm:h-16 w-auto" />
               </Link>
             </div>
 
@@ -175,6 +185,13 @@ export function Navbar() {
       <SearchModal
         isOpen={isSearchOpen}
         onClose={() => setIsSearchOpen(false)}
+      />
+
+      {/* Mobile Menu Drawer */}
+      <MobileDrawer
+        isOpen={isMobileMenuOpen}
+        onClose={() => setIsMobileMenuOpen(false)}
+        onOpenSearch={() => setIsSearchOpen(true)}
       />
     </>
   );

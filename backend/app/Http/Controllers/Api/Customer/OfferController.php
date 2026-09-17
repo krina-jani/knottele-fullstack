@@ -94,7 +94,7 @@ class OfferController extends Controller
                 return response()->json([
                     'success' => false,
                     'message' => 'Invalid or expired offer code'
-                ], 400);
+                ], 200);
             }
 
             // Check min cart amount
@@ -102,7 +102,7 @@ class OfferController extends Controller
                 return response()->json([
                     'success' => false,
                     'message' => "This offer requires a minimum cart amount of ₹{$offer->min_cart_amount}"
-                ], 400);
+                ], 200);
             }
 
             // Check max usage
@@ -110,7 +110,7 @@ class OfferController extends Controller
                 return response()->json([
                     'success' => false,
                     'message' => 'This offer has reached its maximum usage limit'
-                ], 400);
+                ], 200);
             }
 
             // Calculate discount
@@ -126,7 +126,7 @@ class OfferController extends Controller
                 return response()->json([
                     'success' => false,
                     'message' => 'Only percentage and fixed discounts are supported at checkout currently'
-                ], 400);
+                ], 200);
             }
 
             // Ensure discount doesn't exceed subtotal

@@ -45,11 +45,11 @@ export function MobileDrawer({ isOpen, onClose, onOpenSearch }: MobileDrawerProp
   const contactEmailLink = footer?.column_3?.email_link || `mailto:${contactEmail}`;
 
   const menuItems = [
-    { name: "Best Seller", href: "/shop?sort=bestseller" },
-    { name: "New Arrival", href: "/shop?sort=newest" },
-    { name: "Hoodies", href: "/shop?category=hoodies" },
-    { name: "Contact Us", href: "/contact" },
-    { name: "About Us", href: "/about" },
+    { name: "Home", href: "/" },
+    { name: "Shop", href: "/shop" },
+    { name: "Custom Order", href: "/custom-order" },
+    { name: "About", href: "/about" },
+    { name: "Contact", href: "/contact" },
   ];
 
   return (
