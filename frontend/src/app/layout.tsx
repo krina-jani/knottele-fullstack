@@ -46,11 +46,11 @@ export const metadata: Metadata = {
   },
   icons: {
     icon: [
-      { url: "/favicon.ico", sizes: "any" },
-      { url: "/icon.png", type: "image/png" },
+      { url: "/images/logo/Logo_1.png?v=2", type: "image/png" },
+      { url: "/icon.png?v=2", type: "image/png" },
     ],
-    shortcut: "/favicon.ico",
-    apple: "/apple-icon.png",
+    shortcut: "/images/logo/Logo_1.png?v=2",
+    apple: "/images/logo/Logo_1.png?v=2",
   },
 };
 
@@ -70,9 +70,9 @@ export default async function RootLayout({
       className={`${serifFont.variable} ${sansFont.variable} ${scriptFont.variable} h-full antialiased`}
     >
       <head>
-        <link rel="icon" href="/favicon.ico" sizes="any" />
-        <link rel="icon" href="/icon.png" type="image/png" />
-        <link rel="apple-touch-icon" href="/apple-icon.png" />
+        <link rel="icon" href="/images/logo/Logo_1.png?v=2" type="image/png" />
+        <link rel="icon" href="/icon.png?v=2" type="image/png" />
+        <link rel="apple-touch-icon" href="/images/logo/Logo_1.png?v=2" />
       </head>
       <body suppressHydrationWarning className="min-h-full flex flex-col bg-[#FFF8F5] text-[#2C201D] font-sans">
         <MediaProvider initialMedia={initialMedia}>

@@ -14,7 +14,7 @@ interface AuthCardProps {
   onSuccessRedirect?: string;
 }
 
-export function AuthCard({ defaultMode = "signup", onSuccessRedirect = "/account" }: AuthCardProps) {
+export function AuthCard({ defaultMode = "login", onSuccessRedirect = "/account" }: AuthCardProps) {
   const router = useRouter();
   const { login } = useAuth();
   const { showToast } = useToast();
@@ -22,6 +22,12 @@ export function AuthCard({ defaultMode = "signup", onSuccessRedirect = "/account
   const [mode, setMode] = useState<"signup" | "login">(defaultMode);
   const [loading, setLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
+
+  // Sync mode when defaultMode prop changes
+  React.useEffect(() => {
+    setMode(defaultMode);
+    setErrorMsg(null);
+  }, [defaultMode]);
 
   // Form Fields - Sign Up & Log In
   const [fullName, setFullName] = useState("");
@@ -414,24 +420,22 @@ export function AuthCard({ defaultMode = "signup", onSuccessRedirect = "/account
         {mode === "signup" ? (
           <p className="text-xs text-[#786864] font-semibold tracking-wide">
             ALREADY HAVE AN ACCOUNT?{" "}
-            <button
-              type="button"
-              onClick={() => switchMode("login")}
+            <Link
+              href={`/login${onSuccessRedirect && onSuccessRedirect !== "/account" ? `?redirectTo=${encodeURIComponent(onSuccessRedirect)}` : ""}`}
               className="text-[#913638] font-bold hover:underline uppercase ml-1 cursor-pointer"
             >
               LOG IN
-            </button>
+            </Link>
           </p>
         ) : (
           <p className="text-xs text-[#786864] font-semibold tracking-wide">
             DON&apos;T HAVE AN ACCOUNT?{" "}
-            <button
-              type="button"
-              onClick={() => switchMode("signup")}
+            <Link
+              href={`/signup${onSuccessRedirect && onSuccessRedirect !== "/account" ? `?redirectTo=${encodeURIComponent(onSuccessRedirect)}` : ""}`}
               className="text-[#913638] font-bold hover:underline uppercase ml-1 cursor-pointer"
             >
               SIGN UP
-            </button>
+            </Link>
           </p>
         )}
       </div>
