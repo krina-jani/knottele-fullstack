@@ -2,31 +2,32 @@
 
 import React, { Suspense } from "react";
 import { useSearchParams } from "next/navigation";
-import { AuthCard } from "@/components/auth/AuthCard";
+import { VerifyOtpCard } from "@/components/auth/VerifyOtpCard";
 import { sanitizeRedirectUrl } from "@/lib/api";
 
-function LoginContent() {
+function VerifyOtpContent() {
   const searchParams = useSearchParams();
+  const email = searchParams.get("email") || "";
   const rawRedirect = searchParams.get("redirectTo");
   const redirectTarget = sanitizeRedirectUrl(rawRedirect);
 
   return (
     <div className="bg-[#FFF9F6] min-h-screen py-10 sm:py-16 flex items-center justify-center px-4">
-      <AuthCard defaultMode="login" onSuccessRedirect={redirectTarget} />
+      <VerifyOtpCard email={email} onSuccessRedirect={redirectTarget} />
     </div>
   );
 }
 
-export default function LoginPage() {
+export default function VerifyOtpPage() {
   return (
     <Suspense
       fallback={
         <div className="bg-[#FFF9F6] min-h-screen py-16 flex items-center justify-center text-center">
-          <p className="text-xs text-[#786864]">Loading login...</p>
+          <p className="text-xs text-[#786864]">Loading verification screen...</p>
         </div>
       }
     >
-      <LoginContent />
+      <VerifyOtpContent />
     </Suspense>
   );
 }

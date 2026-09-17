@@ -15,6 +15,8 @@ Route::prefix('customer')->group(function () {
     Route::post('media/video/{id}/view', [\App\Http\Controllers\Api\Customer\MediaController::class, 'incrementView']);
     Route::post('login', [CustomerApiAuthController::class, 'login']);
     Route::post('register', [CustomerApiAuthController::class, 'register']);
+    Route::post('verify-otp', [CustomerApiAuthController::class, 'verifyOtp']);
+    Route::post('resend-otp', [CustomerApiAuthController::class, 'resendOtp']);
     Route::post('forgot-password', [CustomerApiAuthController::class, 'forgotPassword']);
     Route::post('reset-password', [CustomerApiAuthController::class, 'resetPassword']);
 

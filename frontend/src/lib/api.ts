@@ -901,10 +901,51 @@ export async function registerCustomer(payload: {
   name: string;
   email: string;
   password: string;
+  password_confirmation?: string;
   mobile?: string;
-}): Promise<{ success: boolean; token?: string; user?: any; message?: string }> {
+}): Promise<{ success: boolean; token?: string; user?: any; message?: string; email?: string; requires_otp?: boolean }> {
   try {
     const response = await fetch(`${getApiBaseUrl()}/customer/register`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Accept: "application/json",
+      },
+      body: JSON.stringify({
+        ...payload,
+        password_confirmation: payload.password_confirmation || payload.password,
+      }),
+    });
+    const result = await response.json();
+    if (response.ok && result.success) {
+      return {
+        success: true,
+        token: result.token,
+        user: result.user,
+        email: result.email,
+        requires_otp: Boolean(result.requires_otp),
+        message: result.message || "Registration successful!",
+      };
+    }
+    return {
+      success: false,
+      message: result.message || (result.errors ? Object.values(result.errors).flat().join(", ") : "Registration failed."),
+    };
+  } catch (error) {
+    console.warn("Register customer error:", error);
+    return { success: false, message: "Connection error. Please try again." };
+  }
+}
+
+/**
+ * Verify Customer Email OTP
+ */
+export async function verifyCustomerOtp(payload: {
+  email: string;
+  otp: string;
+}): Promise<{ success: boolean; token?: string; user?: any; message?: string }> {
+  try {
+    const response = await fetch(`${getApiBaseUrl()}/customer/verify-otp`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -918,18 +959,71 @@ export async function registerCustomer(payload: {
         success: true,
         token: result.token,
         user: result.user,
-        message: result.message || "Registration successful!",
+        message: result.message || "Email verified successfully!",
       };
     }
     return {
       success: false,
-      message: result.message || (result.errors ? Object.values(result.errors).flat().join(", ") : "Registration failed."),
+      message: result.message || (result.errors ? Object.values(result.errors).flat().join(", ") : "Verification failed."),
     };
   } catch (error) {
-    console.warn("Register customer error:", error);
+    console.warn("Verify OTP error:", error);
     return { success: false, message: "Connection error. Please try again." };
   }
 }
+
+/**
+ * Resend Customer Email OTP
+ */
+export async function resendCustomerOtp(payload: {
+  email: string;
+}): Promise<{ success: boolean; message?: string; cooldown_remaining?: number }> {
+  try {
+    const response = await fetch(`${getApiBaseUrl()}/customer/resend-otp`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Accept: "application/json",
+      },
+      body: JSON.stringify(payload),
+    });
+    const result = await response.json();
+    if (response.ok && result.success) {
+      return {
+        success: true,
+        message: result.message || "Verification code sent!",
+      };
+    }
+    return {
+      success: false,
+      message: result.message || "Failed to resend verification code.",
+      cooldown_remaining: result.cooldown_remaining,
+    };
+  } catch (error) {
+    console.warn("Resend OTP error:", error);
+    return { success: false, message: "Connection error. Please try again." };
+  }
+}
+
+/**
+ * Safely sanitize internal redirect URL to prevent open redirect vulnerabilities.
+ */
+export function sanitizeRedirectUrl(url: string | null | undefined): string {
+  if (!url) return "/account/";
+  const trimmed = url.trim();
+  if (
+    trimmed.startsWith("/") &&
+    !trimmed.startsWith("//") &&
+    !trimmed.startsWith("/\\") &&
+    !trimmed.includes(":\\") &&
+    !trimmed.includes("://") &&
+    !trimmed.toLowerCase().includes("javascript:")
+  ) {
+    return trimmed;
+  }
+  return "/account/";
+}
+
 
 /**
  * Login Customer to Laravel Backend API

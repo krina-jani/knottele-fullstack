@@ -7,7 +7,7 @@ import { Eye, EyeOff, Lock, Mail, Phone, User as UserIcon, ArrowRight, Check } f
 import { KnotelleCrownLogo, BotanicalFlourish } from "@/components/ui/BotanicalDecorations";
 import { useAuth } from "@/context/AuthContext";
 import { useToast } from "@/context/ToastContext";
-import { registerCustomer, loginCustomer } from "@/lib/api";
+import { registerCustomer, loginCustomer, sanitizeRedirectUrl } from "@/lib/api";
 
 interface AuthCardProps {
   defaultMode?: "signup" | "login";
@@ -18,6 +18,7 @@ export function AuthCard({ defaultMode = "login", onSuccessRedirect = "/account"
   const router = useRouter();
   const { login } = useAuth();
   const { showToast } = useToast();
+  const safeRedirect = sanitizeRedirectUrl(onSuccessRedirect);
 
   const [mode, setMode] = useState<"signup" | "login">(defaultMode);
   const [loading, setLoading] = useState(false);
@@ -90,17 +91,25 @@ export function AuthCard({ defaultMode = "login", onSuccessRedirect = "/account"
       setLoading(true);
       try {
         const formattedMobile = `+91 ${cleanedMobile}`;
+        const userEmail = email.trim().toLowerCase();
         const result = await registerCustomer({
           name: fullName.trim(),
-          email: email.trim().toLowerCase(),
+          email: userEmail,
           mobile: formattedMobile,
           password: password,
+          password_confirmation: confirmPassword,
         });
 
         if (result.success) {
-          showToast("Account Created! 🌸", "Welcome to the Knotelle Crochet community.", "success");
-          login(email.trim().toLowerCase(), result.user || { name: fullName, email, mobile: formattedMobile }, result.token);
-          router.push(onSuccessRedirect);
+          if (result.requires_otp) {
+            showToast("Verification Code Sent! 🌸", "We've sent a 6-digit code to your email address.", "success");
+            const redirectParam = safeRedirect ? `&redirectTo=${encodeURIComponent(safeRedirect)}` : "";
+            router.push(`/verify-otp?email=${encodeURIComponent(result.email || userEmail)}${redirectParam}`);
+          } else if (result.token && result.user) {
+            showToast("Account Created! 🌸", "Welcome to the Knotelle Crochet community.", "success");
+            login(userEmail, result.user, result.token);
+            router.push(safeRedirect);
+          }
         } else {
           setErrorMsg(result.message || "Failed to create account. Please try again.");
           showToast("Registration Error", result.message || "Failed to create account.", "error");
@@ -131,7 +140,7 @@ export function AuthCard({ defaultMode = "login", onSuccessRedirect = "/account"
         if (result.success) {
           showToast("Welcome Back! ✨", "Successfully logged into your account.", "success");
           login(email.trim().toLowerCase(), result.user, result.token);
-          router.push(onSuccessRedirect);
+          router.push(safeRedirect);
         } else {
           setErrorMsg(result.message || "Invalid email/phone or password.");
           showToast("Login Failed", result.message || "Invalid credentials.", "error");
