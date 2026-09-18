@@ -66,7 +66,9 @@ if [ -d "$BACKEND_DIR" ]; then
 
     # Ensure storage symlink exists
     echo "🔗 Verifying storage symlink..."
-    php artisan storage:link || true
+    if [ ! -L public/storage ] && [ ! -d public/storage ]; then
+        php artisan storage:link || true
+    fi
 
     # Clear & rebuild caches
     echo "🧹 Optimizing Laravel caches..."
@@ -91,6 +93,13 @@ if [ -d "$BACKEND_DIR" ]; then
     # Bring backend back online
     echo "▶️  Bringing backend out of maintenance mode..."
     php artisan up
+
+    # Start/Reload Laravel Backend in PM2 BEFORE building Next.js frontend
+    if command -v pm2 >/dev/null 2>&1; then
+        echo "🔄 Starting/Reloading PM2 backend process..."
+        pm2 describe knotelle-backend > /dev/null 2>&1 && pm2 reload knotelle-backend --update-env || pm2 start "php artisan serve --host=127.0.0.1 --port=8000" --name "knotelle-backend" --cwd "$BACKEND_DIR"
+        pm2 save
+    fi
 fi
 
 # 4. Deploy Frontend (Next.js)
@@ -102,22 +111,16 @@ if [ -d "$FRONTEND_DIR" ]; then
     echo "📦 Installing Node.js dependencies..."
     npm ci || npm install
 
-    # Build production bundle
+    # Build production bundle (Backend on 8000 is now live for static pre-rendering!)
     echo "🔨 Building Next.js production bundle..."
     npm run build
 
     # Restart or start Node PM2 process
     if command -v pm2 >/dev/null 2>&1; then
         echo "🔄 Starting/Reloading PM2 frontend process..."
-        pm2 describe knotelle-frontend > /dev/null 2>&1 && pm2 reload knotelle-frontend --update-env || pm2 start npm --name "knotelle-frontend" -- start -- -p 3000
+        pm2 describe knotelle-frontend > /dev/null 2>&1 && pm2 reload knotelle-frontend --update-env || pm2 start npm --name "knotelle-frontend" --cwd "$FRONTEND_DIR" -- start -- -p 3000
+        pm2 save
     fi
-fi
-
-# Ensure Laravel backend is also running in PM2 if standalone server
-if command -v pm2 >/dev/null 2>&1; then
-    echo "🔄 Starting/Reloading PM2 backend process..."
-    pm2 describe knotelle-backend > /dev/null 2>&1 && pm2 reload knotelle-backend --update-env || pm2 start "php artisan serve --host=127.0.0.1 --port=8000" --name "knotelle-backend" --cwd "$BACKEND_DIR"
-    pm2 save
 fi
 
 echo "=========================================================================="
