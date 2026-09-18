@@ -9,6 +9,7 @@ import { useWishlist } from "@/context/WishlistContext";
 import { useCart } from "@/context/CartContext";
 import { useWebsiteMedia } from "@/context/MediaContext";
 import { useAuth } from "@/context/AuthContext";
+import { normalizeInternalLink } from "@/lib/api";
 
 interface MobileDrawerProps {
   isOpen: boolean;
@@ -45,11 +46,11 @@ export function MobileDrawer({ isOpen, onClose, onOpenSearch }: MobileDrawerProp
   const contactEmailLink = footer?.column_3?.email_link || `mailto:${contactEmail}`;
 
   const menuItems = [
-    { name: "Home", href: "/" },
-    { name: "Shop", href: "/shop" },
-    { name: "Custom Order", href: "/custom-order" },
-    { name: "About", href: "/about" },
-    { name: "Contact", href: "/contact" },
+    { name: "Home", href: "/knottele" },
+    { name: "Shop", href: "/knottele/shop" },
+    { name: "Custom Order", href: "/knottele/custom-order" },
+    { name: "About", href: "/knottele/about" },
+    { name: "Contact", href: "/knottele/contact" },
   ];
 
   return (
@@ -81,7 +82,7 @@ export function MobileDrawer({ isOpen, onClose, onOpenSearch }: MobileDrawerProp
           {/* Quick Action Shortcuts (Wishlist & Cart) */}
           <div className="grid grid-cols-2 gap-3 px-6 py-4 bg-[#FFF9F6] border-b border-[#E7D1CC]/60">
             <Link
-              href="/account/wishlist"
+              href={normalizeInternalLink("/account/wishlist")}
               onClick={onClose}
               className="flex items-center justify-center gap-2 p-2.5 rounded-xl bg-white border border-[#E7D1CC] text-xs font-semibold text-[#2E211E] hover:bg-[#FCE9E5] hover:text-[#913638] transition-colors relative"
             >
@@ -95,7 +96,7 @@ export function MobileDrawer({ isOpen, onClose, onOpenSearch }: MobileDrawerProp
             </Link>
 
             <Link
-              href="/cart"
+              href={normalizeInternalLink("/cart")}
               onClick={onClose}
               className="flex items-center justify-center gap-2 p-2.5 rounded-xl bg-white border border-[#E7D1CC] text-xs font-semibold text-[#2E211E] hover:bg-[#FCE9E5] hover:text-[#913638] transition-colors relative"
             >
@@ -113,11 +114,12 @@ export function MobileDrawer({ isOpen, onClose, onOpenSearch }: MobileDrawerProp
           <div className="flex-1 overflow-y-auto px-6 py-6 space-y-6">
             <nav className="flex flex-col space-y-4">
               {menuItems.map((item) => {
-                const isActive = pathname === item.href || (item.href.includes("/shop?") && pathname === "/shop");
+                const href = normalizeInternalLink(item.href);
+                const isActive = pathname === href || pathname === item.href || (href === "/knottele" && (pathname === "/" || pathname === "/knottele"));
                 return (
                   <Link
                     key={item.name}
-                    href={item.href}
+                    href={href}
                     prefetch={true}
                     onClick={onClose}
                     className={`text-lg font-medium tracking-wide transition-all py-1 flex items-center justify-between ${
@@ -150,7 +152,7 @@ export function MobileDrawer({ isOpen, onClose, onOpenSearch }: MobileDrawerProp
                   </div>
 
                   <Link
-                    href="/account"
+                    href={normalizeInternalLink("/account")}
                     onClick={onClose}
                     className="text-base font-medium text-[#2E211E] hover:text-[#913638] transition-colors py-1 flex items-center gap-2.5"
                   >
@@ -159,7 +161,7 @@ export function MobileDrawer({ isOpen, onClose, onOpenSearch }: MobileDrawerProp
                   </Link>
 
                   <Link
-                    href="/account/orders"
+                    href={normalizeInternalLink("/account/orders")}
                     onClick={onClose}
                     className="text-base font-medium text-[#2E211E] hover:text-[#913638] transition-colors py-1 flex items-center gap-2.5"
                   >
@@ -181,7 +183,7 @@ export function MobileDrawer({ isOpen, onClose, onOpenSearch }: MobileDrawerProp
               ) : (
                 <>
                   <Link
-                    href="/login"
+                    href={normalizeInternalLink("/login")}
                     onClick={onClose}
                     className="text-lg font-medium text-[#2E211E] hover:text-[#913638] transition-colors py-1 flex items-center justify-between"
                   >
@@ -190,7 +192,7 @@ export function MobileDrawer({ isOpen, onClose, onOpenSearch }: MobileDrawerProp
                   </Link>
 
                   <Link
-                    href="/signup"
+                    href={normalizeInternalLink("/signup")}
                     onClick={onClose}
                     className="text-lg font-medium text-[#2E211E] hover:text-[#913638] transition-colors py-1 flex items-center justify-between"
                   >

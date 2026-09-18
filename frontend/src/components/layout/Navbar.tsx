@@ -8,6 +8,7 @@ import { KnotelleCrownLogo } from "@/components/ui/BotanicalDecorations";
 import { useCart } from "@/context/CartContext";
 import { useWishlist } from "@/context/WishlistContext";
 import { useWebsiteMedia } from "@/context/MediaContext";
+import { normalizeInternalLink } from "@/lib/api";
 import { SearchModal } from "./SearchModal";
 import { MobileDrawer } from "./MobileDrawer";
 
@@ -24,11 +25,11 @@ export function Navbar() {
   const actions = navbar?.actions;
 
   const defaultNavLinks = [
-    { name: "Home", href: "/", is_highlighted: false, is_active: true },
-    { name: "Shop", href: "/shop", is_highlighted: false, is_active: true },
-    { name: "Custom Order", href: "/custom-order", is_highlighted: true, is_active: true },
-    { name: "About", href: "/about", is_highlighted: false, is_active: true },
-    { name: "Contact", href: "/contact", is_highlighted: false, is_active: true },
+    { name: "Home", href: "/knottele", is_highlighted: false, is_active: true },
+    { name: "Shop", href: "/knottele/shop", is_highlighted: false, is_active: true },
+    { name: "Custom Order", href: "/knottele/custom-order", is_highlighted: true, is_active: true },
+    { name: "About", href: "/knottele/about", is_highlighted: false, is_active: true },
+    { name: "Contact", href: "/knottele/contact", is_highlighted: false, is_active: true },
   ];
 
   const rawNavLinks = (navbar?.nav_links && navbar.nav_links.length > 0)
@@ -49,7 +50,7 @@ export function Navbar() {
         <div className="bg-[#913638] text-white text-xs font-medium py-2 px-4 text-center tracking-wide transition-all z-50 relative">
           {announcement.link ? (
             <Link
-              href={announcement.link}
+              href={normalizeInternalLink(announcement.link)}
               className="inline-flex items-center justify-center gap-1.5 hover:underline decoration-white/60 underline-offset-4"
             >
               <span>{announcement.text}</span>
@@ -75,7 +76,7 @@ export function Navbar() {
                 <Menu className="w-6 h-6 text-[#2E211E]" />
               </button>
 
-              <Link href="/" className="flex items-center group py-1" aria-label="KNOTELLE Home">
+              <Link href={normalizeInternalLink("/")} className="flex items-center group py-1" aria-label="KNOTELLE Home">
                 <KnotelleCrownLogo className="h-12 sm:h-16 w-auto" />
               </Link>
             </div>
@@ -83,14 +84,15 @@ export function Navbar() {
             {/* Center: Dynamic Navigation Links */}
             <nav className="hidden lg:flex items-center gap-7 xl:gap-9">
               {navLinks.map((link, idx) => {
-                const isActive = pathname === link.href;
+                const href = normalizeInternalLink(link.href);
+                const isActive = pathname === href || pathname === link.href || (href === "/knottele" && (pathname === "/" || pathname === "/knottele"));
                 const isHighlighted = Boolean(link.is_highlighted);
 
                 if (isHighlighted) {
                   return (
                     <Link
                       key={link.href + idx}
-                      href={link.href}
+                      href={href}
                       prefetch={true}
                       className={`inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-semibold tracking-wide transition-all shadow-xs active:scale-95 ${
                         isActive
@@ -107,7 +109,7 @@ export function Navbar() {
                 return (
                   <Link
                     key={link.href + idx}
-                    href={link.href}
+                    href={href}
                     prefetch={true}
                     className={`relative text-sm font-medium tracking-wide py-2 transition-colors flex flex-col items-center ${
                       isActive
@@ -138,7 +140,7 @@ export function Navbar() {
 
               {showWishlist && (
                 <Link
-                  href="/account/wishlist"
+                  href={normalizeInternalLink("/account/wishlist")}
                   className="relative p-2.5 rounded-full text-[#2E211E] hover:text-[#913638] hover:bg-[#FCE9E5] transition-colors flex items-center justify-center"
                   aria-label="View wishlist"
                 >
@@ -153,7 +155,7 @@ export function Navbar() {
 
               {showAccount && (
                 <Link
-                  href="/account"
+                  href={normalizeInternalLink("/account")}
                   className="p-2.5 rounded-full text-[#2E211E] hover:text-[#913638] hover:bg-[#FCE9E5] transition-colors flex items-center justify-center"
                   aria-label="My Account"
                 >

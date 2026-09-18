@@ -12,6 +12,7 @@ import {
 } from "@/components/ui/BotanicalDecorations";
 import { Phone, Mail, MapPin } from "lucide-react";
 import { useWebsiteMedia } from "@/context/MediaContext";
+import { normalizeInternalLink } from "@/lib/api";
 
 const DEFAULT_FOOTER_BG = "/images/categories/footer.png";
 
@@ -97,7 +98,7 @@ export function Footer() {
           
           {/* Left Block: Brand Identity + Socials */}
           <div className="flex flex-col items-start space-y-4 lg:pr-10 lg:border-r lg:border-[#E7D1CC]/90 shrink-0 w-full lg:w-auto">
-            <Link href="/" className="inline-block group" aria-label="KNOTELLE Home">
+            <Link href={normalizeInternalLink("/")} className="inline-block group" aria-label="KNOTELLE Home">
               <KnotelleCrownLogo className="h-24 sm:h-28 w-auto drop-shadow-xs" />
             </Link>
 
@@ -162,7 +163,7 @@ export function Footer() {
               </h4>
               <ul className="space-y-2 text-xs sm:text-sm text-[#5C4D49] font-medium pt-1">
                 {col1Links.map((link, idx) => {
-                  const href = link.url || link.href || "/";
+                  const href = normalizeInternalLink(link.url || link.href || "/");
                   const label = link.label || link.name || "Link";
                   return (
                     <li key={idx}>
@@ -184,7 +185,7 @@ export function Footer() {
               </h4>
               <ul className="space-y-2 text-xs sm:text-sm text-[#5C4D49] font-medium pt-1">
                 {col2Links.map((link, idx) => {
-                  const href = link.url || link.href || "/contact";
+                  const href = normalizeInternalLink(link.url || link.href || "/contact");
                   const label = link.label || link.name || "Help";
                   return (
                     <li key={idx}>

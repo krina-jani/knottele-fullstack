@@ -5,6 +5,24 @@
 
 import { Product } from "@/types/product";
 
+export function normalizeInternalLink(url?: string | null): string {
+  if (!url) return "/knottele";
+  const clean = url.trim();
+  if (
+    clean.startsWith("http://") ||
+    clean.startsWith("https://") ||
+    clean.startsWith("mailto:") ||
+    clean.startsWith("tel:") ||
+    clean.startsWith("#") ||
+    clean.startsWith("javascript:")
+  ) {
+    return clean;
+  }
+  const path = clean.startsWith("/") ? clean : `/${clean}`;
+  if (path.startsWith("/knottele")) return path;
+  return path === "/" ? "/knottele" : `/knottele${path}`;
+}
+
 export function getBrowserApiBaseUrl(): string {
   if (process.env.NEXT_PUBLIC_API_URL) {
     return process.env.NEXT_PUBLIC_API_URL;
