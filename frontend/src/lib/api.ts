@@ -6,16 +6,21 @@
 import { Product } from "@/types/product";
 
 export const getApiBaseUrl = () => {
-  if (process.env.NEXT_PUBLIC_API_URL) {
-    return process.env.NEXT_PUBLIC_API_URL;
-  }
   if (typeof window !== "undefined") {
+    if (process.env.NEXT_PUBLIC_API_URL) {
+      return process.env.NEXT_PUBLIC_API_URL;
+    }
     if (window.location.port === "3000") {
       return "http://127.0.0.1:8000/api";
     }
     return "/api";
   }
-  return "http://127.0.0.1:8000/api";
+  // Server-side (Node.js runtime during next build or SSR)
+  return (
+    process.env.INTERNAL_API_URL ||
+    process.env.NEXT_PUBLIC_API_URL ||
+    "http://127.0.0.1:8000/api"
+  );
 };
 
 export interface ContactFormData {
