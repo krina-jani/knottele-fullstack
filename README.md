@@ -123,3 +123,28 @@ Run this command to re-build and automatically sync the frontend to Laravel:
 powershell
 cd K:\knottele-adminpanel\frontend
 npm run build:laravel
+
+---
+
+## 🚀 Production Deployment (Native Laravel)
+
+The project includes a native Laravel-centric deployment engine:
+
+1. **Deploy via Laravel Artisan Command**:
+   ```bash
+   cd backend
+   php artisan deploy
+   ```
+   *Options: `php artisan deploy --quick` (skip frontend/admin asset rebuilds).*
+
+2. **Deploy via Production Script**:
+   ```bash
+   ./deploy.sh
+   ```
+
+3. **Deploy via Laravel Envoy (Blade syntax)**:
+   ```bash
+   envoy run deploy
+   ```
+
+📖 For full Linux server setup, Nginx configuration, free SSL, queue workers, and domain setup, see [PRODUCTION_SETUP_GUIDE.md](PRODUCTION_SETUP_GUIDE.md).
