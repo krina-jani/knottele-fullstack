@@ -2,7 +2,7 @@ module.exports = {
   apps: [
     {
       name: "knotelle-backend",
-      cwd: "./backend",
+      cwd: "/var/www/knottele-fullstack/backend",
       script: "artisan",
       interpreter: "php",
       args: "serve --host=127.0.0.1 --port=8000",
@@ -12,7 +12,7 @@ module.exports = {
     },
     {
       name: "knotelle-frontend",
-      cwd: "./frontend",
+      cwd: "/var/www/knottele-fullstack/frontend",
       script: "node_modules/next/dist/bin/next",
       args: "start -p 3000",
       env: {
