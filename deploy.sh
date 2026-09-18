@@ -95,6 +95,12 @@ if [ -d "$BACKEND_DIR" ]; then
     echo "📦 Installing PHP dependencies..."
     composer install --no-dev --no-interaction --prefer-dist --optimize-autoloader
 
+    # Build Laravel Vite assets required by the Blade admin panel.
+    # @vite() reads public/build/manifest.json in production.
+    echo "Building Laravel frontend assets..."
+    npm ci --include=dev || npm install --include=dev
+    npm run build
+
     # Database migrations
     echo "🗄️  Running database migrations..."
     php artisan migrate --force
