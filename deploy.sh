@@ -2,15 +2,14 @@
 
 # ==============================================================================
 # KNOTELLE — Production Deployment Script (Laravel Backend + Next.js Frontend)
-# Safe, zero-downtime deployment script with database migration & caching.
+# Safe deployment script with strict health checks and service verification.
 # ==============================================================================
 
 set -e # Exit immediately if a command exits with a non-zero status
 
 echo "🚀 Starting deployment for KNOTELLE..."
 
-# Set your server project directory (overridden automatically if run inside project folder)
-SERVER_PROJECT_DIR="/var/www/knotelle"
+SERVER_PROJECT_DIR="/var/www/knottele-fullstack"
 
 # 1. Determine project root dynamically
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )"
@@ -52,21 +51,21 @@ if [ -d "$BACKEND_DIR" ]; then
     echo "⚙️  Deploying Laravel Backend..."
     cd "$BACKEND_DIR"
 
-    # Maintenance mode
-    echo "⏸️  Putting backend into maintenance mode..."
-    php artisan down --render="errors::503" || true
-
     # Composer dependencies
     echo "📦 Installing PHP dependencies..."
     composer install --no-dev --no-interaction --prefer-dist --optimize-autoloader
 
-    # Database migrations (Safe, non-destructive)
+    # Database migrations
     echo "🗄️  Running database migrations..."
     php artisan migrate --force
 
     # Ensure storage symlink exists
     echo "🔗 Verifying storage symlink..."
-    if [ ! -L public/storage ] && [ ! -d public/storage ]; then
+    if [ -L public/storage ]; then
+        echo "✅ Storage symlink already exists."
+    elif [ -e public/storage ]; then
+        echo "⚠️ public/storage exists but is not a symlink."
+    else
         php artisan storage:link || true
     fi
 
@@ -90,13 +89,9 @@ if [ -d "$BACKEND_DIR" ]; then
         chown -R www-data:www-data storage bootstrap/cache 2>/dev/null || chown -R apache:apache storage bootstrap/cache 2>/dev/null || true
     fi
 
-    # Bring backend back online
-    echo "▶️  Bringing backend out of maintenance mode..."
-    php artisan up
-
     # Start or Reload Laravel Backend in PM2 BEFORE building Next.js frontend
     if command -v pm2 >/dev/null 2>&1; then
-        if pm2 list | grep -q "knotelle-backend"; then
+        if pm2 describe knotelle-backend >/dev/null 2>&1; then
             echo "🔄 Reloading PM2 backend process..."
             pm2 reload knotelle-backend --update-env
         else
@@ -106,16 +101,24 @@ if [ -d "$BACKEND_DIR" ]; then
         pm2 save
     fi
 
-    # Verify Laravel Backend API is listening on port 8000
-    echo "🔍 Verifying Laravel Backend API on http://127.0.0.1:8000..."
-    for i in {1..5}; do
-        if curl -s -I http://127.0.0.1:8000 >/dev/null 2>&1; then
+    # Strict Health Check: Verify Laravel Backend API is listening on port 8000
+    echo "🔍 Waiting for Laravel Backend API (http://127.0.0.1:8000)..."
+    BACKEND_READY=false
+    for i in {1..30}; do
+        if curl -fsS http://127.0.0.1:8000 >/dev/null 2>&1; then
             echo "✅ Laravel Backend is live on port 8000!"
+            BACKEND_READY=true
             break
         fi
-        echo "⏳ Waiting for Laravel Backend to start (attempt $i/5)..."
+        echo "⏳ Waiting for Laravel Backend... ($i/30)"
         sleep 1
     done
+
+    if [ "$BACKEND_READY" != "true" ]; then
+        echo "❌ ERROR: Laravel Backend failed to start on http://127.0.0.1:8000!"
+        pm2 logs knotelle-backend --lines 50 --nostream 2>/dev/null || true
+        exit 1
+    fi
 fi
 
 # 4. Deploy Frontend (Next.js)
@@ -133,7 +136,7 @@ if [ -d "$FRONTEND_DIR" ]; then
 
     # Start or Reload Node PM2 process
     if command -v pm2 >/dev/null 2>&1; then
-        if pm2 list | grep -q "knotelle-frontend"; then
+        if pm2 describe knotelle-frontend >/dev/null 2>&1; then
             echo "🔄 Reloading PM2 frontend process..."
             pm2 reload knotelle-frontend --update-env
         else
@@ -142,8 +145,27 @@ if [ -d "$FRONTEND_DIR" ]; then
         fi
         pm2 save
     fi
+
+    # Strict Health Check: Verify Next.js Frontend is listening on port 3000
+    echo "🔍 Waiting for Next.js Frontend (http://127.0.0.1:3000)..."
+    FRONTEND_READY=false
+    for i in {1..30}; do
+        if curl -fsS http://127.0.0.1:3000 >/dev/null 2>&1; then
+            echo "✅ Next.js Frontend is live on port 3000!"
+            FRONTEND_READY=true
+            break
+        fi
+        echo "⏳ Waiting for Next.js Frontend... ($i/30)"
+        sleep 1
+    done
+
+    if [ "$FRONTEND_READY" != "true" ]; then
+        echo "❌ ERROR: Next.js Frontend failed to start on http://127.0.0.1:3000!"
+        pm2 logs knotelle-frontend --lines 50 --nostream 2>/dev/null || true
+        exit 1
+    fi
 fi
 
 echo "=========================================================================="
-echo "✅ KNOTELLE Deployment completed successfully! Your site is live."
+echo "✅ KNOTELLE Deployment completed successfully! All services are online."
 echo "=========================================================================="
