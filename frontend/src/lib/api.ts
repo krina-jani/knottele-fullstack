@@ -1061,6 +1061,28 @@ export async function loginCustomer(payload: {
 }
 
 /**
+ * Logout Customer from Laravel Backend API
+ */
+export async function logoutCustomer(): Promise<{ success: boolean }> {
+  try {
+    const token = typeof window !== "undefined" ? localStorage.getItem("knotelle_customer_token") : null;
+    if (token) {
+      await fetch(`${getApiBaseUrl()}/customer/logout`, {
+        method: "POST",
+        headers: {
+          Accept: "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+      });
+    }
+    return { success: true };
+  } catch (err) {
+    console.warn("Logout API error:", err);
+    return { success: true };
+  }
+}
+
+/**
  * Fetch Current Customer Profile from Laravel Backend API
  */
 export async function fetchCustomerProfile(): Promise<{ success: boolean; user?: any; message?: string }> {

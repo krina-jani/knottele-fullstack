@@ -22,6 +22,7 @@ import {
 import { FlowerIcon } from "@/components/ui/BotanicalDecorations";
 import { Breadcrumbs } from "@/components/ui/Breadcrumbs";
 import { useToast } from "@/context/ToastContext";
+import { useAuth } from "@/context/AuthContext";
 import { useWebsiteMedia } from "@/context/MediaContext";
 
 const PALETTE_OPTIONS = [
@@ -78,6 +79,7 @@ export default function CustomOrderPage() {
     ? media.customOrderItems
     : (media?.categories && media.categories.length > 0 ? media.categories : []);
   const { showToast } = useToast();
+  const { user } = useAuth();
   const colorInputRef = useRef<HTMLInputElement>(null);
   const [step, setStep] = useState(1);
   const [isSubmitted, setIsSubmitted] = useState(false);
@@ -96,10 +98,18 @@ export default function CustomOrderPage() {
   const [designNotes, setDesignNotes] = useState("");
   const [urgency, setUrgency] = useState("Standard (7-10 days)");
   const [budgetRange, setBudgetRange] = useState("₹1,000 – ₹2,500");
-  const [customerName, setCustomerName] = useState("Ananya Sharma");
-  const [customerEmail, setCustomerEmail] = useState("ananya.sharma@example.com");
-  const [customerPhone, setCustomerPhone] = useState("+91 98765 43210");
+  const [customerName, setCustomerName] = useState(user?.name || "");
+  const [customerEmail, setCustomerEmail] = useState(user?.email || "");
+  const [customerPhone, setCustomerPhone] = useState(user?.phone || "");
   const [uploadedFileName, setUploadedFileName] = useState<string | null>(null);
+
+  React.useEffect(() => {
+    if (user) {
+      if (user.name && !customerName) setCustomerName(user.name);
+      if (user.email && !customerEmail) setCustomerEmail(user.email);
+      if (user.phone && !customerPhone) setCustomerPhone(user.phone);
+    }
+  }, [user]);
 
   const getSwatchDetails = (hex: string) => {
     const matched =

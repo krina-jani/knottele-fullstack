@@ -8,6 +8,7 @@ import {
   fetchCustomerAddresses,
   fetchCustomerProfile,
   saveCustomerAddress,
+  logoutCustomer,
   deleteCustomerAddress as apiDeleteAddress,
   setDefaultCustomerAddress as apiSetDefaultAddress,
 } from "@/lib/api";
@@ -185,7 +186,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }, 100);
   };
 
-  const logout = () => {
+  const logout = async () => {
+    try {
+      await logoutCustomer();
+    } catch {}
+
     setUser(null);
     setOrders([]);
     setIsAuthLoading(false);
@@ -195,8 +200,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       localStorage.removeItem("knotelle_wishlist");
       localStorage.removeItem("knotelle_cart");
       localStorage.removeItem("knotelle_guest_email");
+      localStorage.removeItem("knotelle_pending_wishlist");
+
+      showToast("Logged out", "You have been signed out.", "info");
+      window.location.href = "/login";
     }
-    showToast("Logged out", "You have been signed out.", "info");
   };
 
   const updateProfile = (data: Partial<UserProfile>) => {

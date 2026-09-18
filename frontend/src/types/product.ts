@@ -15,7 +15,7 @@ export interface ProductReview {
 
 export interface Product {
   id: string;
-  db_id?: number;
+  db_id?: number | string;
   slug: string;
   name: string;
   category: string;

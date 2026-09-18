@@ -50,7 +50,7 @@ export function WishlistProvider({ children }: { children: React.ReactNode }) {
       if (savedIds) {
         const parsed = JSON.parse(savedIds);
         setWishlistIds(parsed);
-        const filtered = PRODUCTS.filter((p) => parsed.includes(p.id) || parsed.includes(String(p.db_id || p.id)));
+        const filtered = PRODUCTS.filter((p) => parsed.includes(p.id) || parsed.includes(String((p as any).db_id || p.id)));
         setWishlistItems(filtered);
       } else {
         setWishlistIds([]);
@@ -98,7 +98,7 @@ export function WishlistProvider({ children }: { children: React.ReactNode }) {
   };
 
   const toggleWishlist = async (product: Product) => {
-    const pId = String(product.db_id || product.id);
+    const pId = String((product as any).db_id || product.id);
 
     if (!isLoggedIn) {
       showToast("Sign In Required 🌸", "Please log in to save items to your personal wishlist.", "info");
@@ -114,7 +114,7 @@ export function WishlistProvider({ children }: { children: React.ReactNode }) {
     if (isCurrentlySaved) {
       // Optimistic update
       setWishlistIds((prev) => prev.filter((id) => String(id) !== pId && String(id) !== `prod-${pId}`));
-      setWishlistItems((prev) => prev.filter((item) => String(item.db_id || item.id) !== pId));
+      setWishlistItems((prev) => prev.filter((item) => String((item as any).db_id || item.id) !== pId));
       showToast("Removed from Wishlist", `${product.name} removed from your saved items.`, "info");
 
       await toggleCustomerWishlist(pId);
@@ -135,7 +135,7 @@ export function WishlistProvider({ children }: { children: React.ReactNode }) {
     const cleanId = pId.replace("prod-", "");
     
     setWishlistIds((prev) => prev.filter((id) => String(id) !== pId && String(id) !== cleanId));
-    setWishlistItems((prev) => prev.filter((item) => String(item.db_id || item.id) !== cleanId && String(item.id) !== pId));
+    setWishlistItems((prev) => prev.filter((item) => String((item as any).db_id || item.id) !== cleanId && String(item.id) !== pId));
 
     if (isLoggedIn) {
       await removeFromCustomerWishlist(cleanId);
