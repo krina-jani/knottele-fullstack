@@ -332,7 +332,11 @@ const STATIC_PRODUCT_IMAGES = new Set([
 export function normalizeImageUrl(url?: string | null, fallback = "/images/products/bunny-keychain.jpg"): string {
   if (!url) return fallback;
 
-  const cleanUrl = url.trim();
+  let cleanUrl = url.trim();
+
+  // Strip localhost:8000 and 127.0.0.1:8000 so assets load from the host server
+  cleanUrl = cleanUrl.replace(/^https?:\/\/(127\.0\.0\.1|localhost):8000/, "");
+
   const filename = cleanUrl.split("/").pop()?.split("?")[0] || "";
 
   // If it's one of the 12 bundled static images, serve relative from Next.js public/images/products
@@ -340,20 +344,12 @@ export function normalizeImageUrl(url?: string | null, fallback = "/images/produ
     return `/images/products/${filename}`;
   }
 
-  // If it's a full backend URL (http://127.0.0.1:8000 or http://localhost:8000)
-  if (cleanUrl.includes("127.0.0.1:8000") || cleanUrl.includes("localhost:8000")) {
-    return cleanUrl.replace("localhost:8000", "127.0.0.1:8000");
-  }
-
-  // If it's an external HTTP/HTTPS URL
+  // If it's an external HTTP/HTTPS URL (CDN, Unsplash, Cloudinary, etc.)
   if (cleanUrl.startsWith("http://") || cleanUrl.startsWith("https://") || cleanUrl.startsWith("data:")) {
     return cleanUrl;
   }
 
-  // For newly uploaded admin panel images with relative paths (/images/products/...)
-  const backendBase = "http://127.0.0.1:8000";
-  const path = cleanUrl.startsWith("/") ? cleanUrl : `/${cleanUrl}`;
-  return `${backendBase}${path}`;
+  return cleanUrl.startsWith("/") ? cleanUrl : `/${cleanUrl}`;
 }
 
 export interface ApiProduct {
