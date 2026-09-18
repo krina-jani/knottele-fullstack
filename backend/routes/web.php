@@ -55,6 +55,10 @@ use App\Http\Controllers\Customer\UserController as CustomerUser;
 
 Route::prefix('admin')->group(function () {
 
+    Route::get('/', function () {
+        return redirect()->route('admin.dashboard');
+    });
+
     /*
     |--------------------------------------------------------------------------
     | ADMIN AUTH

@@ -23,7 +23,7 @@ module.exports = {
         NODE_ENV: "production",
         PORT: "3000",
         INTERNAL_API_URL: "http://127.0.0.1:8000/api",
-        NEXT_PUBLIC_API_URL: "/api",
+        NEXT_PUBLIC_API_URL: "/knottele/api",
       },
       autorestart: true,
       restart_delay: 3000,
