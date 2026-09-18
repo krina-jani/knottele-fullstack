@@ -105,6 +105,17 @@ if [ -d "$BACKEND_DIR" ]; then
         fi
         pm2 save
     fi
+
+    # Verify Laravel Backend API is listening on port 8000
+    echo "🔍 Verifying Laravel Backend API on http://127.0.0.1:8000..."
+    for i in {1..5}; do
+        if curl -s -I http://127.0.0.1:8000 >/dev/null 2>&1; then
+            echo "✅ Laravel Backend is live on port 8000!"
+            break
+        fi
+        echo "⏳ Waiting for Laravel Backend to start (attempt $i/5)..."
+        sleep 1
+    done
 fi
 
 # 4. Deploy Frontend (Next.js)
