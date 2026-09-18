@@ -2,7 +2,7 @@
 
 # ==============================================================================
 # KNOTELLE — Production Deployment Script (Laravel Backend + Next.js Frontend)
-# Safe deployment script with strict health checks and service verification.
+# Bulletproof deployment script with strict health checks & failure traps.
 # ==============================================================================
 
 set -e # Exit immediately if a command exits with a non-zero status
@@ -89,24 +89,27 @@ if [ -d "$BACKEND_DIR" ]; then
         chown -R www-data:www-data storage bootstrap/cache 2>/dev/null || chown -R apache:apache storage bootstrap/cache 2>/dev/null || true
     fi
 
-    # Start or Reload Laravel Backend in PM2 BEFORE building Next.js frontend
+    # Start or Restart Laravel Backend in PM2 BEFORE building Next.js frontend
     if command -v pm2 >/dev/null 2>&1; then
         if pm2 describe knotelle-backend >/dev/null 2>&1; then
-            echo "🔄 Reloading PM2 backend process..."
-            pm2 reload knotelle-backend --update-env
+            echo "🔄 Restarting PM2 backend process..."
+            pm2 restart knotelle-backend --update-env
         else
             echo "🚀 Starting PM2 backend process..."
-            pm2 start "php artisan serve --host=127.0.0.1 --port=8000" --name "knotelle-backend" --cwd "$BACKEND_DIR"
+            pm2 start php --name "knotelle-backend" --cwd "$BACKEND_DIR" -- artisan serve --host=127.0.0.1 --port=8000
         fi
         pm2 save
+    else
+        echo "❌ PM2 is not installed!"
+        exit 1
     fi
 
     # Strict Health Check: Verify Laravel Backend API is listening on port 8000
-    echo "🔍 Waiting for Laravel Backend API (http://127.0.0.1:8000)..."
+    echo "🔍 Checking Laravel Backend API (http://127.0.0.1:8000/api/health)..."
     BACKEND_READY=false
     for i in {1..30}; do
-        if curl -fsS http://127.0.0.1:8000 >/dev/null 2>&1; then
-            echo "✅ Laravel Backend is live on port 8000!"
+        if curl -fsS http://127.0.0.1:8000/api/health >/dev/null 2>&1 || curl -fsS http://127.0.0.1:8000 >/dev/null 2>&1; then
+            echo "✅ Laravel Backend is responding on port 8000!"
             BACKEND_READY=true
             break
         fi
@@ -115,8 +118,9 @@ if [ -d "$BACKEND_DIR" ]; then
     done
 
     if [ "$BACKEND_READY" != "true" ]; then
-        echo "❌ ERROR: Laravel Backend failed to start on http://127.0.0.1:8000!"
-        pm2 logs knotelle-backend --lines 50 --nostream 2>/dev/null || true
+        echo "❌ ERROR: Laravel Backend failed to start!"
+        pm2 status
+        pm2 logs knotelle-backend --lines 100 --nostream 2>/dev/null || true
         exit 1
     fi
 fi
@@ -134,11 +138,11 @@ if [ -d "$FRONTEND_DIR" ]; then
     echo "🔨 Building Next.js production bundle..."
     npm run build
 
-    # Start or Reload Node PM2 process
+    # Start or Restart Node PM2 process
     if command -v pm2 >/dev/null 2>&1; then
         if pm2 describe knotelle-frontend >/dev/null 2>&1; then
-            echo "🔄 Reloading PM2 frontend process..."
-            pm2 reload knotelle-frontend --update-env
+            echo "🔄 Restarting PM2 frontend process..."
+            pm2 restart knotelle-frontend --update-env
         else
             echo "🚀 Starting PM2 frontend process..."
             pm2 start npm --name "knotelle-frontend" --cwd "$FRONTEND_DIR" -- start -- -p 3000
@@ -147,11 +151,11 @@ if [ -d "$FRONTEND_DIR" ]; then
     fi
 
     # Strict Health Check: Verify Next.js Frontend is listening on port 3000
-    echo "🔍 Waiting for Next.js Frontend (http://127.0.0.1:3000)..."
+    echo "🔍 Checking Next.js Frontend (http://127.0.0.1:3000)..."
     FRONTEND_READY=false
     for i in {1..30}; do
         if curl -fsS http://127.0.0.1:3000 >/dev/null 2>&1; then
-            echo "✅ Next.js Frontend is live on port 3000!"
+            echo "✅ Next.js Frontend is responding on port 3000!"
             FRONTEND_READY=true
             break
         fi
@@ -161,11 +165,22 @@ if [ -d "$FRONTEND_DIR" ]; then
 
     if [ "$FRONTEND_READY" != "true" ]; then
         echo "❌ ERROR: Next.js Frontend failed to start on http://127.0.0.1:3000!"
-        pm2 logs knotelle-frontend --lines 50 --nostream 2>/dev/null || true
+        pm2 status
+        pm2 logs knotelle-frontend --lines 100 --nostream 2>/dev/null || true
         exit 1
     fi
 fi
 
+echo ""
+echo "📊 Final PM2 Status:"
+pm2 status
+
+echo ""
+echo "🔎 Final Service Checks:"
+curl -fsS http://127.0.0.1:8000/api/health >/dev/null && echo "✅ Laravel API: OK"
+curl -fsS http://127.0.0.1:3000 >/dev/null && echo "✅ Next.js Frontend: OK"
+
+echo ""
 echo "=========================================================================="
 echo "✅ KNOTELLE Deployment completed successfully! All services are online."
 echo "=========================================================================="
