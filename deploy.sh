@@ -71,8 +71,9 @@ if [ -d "$BACKEND_DIR" ]; then
     # Clear & rebuild caches
     echo "🧹 Optimizing Laravel caches..."
     php artisan optimize:clear
+    php artisan route:clear || true
     php artisan config:cache
-    php artisan route:cache
+    php artisan route:cache || true
     php artisan view:cache
     php artisan event:cache
 
@@ -105,11 +106,18 @@ if [ -d "$FRONTEND_DIR" ]; then
     echo "🔨 Building Next.js production bundle..."
     npm run build
 
-    # Restart Node PM2 process if PM2 is present
+    # Restart or start Node PM2 process
     if command -v pm2 >/dev/null 2>&1; then
-        echo "🔄 Reloading PM2 process..."
-        pm2 reload knotelle-frontend --update-env || pm2 reload all --update-env || true
+        echo "🔄 Starting/Reloading PM2 frontend process..."
+        pm2 describe knotelle-frontend > /dev/null 2>&1 && pm2 reload knotelle-frontend --update-env || pm2 start npm --name "knotelle-frontend" -- start -- -p 3000
     fi
+fi
+
+# Ensure Laravel backend is also running in PM2 if standalone server
+if command -v pm2 >/dev/null 2>&1; then
+    echo "🔄 Starting/Reloading PM2 backend process..."
+    pm2 describe knotelle-backend > /dev/null 2>&1 && pm2 reload knotelle-backend --update-env || pm2 start "php artisan serve --host=127.0.0.1 --port=8000" --name "knotelle-backend" --cwd "$BACKEND_DIR"
+    pm2 save
 fi
 
 echo "=========================================================================="
