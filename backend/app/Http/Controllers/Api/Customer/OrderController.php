@@ -66,15 +66,16 @@ class OrderController extends Controller
 
             if ($customer) {
                 $customerId = $customer->id;
-                $customerEmail = strtolower($customer->email);
+                $customerEmail = strtolower(trim($customer->email));
                 $query->where(function ($q) use ($customerId, $customerEmail) {
                     $q->where('customer_id', $customerId);
-                    if ($customerEmail) {
+                    if (!empty($customerEmail)) {
                         $q->orWhere('shipping_address->email', $customerEmail);
                     }
                 });
             } else {
-                $query->where('shipping_address->email', $email);
+                $cleanEmail = strtolower($email);
+                $query->where('shipping_address->email', $cleanEmail);
             }
 
             $orders = $query->get();
