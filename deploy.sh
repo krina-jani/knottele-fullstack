@@ -94,10 +94,15 @@ if [ -d "$BACKEND_DIR" ]; then
     echo "▶️  Bringing backend out of maintenance mode..."
     php artisan up
 
-    # Start/Reload Laravel Backend in PM2 BEFORE building Next.js frontend
+    # Start or Reload Laravel Backend in PM2 BEFORE building Next.js frontend
     if command -v pm2 >/dev/null 2>&1; then
-        echo "🔄 Starting/Reloading PM2 backend process..."
-        pm2 describe knotelle-backend > /dev/null 2>&1 && pm2 reload knotelle-backend --update-env || pm2 start "php artisan serve --host=127.0.0.1 --port=8000" --name "knotelle-backend" --cwd "$BACKEND_DIR"
+        if pm2 list | grep -q "knotelle-backend"; then
+            echo "🔄 Reloading PM2 backend process..."
+            pm2 reload knotelle-backend --update-env
+        else
+            echo "🚀 Starting PM2 backend process..."
+            pm2 start "php artisan serve --host=127.0.0.1 --port=8000" --name "knotelle-backend" --cwd "$BACKEND_DIR"
+        fi
         pm2 save
     fi
 fi
@@ -115,10 +120,15 @@ if [ -d "$FRONTEND_DIR" ]; then
     echo "🔨 Building Next.js production bundle..."
     npm run build
 
-    # Restart or start Node PM2 process
+    # Start or Reload Node PM2 process
     if command -v pm2 >/dev/null 2>&1; then
-        echo "🔄 Starting/Reloading PM2 frontend process..."
-        pm2 describe knotelle-frontend > /dev/null 2>&1 && pm2 reload knotelle-frontend --update-env || pm2 start npm --name "knotelle-frontend" --cwd "$FRONTEND_DIR" -- start -- -p 3000
+        if pm2 list | grep -q "knotelle-frontend"; then
+            echo "🔄 Reloading PM2 frontend process..."
+            pm2 reload knotelle-frontend --update-env
+        else
+            echo "🚀 Starting PM2 frontend process..."
+            pm2 start npm --name "knotelle-frontend" --cwd "$FRONTEND_DIR" -- start -- -p 3000
+        fi
         pm2 save
     fi
 fi
