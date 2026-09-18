@@ -46,6 +46,46 @@ if [ -d "$PROJECT_ROOT/.git" ]; then
     git pull origin main || git pull origin master || true
 fi
 
+# Ensure ecosystem.config.js exists in PROJECT_ROOT
+if [ ! -f "$PROJECT_ROOT/ecosystem.config.js" ]; then
+    echo "⚙️ Creating ecosystem.config.js dynamically..."
+    cat << 'EOF' > "$PROJECT_ROOT/ecosystem.config.js"
+module.exports = {
+  apps: [
+    {
+      name: "knotelle-backend",
+      cwd: "/var/www/knottele-fullstack/backend",
+      script: "artisan",
+      interpreter: "php",
+      args: "serve --host=127.0.0.1 --port=8000",
+      env: {
+        APP_ENV: "production",
+      },
+      autorestart: true,
+      restart_delay: 3000,
+      max_restarts: 10,
+    },
+    {
+      name: "knotelle-frontend",
+      cwd: "/var/www/knottele-fullstack/frontend",
+      script: "node_modules/next/dist/bin/next",
+      interpreter: "node",
+      args: "start -p 3000",
+      env: {
+        NODE_ENV: "production",
+        PORT: "3000",
+        INTERNAL_API_URL: "http://127.0.0.1:8000/api",
+        NEXT_PUBLIC_API_URL: "/api",
+      },
+      autorestart: true,
+      restart_delay: 3000,
+      max_restarts: 10,
+    },
+  ],
+};
+EOF
+fi
+
 # 3. Deploy Backend (Laravel)
 if [ -d "$BACKEND_DIR" ]; then
     echo "⚙️  Deploying Laravel Backend..."
