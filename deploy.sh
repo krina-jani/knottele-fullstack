@@ -95,8 +95,8 @@ if [ -d "$BACKEND_DIR" ]; then
             echo "🔄 Restarting PM2 backend process..."
             pm2 restart knotelle-backend --update-env
         else
-            echo "🚀 Starting PM2 backend process..."
-            pm2 start php --name "knotelle-backend" --cwd "$BACKEND_DIR" -- artisan serve --host=127.0.0.1 --port=8000
+            echo "🚀 Starting PM2 backend process from ecosystem.config.js..."
+            pm2 start "$PROJECT_ROOT/ecosystem.config.js" --only knotelle-backend
         fi
         pm2 save
     else
@@ -136,7 +136,7 @@ if [ -d "$FRONTEND_DIR" ]; then
 
     # Build production bundle (Backend on 8000 is now live for static pre-rendering!)
     echo "🔨 Building Next.js production bundle..."
-    npm run build
+    INTERNAL_API_URL="http://127.0.0.1:8000/api" NEXT_PUBLIC_API_URL="/api" npm run build
 
     # Start or Restart Node PM2 process
     if command -v pm2 >/dev/null 2>&1; then
@@ -144,8 +144,8 @@ if [ -d "$FRONTEND_DIR" ]; then
             echo "🔄 Restarting PM2 frontend process..."
             pm2 restart knotelle-frontend --update-env
         else
-            echo "🚀 Starting PM2 frontend process..."
-            pm2 start npm --name "knotelle-frontend" --cwd "$FRONTEND_DIR" -- start -- -p 3000
+            echo "🚀 Starting PM2 frontend process from ecosystem.config.js..."
+            pm2 start "$PROJECT_ROOT/ecosystem.config.js" --only knotelle-frontend
         fi
         pm2 save
     fi

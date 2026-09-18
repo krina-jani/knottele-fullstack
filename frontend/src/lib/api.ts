@@ -5,22 +5,31 @@
 
 import { Product } from "@/types/product";
 
-export const getApiBaseUrl = () => {
-  if (typeof window !== "undefined") {
-    if (process.env.NEXT_PUBLIC_API_URL) {
-      return process.env.NEXT_PUBLIC_API_URL;
-    }
-    if (window.location.port === "3000") {
-      return "http://127.0.0.1:8000/api";
-    }
-    return "/api";
+export function getBrowserApiBaseUrl(): string {
+  if (process.env.NEXT_PUBLIC_API_URL) {
+    return process.env.NEXT_PUBLIC_API_URL;
   }
-  // Server-side (Node.js runtime during next build or SSR)
-  return (
-    process.env.INTERNAL_API_URL ||
-    process.env.NEXT_PUBLIC_API_URL ||
-    "http://127.0.0.1:8000/api"
-  );
+  if (typeof window !== "undefined" && window.location.port === "3000") {
+    return "http://127.0.0.1:8000/api";
+  }
+  return "/api";
+}
+
+export function getServerApiBaseUrl(): string {
+  if (process.env.INTERNAL_API_URL) {
+    return process.env.INTERNAL_API_URL;
+  }
+  if (process.env.NEXT_PUBLIC_API_URL && process.env.NEXT_PUBLIC_API_URL.startsWith("http")) {
+    return process.env.NEXT_PUBLIC_API_URL;
+  }
+  return "http://127.0.0.1:8000/api";
+}
+
+export const getApiBaseUrl = (): string => {
+  if (typeof window !== "undefined") {
+    return getBrowserApiBaseUrl();
+  }
+  return getServerApiBaseUrl();
 };
 
 export interface ContactFormData {
