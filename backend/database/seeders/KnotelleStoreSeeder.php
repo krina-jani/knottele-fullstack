@@ -15,9 +15,15 @@ class KnotelleStoreSeeder extends Seeder
         $this->seedSettings();
         $this->seedBrand();
         $this->seedCategories();
-        $this->seedTags();
-        $this->seedSpecificationGroups();
-        $this->seedSpecifications();
+        if (Schema::hasTable('tags')) {
+            $this->seedTags();
+        }
+        if (Schema::hasTable('specification_groups')) {
+            $this->seedSpecificationGroups();
+        }
+        if (Schema::hasTable('specifications')) {
+            $this->seedSpecifications();
+        }
         $this->seedTaxClasses();
         $this->seedProducts();
         $this->seedProductVariants();
