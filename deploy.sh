@@ -20,6 +20,7 @@ fi
 echo "📥 Pulling latest code..."
 cd "$PROJECT_ROOT"
 git pull origin main || true
+rm -rf "$PROJECT_ROOT/backend/public/admin" "$PROJECT_ROOT/backend/public/knottele/admin"
 
 # 4. Install Composer dependencies
 if [ -d "$PROJECT_ROOT/backend" ]; then
@@ -46,7 +47,7 @@ if [ -d "$PROJECT_ROOT/backend" ]; then
     fi
 
     # Ensure static public/admin directory never shadows Laravel admin routes
-    rm -rf public/admin
+    rm -rf public/admin public/knottele/admin
 
     # Copy icons to /var/www/html if present to prevent root 404s
     if [ -d "/var/www/html" ]; then

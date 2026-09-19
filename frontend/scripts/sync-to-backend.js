@@ -86,6 +86,10 @@ try {
   if (fs.existsSync(adminDir)) {
     fs.rmSync(adminDir, { recursive: true, force: true });
   }
+  const knotteleAdminDir = path.join(destDir, 'knottele', 'admin');
+  if (fs.existsSync(knotteleAdminDir)) {
+    fs.rmSync(knotteleAdminDir, { recursive: true, force: true });
+  }
   
   console.log('✅ Successfully exported Next.js frontend into Laravel public directory!');
 } catch (error) {

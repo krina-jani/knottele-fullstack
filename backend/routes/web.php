@@ -55,6 +55,9 @@ use App\Http\Controllers\Customer\UserController as CustomerUser;
 
 $adminRoutes = function () {
     Route::get('/', function () {
+        if (request()->is('knottele/*')) {
+            return redirect('/knottele/admin/dashboard');
+        }
         return redirect()->route('admin.dashboard');
     });
 
@@ -63,8 +66,16 @@ $adminRoutes = function () {
     | ADMIN AUTH
     |--------------------------------------------------------------------------
     */
-    Route::get('/login', [AdminAuth::class, 'loginPage'])->name('admin.login');
+    Route::match(['get', 'head'], '/signin', [AdminAuth::class, 'loginPage'])->name('admin.signin');
+    Route::match(['get', 'head'], '/signin/{any}', [AdminAuth::class, 'loginPage'])->where('any', '.*');
+    Route::post('/signin', [AdminAuth::class, 'login'])->name('admin.signin.submit');
+    Route::post('/signin/{any}', [AdminAuth::class, 'login'])->where('any', '.*');
+
+    Route::match(['get', 'head'], '/login', [AdminAuth::class, 'loginPage'])->name('admin.login');
+    Route::match(['get', 'head'], '/login/{any}', [AdminAuth::class, 'loginPage'])->where('any', '.*');
     Route::post('/login', [AdminAuth::class, 'login'])->name('admin.login.submit');
+    Route::post('/login/{any}', [AdminAuth::class, 'login'])->where('any', '.*');
+
     Route::post('/logout', [AdminAuth::class, 'logout'])->name('admin.logout');
 
     /*

@@ -26,8 +26,14 @@ class AppServiceProvider extends ServiceProvider
             \Illuminate\Support\Facades\URL::forceRootUrl($appUrl);
         }
 
-        if ((isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on') || str_starts_with(config('app.url', ''), 'https://')) {
+        $isHttps = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on')
+            || (isset($_SERVER['HTTP_X_FORWARDED_PROTO']) && $_SERVER['HTTP_X_FORWARDED_PROTO'] === 'https')
+            || (request() && request()->isSecure());
+
+        if ($isHttps) {
             \Illuminate\Support\Facades\URL::forceScheme('https');
+        } elseif (isset($_SERVER['HTTP_HOST'])) {
+            \Illuminate\Support\Facades\URL::forceScheme('http');
         }
 
         \Illuminate\Support\Facades\View::composer('customer.partials.header', function ($view) {
