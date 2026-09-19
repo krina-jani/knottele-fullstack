@@ -22,6 +22,11 @@ cd "$PROJECT_ROOT"
 git pull origin main || true
 rm -rf "$PROJECT_ROOT/backend/public/admin" "$PROJECT_ROOT/backend/public/knottele/admin"
 
+# Ensure APP_URL on VPS matches production host
+if [ -f "$PROJECT_ROOT/backend/.env" ]; then
+    sed -i 's|APP_URL=http://127.0.0.1:8000|APP_URL=http://187.127.158.24/knottele|g' "$PROJECT_ROOT/backend/.env"
+fi
+
 # 4. Install Composer dependencies
 if [ -d "$PROJECT_ROOT/backend" ]; then
     echo "📦 Installing Composer dependencies..."

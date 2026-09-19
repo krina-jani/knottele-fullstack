@@ -22,7 +22,17 @@ class AppServiceProvider extends ServiceProvider
     {
         Schema::defaultStringLength(191);
 
-        if ($appUrl = config('app.url')) {
+        if (!app()->runningInConsole() && request()) {
+            $host = request()->getHost();
+            $scheme = request()->getScheme();
+
+            // Auto-detect live VPS or /knottele subpath to ensure links never render as localhost:8000
+            if ($host === '187.127.158.24' || request()->is('knottele*') || str_contains(request()->getRequestUri(), '/knottele')) {
+                \Illuminate\Support\Facades\URL::forceRootUrl($scheme . '://' . $host . '/knottele');
+            } else {
+                \Illuminate\Support\Facades\URL::forceRootUrl($scheme . '://' . request()->getHttpHost());
+            }
+        } elseif ($appUrl = config('app.url')) {
             \Illuminate\Support\Facades\URL::forceRootUrl($appUrl);
         }
 
