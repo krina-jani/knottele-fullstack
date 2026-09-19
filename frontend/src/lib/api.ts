@@ -40,26 +40,32 @@ export function getFullPath(path: string): string {
 }
 
 export function getBrowserApiBaseUrl(): string {
-  if (process.env.NEXT_PUBLIC_API_URL) {
-    return process.env.NEXT_PUBLIC_API_URL;
-  }
   if (typeof window !== "undefined") {
-    if (window.location.port === "3000") {
+    const isLocalhost = window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1";
+
+    // Only connect to loopback port 8000 if developing locally on port 3000
+    if (isLocalhost && window.location.port === "3000") {
       return "http://127.0.0.1:8000/api";
     }
+
+    // When running under /knottele subpath (e.g. http://187.127.158.24/knottele)
     if (window.location.pathname.startsWith("/knottele")) {
       return "/knottele/api";
     }
+
+    // Any remote server origin
+    if (!isLocalhost) {
+      return "/api";
+    }
   }
-  return "/api";
+
+  // Fallback
+  return "/knottele/api";
 }
 
 export function getServerApiBaseUrl(): string {
   if (process.env.INTERNAL_API_URL) {
     return process.env.INTERNAL_API_URL;
-  }
-  if (process.env.NEXT_PUBLIC_API_URL && process.env.NEXT_PUBLIC_API_URL.startsWith("http")) {
-    return process.env.NEXT_PUBLIC_API_URL;
   }
   return "http://127.0.0.1:8000/api";
 }

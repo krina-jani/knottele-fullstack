@@ -5,6 +5,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { ArrowRight, Heart, Sparkles, Leaf, Smile } from "lucide-react";
 import { useWebsiteMedia } from "@/context/MediaContext";
+import { normalizeImageUrl } from "@/lib/api";
 
 const DEFAULT_STORY_BG = "/images/homepage/middleimg.png";
 
@@ -12,7 +13,7 @@ export function BrandStory() {
   const { media } = useWebsiteMedia();
   const bs = media?.brandStory || media?.customCrochet;
 
-  const bgImage = bs?.desktop || DEFAULT_STORY_BG;
+  const bgImage = normalizeImageUrl(bs?.desktop, DEFAULT_STORY_BG);
   const title = bs?.title || "Every Stitch";
   const subtitle = bs?.subtitle || "Has a Story";
   const description = bs?.description || "More than just crochet, we create memories, happiness and a little bit of magic.";

@@ -12,7 +12,7 @@ import {
 } from "@/components/ui/BotanicalDecorations";
 import { Phone, Mail, MapPin } from "lucide-react";
 import { useWebsiteMedia } from "@/context/MediaContext";
-import { normalizeInternalLink } from "@/lib/api";
+import { normalizeInternalLink, normalizeImageUrl } from "@/lib/api";
 
 const DEFAULT_FOOTER_BG = "/images/categories/footer.png";
 
@@ -23,7 +23,7 @@ export function Footer() {
   useEffect(() => {
     const bg = media?.footer?.bg || media?.footer?.image;
     if (bg) {
-      setFooterBg(bg);
+      setFooterBg(normalizeImageUrl(bg, DEFAULT_FOOTER_BG));
     }
   }, [media?.footer?.bg, media?.footer?.image]);
 

@@ -6,6 +6,7 @@ import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 import { HandmadePaperTag } from "@/components/ui/BotanicalDecorations";
 import { useWebsiteMedia } from "@/context/MediaContext";
+import { normalizeImageUrl } from "@/lib/api";
 
 const DEFAULT_BANNER_IMG = "/images/homepage/middleimg.png";
 
@@ -13,8 +14,8 @@ export function CustomBanner() {
   const { media } = useWebsiteMedia();
   const cc = media?.customCrochet;
 
-  const bannerImg = cc?.desktop || DEFAULT_BANNER_IMG;
-  const bannerImgMobile = cc?.mobile || null;
+  const bannerImg = normalizeImageUrl(cc?.desktop, DEFAULT_BANNER_IMG);
+  const bannerImgMobile = cc?.mobile ? normalizeImageUrl(cc?.mobile) : null;
   const title = cc?.title || "Custom Crochet";
   const subtitle = cc?.subtitle || "Just for You";
   const description = cc?.description || "Your imagination, our yarn. \nLet's create something special together.";

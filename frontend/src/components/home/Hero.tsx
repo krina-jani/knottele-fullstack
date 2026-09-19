@@ -6,6 +6,7 @@ import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 
 import { useWebsiteMedia } from "@/context/MediaContext";
+import { normalizeImageUrl } from "@/lib/api";
 
 const DEFAULT_HERO_SLIDES = [
   {
@@ -93,8 +94,8 @@ export function Hero() {
           cta_link: s.primary_button_link || s.cta_link || "/shop",
           secondary_cta_text: s.secondary_button_text || s.secondary_cta_text || "Explore Collections",
           secondary_cta_link: s.secondary_button_link || s.secondary_cta_link || "/shop",
-          bgImage: s.desktop_image || s.desktop || fallback.bgImage,
-          bgImageMobile: s.mobile_image || s.mobile || s.desktop_image || s.desktop || fallback.bgImageMobile,
+          bgImage: normalizeImageUrl(s.desktop_image || s.desktop, fallback.bgImage),
+          bgImageMobile: normalizeImageUrl(s.mobile_image || s.mobile || s.desktop_image || s.desktop, fallback.bgImageMobile),
           cardNote: s.tagline || s.tag_text || fallback.cardNote,
           scriptAccent: s.tagline || s.tag_text || fallback.scriptAccent,
         };
