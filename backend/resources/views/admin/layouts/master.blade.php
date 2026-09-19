@@ -48,23 +48,28 @@
     <script>
         // Global variables
         const BASE_URL = '{{ url('/') }}';
-        const ADMIN_URL = '{{ url('/admin') }}';
+        const ADMIN_URL = '{{ url(request()->is('knottele*') ? '/knottele/admin' : '/admin') }}';
         const ASSET_URL = '{{ asset('') }}';
         window.ADMIN_API_TOKEN = @json(session('admin_api_token'));
     </script>
 </head>
 
 <body class="bg-stone-50">
-    @if (request()->is('admin/*') && !request()->is('admin/login'))
+    @php
+        $isAdminPanel = (request()->is('admin/*') || request()->is('knottele/admin/*') || request()->is('*admin/*'))
+            && !request()->is('*login*') && !request()->is('*signin*');
+    @endphp
+
+    @if ($isAdminPanel)
         @include('admin.partials.sidebar')
     @endif
 
-    <div id="main-content" class="transition-all duration-300 @if (request()->is('admin/*') && !request()->is('admin/login')) ml-0 md:ml-24 @endif">
-        @if (request()->is('admin/*') && !request()->is('admin/login'))
+    <div id="main-content" class="transition-all duration-300 @if ($isAdminPanel) ml-0 md:ml-24 @endif">
+        @if ($isAdminPanel)
             @include('admin.partials.header')
         @endif
 
-        <main class="@if (request()->is('admin/*') && !request()->is('admin/login')) p-4 sm:p-6 md:p-8 @endif">
+        <main class="@if ($isAdminPanel) p-4 sm:p-6 md:p-8 @endif">
             @yield('content')
         </main>
     </div>

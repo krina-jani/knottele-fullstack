@@ -175,7 +175,10 @@ $navItems = [
 // Get current route
 $currentRoute = Route::currentRouteName();
 $isActive = function ($route, $params = []) use ($currentRoute) {
-    return $currentRoute === $route;
+    if ($currentRoute === $route) return true;
+    if ($currentRoute === 'knottele.' . $route) return true;
+    if ($currentRoute && str_ends_with($currentRoute, $route)) return true;
+    return false;
 };
 ?>
 

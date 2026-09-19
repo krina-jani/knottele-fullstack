@@ -7,7 +7,7 @@
                 <i class="fas fa-bars text-xl"></i>
             </button>
             <h1 class="text-lg sm:text-xl font-bold bg-gradient-to-r from-stone-800 to-stone-600 bg-clip-text text-transparent ml-2 sm:ml-4 capitalize truncate max-w-[150px] sm:max-w-none">
-                {{ str_replace('_', ' ', Request::segment(2) ?? 'Dashboard') }}
+                {{ str_replace('_', ' ', Request::segment(Request::segment(1) === 'knottele' ? 3 : 2) ?? 'Dashboard') }}
             </h1>
         </div>
         <div class="flex items-center space-x-2 sm:space-x-4">
