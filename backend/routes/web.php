@@ -404,7 +404,7 @@ $adminRoutes = function () {
 };
 
 Route::prefix('admin')->group($adminRoutes);
-Route::prefix('knottele/admin')->group($adminRoutes);
+Route::prefix('knottele/admin')->as('knottele.')->group($adminRoutes);
 
 
 Route::get('/run-migration', function () {
