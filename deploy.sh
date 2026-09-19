@@ -10,10 +10,10 @@ PROJECT_ROOT="$(pwd)"
 # Ensure backend is brought out of maintenance mode even if an unexpected error occurs
 trap 'if [ -d "$PROJECT_ROOT/backend" ]; then cd "$PROJECT_ROOT/backend" && php artisan up 2>/dev/null || true; fi' EXIT
 
-# 2. Put application into maintenance mode if backend exists
+# 2. Ensure application is running smoothly (zero downtime deploy)
 if [ -d "$PROJECT_ROOT/backend" ]; then
     cd "$PROJECT_ROOT/backend"
-    php artisan down || true
+    php artisan up 2>/dev/null || true
 fi
 
 # 3. Pull latest code from Git

@@ -48,15 +48,8 @@ export function getBrowserApiBaseUrl(): string {
       return "http://127.0.0.1:8000/api";
     }
 
-    // When running under /knottele subpath (e.g. http://187.127.158.24/knottele)
-    if (window.location.pathname.startsWith("/knottele")) {
-      return "/knottele/api";
-    }
-
-    // Any remote server origin
-    if (!isLocalhost) {
-      return "/api";
-    }
+    // On remote production server (IP or domain), always use /knottele/api to avoid 301 redirects and ensure POST requests work seamlessly
+    return "/knottele/api";
   }
 
   // Fallback

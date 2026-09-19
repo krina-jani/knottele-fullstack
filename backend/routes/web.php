@@ -444,12 +444,17 @@ Route::get('/{any}', function ($any = '') {
         $path = '';
     }
 
-    // 1. Direct match with subfolder index.html (e.g. /shop -> public/shop/index.html)
+    // 1. Direct match with static asset file (e.g. /icon.png -> public/icon.png, /favicon.ico -> public/favicon.ico)
+    if ($path && file_exists(public_path($path)) && !is_dir(public_path($path))) {
+        return response()->file(public_path($path));
+    }
+
+    // 2. Direct match with subfolder index.html (e.g. /shop -> public/shop/index.html)
     if ($path && file_exists(public_path($path . '/index.html'))) {
         return response()->file(public_path($path . '/index.html'));
     }
 
-    // 2. Direct match with .html file (e.g. /shop -> public/shop.html)
+    // 3. Direct match with .html file (e.g. /shop -> public/shop.html)
     if ($path && file_exists(public_path($path . '.html'))) {
         return response()->file(public_path($path . '.html'));
     }

@@ -44,7 +44,21 @@ class CustomerApiAuthController extends Controller
         }
 
         if (!$customer || !Hash::check($request->password, $customer->password)) {
-            return response()->json(['message' => 'Invalid email/phone or password.'], 401);
+            // Also check if an administrator or backend user is logging in on the customer storefront
+            $adminUser = \App\Models\User::where('email', strtolower($loginInput))->first();
+            if ($adminUser && Hash::check($request->password, $adminUser->password)) {
+                $customer = Customer::firstOrCreate(
+                    ['email' => strtolower($adminUser->email)],
+                    [
+                        'name' => $adminUser->name ?? 'Admin Member',
+                        'mobile' => '+91 9999999999',
+                        'password' => $adminUser->password,
+                        'email_verified_at' => now(),
+                    ]
+                );
+            } else {
+                return response()->json(['message' => 'Invalid email/phone or password.'], 401);
+            }
         }
 
         $token = $customer->createToken('customer_api')->plainTextToken;

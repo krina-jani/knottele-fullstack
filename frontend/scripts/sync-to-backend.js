@@ -4,7 +4,7 @@ const path = require('path');
 const srcDir = path.resolve(__dirname, '../out');
 const destDir = path.resolve(__dirname, '../../backend/public');
 
-// Files and folders in Laravel public that should NOT be overwritten or deleted
+// Files and folders in Laravel public that should NEVER be deleted
 const PRESERVED_ITEMS = new Set([
   'index.php',
   '.htaccess',
@@ -12,8 +12,34 @@ const PRESERVED_ITEMS = new Set([
   'css',
   'js',
   'storage',
+  'build',
+  'images',
+  'videos',
   'icons.svg',
+  '.git',
+  '.gitignore',
 ]);
+
+function cleanOldFrontendArtifacts(dest) {
+  if (!fs.existsSync(dest)) return;
+
+  const entries = fs.readdirSync(dest, { withFileTypes: true });
+  for (const entry of entries) {
+    if (PRESERVED_ITEMS.has(entry.name)) {
+      continue;
+    }
+    const targetPath = path.join(dest, entry.name);
+    try {
+      if (entry.isDirectory()) {
+        fs.rmSync(targetPath, { recursive: true, force: true });
+      } else {
+        fs.unlinkSync(targetPath);
+      }
+    } catch (err) {
+      console.warn(`[Clean] Could not remove ${targetPath}:`, err.message);
+    }
+  }
+}
 
 function copyRecursive(src, dest) {
   if (!fs.existsSync(src)) {
@@ -44,14 +70,18 @@ function copyRecursive(src, dest) {
   }
 }
 
-console.log('🔄 Syncing Next.js export to Laravel public directory...');
+console.log('🔄 Cleaning old frontend static files and syncing Next.js export...');
 console.log(`📂 From: ${srcDir}`);
 console.log(`📁 To:   ${destDir}`);
 
 try {
+  // 1. Purge obsolete chunks and stale HTML pages
+  cleanOldFrontendArtifacts(destDir);
+
+  // 2. Copy fresh Next.js build
   copyRecursive(srcDir, destDir);
   
-  // Ensure public/admin directory never exists so Nginx never shadows Laravel's admin routes
+  // 3. Ensure public/admin directory never exists so Nginx never shadows Laravel's admin routes
   const adminDir = path.join(destDir, 'admin');
   if (fs.existsSync(adminDir)) {
     fs.rmSync(adminDir, { recursive: true, force: true });
