@@ -153,7 +153,7 @@ class BrandController extends Controller
                     'file_type' => 'image',
                     'file_size' => $logoFile->getSize(),
                     'alt_text' => $data['name'] . ' logo',
-                    'uploaded_by' => auth()->id(),
+                    'uploaded_by' => auth('admin_api')->id() ?? \Illuminate\Support\Facades\Auth::guard('admin')->id() ?? 1,
                     'uploader_type' => 'admin',
                 ]);
 
@@ -284,7 +284,7 @@ class BrandController extends Controller
                     'file_type' => 'image',
                     'file_size' => $logoFile->getSize(),
                     'alt_text' => $data['name'] . ' logo',
-                    'uploaded_by' => auth()->id(),
+                    'uploaded_by' => auth('admin_api')->id() ?? \Illuminate\Support\Facades\Auth::guard('admin')->id() ?? 1,
                     'uploader_type' => 'admin',
                 ]);
 

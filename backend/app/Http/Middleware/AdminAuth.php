@@ -12,10 +12,7 @@ class AdminAuth
     public function handle($request, Closure $next)
     {
         if (!Auth::guard('admin')->check()) {
-            if ($request->is('knottele/*')) {
-                return redirect('/knottele/admin/signin');
-            }
-            return redirect()->route('admin.signin');
+            return redirect()->route('admin.login');
         }
 
         // The admin UI uses the session guard, while its API uses Sanctum bearer

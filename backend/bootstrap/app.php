@@ -23,6 +23,13 @@ return Application::configure(basePath: dirname(__DIR__))
             \App\Http\Middleware\TrackVisitors::class,
         ]);
 
+        $middleware->redirectGuestsTo(function ($request) {
+            if ($request->is('admin*') || $request->is('*/admin*')) {
+                return route('admin.login');
+            }
+            return '/login';
+        });
+
         $middleware->alias([
             'admin.auth'    => \App\Http\Middleware\AdminAuth::class,
             'customer.auth' => \App\Http\Middleware\CustomerAuth::class,

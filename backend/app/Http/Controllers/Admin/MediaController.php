@@ -12,10 +12,16 @@ use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
 
 class MediaController extends Controller
 {
+    protected function getAdminId(): int
+    {
+        return Auth::guard('admin')->id() ?? auth('admin_api')->id() ?? 1;
+    }
+
     public function index()
     {
         return view('admin.media.index');
@@ -1103,7 +1109,7 @@ class MediaController extends Controller
                 'cta_link' => $ctaLink,
                 'tag_text' => $tagText,
                 'is_active' => true,
-                'uploaded_by' => auth()->id() ?: 1,
+                'uploaded_by' => $this->getAdminId(),
                 'uploader_type' => 'admin',
             ]);
 
@@ -1224,7 +1230,7 @@ class MediaController extends Controller
                 'device' => $request->input('device', 'all'),
                 'title' => $request->input('title', ucfirst(str_replace('_', ' ', $request->input('slot') ?: $request->input('section')))),
                 'is_active' => true,
-                'uploaded_by' => auth()->id() ?: 1,
+                'uploaded_by' => $this->getAdminId(),
                 'uploader_type' => 'admin',
             ]);
         }
@@ -1330,7 +1336,7 @@ class MediaController extends Controller
                 'device' => 'all',
                 'title' => $category->name . ' Category Image',
                 'is_active' => true,
-                'uploaded_by' => auth()->id() ?: 1,
+                'uploaded_by' => $this->getAdminId(),
                 'uploader_type' => 'admin',
             ]);
 
@@ -1483,7 +1489,7 @@ class MediaController extends Controller
             'tag_text' => $tagline,
             'sort_order' => $sortOrder,
             'is_active' => $isActive,
-            'uploaded_by' => auth()->id() ?: 1,
+            'uploaded_by' => $this->getAdminId(),
             'uploader_type' => 'admin',
         ]);
 
@@ -1869,7 +1875,7 @@ class MediaController extends Controller
                     'device' => $device,
                     'title' => $rawName,
                     'is_active' => true,
-                    'uploaded_by' => auth()->id() ?: 1,
+                    'uploaded_by' => $this->getAdminId(),
                     'uploader_type' => 'admin',
                 ]);
 
@@ -2214,7 +2220,7 @@ class MediaController extends Controller
             'sort_order' => $sortOrder,
             'is_active' => $isActive,
             'is_featured' => $isFeatured,
-            'uploaded_by' => auth()->id() ?: 1,
+            'uploaded_by' => $this->getAdminId(),
             'uploader_type' => 'admin',
         ]);
 
@@ -2586,7 +2592,7 @@ class MediaController extends Controller
             $settings->disk = 'local';
             $settings->mime_type = 'image/png';
             $settings->file_type = 'image';
-            $settings->uploaded_by = auth()->id() ?: 1;
+            $settings->uploaded_by = $this->getAdminId();
             $settings->uploader_type = 'admin';
         }
 
@@ -2677,7 +2683,7 @@ class MediaController extends Controller
             $media->disk = 'local';
             $media->mime_type = 'image/png';
             $media->file_type = 'image';
-            $media->uploaded_by = auth()->id() ?: 1;
+            $media->uploaded_by = $this->getAdminId();
             $media->uploader_type = 'admin';
         }
 
@@ -2769,7 +2775,7 @@ class MediaController extends Controller
             $media->disk = 'local';
             $media->mime_type = 'image/jpeg';
             $media->file_type = 'image';
-            $media->uploaded_by = auth()->id() ?: 1;
+            $media->uploaded_by = $this->getAdminId();
             $media->uploader_type = 'admin';
         }
 
@@ -2912,7 +2918,7 @@ class MediaController extends Controller
             $settings->disk = 'local';
             $settings->mime_type = 'image/png';
             $settings->file_type = 'image';
-            $settings->uploaded_by = auth()->id() ?: 1;
+            $settings->uploaded_by = $this->getAdminId();
             $settings->uploader_type = 'admin';
         }
 
@@ -2971,7 +2977,7 @@ class MediaController extends Controller
             'file_type' => 'image',
             'sort_order' => $request->filled('sort_order') ? (int)$request->input('sort_order') : ($maxSort + 1),
             'is_active' => $request->has('is_active') ? filter_var($request->input('is_active'), FILTER_VALIDATE_BOOLEAN) : true,
-            'uploaded_by' => auth()->id() ?: 1,
+            'uploaded_by' => $this->getAdminId(),
             'uploader_type' => 'admin',
             'metadata' => [
                 'icon_name' => $iconName,
@@ -3979,7 +3985,7 @@ class MediaController extends Controller
             $media->disk = 'local';
             $media->mime_type = 'application/json';
             $media->file_type = 'document';
-            $media->uploaded_by = auth()->id() ?: 1;
+            $media->uploaded_by = $this->getAdminId();
             $media->uploader_type = 'admin';
         }
 
@@ -4037,7 +4043,7 @@ class MediaController extends Controller
                     'title' => 'Footer Panoramic Background',
                     'sort_order' => 1,
                     'is_active' => true,
-                    'uploaded_by' => auth()->id() ?: 1,
+                    'uploaded_by' => $this->getAdminId(),
                     'uploader_type' => 'admin',
                 ]
             );
@@ -4053,7 +4059,7 @@ class MediaController extends Controller
                     'title' => 'Footer Panoramic Background',
                     'sort_order' => 1,
                     'is_active' => true,
-                    'uploaded_by' => auth()->id() ?: 1,
+                    'uploaded_by' => $this->getAdminId(),
                     'uploader_type' => 'admin',
                 ]
             );
@@ -4132,7 +4138,7 @@ class MediaController extends Controller
             $media->disk = 'local';
             $media->mime_type = 'application/json';
             $media->file_type = 'document';
-            $media->uploaded_by = auth()->id() ?: 1;
+            $media->uploaded_by = $this->getAdminId();
             $media->uploader_type = 'admin';
         }
 
@@ -4183,7 +4189,7 @@ class MediaController extends Controller
             'tag_text' => 'Flower2',
             'sort_order' => $request->filled('sort_order') ? (int)$request->sort_order : ($maxSort + 1),
             'is_active' => true,
-            'uploaded_by' => auth()->id() ?: 1,
+            'uploaded_by' => $this->getAdminId(),
             'uploader_type' => 'admin',
             'file_name' => 'custom_order.png',
             'file_path' => 'images/categories/categories_bg.png',

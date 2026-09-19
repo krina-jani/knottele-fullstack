@@ -152,23 +152,22 @@ The project includes a native Laravel-centric deployment engine:
 
 
 
-### 2. Admin Panel URLs & Credentials
+### 2. Admin Panel URLs & Architecture
 
 #### 🌐 Local Admin Panel:
-- **Local Working URL**: `http://127.0.0.1:8000/admin/signin` (or `http://127.0.0.1:8000/admin/login`)
-- *(Also accessible at `http://127.0.0.1:8000/knottele/admin/signin`)*
+- **Canonical Admin URL**: `http://127.0.0.1:8000/admin/login`
+- **Dashboard**: `http://127.0.0.1:8000/admin/dashboard`
 
 #### 🚀 Live Server Admin Panel:
-- **Live Working URL**: `http://187.127.158.24/knottele/admin/signin`
-- **Alias URL**: `http://187.127.158.24/knottele/admin/login`
+- **Canonical Live URL**: `http://187.127.158.24/knottele/admin/login`
+- **Dashboard**: `http://187.127.158.24/knottele/admin/dashboard`
 
-#### 🔑 Admin Credentials:
-| Field | Value |
-|---|---|
-| **Email** | `admin@example.com` |
-| **Password** | `Admin@123` |
+#### 🛍️ Customer Storefront:
+- **Local**: `http://localhost:3000/` (or `http://127.0.0.1:8000/`)
+- **Live VPS**: `http://187.127.158.24/knottele/`
+- **Customer Login**: `http://187.127.158.24/knottele/login`
 
 #### 🚀 One-Step Deployment Command (SSH):
 ```bash
-cd /var/www/knottele-fullstack && git reset --hard && git clean -fd && git pull origin main && rm -rf backend/public/admin && chmod +x deploy.sh && ./deploy.sh
+cd /var/www/knottele-fullstack && git pull origin main && rm -rf backend/public/admin backend/public/knottele/admin && chmod +x deploy.sh && ./deploy.sh
 ```

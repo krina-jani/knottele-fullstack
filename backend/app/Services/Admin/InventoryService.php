@@ -96,8 +96,8 @@ class InventoryService
                 'new_quantity' => $newQuantity,
                 'reason' => $reason,
                 'source_type' => 'admin',
-                'source_id' => auth()->id(),
-                'admin_id' => auth()->id(),
+                'source_id' => \Illuminate\Support\Facades\Auth::guard('admin')->id() ?? auth('admin_api')->id() ?? 1,
+                'admin_id' => \Illuminate\Support\Facades\Auth::guard('admin')->id() ?? auth('admin_api')->id() ?? 1,
                 'notes' => $notes,
             ]);
 

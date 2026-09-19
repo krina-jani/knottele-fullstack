@@ -14,9 +14,7 @@ class AuthController extends Controller
     public function loginPage()
     {
         if (Auth::guard('admin')->check()) {
-            return request()->is('knottele/*') 
-                ? redirect('/knottele/admin/dashboard') 
-                : redirect()->route('admin.dashboard');
+            return redirect()->route('admin.dashboard');
         }
         
         return view('admin.auth.login');
@@ -61,9 +59,7 @@ class AuthController extends Controller
 
         session()->save();
 
-        return $request->is('knottele/*') 
-            ? redirect('/knottele/admin/dashboard') 
-            : redirect()->route('admin.dashboard');
+        return redirect()->route('admin.dashboard');
     }
 
 
@@ -82,8 +78,6 @@ class AuthController extends Controller
         $request->session()->invalidate();
         $request->session()->regenerateToken();
 
-        return $request->is('knottele/*') 
-            ? redirect('/knottele/admin/signin') 
-            : redirect()->route('admin.signin');
+        return redirect()->route('admin.login');
     }
 }

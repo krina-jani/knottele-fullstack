@@ -55,9 +55,6 @@ use App\Http\Controllers\Customer\UserController as CustomerUser;
 
 $adminRoutes = function () {
     Route::get('/', function () {
-        if (request()->is('knottele/*')) {
-            return redirect('/knottele/admin/dashboard');
-        }
         return redirect()->route('admin.dashboard');
     });
 
@@ -416,16 +413,6 @@ $adminRoutes = function () {
 
 Route::prefix('admin')->group($adminRoutes);
 Route::prefix('knottele/admin')->as('knottele.')->group($adminRoutes);
-
-
-Route::get('/run-migration', function () {
-    try {
-        \Illuminate\Support\Facades\Artisan::call('migrate:fresh', ['--seed' => true]);
-        return "Database migration and seeding completed successfully! You can now go back to your website.";
-    } catch (\Exception $e) {
-        return "Error: " . $e->getMessage();
-    }
-});
 
 Route::get('/check-contact-messages', function () {
     return \App\Models\ContactMessage::count();
