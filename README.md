@@ -148,3 +148,18 @@ The project includes a native Laravel-centric deployment engine:
    ```
 
 📖 For full Linux server setup, Nginx configuration, free SSL, queue workers, and domain setup, see [PRODUCTION_SETUP_GUIDE.md](PRODUCTION_SETUP_GUIDE.md).
+
+
+
+
+2. Admin Panel URLs & Credentials
+🌐 Local Admin Panel:
+Local URL: http://127.0.0.1:8000/admin/login
+(also works on http://localhost:8000/admin/login or 
+http://127.0.0.1:8000/knottele/admin/login)
+🚀 Live Server Admin Panel:
+Live URL: http://187.127.158.24/knottele/admin/login
+🔑 Admin Credentials:
+Field	Value
+Email	admin@example.com
+Password	Admin@123
