@@ -110,7 +110,7 @@ export function Navbar() {
                   <Link
                     key={link.href + idx}
                     href={href}
-                    prefetch={true}
+                    prefetch={false}
                     className={`relative text-sm font-medium tracking-wide py-2 transition-colors flex flex-col items-center ${
                       isActive
                         ? "text-[#913638] font-bold"

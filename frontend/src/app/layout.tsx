@@ -46,11 +46,11 @@ export const metadata: Metadata = {
   },
   icons: {
     icon: [
-      { url: "/images/logo/Logo_1.png?v=2", type: "image/png" },
-      { url: "/icon.png?v=2", type: "image/png" },
+      { url: "/knottele/images/logo/Logo_1.png?v=2", type: "image/png" },
+      { url: "/knottele/icon.png?v=2", type: "image/png" },
     ],
-    shortcut: "/images/logo/Logo_1.png?v=2",
-    apple: "/images/logo/Logo_1.png?v=2",
+    shortcut: "/knottele/images/logo/Logo_1.png?v=2",
+    apple: "/knottele/images/logo/Logo_1.png?v=2",
   },
 };
 
@@ -70,9 +70,9 @@ export default async function RootLayout({
       className={`${serifFont.variable} ${sansFont.variable} ${scriptFont.variable} h-full antialiased`}
     >
       <head>
-        <link rel="icon" href="/images/logo/Logo_1.png?v=2" type="image/png" />
-        <link rel="icon" href="/icon.png?v=2" type="image/png" />
-        <link rel="apple-touch-icon" href="/images/logo/Logo_1.png?v=2" />
+        <link rel="icon" href="/knottele/images/logo/Logo_1.png?v=2" type="image/png" />
+        <link rel="icon" href="/knottele/icon.png?v=2" type="image/png" />
+        <link rel="apple-touch-icon" href="/knottele/images/logo/Logo_1.png?v=2" />
       </head>
       <body suppressHydrationWarning className="min-h-full flex flex-col bg-[#FFF8F5] text-[#2C201D] font-sans">
         <MediaProvider initialMedia={initialMedia}>

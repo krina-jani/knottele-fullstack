@@ -120,7 +120,7 @@ export function MobileDrawer({ isOpen, onClose, onOpenSearch }: MobileDrawerProp
                   <Link
                     key={item.name}
                     href={href}
-                    prefetch={true}
+                    prefetch={false}
                     onClick={onClose}
                     className={`text-lg font-medium tracking-wide transition-all py-1 flex items-center justify-between ${
                       isActive

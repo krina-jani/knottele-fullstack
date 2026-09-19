@@ -7,10 +7,8 @@ import { Product } from "@/types/product";
 
 export function normalizeInternalLink(url?: string | null): string {
   if (!url) return "/";
-  const clean = url.trim();
+  let clean = url.trim();
   if (
-    clean.startsWith("http://") ||
-    clean.startsWith("https://") ||
     clean.startsWith("mailto:") ||
     clean.startsWith("tel:") ||
     clean.startsWith("#") ||
@@ -18,6 +16,15 @@ export function normalizeInternalLink(url?: string | null): string {
   ) {
     return clean;
   }
+
+  // Extract path if url is a full absolute URL (e.g. http://187.127.158.24/shop or https://knotelle.com/shop)
+  try {
+    if (clean.startsWith("http://") || clean.startsWith("https://")) {
+      const parsed = new URL(clean);
+      clean = parsed.pathname + parsed.search + parsed.hash;
+    }
+  } catch {}
+
   let path = clean.startsWith("/") ? clean : `/${clean}`;
   // Strip /knottele prefix so Next.js <Link> doesn't duplicate the basePath
   if (path.startsWith("/knottele")) {
