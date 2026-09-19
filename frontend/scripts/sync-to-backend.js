@@ -50,6 +50,13 @@ console.log(`📁 To:   ${destDir}`);
 
 try {
   copyRecursive(srcDir, destDir);
+  
+  // Ensure public/admin directory never exists so Nginx never shadows Laravel's admin routes
+  const adminDir = path.join(destDir, 'admin');
+  if (fs.existsSync(adminDir)) {
+    fs.rmSync(adminDir, { recursive: true, force: true });
+  }
+  
   console.log('✅ Successfully exported Next.js frontend into Laravel public directory!');
 } catch (error) {
   console.error('❌ Error during sync to Laravel public:', error);

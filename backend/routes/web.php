@@ -53,8 +53,7 @@ use App\Http\Controllers\Customer\UserController as CustomerUser;
 
 
 
-Route::prefix('admin')->group(function () {
-
+$adminRoutes = function () {
     Route::get('/', function () {
         return redirect()->route('admin.dashboard');
     });
@@ -402,8 +401,10 @@ Route::prefix('admin')->group(function () {
         Route::delete('/contact-messages/{id}', [App\Http\Controllers\Admin\ContactMessageController::class, 'destroy'])->name('admin.contact-messages.destroy');
 
     });
+};
 
-});
+Route::prefix('admin')->group($adminRoutes);
+Route::prefix('knottele/admin')->group($adminRoutes);
 
 
 Route::get('/run-migration', function () {
