@@ -320,7 +320,14 @@ class CustomerApiAuthController extends Controller
 
     public function logout(Request $request)
     {
-        $request->user()->currentAccessToken()->delete();
+        try {
+            $user = $request->user();
+            if ($user && method_exists($user, 'currentAccessToken') && $user->currentAccessToken()) {
+                $user->currentAccessToken()->delete();
+            }
+        } catch (\Throwable $e) {
+            \Log::warning('Customer logout token cleanup warning: ' . $e->getMessage());
+        }
 
         return response()->json(['success' => true, 'message' => 'Logged out']);
     }

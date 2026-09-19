@@ -25,11 +25,11 @@ export function Navbar() {
   const actions = navbar?.actions;
 
   const defaultNavLinks = [
-    { name: "Home", href: "/knottele", is_highlighted: false, is_active: true },
-    { name: "Shop", href: "/knottele/shop", is_highlighted: false, is_active: true },
-    { name: "Custom Order", href: "/knottele/custom-order", is_highlighted: true, is_active: true },
-    { name: "About", href: "/knottele/about", is_highlighted: false, is_active: true },
-    { name: "Contact", href: "/knottele/contact", is_highlighted: false, is_active: true },
+    { name: "Home", href: "/", is_highlighted: false, is_active: true },
+    { name: "Shop", href: "/shop", is_highlighted: false, is_active: true },
+    { name: "Custom Order", href: "/custom-order", is_highlighted: true, is_active: true },
+    { name: "About", href: "/about", is_highlighted: false, is_active: true },
+    { name: "Contact", href: "/contact", is_highlighted: false, is_active: true },
   ];
 
   const rawNavLinks = (navbar?.nav_links && navbar.nav_links.length > 0)
@@ -85,7 +85,7 @@ export function Navbar() {
             <nav className="hidden lg:flex items-center gap-7 xl:gap-9">
               {navLinks.map((link, idx) => {
                 const href = normalizeInternalLink(link.href);
-                const isActive = pathname === href || pathname === link.href || (href === "/knottele" && (pathname === "/" || pathname === "/knottele"));
+                const isActive = pathname === href || (href === "/" && (pathname === "/" || pathname === ""));
                 const isHighlighted = Boolean(link.is_highlighted);
 
                 if (isHighlighted) {

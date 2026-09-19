@@ -1,7 +1,7 @@
 "use client";
 
 import React, { createContext, useContext, useState, useCallback } from "react";
-import { CheckCircle2, Heart, ShoppingBag, AlertCircle, X } from "lucide-react";
+import { CheckCircle2, Heart, ShoppingBag, AlertCircle, Info, X } from "lucide-react";
 
 export type ToastType = "success" | "cart" | "wishlist" | "info" | "error";
 
@@ -60,7 +60,12 @@ export function ToastProvider({ children }: { children: React.ReactNode }) {
                   <CheckCircle2 className="w-4 h-4" />
                 </div>
               )}
-              {(toast.type === "error" || toast.type === "info") && (
+              {toast.type === "info" && (
+                <div className="w-8 h-8 rounded-full bg-[#EBF2F7] text-[#2B6CB0] flex items-center justify-center">
+                  <Info className="w-4 h-4" />
+                </div>
+              )}
+              {toast.type === "error" && (
                 <div className="w-8 h-8 rounded-full bg-[#FCE9E5] text-[#913638] flex items-center justify-center">
                   <AlertCircle className="w-4 h-4" />
                 </div>

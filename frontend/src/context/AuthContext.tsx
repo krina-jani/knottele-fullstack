@@ -11,6 +11,7 @@ import {
   logoutCustomer,
   deleteCustomerAddress as apiDeleteAddress,
   setDefaultCustomerAddress as apiSetDefaultAddress,
+  getFullPath,
 } from "@/lib/api";
 
 export interface UserProfile {
@@ -202,8 +203,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       localStorage.removeItem("knotelle_guest_email");
       localStorage.removeItem("knotelle_pending_wishlist");
 
-      showToast("Logged out", "You have been signed out.", "info");
-      window.location.href = "/login";
+      showToast("Signed Out", "You have been signed out successfully.", "info");
+      window.location.href = getFullPath("/login");
     }
   };
 

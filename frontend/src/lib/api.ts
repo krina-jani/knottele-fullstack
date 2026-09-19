@@ -6,7 +6,7 @@
 import { Product } from "@/types/product";
 
 export function normalizeInternalLink(url?: string | null): string {
-  if (!url) return "/knottele";
+  if (!url) return "/";
   const clean = url.trim();
   if (
     clean.startsWith("http://") ||
@@ -18,17 +18,31 @@ export function normalizeInternalLink(url?: string | null): string {
   ) {
     return clean;
   }
-  const path = clean.startsWith("/") ? clean : `/${clean}`;
-  if (path.startsWith("/knottele")) return path;
-  return path === "/" ? "/knottele" : `/knottele${path}`;
+  let path = clean.startsWith("/") ? clean : `/${clean}`;
+  // Strip /knottele prefix so Next.js <Link> doesn't duplicate the basePath
+  if (path.startsWith("/knottele")) {
+    path = path.replace(/^\/knottele(?:\/|$)/, "/");
+  }
+  return path || "/";
+}
+
+export function getFullPath(path: string): string {
+  const clean = path.startsWith("/") ? path : `/${path}`;
+  if (clean.startsWith("/knottele")) return clean;
+  return clean === "/" ? "/knottele" : `/knottele${clean}`;
 }
 
 export function getBrowserApiBaseUrl(): string {
   if (process.env.NEXT_PUBLIC_API_URL) {
     return process.env.NEXT_PUBLIC_API_URL;
   }
-  if (typeof window !== "undefined" && window.location.port === "3000") {
-    return "http://127.0.0.1:8000/api";
+  if (typeof window !== "undefined") {
+    if (window.location.port === "3000") {
+      return "http://127.0.0.1:8000/api";
+    }
+    if (window.location.pathname.startsWith("/knottele")) {
+      return "/knottele/api";
+    }
   }
   return "/api";
 }

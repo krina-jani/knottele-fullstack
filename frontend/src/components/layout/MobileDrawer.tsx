@@ -46,11 +46,11 @@ export function MobileDrawer({ isOpen, onClose, onOpenSearch }: MobileDrawerProp
   const contactEmailLink = footer?.column_3?.email_link || `mailto:${contactEmail}`;
 
   const menuItems = [
-    { name: "Home", href: "/knottele" },
-    { name: "Shop", href: "/knottele/shop" },
-    { name: "Custom Order", href: "/knottele/custom-order" },
-    { name: "About", href: "/knottele/about" },
-    { name: "Contact", href: "/knottele/contact" },
+    { name: "Home", href: "/" },
+    { name: "Shop", href: "/shop" },
+    { name: "Custom Order", href: "/custom-order" },
+    { name: "About", href: "/about" },
+    { name: "Contact", href: "/contact" },
   ];
 
   return (
@@ -115,7 +115,7 @@ export function MobileDrawer({ isOpen, onClose, onOpenSearch }: MobileDrawerProp
             <nav className="flex flex-col space-y-4">
               {menuItems.map((item) => {
                 const href = normalizeInternalLink(item.href);
-                const isActive = pathname === href || pathname === item.href || (href === "/knottele" && (pathname === "/" || pathname === "/knottele"));
+                const isActive = pathname === href || (href === "/" && (pathname === "/" || pathname === ""));
                 return (
                   <Link
                     key={item.name}
@@ -214,7 +214,7 @@ export function MobileDrawer({ isOpen, onClose, onOpenSearch }: MobileDrawerProp
                   Have a specific design in mind? Work with our master artisans.
                 </p>
                 <Link
-                  href="/custom-order"
+                  href={normalizeInternalLink("/custom-order")}
                   onClick={onClose}
                   className="inline-block w-full py-2 px-3 rounded-full bg-[#913638] text-white text-xs font-semibold hover:bg-[#74292B] active:scale-[0.98] transition-all text-center cursor-pointer shadow-xs"
                 >

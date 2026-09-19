@@ -277,8 +277,8 @@ class ProductController extends Controller
                             'size' => $size,
                         ];
                     })->toArray(),
-                    'created_at' => $product->created_at->format('Y-m-d H:i:s'),
-                    'created_at_formatted' => $product->created_at->format('M d, Y'),
+                    'created_at' => $product->created_at ? $product->created_at->format('Y-m-d H:i:s') : null,
+                    'created_at_formatted' => $product->created_at ? $product->created_at->format('M d, Y') : null,
                     'images' => $allProductImages, // for ProductCard.jsx and carousels
                     'featured' => (bool) $product->is_featured,
                     'bestseller' => (bool) $product->is_bestseller,
@@ -508,8 +508,8 @@ public function show($slug): JsonResponse
             'review_count' => (int) $product->review_count ?? 0,
             'has_variants' => $product->product_type === 'configurable',
             'variants_count' => $product->variants->count(),
-            'created_at' => $product->created_at->format('Y-m-d H:i:s'),
-            'created_at_formatted' => $product->created_at->format('M d, Y'),
+            'created_at' => $product->created_at ? $product->created_at->format('Y-m-d H:i:s') : null,
+            'created_at_formatted' => $product->created_at ? $product->created_at->format('M d, Y') : null,
             // Include additional details for show method
             'variants' => $product->variants->map(function ($variant) use ($self) {
                 $images = $variant->images->map(function ($image) use ($self) {
@@ -551,7 +551,7 @@ public function show($slug): JsonResponse
                     'user_icon' => $review->user_icon,
                     'rating' => (float) $review->rating,
                     'review' => $review->review,
-                    'created_at' => $review->created_at->format('Y-m-d')
+                    'created_at' => $review->created_at ? $review->created_at->format('Y-m-d') : null
                 ];
             })->values(),
             'meta_title' => $product->meta_title,

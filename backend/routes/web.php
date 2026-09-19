@@ -436,6 +436,13 @@ Route::get('/', function () {
 Route::get('/{any}', function ($any = '') {
     $path = trim($any, '/');
 
+    // Strip knottele prefix if present (e.g. /knottele/shop -> shop)
+    if (str_starts_with($path, 'knottele/')) {
+        $path = substr($path, strlen('knottele/'));
+    } elseif ($path === 'knottele') {
+        $path = '';
+    }
+
     // 1. Direct match with subfolder index.html (e.g. /shop -> public/shop/index.html)
     if ($path && file_exists(public_path($path . '/index.html'))) {
         return response()->file(public_path($path . '/index.html'));
@@ -452,4 +459,4 @@ Route::get('/{any}', function ($any = '') {
     }
 
     return view('app');
-})->where('any', '^(?!admin|api).*$');
+})->where('any', '^(?!admin|api|knottele/admin|knottele/api).*$');

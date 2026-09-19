@@ -10,6 +10,7 @@ import {
   toggleCustomerWishlist,
   removeFromCustomerWishlist,
   syncCustomerWishlist,
+  getFullPath,
 } from "@/lib/api";
 
 interface WishlistContextType {
@@ -104,7 +105,7 @@ export function WishlistProvider({ children }: { children: React.ReactNode }) {
       showToast("Sign In Required 🌸", "Please log in to save items to your personal wishlist.", "info");
       if (typeof window !== "undefined") {
         localStorage.setItem("knotelle_pending_wishlist", pId);
-        window.location.href = `/login?redirectTo=${encodeURIComponent(window.location.pathname)}`;
+        window.location.href = getFullPath(`/login?redirectTo=${encodeURIComponent(window.location.pathname)}`);
       }
       return;
     }
