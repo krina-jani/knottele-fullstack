@@ -7,6 +7,9 @@ echo "🚀 Starting KNOTELLE Deployment..."
 cd "$(dirname "$0")"
 PROJECT_ROOT="$(pwd)"
 
+# Ensure backend is brought out of maintenance mode even if an unexpected error occurs
+trap 'if [ -d "$PROJECT_ROOT/backend" ]; then cd "$PROJECT_ROOT/backend" && php artisan up 2>/dev/null || true; fi' EXIT
+
 # 2. Put application into maintenance mode if backend exists
 if [ -d "$PROJECT_ROOT/backend" ]; then
     cd "$PROJECT_ROOT/backend"
@@ -44,6 +47,12 @@ if [ -d "$PROJECT_ROOT/backend" ]; then
 
     # Ensure static public/admin directory never shadows Laravel admin routes
     rm -rf public/admin
+
+    # Copy icons to /var/www/html if present to prevent root 404s
+    if [ -d "/var/www/html" ]; then
+        cp -f "$PROJECT_ROOT/backend/public/icon.png" /var/www/html/ 2>/dev/null || true
+        cp -f "$PROJECT_ROOT/backend/public/favicon.ico" /var/www/html/ 2>/dev/null || true
+    fi
 
     # 7. Database Migrations
     echo "🗄️ Running Migrations..."

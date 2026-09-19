@@ -76,7 +76,7 @@ export function Navbar() {
                 <Menu className="w-6 h-6 text-[#2E211E]" />
               </button>
 
-              <Link href={normalizeInternalLink("/")} className="flex items-center group py-1" aria-label="KNOTELLE Home">
+              <Link href={normalizeInternalLink("/")} prefetch={false} className="flex items-center group py-1" aria-label="KNOTELLE Home">
                 <KnotelleCrownLogo className="h-12 sm:h-16 w-auto" />
               </Link>
             </div>
