@@ -163,3 +163,7 @@ Live URL: http://187.127.158.24/knottele/admin/login
 Field	Value
 Email	admin@example.com
 Password	Admin@123
+
+
+
+cd /var/www/knottele-fullstack && git reset --hard && git clean -fd && git pull origin main && chmod +x deploy.sh && ./deploy.sh
