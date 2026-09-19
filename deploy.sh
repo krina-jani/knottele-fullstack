@@ -56,7 +56,7 @@ php artisan queue:restart || true
 # 11. Folder permissions
 echo "🔒 Updating permissions..."
 chmod -R 775 storage bootstrap/cache || true
-chown -R www-data:www-data storage bootstrap/cache 2>/dev/null || true
+chown -R nginx:nginx storage bootstrap/cache 2>/dev/null || chown -R apache:apache storage bootstrap/cache 2>/dev/null || chown -R www-data:www-data storage bootstrap/cache 2>/dev/null || true
 
 # 12. Bring application out of maintenance mode
 php artisan up
