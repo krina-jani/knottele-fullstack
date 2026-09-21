@@ -1268,6 +1268,18 @@ export async function fetchHomepageMedia(): Promise<HomepageMedia | null> {
       },
       ...(bypassCache ? { cache: "no-store" as const } : {}),
     });
+
+    if (!response.ok) {
+      console.warn(`Fetch homepage media returned HTTP ${response.status}`);
+      return null;
+    }
+
+    const contentType = response.headers.get("content-type") || "";
+    if (!contentType.includes("application/json")) {
+      console.warn("Fetch homepage media received non-JSON content type:", contentType);
+      return null;
+    }
+
     const result = await response.json();
     if (result.success && result.data) {
       return result.data as HomepageMedia;

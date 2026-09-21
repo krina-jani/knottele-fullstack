@@ -7028,7 +7028,7 @@
         if (document.getElementById('footerSectionActive')) document.getElementById('footerSectionActive').checked = f.is_active !== false;
 
         // Background image
-        const bgImg = f.bg_image || f.desktop_image || '';
+        const bgImg = f.bg_image_url || f.bg_image || f.desktop_image || '';
         if (document.getElementById('footerBgImageUrl')) document.getElementById('footerBgImageUrl').value = bgImg;
         if (bgImg && document.getElementById('footerBgPreviewImg')) {
             document.getElementById('footerBgPreviewImg').src = bgImg;
@@ -7076,8 +7076,13 @@
         }
 
         // Immediately populate from cached managerData if available
-        if (managerData && managerData.footer_settings) {
-            populateFooterSettingsForm(managerData.footer_settings);
+        let fData = managerData?.footer_settings;
+        if (!fData && managerData?.sections) {
+            const sec = managerData.sections.find(s => s.id === 'footer' || s.is_footer_section);
+            if (sec && sec.metadata) fData = sec.metadata;
+        }
+        if (fData) {
+            populateFooterSettingsForm(fData);
         }
 
         try {
@@ -7201,7 +7206,7 @@
     }
 
     // ==========================================
-    // 18. NAVBAR SETTINGS & NAVIGATION HANDLERS
+    // 18. NAVBAR & HEADER SETTINGS HANDLERS
     // ==========================================
     let navbarLinkIndex = 0;
 
@@ -7241,8 +7246,13 @@
         }
 
         // Immediately populate from cached managerData if available
-        if (managerData && managerData.navbar_settings) {
-            populateNavbarSettingsForm(managerData.navbar_settings);
+        let nData = managerData?.navbar_settings;
+        if (!nData && managerData?.sections) {
+            const sec = managerData.sections.find(s => s.id === 'navbar_settings');
+            if (sec && sec.metadata) nData = sec.metadata;
+        }
+        if (nData) {
+            populateNavbarSettingsForm(nData);
         }
 
         try {

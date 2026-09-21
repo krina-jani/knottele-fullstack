@@ -499,20 +499,33 @@ Route::get('/{any}', function ($any = '') {
         }
     }
 
-    // 4. If request is for a missing static asset or chunk, return real 404 (never HTML)
-    if (preg_match('/\.(js|css|png|jpg|jpeg|gif|svg|ico|woff|woff2|ttf|eot|map|json|txt)$/i', $path) || str_starts_with($path, '_next/')) {
-        abort(404);
+    // 4. If request is for Next.js RSC Flight payload or missing static asset, return 404 (never HTML)
+    if (
+        request()->has('_rsc') ||
+        str_contains($path, '__next.') ||
+        str_ends_with($path, '.txt') ||
+        request()->wantsJson() ||
+        preg_match('/\.(js|css|png|jpg|jpeg|gif|svg|ico|woff|woff2|ttf|eot|map|json|txt)$/i', $path) ||
+        str_starts_with($path, '_next/') ||
+        str_contains($path, '_next/')
+    ) {
+        return response()->json(['message' => 'Not Found'], 404);
     }
 
-    // 5. Fallback: if 404.html or _not-found/index.html exists for unknown routes, serve it cleanly with 404 status to prevent React #418 hydration error
+    // 5. Fallback: if 404.html exists for unknown routes, serve it cleanly with 404 status without hydration scripts to prevent React #418
     if (file_exists(public_path('404.html'))) {
-        return response(file_get_contents(public_path('404.html')), 404, [
+        $html = file_get_contents(public_path('404.html'));
+        // Strip client-side hydration scripts to avoid Next.js attempting to hydrate non-existent routes
+        $html = preg_replace('/<script[\s\S]*?<\/script>/i', '', $html);
+        return response($html, 404, [
             'Content-Type' => 'text/html; charset=utf-8',
         ]);
     }
 
     if (file_exists(public_path('_not-found/index.html'))) {
-        return response(file_get_contents(public_path('_not-found/index.html')), 404, [
+        $html = file_get_contents(public_path('_not-found/index.html'));
+        $html = preg_replace('/<script[\s\S]*?<\/script>/i', '', $html);
+        return response($html, 404, [
             'Content-Type' => 'text/html; charset=utf-8',
         ]);
     }

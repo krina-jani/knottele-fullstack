@@ -17,8 +17,9 @@ class MediaController extends Controller
      */
     public function index(Request $request): JsonResponse
     {
-        // 1. Hero Slides
-        $heroMedia = Media::where('page', 'homepage')
+        try {
+            // 1. Hero Slides
+            $heroMedia = Media::where('page', 'homepage')
             ->where('section', 'hero')
             ->where('is_active', true)
             ->orderBy('sort_order', 'asc')
@@ -320,7 +321,10 @@ class MediaController extends Controller
         $categories = Category::where('status', 1)
             ->whereNull('parent_id')
             ->orderBy('sort_order', 'asc')
-            ->with(['image', 'products.variants'])
+            ->with(['image'])
+            ->withCount(['products' => function ($q) {
+                $q->where('status', 'active');
+            }])
             ->get()
             ->map(function ($cat) {
                 $imageUrl = null;
@@ -343,7 +347,7 @@ class MediaController extends Controller
                     'name' => $cat->name,
                     'slug' => $cat->slug,
                     'image' => $imageUrl,
-                    'itemCount' => $cat->products->where('status', 'active')->count(),
+                    'itemCount' => (int)($cat->products_count ?? 0),
                     'sort_order' => $cat->sort_order,
                 ];
             });
@@ -586,6 +590,16 @@ class MediaController extends Controller
                 ],
             ]
         ]);
+        } catch (\Throwable $e) {
+            \Log::error('Customer MediaController index error: ' . $e->getMessage(), [
+                'trace' => $e->getTraceAsString()
+            ]);
+            return response()->json([
+                'success' => false,
+                'message' => 'Error retrieving storefront media: ' . $e->getMessage(),
+                'data' => null,
+            ], 500);
+        }
     }
 
     /**

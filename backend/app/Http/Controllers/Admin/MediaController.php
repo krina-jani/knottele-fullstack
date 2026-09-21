@@ -1009,6 +1009,9 @@ class MediaController extends Controller
                 ];
             });
 
+        $footerSec = collect($sections)->firstWhere('id', 'footer');
+        $navbarSec = collect($sections)->firstWhere('id', 'navbar_settings');
+
         return response()->json([
             'success' => true,
             'data' => [
@@ -1016,6 +1019,8 @@ class MediaController extends Controller
                 'categories' => $categories,
                 'best_sellers' => $bestSellers,
                 'total_media' => $allMedia->count(),
+                'footer_settings' => $footerSec['metadata'] ?? null,
+                'navbar_settings' => $navbarSec['metadata'] ?? null,
             ]
         ]);
     }
@@ -4030,6 +4035,11 @@ class MediaController extends Controller
             $uniqueName = 'footer_bg_' . time() . '.' . $ext;
             $file->move($uploadDir, $uniqueName);
             $bgPath = 'images/footer/' . $uniqueName;
+            $fullBgUrl = asset($bgPath);
+
+            $meta['bg_image'] = $fullBgUrl;
+            $meta['desktop_image'] = $fullBgUrl;
+            $meta['bg_image_url'] = $fullBgUrl;
 
             // Update or create footer_bg media slot
             Media::updateOrCreate(
@@ -4048,11 +4058,16 @@ class MediaController extends Controller
                 ]
             );
         } elseif ($request->filled('bg_image_url')) {
+            $url = $request->input('bg_image_url');
+            $meta['bg_image'] = $url;
+            $meta['desktop_image'] = $url;
+            $meta['bg_image_url'] = $url;
+
             Media::updateOrCreate(
                 ['page' => 'homepage', 'section' => 'footer', 'slot' => 'footer_bg'],
                 [
                     'file_name' => 'footer.png',
-                    'file_path' => $request->input('bg_image_url'),
+                    'file_path' => $url,
                     'disk' => 'local',
                     'mime_type' => 'image/png',
                     'file_type' => 'image',
