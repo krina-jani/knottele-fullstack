@@ -64,7 +64,7 @@ class TaxClassController extends Controller
                     'tax_rates_count' => $taxClass->rates_count,
                     'products_count' => $taxClass->products_count,
                     'created_at' => $taxClass->created_at,
-                    'created_at_formatted' => $taxClass->created_at->format('M d, Y'),
+                    'created_at_formatted' => $taxClass->created_at ? $taxClass->created_at->format('M d, Y') : '-',
                     'updated_at' => $taxClass->updated_at,
                 ];
             });

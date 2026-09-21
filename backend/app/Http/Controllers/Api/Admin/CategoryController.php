@@ -72,8 +72,9 @@ class CategoryController extends Controller
                     'parent_name' => $category->parent ? $category->parent->name : null,
                     'products_count' => $category->products_count,
                     'children_count' => $category->children_count,
-                    'created_at' => $category->created_at->format('Y-m-d H:i:s'),
-                    'updated_at' => $category->updated_at->format('Y-m-d H:i:s'),
+                    'created_at' => $category->created_at ? $category->created_at->format('Y-m-d H:i:s') : null,
+                    'created_at_formatted' => $category->created_at ? $category->created_at->format('M d, Y') : '-',
+                    'updated_at' => $category->updated_at ? $category->updated_at->format('Y-m-d H:i:s') : null,
                 ];
             })->values()->all();
 

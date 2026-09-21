@@ -149,9 +149,9 @@ class ProductController extends Controller
                     ],
                     'has_variants' => $product->product_type === 'configurable',
                     'variants_count' => $product->variants()->count(),
-                    'created_at' => $product->created_at->format('Y-m-d H:i:s'),
-                    'created_at_formatted' => $product->created_at->format('M d, Y'),
-                    'updated_at' => $product->updated_at->format('Y-m-d H:i:s'),
+                    'created_at' => $product->created_at ? $product->created_at->format('Y-m-d H:i:s') : null,
+                    'created_at_formatted' => $product->created_at ? $product->created_at->format('M d, Y') : '-',
+                    'updated_at' => $product->updated_at ? $product->updated_at->format('Y-m-d H:i:s') : null,
                 ];
             });
 
@@ -482,7 +482,7 @@ class ProductController extends Controller
                         'sku' => $product->defaultVariant ? $product->defaultVariant->sku : 'N/A',
                         'price' => $product->defaultVariant ? $product->defaultVariant->price : 0,
                         'status' => $product->status,
-                        'created_at' => $product->created_at->format('Y-m-d H:i:s'),
+                        'created_at' => $product->created_at ? $product->created_at->format('Y-m-d H:i:s') : null,
                     ];
                 });
 

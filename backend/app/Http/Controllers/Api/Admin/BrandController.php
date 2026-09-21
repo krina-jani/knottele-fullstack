@@ -90,7 +90,7 @@ class BrandController extends Controller
                     'meta_keywords' => $brand->meta_keywords,
                     'product_count' => $brand->products_count,
                     'created_at' => $brand->created_at,
-                    'created_at_formatted' => $brand->created_at->format('M d, Y'),
+                    'created_at_formatted' => $brand->created_at ? $brand->created_at->format('M d, Y') : '-',
                     'updated_at' => $brand->updated_at,
                 ];
             })->values()->all();

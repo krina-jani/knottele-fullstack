@@ -77,7 +77,7 @@ class InventoryController extends Controller
                     'min_stock' => 10, // Default min stock for UI purposes
                     'status' => $variant->stock_status,
                     'image' => $variant->display_image ? asset('storage/' . $variant->display_image) : null,
-                    'last_updated' => $variant->updated_at->format('Y-m-d H:i'),
+                    'last_updated' => $variant->updated_at ? $variant->updated_at->format('Y-m-d H:i') : '-',
                 ];
             })->values()->all();
 
@@ -204,7 +204,7 @@ class InventoryController extends Controller
                     'reason' => $entry->reason,
                     'updated_by' => $entry->admin ? $entry->admin->name : 'System',
                     'notes' => $entry->notes,
-                    'updated_at' => $entry->created_at->format('Y-m-d H:i'),
+                    'updated_at' => $entry->created_at ? $entry->created_at->format('Y-m-d H:i') : '-',
                 ];
             })->values()->all();
 

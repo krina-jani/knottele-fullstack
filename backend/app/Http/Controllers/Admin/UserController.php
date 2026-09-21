@@ -387,7 +387,7 @@ class UserController extends Controller
                 'Blocked' => $customer->is_block ? 'Yes' : 'No',
                 'Block Reason' => $customer->block_reason,
                 'Total Orders' => $customer->orders_count,
-                'Joined Date' => $customer->created_at->format('Y-m-d'),
+                'Joined Date' => $customer->created_at ? $customer->created_at->format('Y-m-d') : '-',
                 'Last Login' => $customer->last_login_at ? $customer->last_login_at->format('Y-m-d H:i') : 'Never',
             ];
         });

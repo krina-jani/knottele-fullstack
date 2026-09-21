@@ -77,7 +77,7 @@ class OrderController extends Controller
                     'customer_name' => $order->customer->name ?? (!empty($order->shipping_address['name']) ? $order->shipping_address['name'] : 'Guest'),
                     'customer_email' => $order->customer->email ?? (!empty($order->shipping_address['email']) ? $order->shipping_address['email'] : 'N/A'),
                     'customer_mobile' => $order->customer->mobile ?? (!empty($order->shipping_address['phone']) ? $order->shipping_address['phone'] : 'N/A'),
-                    'date' => $order->created_at->format('Y-m-d'),
+                    'date' => $order->created_at ? $order->created_at->format('Y-m-d') : '-',
                     'created_at' => $order->created_at,
                     'items_count' => $order->items_count,
                     'grand_total' => $order->grand_total,
@@ -324,7 +324,7 @@ class OrderController extends Controller
                 'Customer' => $order->customer->name ?? ($order->shipping_address['name'] ?? 'Guest'),
                 'Email' => $order->customer->email ?? ($order->shipping_address['email'] ?? 'N/A'),
                 'Phone' => $order->customer->mobile ?? ($order->shipping_address['phone'] ?? 'N/A'),
-                'Order Date' => $order->created_at->format('Y-m-d H:i'),
+                'Order Date' => $order->created_at ? $order->created_at->format('Y-m-d H:i') : '-',
                 'Status' => ucfirst($order->status),
                 'Payment Status' => ucfirst(str_replace('_', ' ', $order->payment_status)),
                 'Payment Method' => match ($order->payment_method) {

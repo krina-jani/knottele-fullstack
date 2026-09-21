@@ -513,7 +513,7 @@ class WishlistController extends Controller
                     'compare_price' => $item->variant->compare_price ?? 0,
                     'image' => $item->variant->display_image,
                     'in_stock' => $item->variant->stock_quantity > 0,
-                    'added_at' => $item->created_at->format('M d, Y'),
+                    'added_at' => $item->created_at ? $item->created_at->format('M d, Y') : '-',
                 ];
             });
 

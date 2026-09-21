@@ -71,7 +71,7 @@ class TaxRateController extends Controller
                     'priority' => $taxRate->priority,
                     'location' => $this->getLocationLabel($taxRate),
                     'created_at' => $taxRate->created_at,
-                    'created_at_formatted' => $taxRate->created_at->format('M d, Y'),
+                    'created_at_formatted' => $taxRate->created_at ? $taxRate->created_at->format('M d, Y') : '-',
                     'updated_at' => $taxRate->updated_at,
                 ];
             });
