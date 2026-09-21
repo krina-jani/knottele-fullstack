@@ -50,6 +50,11 @@ Route::prefix('customer')->group(function () {
     Route::get('orders/{id}', [\App\Http\Controllers\Api\Customer\OrderController::class, 'show']);
     Route::post('cart/validate', [\App\Http\Controllers\Api\Customer\OrderController::class, 'validateCart']);
 
+    // Custom Order Requests (Guest submission & lookup / Customer history)
+    Route::post('custom-orders', [\App\Http\Controllers\Api\Customer\CustomOrderController::class, 'store']);
+    Route::get('custom-orders', [\App\Http\Controllers\Api\Customer\CustomOrderController::class, 'index']);
+    Route::get('custom-orders/{reference}', [\App\Http\Controllers\Api\Customer\CustomOrderController::class, 'show']);
+
     // Protected routes (require authentication)
     Route::post('update-profile', [CustomerApiAuthController::class, 'updateProfile']);
     Route::middleware('auth:customer_api')->group(function () {
@@ -57,6 +62,8 @@ Route::prefix('customer')->group(function () {
         Route::post('logout', [CustomerApiAuthController::class, 'logout']);
         Route::get('orders', [\App\Http\Controllers\Api\Customer\OrderController::class, 'index']);
         Route::get('orders/{id}', [\App\Http\Controllers\Api\Customer\OrderController::class, 'show']);
+        Route::get('custom-orders', [\App\Http\Controllers\Api\Customer\CustomOrderController::class, 'index']);
+        Route::get('custom-orders/{reference}', [\App\Http\Controllers\Api\Customer\CustomOrderController::class, 'show']);
 
         // Wishlist routes
         Route::get('wishlist', [\App\Http\Controllers\Api\Customer\WishlistController::class, 'index']);

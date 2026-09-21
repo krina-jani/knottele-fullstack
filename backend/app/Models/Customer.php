@@ -194,4 +194,9 @@ class Customer extends Authenticatable
             ? $this->last_login_at->format('Y-m-d H:i')
             : 'Never';
     }
+
+    public function customOrders(): HasMany
+    {
+        return $this->hasMany(CustomOrderRequest::class, 'customer_id');
+    }
 }

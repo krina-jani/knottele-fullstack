@@ -79,6 +79,12 @@ $navItems = [
         'route' => 'admin.orders.index',
     ],
 
+    'custom_orders' => [
+        'title' => 'Custom Orders',
+        'icon' => 'fas fa-wand-magic-sparkles',
+        'route' => 'admin.custom_orders.index',
+    ],
+
     'offers' => [
         'title' => 'Offers',
         'icon' => 'fas fa-percentage',

@@ -841,6 +841,119 @@ export async function fetchOrderById(id: string, email?: string): Promise<any | 
 }
 
 /**
+ * Submit a Custom Crochet Commission Request
+ */
+export async function submitCustomOrder(formData: FormData): Promise<{ success: boolean; message: string; data?: any; reference_id?: string }> {
+  try {
+    const token = typeof window !== "undefined" ? localStorage.getItem("knotelle_customer_token") : null;
+    const headers: Record<string, string> = {
+      Accept: "application/json",
+    };
+    if (token) {
+      headers["Authorization"] = `Bearer ${token}`;
+    }
+
+    const response = await fetch(`${getApiBaseUrl()}/customer/custom-orders`, {
+      method: "POST",
+      headers,
+      body: formData,
+    });
+
+    const result = await response.json();
+    if (response.ok && result.success) {
+      return {
+        success: true,
+        message: result.message || "Custom order submitted successfully!",
+        data: result.data,
+        reference_id: result.reference_id || result.data?.reference_id,
+      };
+    }
+    return {
+      success: false,
+      message: result.message || "Failed to submit custom order.",
+    };
+  } catch (error) {
+    console.warn("Submit custom order error:", error);
+    return {
+      success: false,
+      message: "Network error. Please try submitting again.",
+    };
+  }
+}
+
+/**
+ * Fetch Custom Orders for Customer / Guest Email
+ */
+export async function fetchCustomerCustomOrders(email?: string): Promise<any[]> {
+  try {
+    let emailToUse = email;
+    if (!emailToUse && typeof window !== "undefined") {
+      const storedUser = localStorage.getItem("knotelle_customer_user");
+      if (storedUser) {
+        try {
+          const parsed = JSON.parse(storedUser);
+          if (parsed.email) emailToUse = parsed.email;
+        } catch {}
+      }
+      if (!emailToUse) {
+        emailToUse = localStorage.getItem("knotelle_guest_email") || undefined;
+      }
+    }
+    const token = typeof window !== "undefined" ? localStorage.getItem("knotelle_customer_token") : null;
+    const url = emailToUse
+      ? `${getApiBaseUrl()}/customer/custom-orders?email=${encodeURIComponent(emailToUse)}`
+      : `${getApiBaseUrl()}/customer/custom-orders`;
+    const headers: Record<string, string> = {
+      Accept: "application/json",
+    };
+    if (token) {
+      headers["Authorization"] = `Bearer ${token}`;
+    }
+    const response = await fetch(url, {
+      headers,
+      cache: "no-store",
+    });
+    const result = await response.json();
+    if (result.success && Array.isArray(result.data)) {
+      return result.data;
+    }
+    return [];
+  } catch (error) {
+    console.warn("Failed to fetch customer custom orders:", error);
+    return [];
+  }
+}
+
+/**
+ * Fetch Single Custom Order by Reference ID or ID
+ */
+export async function fetchCustomOrderById(referenceOrId: string, email?: string): Promise<any | null> {
+  try {
+    const token = typeof window !== "undefined" ? localStorage.getItem("knotelle_customer_token") : null;
+    const query = email ? `?email=${encodeURIComponent(email)}` : "";
+    const url = `${getApiBaseUrl()}/customer/custom-orders/${encodeURIComponent(referenceOrId)}${query}`;
+    const headers: Record<string, string> = {
+      Accept: "application/json",
+    };
+    if (token) {
+      headers["Authorization"] = `Bearer ${token}`;
+    }
+    const response = await fetch(url, {
+      headers,
+      cache: "no-store",
+    });
+    const result = await response.json();
+    if (result.success && result.data) {
+      return result.data;
+    }
+    return null;
+  } catch (error) {
+    console.warn("Failed to fetch custom order details:", error);
+    return null;
+  }
+}
+
+/**
  * Fetch Active Offers/Coupons from Laravel Backend API
  */
 export async function fetchActiveOffers(): Promise<Array<{

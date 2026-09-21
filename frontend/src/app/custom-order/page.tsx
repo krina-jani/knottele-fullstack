@@ -24,6 +24,7 @@ import { Breadcrumbs } from "@/components/ui/Breadcrumbs";
 import { useToast } from "@/context/ToastContext";
 import { useAuth } from "@/context/AuthContext";
 import { useWebsiteMedia } from "@/context/MediaContext";
+import { submitCustomOrder } from "@/lib/api";
 
 const PALETTE_OPTIONS = [
   { name: "Blush Garden", colors: ["#F4C7C1", "#8F3032", "#FFF8F5", "#9CAF88"] },
@@ -101,7 +102,9 @@ export default function CustomOrderPage() {
   const [customerName, setCustomerName] = useState(user?.name || "");
   const [customerEmail, setCustomerEmail] = useState(user?.email || "");
   const [customerPhone, setCustomerPhone] = useState(user?.phone || "");
+  const [uploadedFile, setUploadedFile] = useState<File | null>(null);
   const [uploadedFileName, setUploadedFileName] = useState<string | null>(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   React.useEffect(() => {
     if (user) {
@@ -171,17 +174,68 @@ export default function CustomOrderPage() {
 
   const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
-      setUploadedFileName(e.target.files[0].name);
-      showToast("Reference Image Attached 📸", e.target.files[0].name, "success");
+      const file = e.target.files[0];
+      setUploadedFile(file);
+      setUploadedFileName(file.name);
+      showToast("Reference Image Attached 📸", file.name, "success");
     }
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    const refId = `KNT-CUSTOM-${Math.floor(1000 + Math.random() * 9000)}`;
-    setOrderReferenceId(refId);
-    setIsSubmitted(true);
-    showToast("Custom Request Sent! 🌸", `Reference #${refId} received. Our artisan will contact you within 24 hours.`, "success");
+    if (!customerName.trim() || !customerEmail.trim()) {
+      showToast("Missing Information", "Please provide your name and email address.", "error");
+      return;
+    }
+
+    setIsSubmitting(true);
+    try {
+      const formData = new FormData();
+      formData.append("name", customerName.trim());
+      formData.append("email", customerEmail.trim());
+      if (customerPhone.trim()) formData.append("phone", customerPhone.trim());
+      formData.append("category", category);
+      if (selectedPalette) formData.append("selected_palette", selectedPalette);
+      if (customColors && customColors.length > 0) {
+        formData.append("custom_colors", JSON.stringify(customColors));
+      }
+      if (customColorNotes.trim()) formData.append("custom_color_notes", customColorNotes.trim());
+      if (sizePreference) formData.append("size_preference", sizePreference);
+      if (personalization.trim()) formData.append("personalization", personalization.trim());
+      if (designNotes.trim()) formData.append("design_notes", designNotes.trim());
+      if (urgency) formData.append("urgency", urgency);
+      if (budgetRange) formData.append("budget_range", budgetRange);
+      if (uploadedFile) {
+        formData.append("reference_image", uploadedFile);
+      }
+
+      const res = await submitCustomOrder(formData);
+      if (res.success) {
+        const refId = res.reference_id || `KNT-CUSTOM-${Math.floor(1000 + Math.random() * 9000)}`;
+        setOrderReferenceId(refId);
+        setIsSubmitted(true);
+        if (typeof window !== "undefined") {
+          try {
+            const existing = JSON.parse(localStorage.getItem("knotelle_custom_orders") || "[]");
+            existing.unshift({
+              reference_id: refId,
+              category,
+              created_at: new Date().toISOString(),
+              status: "pending",
+              data: res.data,
+            });
+            localStorage.setItem("knotelle_custom_orders", JSON.stringify(existing.slice(0, 30)));
+          } catch {}
+        }
+        showToast("Custom Request Sent! 🌸", `Reference #${refId} received. Our artisan will contact you within 24 hours.`, "success");
+      } else {
+        showToast("Submission Failed", res.message || "Could not save custom order. Please try again.", "error");
+      }
+    } catch (err) {
+      showToast("Error", "An unexpected error occurred while submitting.", "error");
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -219,6 +273,13 @@ export default function CustomOrderPage() {
 
             <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
               <Link
+                href="/account/custom-orders"
+                className="w-full sm:w-auto px-7 py-3.5 rounded-full bg-[#FFF9F6] text-[#913638] border border-[#913638] text-xs sm:text-sm font-semibold hover:bg-[#FDE9E5] active:scale-[0.98] shadow-xs transition-all text-center flex items-center justify-center gap-2"
+              >
+                <Sparkles className="w-4 h-4" />
+                <span>Track Request in My Account</span>
+              </Link>
+              <Link
                 href="/shop"
                 className="w-full sm:w-auto px-8 py-3.5 rounded-full bg-[#913638] text-white text-xs sm:text-sm font-semibold hover:bg-[#74292B] active:scale-[0.98] shadow-xs hover:shadow-boutique-hover transition-all text-center"
               >
@@ -228,6 +289,8 @@ export default function CustomOrderPage() {
                 onClick={() => {
                   setIsSubmitted(false);
                   setStep(1);
+                  setUploadedFile(null);
+                  setUploadedFileName(null);
                 }}
                 className="w-full sm:w-auto px-7 py-3.5 rounded-full bg-white text-[#2E211E] border border-[#E7D1CC] text-xs sm:text-sm font-semibold hover:bg-[#FCE9E5] hover:text-[#913638] active:scale-[0.98] shadow-xs transition-all cursor-pointer"
               >
@@ -927,10 +990,20 @@ export default function CustomOrderPage() {
                     </button>
                     <button
                       type="submit"
-                      className="px-8 py-3.5 rounded-full bg-[#913638] text-white text-xs sm:text-sm font-semibold hover:bg-[#74292B] shadow-xs hover:shadow-boutique-hover transition-all flex items-center gap-2 active:scale-[0.98] cursor-pointer"
+                      disabled={isSubmitting}
+                      className="px-8 py-3.5 rounded-full bg-[#913638] text-white text-xs sm:text-sm font-semibold hover:bg-[#74292B] shadow-xs hover:shadow-boutique-hover transition-all flex items-center gap-2 active:scale-[0.98] cursor-pointer disabled:opacity-60"
                     >
-                      <Send className="w-4 h-4" />
-                      <span>Send Custom Request →</span>
+                      {isSubmitting ? (
+                        <>
+                          <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                          <span>Submitting Request...</span>
+                        </>
+                      ) : (
+                        <>
+                          <Send className="w-4 h-4" />
+                          <span>Send Custom Request →</span>
+                        </>
+                      )}
                     </button>
                   </div>
                 </div>

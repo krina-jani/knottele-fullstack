@@ -13,6 +13,7 @@ use App\Http\Controllers\Admin\CategoryController as AdminCategory;
 use App\Http\Controllers\Admin\BrandController as AdminBrand;
 use App\Http\Controllers\Admin\ProductController as AdminProduct;
 use App\Http\Controllers\Admin\OrderController as AdminOrder;
+use App\Http\Controllers\Admin\CustomOrderController as AdminCustomOrder;
 use App\Http\Controllers\Admin\MediaController as AdminMedia;
 use App\Http\Controllers\Admin\TaxController as AdminTax;
 use App\Http\Controllers\Admin\UserController as AdminUser;
@@ -146,6 +147,18 @@ $adminRoutes = function () {
             Route::post('/bulk-delete', [AdminOrder::class, 'bulkDelete'])->name('bulk-delete');
             Route::get('/export', [AdminOrder::class, 'export'])->name('export');
             Route::get('/{order}/invoice', [AdminOrder::class, 'printInvoice'])->name('invoice');
+        });
+
+        /*
+        |--------------------------------------------------------------------------
+        | CUSTOM ORDER REQUESTS
+        |--------------------------------------------------------------------------
+        */
+        Route::prefix('custom-orders')->name('admin.custom_orders.')->group(function () {
+            Route::get('/', [AdminCustomOrder::class, 'index'])->name('index');
+            Route::get('/{id}', [AdminCustomOrder::class, 'show'])->name('show');
+            Route::post('/{id}/update-status', [AdminCustomOrder::class, 'updateStatus'])->name('update-status');
+            Route::delete('/{id}', [AdminCustomOrder::class, 'destroy'])->name('destroy');
         });
 
         /*
@@ -523,6 +536,13 @@ Route::match(['GET', 'HEAD'], '/{any}', function ($any = '') {
         }
         if (file_exists(public_path('account/orders/placeholder/index.html'))) {
             return response()->file(public_path('account/orders/placeholder/index.html'));
+        }
+    }
+
+    // 3e. Resilient account/custom-orders route fallback
+    if (str_starts_with($path, 'account/custom-orders')) {
+        if (file_exists(public_path('account/custom-orders/index.html'))) {
+            return response()->file(public_path('account/custom-orders/index.html'));
         }
     }
 

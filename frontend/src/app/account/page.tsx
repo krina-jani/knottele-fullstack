@@ -16,10 +16,20 @@ import {
 } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
 import { useWishlist } from "@/context/WishlistContext";
+import { fetchCustomerCustomOrders } from "@/lib/api";
 
 export default function AccountDashboardPage() {
   const { user, orders } = useAuth();
   const { wishlistCount } = useWishlist();
+  const [customOrdersCount, setCustomOrdersCount] = React.useState(0);
+
+  React.useEffect(() => {
+    fetchCustomerCustomOrders()
+      .then((res) => {
+        if (Array.isArray(res)) setCustomOrdersCount(res.length);
+      })
+      .catch(() => {});
+  }, [user]);
 
   const getStatusBadgeStyle = (status: string) => {
     const s = (status || "").toLowerCase();
@@ -67,8 +77,8 @@ export default function AccountDashboardPage() {
         </div>
       </div>
 
-      {/* 4 Stat Metric Cards */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+      {/* 5 Stat Metric Cards */}
+      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4">
         {/* Total Orders */}
         <Link
           href="/account/orders"
@@ -84,6 +94,23 @@ export default function AccountDashboardPage() {
             {orders.length}
           </p>
           <p className="text-xs text-[#786864] mt-0.5 font-medium">Total Orders</p>
+        </Link>
+
+        {/* Custom Orders */}
+        <Link
+          href="/account/custom-orders"
+          className="p-5 rounded-2xl bg-white border border-[#E7D1CC] hover:border-[#EFB8B0] shadow-xs hover:shadow-boutique transition-all group"
+        >
+          <div className="flex items-center justify-between mb-3">
+            <div className="w-10 h-10 rounded-xl bg-purple-50 text-purple-700 flex items-center justify-center group-hover:scale-105 transition-transform">
+              <Sparkles className="w-5 h-5" />
+            </div>
+            <ChevronRight className="w-4 h-4 text-[#786864]/40 group-hover:text-[#913638] group-hover:translate-x-0.5 transition-all" />
+          </div>
+          <p className="text-2xl font-bold font-serif-luxury text-[#2E211E]">
+            {customOrdersCount}
+          </p>
+          <p className="text-xs text-[#786864] mt-0.5 font-medium">Custom Orders</p>
         </Link>
 
         {/* Active In-Progress Orders */}
