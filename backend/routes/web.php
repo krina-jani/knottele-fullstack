@@ -461,7 +461,12 @@ Route::get('/{any}', function ($any = '') {
         return response()->file(public_path($path . '.html'));
     }
 
-    // 3. Fallback to main index.html for client-side routing
+    // 4. If request is for a missing static asset or chunk, return real 404 (never HTML)
+    if (preg_match('/\.(js|css|png|jpg|jpeg|gif|svg|ico|woff|woff2|ttf|eot|map|json|txt)$/i', $path) || str_starts_with($path, '_next/')) {
+        abort(404);
+    }
+
+    // 5. Fallback to main index.html for client-side page routing
     if (file_exists(public_path('index.html'))) {
         return response()->file(public_path('index.html'));
     }

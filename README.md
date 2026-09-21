@@ -112,3 +112,15 @@ cd /var/www/knottele-fullstack && chmod +x deploy.sh && ./deploy.sh
 ```
 
 📖 For full Linux server setup, Nginx configuration, free SSL, queue workers, and domain setup, see [PRODUCTION_SETUP_GUIDE.md](PRODUCTION_SETUP_GUIDE.md).
+---
+
+## 👑 Quick Admin Panel Links
+
+| Page | Exact Live Production Link |
+| :--- | :--- |
+| **Admin Dashboard** | **[http://187.127.158.24/knottele/admin/dashboard](http://187.127.158.24/knottele/admin/dashboard)** |
+| **Admin Sign In / Login** | **[http://187.127.158.24/knottele/admin/signin](http://187.127.158.24/knottele/admin/signin)** |
+
+**Admin Credentials:**
+- **Email:** `admin@example.com`
+- **Password:** `Admin@123` *(case-sensitive)*
