@@ -280,6 +280,8 @@ export default function CheckoutPage() {
                 payment_status: "paid",
                 offer_code: promoCode || undefined,
                 discount_total: discount || 0,
+                shipping_total: shipping || 0,
+                grand_total: total,
               });
 
               if (!res || !res.success) {
@@ -387,6 +389,8 @@ export default function CheckoutPage() {
         payment_method: "cod",
         offer_code: promoCode || undefined,
         discount_total: discount || 0,
+        shipping_total: shipping || 0,
+        grand_total: total,
       });
 
       if (!res || !res.success) {

@@ -120,6 +120,35 @@ class UserController extends Controller
 
             $user->update($data);
 
+            // Also synchronize customer's orders and shipping addresses
+            $orders = \App\Models\Order::where('customer_id', $user->id)
+                ->orWhere('shipping_address->email', $user->email)
+                ->orWhere('shipping_address->email', $validated['email'])
+                ->get();
+
+            foreach ($orders as $ord) {
+                $ord->customer_id = $user->id;
+                $addr = $ord->shipping_address;
+                if (is_array($addr)) {
+                    $addr['name'] = $validated['name'];
+                    $addr['email'] = $validated['email'];
+                    if (!empty($validated['mobile'])) {
+                        $addr['phone'] = $validated['mobile'];
+                    }
+                    $ord->shipping_address = $addr;
+                }
+                $bill = $ord->billing_address;
+                if (is_array($bill)) {
+                    $bill['name'] = $validated['name'];
+                    $bill['email'] = $validated['email'];
+                    if (!empty($validated['mobile'])) {
+                        $bill['phone'] = $validated['mobile'];
+                    }
+                    $ord->billing_address = $bill;
+                }
+                $ord->save();
+            }
+
             DB::commit();
 
             return response()->json([

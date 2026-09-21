@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useAuth } from "@/context/AuthContext";
 import { updateCustomerProfile } from "@/lib/api";
 import { User, Mail, Phone, Lock, CheckCircle2 } from "lucide-react";
@@ -14,6 +14,19 @@ export default function ProfilePage() {
   const [phone, setPhone] = useState(user?.phone?.replace(/\D/g, "").slice(-10) || (user as any)?.mobile?.replace(/\D/g, "").slice(-10) || "");
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState<{ type: "success" | "error"; text: string } | null>(null);
+
+  useEffect(() => {
+    if (!user) return;
+    if (user.name) {
+      const parts = user.name.trim().split(" ");
+      setFirstName(parts[0] || "");
+      setLastName(parts.slice(1).join(" ") || "");
+    }
+    const phoneVal = user.phone || (user as any).mobile || "";
+    if (phoneVal) {
+      setPhone(phoneVal.replace(/\D/g, "").slice(-10));
+    }
+  }, [user]);
 
   const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();

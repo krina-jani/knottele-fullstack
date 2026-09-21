@@ -186,6 +186,10 @@ class OrderController extends Controller
             'discount_total' => 'nullable|numeric',
             'discount_amount' => 'nullable|numeric',
             'discount' => 'nullable|numeric',
+            'shipping_total' => 'nullable|numeric',
+            'shipping' => 'nullable|numeric',
+            'grand_total' => 'nullable|numeric',
+            'total' => 'nullable|numeric',
         ]);
 
         try {
@@ -293,10 +297,24 @@ class OrderController extends Controller
                 }
             }
 
-            // Shipping rule: 99rs shipping for order subtotal < 999rs; Free (0rs) for subtotal >= 999rs or 0rs
-            $effectiveSubtotal = max(0, $subtotal - $discountTotal);
-            $shippingTotal = ($subtotal == 0 || $effectiveSubtotal >= 999) ? 0 : 99;
-            $grandTotal = max(0, $subtotal - $discountTotal + $shippingTotal);
+            // Shipping rule: Free (0rs) for subtotal >= 999rs or 0rs; otherwise 99rs
+            if ($request->has('shipping_total') || $request->has('shipping')) {
+                $shippingTotal = (float) ($request->shipping_total ?? $request->shipping ?? 0);
+            } elseif ($subtotal == 0 || $subtotal >= 999) {
+                $shippingTotal = 0;
+            } else {
+                $shippingTotal = 99;
+            }
+
+            $grandTotal = max(0, round($subtotal - $discountTotal + $shippingTotal, 2));
+
+            // Sync with frontend total if provided and matches within minor rounding
+            if ($request->filled('grand_total') || $request->filled('total')) {
+                $frontendTotal = (float) ($request->grand_total ?? $request->total);
+                if (abs($grandTotal - $frontendTotal) <= 1.0) {
+                    $grandTotal = $frontendTotal;
+                }
+            }
 
             // Associate customer ID if authenticated or matching email found (or create new customer profile)
             $authCustomer = auth('customer_api')->user();
@@ -502,9 +520,9 @@ class OrderController extends Controller
                 ];
             })->values()->toArray(),
             'shippingAddress' => [
-                'fullName' => $order->shipping_address['name'] ?? 'Customer',
-                'email' => $order->shipping_address['email'] ?? '',
-                'phone' => $order->shipping_address['phone'] ?? '',
+                'fullName' => $order->customer->name ?? ($order->shipping_address['name'] ?? 'Customer'),
+                'email' => $order->customer->email ?? ($order->shipping_address['email'] ?? ''),
+                'phone' => $order->customer->mobile ?? ($order->shipping_address['phone'] ?? ''),
                 'addressLine1' => $order->shipping_address['address_line_1'] ?? '',
                 'addressLine2' => $order->shipping_address['address_line_2'] ?? '',
                 'city' => $order->shipping_address['city'] ?? '',
