@@ -159,10 +159,10 @@ $adminRoutes = function () {
             Route::get('/data', [AdminMedia::class, 'getData'])->name('admin.media.data');
             Route::post('/upload', [AdminMedia::class, 'upload'])->name('admin.media.upload');
             Route::post('/assign-slot', [AdminMedia::class, 'assignSlot'])->name('admin.media.assign-slot');
-            Route::post('/add-hero-slide', [AdminMedia::class, 'addHeroSlide'])->name('admin.media.add-hero-slide');
-            Route::post('/hero-slide', [AdminMedia::class, 'addHeroSlide'])->name('admin.media.hero-slide');
+            Route::match(['post', 'put'], '/add-hero-slide', [AdminMedia::class, 'addHeroSlide'])->name('admin.media.add-hero-slide');
+            Route::match(['post', 'put'], '/hero-slide', [AdminMedia::class, 'addHeroSlide'])->name('admin.media.hero-slide');
             Route::get('/hero-slide/{id}', [AdminMedia::class, 'getHeroSlide'])->name('admin.media.get-hero-slide');
-            Route::post('/hero-slide/{id}', [AdminMedia::class, 'updateHeroSlide'])->name('admin.media.update-hero-slide');
+            Route::match(['post', 'put', 'patch'], '/hero-slide/{id}', [AdminMedia::class, 'updateHeroSlide'])->name('admin.media.update-hero-slide');
             Route::delete('/hero-slide/{id}', [AdminMedia::class, 'deleteHeroSlide'])->name('admin.media.delete-hero-slide');
             Route::post('/update-metadata/{id?}', [AdminMedia::class, 'updateMetadata'])->name('admin.media.update-metadata');
             Route::post('/detach-slot', [AdminMedia::class, 'detachSlot'])->name('admin.media.detach-slot');

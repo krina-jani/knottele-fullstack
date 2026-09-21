@@ -4535,7 +4535,8 @@
         // Sync with server in background if effectiveId exists
         if (effectiveId) {
             try {
-                const res = await axios.get(`/admin/media/hero-slide/${effectiveId}`);
+                const adminMediaBase = window.location.pathname.startsWith('/knottele') ? '/knottele/admin/media' : '/admin/media';
+                const res = await axios.get(`${adminMediaBase}/hero-slide/${effectiveId}`);
                 if (res.data && res.data.success) {
                     const s = res.data.data;
                     // Only update if current modal is still for this slide
@@ -4663,7 +4664,8 @@
             formData.append('_token', csrfToken);
         }
 
-        const endpoint = isEdit ? `/admin/media/hero-slide/${slideId}` : '/admin/media/hero-slide';
+        const adminMediaBase = window.location.pathname.startsWith('/knottele') ? '/knottele/admin/media' : '/admin/media';
+        const endpoint = isEdit ? `${adminMediaBase}/hero-slide/${slideId}` : `${adminMediaBase}/hero-slide`;
 
         try {
             const res = await axios.post(endpoint, formData, {
@@ -4701,8 +4703,9 @@
         }
 
         try {
+            const adminMediaBase = window.location.pathname.startsWith('/knottele') ? '/knottele/admin/media' : '/admin/media';
             const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
-            const res = await axios.delete(`/admin/media/hero-slide/${id}`, {
+            const res = await axios.delete(`${adminMediaBase}/hero-slide/${id}`, {
                 headers: {
                     'X-CSRF-TOKEN': csrfToken || ''
                 }

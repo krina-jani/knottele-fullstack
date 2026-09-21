@@ -100,6 +100,22 @@
             if (csrfMeta) {
                 window.axios.defaults.headers.common['X-CSRF-TOKEN'] = csrfMeta.getAttribute('content');
             }
+
+            // Universal subdirectory support:
+            // When hosted under /knottele, ensure axios requests starting with /admin/ or /api/ are prefixed with /knottele
+            window.axios.interceptors.request.use(function (config) {
+                if (config.url && typeof config.url === 'string') {
+                    const isKnottele = window.location.pathname.startsWith('/knottele');
+                    if (isKnottele && !config.url.startsWith('http://') && !config.url.startsWith('https://')) {
+                        if (config.url.startsWith('/admin/') || config.url.startsWith('/api/')) {
+                            config.url = '/knottele' + config.url;
+                        } else if (config.url.startsWith('admin/') || config.url.startsWith('api/')) {
+                            config.url = '/knottele/' + config.url;
+                        }
+                    }
+                }
+                return config;
+            });
         }
     </script>
 
