@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { notFound } from "next/navigation";
+import { notFound, useParams } from "next/navigation";
 import {
   Clock,
   ArrowLeft,
@@ -18,12 +18,24 @@ interface OrderDetailViewProps {
   id: string;
 }
 
-export default function OrderDetailView({ id }: OrderDetailViewProps) {
+export default function OrderDetailView({ id: propId }: OrderDetailViewProps) {
   const { orders } = useAuth();
   const [apiOrder, setApiOrder] = useState<Order | null>(null);
   const [loading, setLoading] = useState(false);
 
-  const cleanId = decodeURIComponent(id || "");
+  const params = useParams();
+  const rawParamId = typeof params?.id === "string" ? params.id : Array.isArray(params?.id) ? params.id[0] : "";
+  const pathnameId = typeof window !== "undefined"
+    ? window.location.pathname.replace(/^.*\/account\/orders\//, "").replace(/\/.*$/, "")
+    : "";
+
+  const effectiveId = (propId && propId !== "placeholder")
+    ? propId
+    : (rawParamId && rawParamId !== "placeholder")
+      ? rawParamId
+      : (pathnameId && pathnameId !== "placeholder" ? pathnameId : "");
+
+  const cleanId = decodeURIComponent(effectiveId || "");
   const contextOrder = orders.find(
     (o) =>
       o.id === cleanId ||
@@ -36,7 +48,7 @@ export default function OrderDetailView({ id }: OrderDetailViewProps) {
   const order = contextOrder || apiOrder;
 
   useEffect(() => {
-    if (!contextOrder && cleanId) {
+    if (!contextOrder && cleanId && cleanId !== "placeholder") {
       setLoading(true);
       fetchOrderById(cleanId)
         .then((fetched) => {

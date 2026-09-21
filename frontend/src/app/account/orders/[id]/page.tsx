@@ -9,12 +9,17 @@ interface OrderDetailPageProps {
 }
 
 export function generateStaticParams() {
-  if (INITIAL_ORDERS.length > 0) {
-    return INITIAL_ORDERS.map((order) => ({
-      id: order.id,
-    }));
+  const ids = ["1", "2", "3", "4", "5", "placeholder"];
+  if (INITIAL_ORDERS && INITIAL_ORDERS.length > 0) {
+    INITIAL_ORDERS.forEach((order) => {
+      if (order?.id && !ids.includes(order.id)) {
+        ids.push(order.id);
+      }
+    });
   }
-  return [{ id: "placeholder" }];
+  return ids.map((id) => ({
+    id,
+  }));
 }
 
 export default async function OrderDetailPage({ params }: OrderDetailPageProps) {

@@ -45,8 +45,9 @@ Route::prefix('customer')->group(function () {
         Route::get('/{slug}', [ProductController::class, 'show']); // Move to bottom
     });
 
-    // Order checkout (public for guests, can be moved to protected if needed)
+    // Order checkout and details (public for guests with email / authenticated customers)
     Route::post('orders', [\App\Http\Controllers\Api\Customer\OrderController::class, 'store']);
+    Route::get('orders/{id}', [\App\Http\Controllers\Api\Customer\OrderController::class, 'show']);
     Route::post('cart/validate', [\App\Http\Controllers\Api\Customer\OrderController::class, 'validateCart']);
 
     // Protected routes (require authentication)

@@ -434,7 +434,7 @@ Route::get('/check-contact-messages', function () {
 | CUSTOMER FRONTEND (NEXT.JS UNIFIED SERVING)
 |--------------------------------------------------------------------------
 */
-Route::get('/', function () {
+Route::match(['GET', 'HEAD'], '/', function () {
     $indexPath = public_path('index.html');
     if (file_exists($indexPath)) {
         return response()->file($indexPath);
@@ -442,7 +442,7 @@ Route::get('/', function () {
     return view('welcome');
 });
 
-Route::get('/{any}', function ($any = '') {
+Route::match(['GET', 'HEAD'], '/{any}', function ($any = '') {
     $path = trim($any, '/');
 
     // Strip knottele prefix if present (e.g. /knottele/shop -> shop)
@@ -469,8 +469,9 @@ Route::get('/{any}', function ($any = '') {
 
     // 3b. Resilient product route fallback: serve product template and RSC tree so client-side React never redirects to home
     if (str_starts_with($path, 'product/')) {
-        if (str_contains($path, '__next.') || str_ends_with($path, '.txt')) {
-            $fallbackTxt = glob(public_path('product/*/' . basename($path)));
+        if (request()->has('_rsc') || str_contains($path, '__next.') || str_ends_with($path, '.txt')) {
+            $txtFile = str_ends_with($path, '.txt') ? basename($path) : 'index.txt';
+            $fallbackTxt = glob(public_path('product/*/' . $txtFile));
             if (!empty($fallbackTxt)) {
                 return response()->file($fallbackTxt[0], [
                     'Content-Type' => 'text/plain; charset=utf-8',
@@ -485,8 +486,9 @@ Route::get('/{any}', function ($any = '') {
 
     // 3c. Resilient category route fallback
     if (str_starts_with($path, 'category/')) {
-        if (str_contains($path, '__next.') || str_ends_with($path, '.txt')) {
-            $fallbackTxt = glob(public_path('category/*/' . basename($path)));
+        if (request()->has('_rsc') || str_contains($path, '__next.') || str_ends_with($path, '.txt')) {
+            $txtFile = str_ends_with($path, '.txt') ? basename($path) : 'index.txt';
+            $fallbackTxt = glob(public_path('category/*/' . $txtFile));
             if (!empty($fallbackTxt)) {
                 return response()->file($fallbackTxt[0], [
                     'Content-Type' => 'text/plain; charset=utf-8',
@@ -496,6 +498,31 @@ Route::get('/{any}', function ($any = '') {
         $catIndex = glob(public_path('category/*/index.html'));
         if (!empty($catIndex)) {
             return response()->file($catIndex[0]);
+        }
+    }
+
+    // 3d. Resilient account/orders route fallback: serve order template and RSC tree so any order ID loads smoothly
+    if (str_starts_with($path, 'account/orders/')) {
+        if (request()->has('_rsc') || str_contains($path, '__next.') || str_ends_with($path, '.txt')) {
+            $txtFile = str_ends_with($path, '.txt') ? basename($path) : 'index.txt';
+            $fallbackTxt = glob(public_path('account/orders/*/' . $txtFile));
+            if (!empty($fallbackTxt)) {
+                return response()->file($fallbackTxt[0], [
+                    'Content-Type' => 'text/plain; charset=utf-8',
+                ]);
+            }
+            if (file_exists(public_path('account/orders/placeholder/' . $txtFile))) {
+                return response()->file(public_path('account/orders/placeholder/' . $txtFile), [
+                    'Content-Type' => 'text/plain; charset=utf-8',
+                ]);
+            }
+        }
+        $orderIndex = glob(public_path('account/orders/*/index.html'));
+        if (!empty($orderIndex)) {
+            return response()->file($orderIndex[0]);
+        }
+        if (file_exists(public_path('account/orders/placeholder/index.html'))) {
+            return response()->file(public_path('account/orders/placeholder/index.html'));
         }
     }
 
