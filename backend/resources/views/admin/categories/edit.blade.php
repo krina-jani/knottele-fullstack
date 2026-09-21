@@ -442,6 +442,48 @@
         return options;
     }
 
+    // Setup event listeners
+    function setupEventListeners() {
+        const nameInput = document.getElementById('name');
+        if (nameInput) {
+            nameInput.addEventListener('blur', generateSlug);
+        }
+
+        const categoryForm = document.getElementById('categoryForm');
+        if (categoryForm) {
+            categoryForm.addEventListener('submit', updateCategory);
+        }
+
+        ['name', 'slug'].forEach(fieldId => {
+            const element = document.getElementById(fieldId);
+            if (element) {
+                element.addEventListener('input', function() {
+                    const errorElement = document.getElementById(fieldId + 'Error');
+                    if (errorElement) {
+                        errorElement.classList.add('hidden');
+                        errorElement.textContent = '';
+                    }
+                });
+            }
+        });
+    }
+
+    // Generate slug from name
+    function generateSlug() {
+        const nameInput = document.getElementById('name');
+        const slugInput = document.getElementById('slug');
+        if (!nameInput || !slugInput) return;
+
+        if (nameInput.value && (!slugInput.value || slugInput.value === '')) {
+            const slug = nameInput.value.toLowerCase()
+                .replace(/[^a-z0-9 -]/g, '')
+                .replace(/\s+/g, '-')
+                .replace(/-+/g, '-')
+                .replace(/^-+|-+$/g, '');
+            slugInput.value = slug;
+        }
+    }
+
 
 
     // =============== MEDIA MANAGEMENT FUNCTIONS ===============
@@ -710,10 +752,12 @@
         };
 
         // Show loading state
-        const submitBtn = e.target.querySelector('button[type="submit"]');
-        const originalText = submitBtn.innerHTML;
-        submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Updating...';
-        submitBtn.disabled = true;
+        const submitBtn = (e.target ? e.target.querySelector('button[type="submit"]') : null) || document.querySelector('#categoryForm button[type="submit"]');
+        const originalText = submitBtn ? submitBtn.innerHTML : '';
+        if (submitBtn) {
+            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Updating...';
+            submitBtn.disabled = true;
+        }
 
         // Clear previous errors
         ['nameError', 'slugError'].forEach(errorId => {
@@ -753,8 +797,10 @@
                 toastr.error(error.response?.data?.message || 'Failed to update category');
             }
         } finally {
-            submitBtn.innerHTML = originalText;
-            submitBtn.disabled = false;
+            if (submitBtn) {
+                submitBtn.innerHTML = originalText;
+                submitBtn.disabled = false;
+            }
         }
     }
 

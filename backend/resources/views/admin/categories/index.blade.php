@@ -647,7 +647,7 @@
                         field: "status",
                         width: 120,
                         hozAlign: "center",
-                        headerFilter: "select",
+                        headerFilter: "list",
                         headerFilterParams: {
                             values: {
                                 "": "All",

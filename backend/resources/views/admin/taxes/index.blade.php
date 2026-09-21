@@ -697,7 +697,7 @@
                         width: 100,
                         responsive: 0,
                         hozAlign: "center",
-                        headerFilter: "select",
+                        headerFilter: "list",
                         headerFilterParams: {
                             values: {
                                 "": "All",

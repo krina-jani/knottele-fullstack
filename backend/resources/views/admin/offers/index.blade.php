@@ -1448,13 +1448,21 @@
 
                 if (response.data.success) {
                     const stats = response.data.data;
-                    document.getElementById('totalOffers').textContent = stats.total_offers || 0;
-                    document.getElementById('activeOffers').textContent = stats.active_offers || 0;
-                    document.getElementById('expiredOffers').textContent = stats.expired_offers || 0;
+                    const totalEl = document.getElementById('totalOffers');
+                    const activeEl = document.getElementById('activeOffers');
+                    const expiredEl = document.getElementById('expiredOffers');
+                    const mostUsedEl = document.getElementById('mostUsedOffer');
 
-                    if (stats.most_used_offer) {
-                        document.getElementById('mostUsedOffer').textContent =
-                            `${stats.most_used_offer.name} (${stats.most_used_offer.usages_count} uses)`;
+                    if (totalEl) totalEl.textContent = stats.total_offers || 0;
+                    if (activeEl) activeEl.textContent = stats.active_offers || 0;
+                    if (expiredEl) expiredEl.textContent = stats.expired_offers || 0;
+
+                    if (mostUsedEl) {
+                        if (stats.most_used_offer) {
+                            mostUsedEl.textContent = `${stats.most_used_offer.name} (${stats.most_used_offer.usages_count} uses)`;
+                        } else {
+                            mostUsedEl.textContent = '-';
+                        }
                     }
                 }
             } catch (error) {

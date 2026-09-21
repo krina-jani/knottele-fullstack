@@ -241,25 +241,25 @@
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div class="space-y-2">
                             <label class="text-sm font-semibold text-gray-700 flex items-center gap-2">
-                                <i data-lucide="facebook" class="w-4 h-4 text-blue-600"></i> Facebook
+                                <i class="fab fa-facebook text-blue-600 text-base"></i> Facebook
                             </label>
                             <input type="url" data-key="social_facebook" class="setting-input w-full px-4 py-2.5 bg-white border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500/20 outline-none" placeholder="https://facebook.com/yourpage">
                         </div>
                         <div class="space-y-2">
                             <label class="text-sm font-semibold text-gray-700 flex items-center gap-2">
-                                <i data-lucide="instagram" class="w-4 h-4 text-pink-600"></i> Instagram
+                                <i class="fab fa-instagram text-pink-600 text-base"></i> Instagram
                             </label>
                             <input type="url" data-key="social_instagram" class="setting-input w-full px-4 py-2.5 bg-white border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500/20 outline-none" placeholder="https://instagram.com/yourprofile">
                         </div>
                         <div class="space-y-2">
                             <label class="text-sm font-semibold text-gray-700 flex items-center gap-2">
-                                <i data-lucide="twitter" class="w-4 h-4 text-red-500"></i> Twitter / X
+                                <i class="fab fa-x-twitter text-stone-800 text-base"></i> Twitter / X
                             </label>
                             <input type="url" data-key="social_twitter" class="setting-input w-full px-4 py-2.5 bg-white border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500/20 outline-none">
                         </div>
                         <div class="space-y-2">
                             <label class="text-sm font-semibold text-gray-700 flex items-center gap-2">
-                                <i data-lucide="linkedin" class="w-4 h-4 text-blue-700"></i> LinkedIn
+                                <i class="fab fa-linkedin text-blue-700 text-base"></i> LinkedIn
                             </label>
                             <input type="url" data-key="social_linkedin" class="setting-input w-full px-4 py-2.5 bg-white border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500/20 outline-none">
                         </div>

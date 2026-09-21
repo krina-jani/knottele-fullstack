@@ -294,7 +294,7 @@ function initializeSalesTable() {
                 width: 140,
                 responsive: 0,
                 hozAlign: "center",
-                headerFilter: "select",
+                headerFilter: "list",
                 headerFilterParams: {
                     values: {
                         "": "All Status",
