@@ -131,7 +131,7 @@
     </div>
 
     <!-- MODAL 1: DIRECT SLOT REPLACE / UPLOAD MODAL -->
-    <div id="slotUploadModal" class="fixed inset-0 bg-stone-900/60 backdrop-blur-xs hidden items-center justify-center z-50 p-4">
+    <div id="slotUploadModal" class="fixed inset-0 bg-stone-900/60 backdrop-blur-xs hidden items-center justify-center z-[9999] p-4 overflow-y-auto" style="display: none;" onclick="if(event.target === this) closeSlotUploadModal()">
         <div class="bg-white rounded-3xl max-w-xl w-full max-h-[90vh] flex flex-col overflow-hidden shadow-2xl border border-stone-100 animate-fadeIn">
             
             <!-- Sticky / Pinned Header -->
@@ -247,7 +247,7 @@
     </div>
 
     <!-- MODAL 2: RESPONSIVE DEVICE PREVIEW MODAL -->
-    <div id="devicePreviewModal" class="fixed inset-0 bg-stone-900/70 backdrop-blur-sm hidden items-center justify-center z-50 p-4">
+    <div id="devicePreviewModal" class="fixed inset-0 bg-stone-900/70 backdrop-blur-sm hidden items-center justify-center z-[9999] p-4 overflow-y-auto" style="display: none;" onclick="if(event.target === this) closeDevicePreviewModal()">
         <div class="bg-white rounded-3xl max-w-4xl w-full max-h-[92vh] flex flex-col overflow-hidden shadow-2xl border border-stone-100">
             
             <!-- Header with device switcher -->
@@ -302,7 +302,7 @@
     </div>
 
     <!-- MODAL 3: EDIT SECTION OPTIONS & METADATA MODAL -->
-    <div id="editMetadataModal" class="fixed inset-0 bg-stone-900/60 backdrop-blur-xs hidden items-center justify-center z-50 p-4">
+    <div id="editMetadataModal" class="fixed inset-0 bg-stone-900/60 backdrop-blur-xs hidden items-center justify-center z-[9999] p-4 overflow-y-auto" style="display: none;" onclick="if(event.target === this) closeEditMetadataModal()">
         <div class="bg-white rounded-3xl max-w-xl w-full max-h-[90vh] flex flex-col overflow-hidden shadow-2xl border border-stone-100">
             <!-- Pinned Header -->
             <div class="p-5 px-6 border-b border-stone-100 flex items-center justify-between bg-stone-50/80 shrink-0">
@@ -396,7 +396,7 @@
     </div>
 
     <!-- MODAL 4: HERO SLIDE MODAL (CREATE & EDIT) -->
-    <div id="heroSlideModal" onclick="if(event.target === this) closeHeroSlideModal()" class="fixed inset-0 bg-stone-900/60 backdrop-blur-xs hidden items-center justify-center z-50 p-4">
+    <div id="heroSlideModal" onclick="if(event.target === this) closeHeroSlideModal()" class="fixed inset-0 bg-stone-900/60 backdrop-blur-xs hidden items-center justify-center z-[9999] p-4 overflow-y-auto" style="display: none;">
         <div class="bg-white rounded-3xl max-w-2xl w-full max-h-[92vh] flex flex-col overflow-hidden shadow-2xl border border-stone-100 animate-fadeIn" onclick="event.stopPropagation()">
             
             <!-- Pinned Header -->
@@ -605,7 +605,7 @@
     </div>
 
     <!-- MODAL 5: MEDIA LIBRARY PICKER MODAL -->
-    <div id="mediaPickerModal" onclick="if(event.target === this) closeMediaPicker()" class="fixed inset-0 bg-stone-900/60 backdrop-blur-xs hidden items-center justify-center z-50 p-4">
+    <div id="mediaPickerModal" onclick="if(event.target === this) closeMediaPicker()" class="fixed inset-0 bg-stone-900/60 backdrop-blur-xs hidden items-center justify-center z-[9999] p-4 overflow-y-auto" style="display: none;">
         <div class="bg-white rounded-3xl max-w-3xl w-full max-h-[85vh] flex flex-col overflow-hidden shadow-2xl border border-stone-100 animate-fadeIn" onclick="event.stopPropagation()">
             
             <div class="p-5 px-6 border-b border-stone-100 flex items-center justify-between bg-stone-50/80 shrink-0">
@@ -645,7 +645,7 @@
     </div>
 
     <!-- MODAL 6: CUSTOMER REVIEW (TESTIMONIAL) MODAL -->
-    <div id="testimonialModal" onclick="if(event.target === this) closeTestimonialModal()" class="fixed inset-0 bg-stone-900/60 backdrop-blur-xs hidden items-center justify-center z-50 p-4">
+    <div id="testimonialModal" onclick="if(event.target === this) closeTestimonialModal()" class="fixed inset-0 bg-stone-900/60 backdrop-blur-xs hidden items-center justify-center z-[9999] p-4 overflow-y-auto" style="display: none;">
         <div class="bg-white rounded-3xl max-w-lg w-full max-h-[90vh] flex flex-col overflow-hidden shadow-2xl border border-stone-100 animate-fadeIn" onclick="event.stopPropagation()">
             <!-- Pinned Header -->
             <div class="p-5 px-6 border-b border-stone-100 flex items-center justify-between bg-stone-50/80 shrink-0">
@@ -714,7 +714,7 @@
                         <span id="testimonialSubmitBtnText">Save Review</span>
                     </button>
           <!-- MODAL 7: ADD / EDIT VIDEO & REEL MODAL -->
-    <div id="videoReelModal" onclick="if(event.target === this) closeVideoReelModal()" class="fixed inset-0 bg-stone-900/60 backdrop-blur-xs hidden items-center justify-center z-50 p-3 sm:p-5">
+    <div id="videoReelModal" onclick="if(event.target === this) closeVideoReelModal()" class="fixed inset-0 bg-stone-900/60 backdrop-blur-xs hidden items-center justify-center z-[9999] p-3 sm:p-5 overflow-y-auto" style="display: none;">
         <div class="bg-white rounded-3xl max-w-5xl w-full max-h-[94vh] flex flex-col overflow-hidden shadow-2xl border border-stone-100 animate-fadeIn" onclick="event.stopPropagation()">
             
             <!-- Pinned Header -->
@@ -960,7 +960,7 @@
     </div>
 
     <!-- MODAL 8: BLOG / VIDEOS SECTION SETTINGS MODAL -->
-    <div id="blogReelsSettingsModal" onclick="if(event.target === this) closeBlogReelsSettingsModal()" class="fixed inset-0 bg-stone-900/60 backdrop-blur-xs hidden items-center justify-center z-50 p-4">
+    <div id="blogReelsSettingsModal" onclick="if(event.target === this) closeBlogReelsSettingsModal()" class="fixed inset-0 bg-stone-900/60 backdrop-blur-xs hidden items-center justify-center z-[9999] p-4 overflow-y-auto" style="display: none;">
         <div class="bg-white rounded-3xl max-w-xl w-full max-h-[90vh] flex flex-col overflow-hidden shadow-2xl border border-stone-100 animate-fadeIn" onclick="event.stopPropagation()">
             <!-- Pinned Header -->
             <div class="p-5 px-6 border-b border-stone-100 flex items-center justify-between bg-stone-50/80 shrink-0">
@@ -1026,7 +1026,7 @@
     </div>
 
     <!-- MODAL 9: ABOUT STORY MODAL -->
-    <div id="aboutStoryModal" onclick="if(event.target === this) closeAboutStoryModal()" class="fixed inset-0 bg-stone-900/60 backdrop-blur-xs hidden items-center justify-center z-50 p-4">
+    <div id="aboutStoryModal" onclick="if(event.target === this) closeAboutStoryModal()" class="fixed inset-0 bg-stone-900/60 backdrop-blur-xs hidden items-center justify-center z-[9999] p-4 overflow-y-auto" style="display: none;">
         <div class="bg-white rounded-3xl max-w-3xl w-full max-h-[92vh] flex flex-col overflow-hidden shadow-2xl border border-stone-100 animate-fadeIn" onclick="event.stopPropagation()">
             <!-- Pinned Header -->
             <div class="p-5 px-6 border-b border-stone-100 flex items-center justify-between bg-stone-50/80 shrink-0">
@@ -1236,7 +1236,7 @@
     </div>
 
     <!-- MODAL 10: CRAFT PILLARS HEADER SETTINGS MODAL -->
-    <div id="craftPillarsHeaderModal" onclick="if(event.target === this) closeCraftPillarsHeaderModal()" class="fixed inset-0 bg-stone-900/60 backdrop-blur-xs hidden items-center justify-center z-50 p-4">
+    <div id="craftPillarsHeaderModal" onclick="if(event.target === this) closeCraftPillarsHeaderModal()" class="fixed inset-0 bg-stone-900/60 backdrop-blur-xs hidden items-center justify-center z-[9999] p-4 overflow-y-auto" style="display: none;">
         <div class="bg-white rounded-3xl max-w-lg w-full max-h-[90vh] flex flex-col overflow-hidden shadow-2xl border border-stone-100 animate-fadeIn" onclick="event.stopPropagation()">
             <!-- Pinned Header -->
             <div class="p-5 px-6 border-b border-stone-100 flex items-center justify-between bg-stone-50/80 shrink-0">
@@ -1283,7 +1283,7 @@
     </div>
 
     <!-- MODAL 11: ADD / EDIT CRAFT PILLAR MODAL -->
-    <div id="craftPillarModal" onclick="if(event.target === this) closeCraftPillarModal()" class="fixed inset-0 bg-stone-900/60 backdrop-blur-xs hidden items-center justify-center z-50 p-4">
+    <div id="craftPillarModal" onclick="if(event.target === this) closeCraftPillarModal()" class="fixed inset-0 bg-stone-900/60 backdrop-blur-xs hidden items-center justify-center z-[9999] p-4 overflow-y-auto" style="display: none;">
         <div class="bg-white rounded-3xl max-w-xl w-full max-h-[92vh] flex flex-col overflow-hidden shadow-2xl border border-stone-100 animate-fadeIn" onclick="event.stopPropagation()">
             <!-- Pinned Header -->
             <div class="p-5 px-6 border-b border-stone-100 flex items-center justify-between bg-stone-50/80 shrink-0">
@@ -1404,7 +1404,7 @@
     </div>
 
     <!-- MODAL: CUSTOM ORDER ITEM / CATEGORY MODAL -->
-    <div id="customOrderItemModal" onclick="if(event.target === this) closeCustomOrderItemModal()" class="fixed inset-0 bg-stone-900/60 backdrop-blur-xs hidden items-center justify-center z-50 p-4">
+    <div id="customOrderItemModal" onclick="if(event.target === this) closeCustomOrderItemModal()" class="fixed inset-0 bg-stone-900/60 backdrop-blur-xs hidden items-center justify-center z-[9999] p-4 overflow-y-auto" style="display: none;">
         <div class="bg-white rounded-3xl max-w-lg w-full max-h-[90vh] flex flex-col overflow-hidden shadow-2xl border border-stone-100 animate-fadeIn" onclick="event.stopPropagation()">
             <!-- Pinned Header -->
             <div class="p-5 px-6 border-b border-stone-100 flex items-center justify-between bg-stone-50/80 shrink-0">
@@ -1465,7 +1465,7 @@
     </div>
 
     <!-- MODAL 12: CONTACT INTRO MODAL -->
-    <div id="contactIntroModal" onclick="if(event.target === this) closeContactIntroModal()" class="fixed inset-0 bg-stone-900/60 backdrop-blur-xs hidden items-center justify-center z-50 p-4">
+    <div id="contactIntroModal" onclick="if(event.target === this) closeContactIntroModal()" class="fixed inset-0 bg-stone-900/60 backdrop-blur-xs hidden items-center justify-center z-[9999] p-4 overflow-y-auto" style="display: none;">
         <div class="bg-white rounded-3xl max-w-3xl w-full max-h-[92vh] flex flex-col overflow-hidden shadow-2xl border border-stone-100 animate-fadeIn" onclick="event.stopPropagation()">
             <!-- Pinned Header -->
             <div class="p-5 px-6 border-b border-stone-100 flex items-center justify-between bg-stone-50/80 shrink-0">
@@ -1593,7 +1593,7 @@
     </div>
 
     <!-- MODAL 13: CONTACT INFO HEADER & CUSTOM ORDER BOX MODAL -->
-    <div id="contactInfoHeaderModal" onclick="if(event.target === this) closeContactInfoHeaderModal()" class="fixed inset-0 bg-stone-900/60 backdrop-blur-xs hidden items-center justify-center z-50 p-4">
+    <div id="contactInfoHeaderModal" onclick="if(event.target === this) closeContactInfoHeaderModal()" class="fixed inset-0 bg-stone-900/60 backdrop-blur-xs hidden items-center justify-center z-[9999] p-4 overflow-y-auto" style="display: none;">
         <div class="bg-white rounded-3xl max-w-xl w-full max-h-[92vh] flex flex-col overflow-hidden shadow-2xl border border-stone-100 animate-fadeIn" onclick="event.stopPropagation()">
             <!-- Pinned Header -->
             <div class="p-5 px-6 border-b border-stone-100 flex items-center justify-between bg-stone-50/80 shrink-0">
@@ -1679,7 +1679,7 @@
     </div>
 
     <!-- MODAL 14: ADD / EDIT CONTACT DETAIL ITEM MODAL -->
-    <div id="contactInfoItemModal" onclick="if(event.target === this) closeContactInfoItemModal()" class="fixed inset-0 bg-stone-900/60 backdrop-blur-xs hidden items-center justify-center z-50 p-4">
+    <div id="contactInfoItemModal" onclick="if(event.target === this) closeContactInfoItemModal()" class="fixed inset-0 bg-stone-900/60 backdrop-blur-xs hidden items-center justify-center z-[9999] p-4 overflow-y-auto" style="display: none;">
         <div class="bg-white rounded-3xl max-w-xl w-full max-h-[92vh] flex flex-col overflow-hidden shadow-2xl border border-stone-100 animate-fadeIn" onclick="event.stopPropagation()">
             <!-- Pinned Header -->
             <div class="p-5 px-6 border-b border-stone-100 flex items-center justify-between bg-stone-50/80 shrink-0">
@@ -1799,7 +1799,7 @@
     </div>
 
     <!-- MODAL 15: SEND US A MESSAGE / CONTACT FORM SETTINGS MODAL -->
-    <div id="contactFormModal" onclick="if(event.target === this) closeContactFormModal()" class="fixed inset-0 bg-stone-900/60 backdrop-blur-xs hidden items-center justify-center z-50 p-4">
+    <div id="contactFormModal" onclick="if(event.target === this) closeContactFormModal()" class="fixed inset-0 bg-stone-900/60 backdrop-blur-xs hidden items-center justify-center z-[9999] p-4 overflow-y-auto" style="display: none;">
         <div class="bg-white rounded-3xl max-w-2xl w-full max-h-[92vh] flex flex-col overflow-hidden shadow-2xl border border-stone-100 animate-fadeIn" onclick="event.stopPropagation()">
             <!-- Pinned Header -->
             <div class="p-5 px-6 border-b border-stone-100 flex items-center justify-between bg-stone-50/80 shrink-0">
@@ -1983,7 +1983,7 @@
     </div>
 
     <!-- MODAL 16: FAQ SECTION HEADER SETTINGS MODAL -->
-    <div id="contactFaqsHeaderModal" onclick="if(event.target === this) closeContactFaqsHeaderModal()" class="fixed inset-0 bg-stone-900/60 backdrop-blur-xs hidden items-center justify-center z-50 p-4">
+    <div id="contactFaqsHeaderModal" onclick="if(event.target === this) closeContactFaqsHeaderModal()" class="fixed inset-0 bg-stone-900/60 backdrop-blur-xs hidden items-center justify-center z-[9999] p-4 overflow-y-auto" style="display: none;">
         <div class="bg-white rounded-3xl max-w-lg w-full max-h-[90vh] flex flex-col overflow-hidden shadow-2xl border border-stone-100 animate-fadeIn" onclick="event.stopPropagation()">
             <!-- Pinned Header -->
             <div class="p-5 px-6 border-b border-stone-100 flex items-center justify-between bg-stone-50/80 shrink-0">
@@ -2033,7 +2033,7 @@
     </div>
 
     <!-- MODAL 17: ADD / EDIT FAQ ITEM MODAL -->
-    <div id="contactFaqModal" onclick="if(event.target === this) closeContactFaqModal()" class="fixed inset-0 bg-stone-900/60 backdrop-blur-xs hidden items-center justify-center z-50 p-4">
+    <div id="contactFaqModal" onclick="if(event.target === this) closeContactFaqModal()" class="fixed inset-0 bg-stone-900/60 backdrop-blur-xs hidden items-center justify-center z-[9999] p-4 overflow-y-auto" style="display: none;">
         <div class="bg-white rounded-3xl max-w-xl w-full max-h-[92vh] flex flex-col overflow-hidden shadow-2xl border border-stone-100 animate-fadeIn" onclick="event.stopPropagation()">
             <!-- Pinned Header -->
             <div class="p-5 px-6 border-b border-stone-100 flex items-center justify-between bg-stone-50/80 shrink-0">
@@ -2737,7 +2737,7 @@
                                         <p class="text-xs text-stone-500">The Best Sellers section automatically displays products flagged as "Bestseller" or "Featured" in your Products database.</p>
                                     </div>
                                 </div>
-                                <a href="/admin/products" class="btn-primary text-xs px-4 py-2.5 flex items-center gap-2 shrink-0">
+                                <a href="${window.location.pathname.startsWith('/knottele') ? '/knottele/admin/products' : '/admin/products'}" class="btn-primary text-xs px-4 py-2.5 flex items-center gap-2 shrink-0">
                                     <i class="fas fa-edit"></i>
                                     <span>Manage Products</span>
                                 </a>
@@ -3879,6 +3879,7 @@
 
     // 4. Render Category Card
     function renderCategoryCard(cat) {
+        const adminBase = window.location.pathname.startsWith('/knottele') ? '/knottele/admin' : '/admin';
         return `
             <div class="bg-white border border-stone-200 rounded-2xl p-4 shadow-2xs hover:shadow-boutique transition-all flex flex-col items-center text-center group">
                 <div class="relative w-24 h-24 rounded-full overflow-hidden border-2 border-[#E7D1CC] shadow-xs mb-3 bg-[#FFF9F6]">
@@ -3889,10 +3890,14 @@
                 <span class="text-[11px] text-stone-500 font-semibold mb-3">${cat.product_count} Active Products</span>
 
                 <div class="w-full pt-3 border-t border-stone-100 flex items-center justify-center gap-2">
-                    <button onclick="openCategoryUploadModal(${cat.id})"
-                            class="w-full py-1.5 px-3 rounded-xl bg-red-50 text-red-700 hover:bg-red-600 hover:text-white text-xs font-bold transition-all flex items-center justify-center gap-1.5">
-                        <i class="fas fa-upload text-[10px]"></i>
-                        <span>Replace Image</span>
+                    <a href="${adminBase}/categories/${cat.id}/edit"
+                       class="flex-1 py-2 px-3 rounded-xl bg-red-600 hover:bg-red-700 text-white text-xs font-bold transition-all flex items-center justify-center gap-1.5 shadow-xs cursor-pointer">
+                        <i class="fas fa-edit text-[10px]"></i>
+                        <span>Edit Category</span>
+                    </a>
+                    <button type="button" onclick="openCategoryUploadModal(${cat.id})"
+                            class="py-2 px-2.5 rounded-xl bg-stone-100 hover:bg-stone-200 text-stone-700 text-xs font-bold transition-all flex items-center justify-center cursor-pointer" title="Manage Category Image">
+                        <i class="fas fa-image text-xs"></i>
                     </button>
                 </div>
             </div>
@@ -4024,6 +4029,7 @@
 
         const modal = document.getElementById('customOrderItemModal');
         if (modal) {
+            modal.style.setProperty('display', 'flex', 'important');
             modal.classList.remove('hidden');
             modal.classList.add('flex');
         }
@@ -4032,6 +4038,7 @@
     async function openEditCustomOrderItemModal(id) {
         const modal = document.getElementById('customOrderItemModal');
         if (modal) {
+            modal.style.setProperty('display', 'flex', 'important');
             modal.classList.remove('hidden');
             modal.classList.add('flex');
         }
@@ -4074,6 +4081,7 @@
     function closeCustomOrderItemModal() {
         const modal = document.getElementById('customOrderItemModal');
         if (modal) {
+            modal.style.setProperty('display', 'none', 'important');
             modal.classList.add('hidden');
             modal.classList.remove('flex');
         }
@@ -4232,7 +4240,8 @@
         clearSlotFileInput();
 
         const modal = document.getElementById('slotUploadModal');
-        modal.classList.remove('hidden');
+        modal.style.setProperty('display', 'flex', 'important');
+            modal.classList.remove('hidden');
         modal.classList.add('flex');
     }
 
@@ -4258,7 +4267,8 @@
         document.getElementById('editMediaActive').checked = m.is_active !== false;
 
         const modal = document.getElementById('editMetadataModal');
-        modal.classList.remove('hidden');
+        modal.style.setProperty('display', 'flex', 'important');
+            modal.classList.remove('hidden');
         modal.classList.add('flex');
     }
 
@@ -4276,7 +4286,8 @@
 
     function closeSlotUploadModal() {
         const modal = document.getElementById('slotUploadModal');
-        modal.classList.add('hidden');
+        modal.style.setProperty('display', 'none', 'important');
+            modal.classList.add('hidden');
         modal.classList.remove('flex');
     }
 
@@ -4342,13 +4353,15 @@
         document.getElementById('editMediaActive').checked = m.is_active !== false;
 
         const modal = document.getElementById('editMetadataModal');
-        modal.classList.remove('hidden');
+        modal.style.setProperty('display', 'flex', 'important');
+            modal.classList.remove('hidden');
         modal.classList.add('flex');
     }
 
     function closeEditMetadataModal() {
         const modal = document.getElementById('editMetadataModal');
         if (modal) {
+            modal.style.setProperty('display', 'none', 'important');
             modal.classList.add('hidden');
             modal.classList.remove('flex');
         }
@@ -4514,6 +4527,7 @@
 
         const modal = document.getElementById('heroSlideModal');
         if (modal) {
+            modal.style.setProperty('display', 'flex', 'important');
             modal.classList.remove('hidden');
             modal.classList.add('flex');
             setTimeout(() => {
@@ -4592,6 +4606,7 @@
         // Show modal immediately so the user sees it instantly
         const modal = document.getElementById('heroSlideModal');
         if (modal) {
+            modal.style.setProperty('display', 'flex', 'important');
             modal.classList.remove('hidden');
             modal.classList.add('flex');
             setTimeout(() => {
@@ -4647,6 +4662,7 @@
     function closeHeroSlideModal() {
         const modal = document.getElementById('heroSlideModal');
         if (modal) {
+            modal.style.setProperty('display', 'none', 'important');
             modal.classList.add('hidden');
             modal.classList.remove('flex');
         }
@@ -4810,7 +4826,8 @@
         document.getElementById('testimonialActive').checked = true;
         
         const modal = document.getElementById('testimonialModal');
-        modal.classList.remove('hidden');
+        modal.style.setProperty('display', 'flex', 'important');
+            modal.classList.remove('hidden');
         modal.classList.add('flex');
     }
 
@@ -4822,7 +4839,8 @@
         document.getElementById('testimonialSubmitBtnText').innerText = 'Update Review';
 
         const modal = document.getElementById('testimonialModal');
-        modal.classList.remove('hidden');
+        modal.style.setProperty('display', 'flex', 'important');
+            modal.classList.remove('hidden');
         modal.classList.add('flex');
 
         try {
@@ -4844,6 +4862,7 @@
     function closeTestimonialModal() {
         const modal = document.getElementById('testimonialModal');
         if (modal) {
+            modal.style.setProperty('display', 'none', 'important');
             modal.classList.add('hidden');
             modal.classList.remove('flex');
         }
@@ -4936,7 +4955,8 @@
         const grid = document.getElementById('mediaPickerGrid');
         grid.innerHTML = '<div class="col-span-full py-8 text-center text-stone-400"><i class="fas fa-spinner fa-spin mr-2"></i>Loading media library items...</div>';
         
-        modal.classList.remove('hidden');
+        modal.style.setProperty('display', 'flex', 'important');
+            modal.classList.remove('hidden');
         modal.classList.add('flex');
 
         try {
@@ -4952,6 +4972,7 @@
     function closeMediaPicker() {
         const modal = document.getElementById('mediaPickerModal');
         if (modal) {
+            modal.style.setProperty('display', 'none', 'important');
             modal.classList.add('hidden');
             modal.classList.remove('flex');
         }
@@ -5176,7 +5197,8 @@
         }
 
         const modal = document.getElementById('videoReelModal');
-        modal.classList.remove('hidden');
+        modal.style.setProperty('display', 'flex', 'important');
+            modal.classList.remove('hidden');
         modal.classList.add('flex');
 
         setTimeout(() => {
@@ -5246,6 +5268,7 @@
             }
 
             const modal = document.getElementById('videoReelModal');
+            modal.style.setProperty('display', 'flex', 'important');
             modal.classList.remove('hidden');
             modal.classList.add('flex');
 
@@ -5266,6 +5289,7 @@
         clearVideoPreviewPlayer();
         const modal = document.getElementById('videoReelModal');
         if (modal) {
+            modal.style.setProperty('display', 'none', 'important');
             modal.classList.add('hidden');
             modal.classList.remove('flex');
         }
@@ -5537,6 +5561,7 @@
 
         const modal = document.getElementById('blogReelsSettingsModal');
         if (modal) {
+            modal.style.setProperty('display', 'flex', 'important');
             modal.classList.remove('hidden');
             modal.classList.add('flex');
         }
@@ -5545,6 +5570,7 @@
     function closeBlogReelsSettingsModal() {
         const modal = document.getElementById('blogReelsSettingsModal');
         if (modal) {
+            modal.style.setProperty('display', 'none', 'important');
             modal.classList.add('hidden');
             modal.classList.remove('flex');
         }
@@ -5580,13 +5606,15 @@
         setPreviewDevice('desktop');
 
         const modal = document.getElementById('devicePreviewModal');
-        modal.classList.remove('hidden');
+        modal.style.setProperty('display', 'flex', 'important');
+            modal.classList.remove('hidden');
         modal.classList.add('flex');
     }
 
     function closeDevicePreviewModal() {
         const modal = document.getElementById('devicePreviewModal');
-        modal.classList.add('hidden');
+        modal.style.setProperty('display', 'none', 'important');
+            modal.classList.add('hidden');
         modal.classList.remove('flex');
     }
 
@@ -5775,6 +5803,7 @@
     async function openAboutStoryModal() {
         const modal = document.getElementById('aboutStoryModal');
         if (modal) {
+            modal.style.setProperty('display', 'flex', 'important');
             modal.classList.remove('hidden');
             modal.classList.add('flex');
         }
@@ -5844,6 +5873,7 @@
     function closeAboutStoryModal() {
         const modal = document.getElementById('aboutStoryModal');
         if (modal) {
+            modal.style.setProperty('display', 'none', 'important');
             modal.classList.add('hidden');
             modal.classList.remove('flex');
         }
@@ -5940,6 +5970,7 @@
         }
         const modal = document.getElementById('craftPillarsHeaderModal');
         if (modal) {
+            modal.style.setProperty('display', 'flex', 'important');
             modal.classList.remove('hidden');
             modal.classList.add('flex');
         }
@@ -5948,6 +5979,7 @@
     function closeCraftPillarsHeaderModal() {
         const modal = document.getElementById('craftPillarsHeaderModal');
         if (modal) {
+            modal.style.setProperty('display', 'none', 'important');
             modal.classList.add('hidden');
             modal.classList.remove('flex');
         }
@@ -6021,6 +6053,7 @@
 
         const modal = document.getElementById('craftPillarModal');
         if (modal) {
+            modal.style.setProperty('display', 'flex', 'important');
             modal.classList.remove('hidden');
             modal.classList.add('flex');
         }
@@ -6029,6 +6062,7 @@
     async function openEditCraftPillarModal(id) {
         const modal = document.getElementById('craftPillarModal');
         if (modal) {
+            modal.style.setProperty('display', 'flex', 'important');
             modal.classList.remove('hidden');
             modal.classList.add('flex');
         }
@@ -6073,6 +6107,7 @@
     function closeCraftPillarModal() {
         const modal = document.getElementById('craftPillarModal');
         if (modal) {
+            modal.style.setProperty('display', 'none', 'important');
             modal.classList.add('hidden');
             modal.classList.remove('flex');
         }
@@ -6174,6 +6209,7 @@
     async function openContactIntroModal() {
         const modal = document.getElementById('contactIntroModal');
         if (modal) {
+            modal.style.setProperty('display', 'flex', 'important');
             modal.classList.remove('hidden');
             modal.classList.add('flex');
         }
@@ -6235,6 +6271,7 @@
     function closeContactIntroModal() {
         const modal = document.getElementById('contactIntroModal');
         if (modal) {
+            modal.style.setProperty('display', 'none', 'important');
             modal.classList.add('hidden');
             modal.classList.remove('flex');
         }
@@ -6308,6 +6345,7 @@
     async function openContactInfoHeaderModal() {
         const modal = document.getElementById('contactInfoHeaderModal');
         if (modal) {
+            modal.style.setProperty('display', 'flex', 'important');
             modal.classList.remove('hidden');
             modal.classList.add('flex');
         }
@@ -6349,6 +6387,7 @@
     function closeContactInfoHeaderModal() {
         const modal = document.getElementById('contactInfoHeaderModal');
         if (modal) {
+            modal.style.setProperty('display', 'none', 'important');
             modal.classList.add('hidden');
             modal.classList.remove('flex');
         }
@@ -6409,6 +6448,7 @@
 
         const modal = document.getElementById('contactInfoItemModal');
         if (modal) {
+            modal.style.setProperty('display', 'flex', 'important');
             modal.classList.remove('hidden');
             modal.classList.add('flex');
         }
@@ -6417,6 +6457,7 @@
     async function openEditContactInfoItemModal(id) {
         const modal = document.getElementById('contactInfoItemModal');
         if (modal) {
+            modal.style.setProperty('display', 'flex', 'important');
             modal.classList.remove('hidden');
             modal.classList.add('flex');
         }
@@ -6465,6 +6506,7 @@
     function closeContactInfoItemModal() {
         const modal = document.getElementById('contactInfoItemModal');
         if (modal) {
+            modal.style.setProperty('display', 'none', 'important');
             modal.classList.add('hidden');
             modal.classList.remove('flex');
         }
@@ -6575,6 +6617,7 @@
     async function openContactFormModal() {
         const modal = document.getElementById('contactFormModal');
         if (modal) {
+            modal.style.setProperty('display', 'flex', 'important');
             modal.classList.remove('hidden');
             modal.classList.add('flex');
         }
@@ -6634,6 +6677,7 @@
     function closeContactFormModal() {
         const modal = document.getElementById('contactFormModal');
         if (modal) {
+            modal.style.setProperty('display', 'none', 'important');
             modal.classList.add('hidden');
             modal.classList.remove('flex');
         }
@@ -6680,6 +6724,7 @@
     async function openContactFaqsHeaderModal() {
         const modal = document.getElementById('contactFaqsHeaderModal');
         if (modal) {
+            modal.style.setProperty('display', 'flex', 'important');
             modal.classList.remove('hidden');
             modal.classList.add('flex');
         }
@@ -6713,6 +6758,7 @@
     function closeContactFaqsHeaderModal() {
         const modal = document.getElementById('contactFaqsHeaderModal');
         if (modal) {
+            modal.style.setProperty('display', 'none', 'important');
             modal.classList.add('hidden');
             modal.classList.remove('flex');
         }
@@ -6766,6 +6812,7 @@
 
         const modal = document.getElementById('contactFaqModal');
         if (modal) {
+            modal.style.setProperty('display', 'flex', 'important');
             modal.classList.remove('hidden');
             modal.classList.add('flex');
         }
@@ -6774,6 +6821,7 @@
     async function openEditContactFaqModal(id) {
         const modal = document.getElementById('contactFaqModal');
         if (modal) {
+            modal.style.setProperty('display', 'flex', 'important');
             modal.classList.remove('hidden');
             modal.classList.add('flex');
         }
@@ -6815,6 +6863,7 @@
     function closeContactFaqModal() {
         const modal = document.getElementById('contactFaqModal');
         if (modal) {
+            modal.style.setProperty('display', 'none', 'important');
             modal.classList.add('hidden');
             modal.classList.remove('flex');
         }
@@ -6957,7 +7006,8 @@
 
         // Force modal visible immediately
         modal.style.setProperty('display', 'flex', 'important');
-        modal.classList.remove('hidden');
+        modal.style.setProperty('display', 'flex', 'important');
+            modal.classList.remove('hidden');
         modal.classList.add('flex');
 
         // Immediately populate from cached managerData if available
@@ -6988,6 +7038,7 @@
     function closeCustomCrochetModal() {
         const modal = document.getElementById('customCrochetModal');
         if (modal) {
+            modal.style.setProperty('display', 'none', 'important');
             modal.style.setProperty('display', 'none', 'important');
             modal.classList.add('hidden');
             modal.classList.remove('flex');
@@ -7175,7 +7226,8 @@
         }
 
         modal.style.setProperty('display', 'flex', 'important');
-        modal.classList.remove('hidden');
+        modal.style.setProperty('display', 'flex', 'important');
+            modal.classList.remove('hidden');
         modal.classList.add('flex');
 
         // Immediately populate from cached managerData if available
@@ -7206,6 +7258,7 @@
     function closeFooterSettingsModal() {
         const modal = document.getElementById('footerSettingsModal');
         if (modal) {
+            modal.style.setProperty('display', 'none', 'important');
             modal.style.setProperty('display', 'none', 'important');
             modal.classList.add('hidden');
             modal.classList.remove('flex');
@@ -7389,7 +7442,8 @@
         }
 
         modal.style.setProperty('display', 'flex', 'important');
-        modal.classList.remove('hidden');
+        modal.style.setProperty('display', 'flex', 'important');
+            modal.classList.remove('hidden');
         modal.classList.add('flex');
 
         try {
@@ -7419,6 +7473,7 @@
     function closeNavbarSettingsModal() {
         const modal = document.getElementById('navbarSettingsModal');
         if (modal) {
+            modal.style.setProperty('display', 'none', 'important');
             modal.style.setProperty('display', 'none', 'important');
             modal.classList.add('hidden');
             modal.classList.remove('flex');
@@ -7496,5 +7551,168 @@
     window.populateNavbarSettingsForm = populateNavbarSettingsForm;
     window.addNavbarLinkRow = addNavbarLinkRow;
     window.handleNavbarSettingsSubmit = handleNavbarSettingsSubmit;
+
+
+    // =========================================================================
+    // EXPOSE ALL MEDIA MANAGER FUNCTIONS TO GLOBAL WINDOW SCOPE
+    // =========================================================================
+    window.adminMediaBase = adminMediaBase;
+    window.loadManagerData = loadManagerData;
+    window.refreshLibraryData = refreshLibraryData;
+    window.switchView = switchView;
+    window.onPageFilterChange = onPageFilterChange;
+    window.openGenericUploadModal = openGenericUploadModal;
+
+    // Slot Controls
+    window.handleSlotPreviewClick = handleSlotPreviewClick;
+    window.handleSlotReplaceClick = handleSlotReplaceClick;
+    window.handleSlotOptionsClick = handleSlotOptionsClick;
+    window.handleSlotUploadSubmit = handleSlotUploadSubmit;
+    window.handleSlotFileChange = handleSlotFileChange;
+    window.clearSlotFileInput = clearSlotFileInput;
+    window.closeSlotUploadModal = closeSlotUploadModal;
+    window.detachSlot = detachSlot;
+
+    // Metadata Modal (Edit Options / Text Sections)
+    window.openTextSectionEditModal = openTextSectionEditModal;
+    window.closeEditMetadataModal = closeEditMetadataModal;
+    window.handleMetadataSubmit = handleMetadataSubmit;
+
+    // Hero Slides
+    window.openAddHeroSlideModal = openAddHeroSlideModal;
+    window.openEditHeroSlideModal = openEditHeroSlideModal;
+    window.closeHeroSlideModal = closeHeroSlideModal;
+    window.handleHeroSlideSubmit = handleHeroSlideSubmit;
+    window.deleteHeroSlide = deleteHeroSlide;
+    window.handleHeroDesktopFileChange = handleHeroDesktopFileChange;
+    window.handleHeroMobileFileChange = handleHeroMobileFileChange;
+    window.clearHeroDesktopFileInput = clearHeroDesktopFileInput;
+    window.clearHeroMobileFileInput = clearHeroMobileFileInput;
+
+    // Categories
+    window.openCategoryUploadModal = openCategoryUploadModal;
+    window.renderCategoryCard = renderCategoryCard;
+
+    // Video Reels & Blog
+    window.openBlogReelsSettingsModal = openBlogReelsSettingsModal;
+    window.closeBlogReelsSettingsModal = closeBlogReelsSettingsModal;
+    window.handleBlogReelsSettingsSubmit = handleBlogReelsSettingsSubmit;
+    window.openAddVideoReelModal = openAddVideoReelModal;
+    window.openEditVideoReelModal = openEditVideoReelModal;
+    window.closeVideoReelModal = closeVideoReelModal;
+    window.handleVideoReelSubmit = handleVideoReelSubmit;
+    window.deleteVideoReel = deleteVideoReel;
+    window.toggleVideoReelStatus = toggleVideoReelStatus;
+    window.setReelCategory = setReelCategory;
+    window.clearReelCoverInput = clearReelCoverInput;
+    window.handleVideoFileInputChange = handleVideoFileInputChange;
+    window.handleVideoUrlInputChange = handleVideoUrlInputChange;
+    window.handleReelCoverInputChange = handleReelCoverInputChange;
+    window.handleVideoPlayerCanPlay = handleVideoPlayerCanPlay;
+    window.handleVideoPlayerError = handleVideoPlayerError;
+    window.renderVideoReelCard = renderVideoReelCard;
+
+    // Testimonials
+    window.openAddTestimonialModal = openAddTestimonialModal;
+    window.openEditTestimonialModal = openEditTestimonialModal;
+    window.closeTestimonialModal = closeTestimonialModal;
+    window.handleTestimonialSubmit = handleTestimonialSubmit;
+    window.deleteTestimonial = deleteTestimonial;
+
+    // Custom Crochet
+    window.openCustomCrochetModal = openCustomCrochetModal;
+    window.closeCustomCrochetModal = closeCustomCrochetModal;
+    window.handleCustomCrochetSubmit = handleCustomCrochetSubmit;
+    window.handleCustomCrochetFileChange = handleCustomCrochetFileChange;
+    window.clearCustomCrochetFileInput = clearCustomCrochetFileInput;
+
+    // About Us - Brand Story
+    window.openAboutStoryModal = openAboutStoryModal;
+    window.closeAboutStoryModal = closeAboutStoryModal;
+    window.handleAboutStorySubmit = handleAboutStorySubmit;
+    window.handleAboutDesktopFileChange = handleAboutDesktopFileChange;
+    window.handleAboutMobileFileChange = handleAboutMobileFileChange;
+    window.clearAboutDesktopFileInput = clearAboutDesktopFileInput;
+    window.clearAboutMobileFileInput = clearAboutMobileFileInput;
+
+    // About Us - Craft Pillars
+    window.openCraftPillarsHeaderModal = openCraftPillarsHeaderModal;
+    window.closeCraftPillarsHeaderModal = closeCraftPillarsHeaderModal;
+    window.handleCraftPillarsHeaderSubmit = handleCraftPillarsHeaderSubmit;
+    window.openAddCraftPillarModal = openAddCraftPillarModal;
+    window.openEditCraftPillarModal = openEditCraftPillarModal;
+    window.closeCraftPillarModal = closeCraftPillarModal;
+    window.handleCraftPillarSubmit = handleCraftPillarSubmit;
+    window.deleteCraftPillar = deleteCraftPillar;
+    window.toggleCraftPillar = toggleCraftPillar;
+    window.selectPillarIcon = selectPillarIcon;
+
+    // Custom Order Steps / Items
+    window.openAddCustomOrderItemModal = openAddCustomOrderItemModal;
+    window.openEditCustomOrderItemModal = openEditCustomOrderItemModal;
+    window.closeCustomOrderItemModal = closeCustomOrderItemModal;
+    window.handleCustomOrderItemSubmit = handleCustomOrderItemSubmit;
+    window.deleteCustomOrderItem = deleteCustomOrderItem;
+    window.toggleCustomOrderItem = toggleCustomOrderItem;
+
+    // Contact Us - Intro
+    window.openContactIntroModal = openContactIntroModal;
+    window.closeContactIntroModal = closeContactIntroModal;
+    window.handleContactIntroSubmit = handleContactIntroSubmit;
+    window.handleContactIntroFileChange = handleContactIntroFileChange;
+    window.clearContactIntroFileInput = clearContactIntroFileInput;
+
+    // Contact Us - Info Channels
+    window.openContactInfoHeaderModal = openContactInfoHeaderModal;
+    window.closeContactInfoHeaderModal = closeContactInfoHeaderModal;
+    window.handleContactInfoHeaderSubmit = handleContactInfoHeaderSubmit;
+    window.openAddContactInfoItemModal = openAddContactInfoItemModal;
+    window.openEditContactInfoItemModal = openEditContactInfoItemModal;
+    window.closeContactInfoItemModal = closeContactInfoItemModal;
+    window.handleContactInfoItemSubmit = handleContactInfoItemSubmit;
+    window.deleteContactInfoItem = deleteContactInfoItem;
+    window.toggleContactInfoItem = toggleContactInfoItem;
+    window.selectContactInfoIcon = selectContactInfoIcon;
+
+    // Contact Us - Form Settings
+    window.openContactFormModal = openContactFormModal;
+    window.closeContactFormModal = closeContactFormModal;
+    window.handleContactFormSubmit = handleContactFormSubmit;
+
+    // Contact Us - FAQs
+    window.openContactFaqsHeaderModal = openContactFaqsHeaderModal;
+    window.closeContactFaqsHeaderModal = closeContactFaqsHeaderModal;
+    window.handleContactFaqsHeaderSubmit = handleContactFaqsHeaderSubmit;
+    window.openAddContactFaqModal = openAddContactFaqModal;
+    window.openEditContactFaqModal = openEditContactFaqModal;
+    window.closeContactFaqModal = closeContactFaqModal;
+    window.handleContactFaqSubmit = handleContactFaqSubmit;
+    window.deleteContactFaq = deleteContactFaq;
+    window.toggleContactFaq = toggleContactFaq;
+
+    // Footer Settings
+    window.openFooterSettingsModal = openFooterSettingsModal;
+    window.closeFooterSettingsModal = closeFooterSettingsModal;
+    window.handleFooterSettingsSubmit = handleFooterSettingsSubmit;
+    window.handleFooterBgFileChange = handleFooterBgFileChange;
+    window.clearFooterBgFileInput = clearFooterBgFileInput;
+    window.addFooterCol1Link = addFooterCol1Link;
+    window.addFooterCol2Link = addFooterCol2Link;
+
+    // Navbar Settings
+    window.openNavbarSettingsModal = openNavbarSettingsModal;
+    window.closeNavbarSettingsModal = closeNavbarSettingsModal;
+    window.handleNavbarSettingsSubmit = handleNavbarSettingsSubmit;
+    window.addNavbarLinkRow = addNavbarLinkRow;
+
+    // Device Preview & Media Picker
+    window.openDevicePreview = openDevicePreview;
+    window.setPreviewDevice = setPreviewDevice;
+    window.closeDevicePreviewModal = closeDevicePreviewModal;
+    window.openMediaPicker = openMediaPicker;
+    window.closeMediaPicker = closeMediaPicker;
+    window.selectMediaFromPicker = selectMediaFromPicker;
+    window.deleteMedia = deleteMedia;
+
 </script>
 @endpush
