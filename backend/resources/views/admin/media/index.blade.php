@@ -6894,6 +6894,31 @@
     // ==========================================
     // CUSTOM CROCHET BANNER & HANGING TAG HANDLERS
     // ==========================================
+    function populateCustomCrochetForm(c) {
+        if (!c) return;
+        if (document.getElementById('customCrochetTitle')) document.getElementById('customCrochetTitle').value = c.title || 'Custom Crochet';
+        if (document.getElementById('customCrochetSubtitle')) document.getElementById('customCrochetSubtitle').value = c.subtitle || 'Just for You';
+        if (document.getElementById('customCrochetDescription')) document.getElementById('customCrochetDescription').value = c.description || "Your imagination, our yarn. Let's create something special together.";
+        if (document.getElementById('customCrochetTagText')) document.getElementById('customCrochetTagText').value = c.tag_text || 'Turn Your Ideas Into Handmade Reality';
+        if (document.getElementById('customCrochetTagActive')) document.getElementById('customCrochetTagActive').checked = c.tag_active !== false;
+        if (document.getElementById('customCrochetCtaText')) document.getElementById('customCrochetCtaText').value = c.cta_text || 'Request Your Custom Order';
+        if (document.getElementById('customCrochetCtaLink')) document.getElementById('customCrochetCtaLink').value = c.cta_link || '/custom-order';
+        if (document.getElementById('customCrochetAlt')) document.getElementById('customCrochetAlt').value = c.alt_text || 'Custom Crochet Banner';
+        if (document.getElementById('customCrochetActive')) document.getElementById('customCrochetActive').checked = c.is_active !== false;
+        const imgUrl = c.image_url || c.desktop_image || c.image || '';
+        if (document.getElementById('customCrochetImageUrl')) document.getElementById('customCrochetImageUrl').value = imgUrl;
+
+        if (imgUrl && document.getElementById('customCrochetPreviewImg')) {
+            document.getElementById('customCrochetPreviewImg').src = imgUrl;
+            if (document.getElementById('customCrochetFileName')) {
+                document.getElementById('customCrochetFileName').textContent = imgUrl.split('/').pop() || 'Banner Visual';
+            }
+            if (document.getElementById('customCrochetPreviewContainer')) {
+                document.getElementById('customCrochetPreviewContainer').classList.remove('hidden');
+            }
+        }
+    }
+
     async function openCustomCrochetModal() {
         const modal = document.getElementById('customCrochetModal');
         if (modal) {
@@ -6901,34 +6926,24 @@
             modal.classList.add('flex');
         }
 
+        // Immediately populate from cached managerData if available
+        let cData = null;
+        if (managerData && managerData.sections) {
+            const sec = managerData.sections.find(s => s.id === 'custom_crochet' || s.is_custom_crochet_section);
+            if (sec && sec.metadata) cData = sec.metadata;
+        }
+        if (cData) {
+            populateCustomCrochetForm(cData);
+        }
+
         try {
             const res = await axios.get(`${adminMediaBase}/homepage/custom-crochet`);
             if (res.data && res.data.success) {
                 const c = res.data.data || {};
-                if (document.getElementById('customCrochetTitle')) document.getElementById('customCrochetTitle').value = c.title || 'Custom Crochet';
-                if (document.getElementById('customCrochetSubtitle')) document.getElementById('customCrochetSubtitle').value = c.subtitle || 'Just for You';
-                if (document.getElementById('customCrochetDescription')) document.getElementById('customCrochetDescription').value = c.description || "Your imagination, our yarn. Let's create something special together.";
-                if (document.getElementById('customCrochetTagText')) document.getElementById('customCrochetTagText').value = c.tag_text || 'Turn Your Ideas Into Handmade Reality';
-                if (document.getElementById('customCrochetTagActive')) document.getElementById('customCrochetTagActive').checked = c.tag_active !== false;
-                if (document.getElementById('customCrochetCtaText')) document.getElementById('customCrochetCtaText').value = c.cta_text || 'Request Your Custom Order';
-                if (document.getElementById('customCrochetCtaLink')) document.getElementById('customCrochetCtaLink').value = c.cta_link || '/custom-order';
-                if (document.getElementById('customCrochetAlt')) document.getElementById('customCrochetAlt').value = c.alt_text || 'Custom Crochet Banner';
-                if (document.getElementById('customCrochetActive')) document.getElementById('customCrochetActive').checked = c.is_active !== false;
-                if (document.getElementById('customCrochetImageUrl')) document.getElementById('customCrochetImageUrl').value = c.image_url || '';
-
-                if (c.image_url && document.getElementById('customCrochetPreviewImg')) {
-                    document.getElementById('customCrochetPreviewImg').src = c.image_url;
-                    if (document.getElementById('customCrochetFileName')) {
-                        document.getElementById('customCrochetFileName').textContent = c.image_url.split('/').pop() || 'Banner Visual';
-                    }
-                    if (document.getElementById('customCrochetPreviewContainer')) {
-                        document.getElementById('customCrochetPreviewContainer').classList.remove('hidden');
-                    }
-                }
+                populateCustomCrochetForm(c);
             }
         } catch (err) {
-            console.error('Error fetching Custom Crochet settings:', err);
-            toastr.error('Failed to load Custom Crochet Banner settings.');
+            console.warn('Background sync of Custom Crochet settings failed', err);
         }
     }
 

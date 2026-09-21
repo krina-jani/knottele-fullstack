@@ -484,10 +484,6 @@
         return options;
     }
 
-    }
-
-
-
     // =============== MEDIA MANAGEMENT FUNCTIONS ===============
 
     let currentMode = 'main'; // Only 'main' for category image
