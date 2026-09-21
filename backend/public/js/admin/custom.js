@@ -194,19 +194,21 @@ function fixTabulatorLayout() {
     setTimeout(() => {
         // Redraw all Tabulator tables on the page
         if (typeof Tabulator !== 'undefined') {
-            // Check for global table instances
+            // Check for global table instances safely
             if (window.productsTable && typeof window.productsTable.redraw === "function") {
                 window.productsTable.redraw(true);
             }
-
-            if (window.categoriesTable) {
+            if (window.categoriesTable && typeof window.categoriesTable.redraw === "function") {
                 window.categoriesTable.redraw(true);
             }
-            if (window.usersTable) {
+            if (window.usersTable && typeof window.usersTable.redraw === "function") {
                 window.usersTable.redraw(true);
             }
-            if (window.ordersTable) {
+            if (window.ordersTable && typeof window.ordersTable.redraw === "function") {
                 window.ordersTable.redraw(true);
+            }
+            if (window.brandsTable && typeof window.brandsTable.redraw === "function") {
+                window.brandsTable.redraw(true);
             }
             // Add more table instances as needed
         }

@@ -735,6 +735,8 @@
                 }
             });
 
+            window.categoriesTable = categoriesTable;
+
             // Fix layout after table is built
             categoriesTable.on("tableBuilt", function() {
                 console.log("Tabulator table built successfully");
