@@ -35,6 +35,7 @@ import {
   createRazorpayOrder,
   verifyRazorpayPayment,
 } from "@/lib/api";
+import { KNOTELLE_LOGO_BASE64 } from "@/lib/brandLogo";
 
 const loadRazorpayScript = (): Promise<boolean> => {
   return new Promise((resolve) => {
@@ -239,7 +240,7 @@ export default function CheckoutPage() {
           currency: razorpayOrder.currency || "INR",
           name: "KNOTELLE Boutique",
           description: "Artisanal Handmade Order",
-          image: "/images/logo/Logo_1.png",
+          image: KNOTELLE_LOGO_BASE64,
           order_id: razorpayOrder.order_id,
           prefill: {
             name: cleanName,

@@ -64,8 +64,10 @@ if [ -d "$PROJECT_ROOT/backend" ]; then
 
     # Copy icons to /var/www/html if present to prevent root 404s
     if [ -d "/var/www/html" ]; then
+        mkdir -p /var/www/html/images/logo 2>/dev/null || true
         cp -f "$PROJECT_ROOT/backend/public/icon.png" /var/www/html/ 2>/dev/null || true
         cp -f "$PROJECT_ROOT/backend/public/favicon.ico" /var/www/html/ 2>/dev/null || true
+        cp -f "$PROJECT_ROOT/backend/public/images/logo/Logo_1.png" /var/www/html/images/logo/ 2>/dev/null || true
     fi
 
     # 7. Database Migrations
