@@ -460,7 +460,7 @@
             error => {
                 if (error.response?.status === 401) {
                     // Token expired, redirect to login
-                    window.location.href = '{{ route('admin.login') }}';
+                    window.location.href = '{{ route('admin.signin') }}';
                 } else if (error.response?.status === 500) {
                     console.error('Server error:', error.response.data);
                     toastr.error('Server error. Please try again later.');

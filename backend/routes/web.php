@@ -68,8 +68,12 @@ $adminRoutes = function () {
     Route::post('/signin', [AdminAuth::class, 'login'])->name('admin.signin.submit');
     Route::post('/signin/{any}', [AdminAuth::class, 'login'])->where('any', '.*');
 
-    Route::match(['get', 'head'], '/login', [AdminAuth::class, 'loginPage'])->name('admin.login');
-    Route::match(['get', 'head'], '/login/{any}', [AdminAuth::class, 'loginPage'])->where('any', '.*');
+    Route::match(['get', 'head'], '/login', function () {
+        return redirect()->route('admin.signin');
+    })->name('admin.login');
+    Route::match(['get', 'head'], '/login/{any}', function () {
+        return redirect()->route('admin.signin');
+    })->where('any', '.*');
     Route::post('/login', [AdminAuth::class, 'login'])->name('admin.login.submit');
     Route::post('/login/{any}', [AdminAuth::class, 'login'])->where('any', '.*');
 

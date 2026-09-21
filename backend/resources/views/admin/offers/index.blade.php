@@ -757,7 +757,7 @@
             error => {
                 if (error.response?.status === 401) {
                     // Token expired, redirect to login
-                    window.location.href = '{{ route("admin.login") }}';
+                    window.location.href = '{{ route("admin.signin") }}';
                 }
                 return Promise.reject(error);
             }

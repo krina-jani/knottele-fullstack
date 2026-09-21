@@ -12,7 +12,7 @@ class AdminAuth
     public function handle($request, Closure $next)
     {
         if (!Auth::guard('admin')->check()) {
-            return redirect()->route('admin.login');
+            return redirect()->route('admin.signin');
         }
 
         // The admin UI uses the session guard, while its API uses Sanctum bearer
