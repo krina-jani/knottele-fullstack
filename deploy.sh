@@ -18,8 +18,8 @@ fi
 
 # 3. Pull latest code from Git
 echo "📥 Pulling latest code..."
-cd "$PROJECT_ROOT"
-git pull origin main || true
+git fetch origin main
+git reset --hard origin/main
 rm -rf "$PROJECT_ROOT/backend/public/admin" "$PROJECT_ROOT/backend/public/knottele/admin"
 
 # Ensure APP_URL on VPS matches production host
