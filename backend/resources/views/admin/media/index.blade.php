@@ -2231,8 +2231,8 @@
     </div>
 
     <!-- MODAL 19: FOOTER SETTINGS & NAVIGATION MODAL -->
-    <div id="footerSettingsModal" class="fixed inset-0 bg-stone-900/60 backdrop-blur-xs hidden items-center justify-center z-50 p-4">
-        <div class="bg-white rounded-3xl max-w-3xl w-full max-h-[92vh] flex flex-col overflow-hidden shadow-2xl border border-stone-100 animate-fadeIn">
+    <div id="footerSettingsModal" class="fixed inset-0 bg-stone-900/60 backdrop-blur-xs hidden items-center justify-center z-[9999] p-4" style="display: none;" onclick="if(event.target === this) closeFooterSettingsModal()">
+        <div class="bg-white rounded-3xl max-w-3xl w-full max-h-[92vh] flex flex-col overflow-hidden shadow-2xl border border-stone-100 animate-fadeIn" onclick="event.stopPropagation()">
             <!-- Header -->
             <div class="p-5 px-6 border-b border-stone-100 flex items-center justify-between bg-stone-50/80 shrink-0">
                 <div class="flex items-center gap-3">
@@ -2443,8 +2443,8 @@
     </div>
 
     <!-- MODAL 20: NAVBAR SETTINGS & NAVIGATION MODAL -->
-    <div id="navbarSettingsModal" class="fixed inset-0 bg-stone-900/60 backdrop-blur-xs hidden items-center justify-center z-50 p-4">
-        <div class="bg-white rounded-3xl max-w-3xl w-full max-h-[92vh] flex flex-col overflow-hidden shadow-2xl border border-stone-100 animate-fadeIn">
+    <div id="navbarSettingsModal" class="fixed inset-0 bg-stone-900/60 backdrop-blur-xs hidden items-center justify-center z-[9999] p-4" style="display: none;" onclick="if(event.target === this) closeNavbarSettingsModal()">
+        <div class="bg-white rounded-3xl max-w-3xl w-full max-h-[92vh] flex flex-col overflow-hidden shadow-2xl border border-stone-100 animate-fadeIn" onclick="event.stopPropagation()">
             <!-- Header -->
             <div class="p-5 px-6 border-b border-stone-100 flex items-center justify-between bg-stone-50/80 shrink-0">
                 <div class="flex items-center gap-3">
@@ -2657,7 +2657,14 @@
                                 <span>Edit Banner & Hanging Tag</span>
                             </button>
                         </div>
-                    ` : ''))}
+                    ` : (section.is_footer_section ? `
+                        <div class="flex items-center gap-2">
+                            <button type="button" onclick="openFooterSettingsModal()" class="px-5 py-2.5 rounded-xl bg-red-600 hover:bg-red-700 text-white text-xs font-bold shadow-xs hover:shadow-md transition-all flex items-center gap-2 active:scale-95 cursor-pointer">
+                                <i class="fas fa-sliders-h text-xs"></i>
+                                <span>Edit Footer Settings & Links</span>
+                            </button>
+                        </div>
+                    ` : '')))}
                 </div>
             `;
 
@@ -3488,7 +3495,7 @@
                                     <p class="text-xs text-stone-600 font-medium">${escapeHtml(m.heart_tagline || m.subtitle || 'Made with ♡ for a kinder, cozier world.')}</p>
                                 </div>
 
-                                <button type="button" onclick="openFooterSettingsModal()"
+                                <button type="button" onclick="window.openFooterSettingsModal ? window.openFooterSettingsModal() : openFooterSettingsModal()"
                                         class="px-6 py-3 rounded-2xl bg-red-600 hover:bg-red-700 text-white text-xs font-bold shadow-xs hover:shadow-md transition-all flex items-center gap-2.5 active:scale-95 cursor-pointer">
                                     <i class="fas fa-sliders-h text-sm"></i>
                                     <span>Edit Footer Settings & Links</span>
@@ -7067,6 +7074,7 @@
     window.handleCustomCrochetSubmit = handleCustomCrochetSubmit;
 
     // ==========================================
+    // ==========================================
     // 17. FOOTER SETTINGS & NAVIGATION HANDLERS
     // ==========================================
     let footerCol1LinkIndex = 0;
@@ -7074,85 +7082,114 @@
 
     function populateFooterSettingsForm(f) {
         if (!f) return;
-        if (document.getElementById('footerCol1Title')) document.getElementById('footerCol1Title').value = f.col1_title || 'Quick Links';
-        if (document.getElementById('footerCol2Title')) document.getElementById('footerCol2Title').value = f.col2_title || 'Help';
-        if (document.getElementById('footerCol3Title')) document.getElementById('footerCol3Title').value = f.col3_title || 'Contact';
+        try {
+            const setVal = (id, val) => {
+                const el = document.getElementById(id);
+                if (el) el.value = val;
+            };
+            const setCheck = (id, val) => {
+                const el = document.getElementById(id);
+                if (el) el.checked = !!val;
+            };
 
-        if (document.getElementById('footerContactPhone')) document.getElementById('footerContactPhone').value = f.contact_phone || '+91 97730 39243';
-        if (document.getElementById('footerContactPhoneLink')) document.getElementById('footerContactPhoneLink').value = f.contact_phone_link || 'tel:+919773039243';
-        if (document.getElementById('footerContactEmail')) document.getElementById('footerContactEmail').value = f.contact_email || 'support@knotelle.in';
-        if (document.getElementById('footerContactEmailLink')) document.getElementById('footerContactEmailLink').value = f.contact_email_link || 'mailto:support@knotelle.in';
-        if (document.getElementById('footerContactAddress')) document.getElementById('footerContactAddress').value = f.contact_address || 'India';
+            setVal('footerCol1Title', f.col1_title || 'Quick Links');
+            setVal('footerCol2Title', f.col2_title || 'Help');
+            setVal('footerCol3Title', f.col3_title || 'Contact');
 
-        if (document.getElementById('footerInstagramUrl')) document.getElementById('footerInstagramUrl').value = f.instagram_url || 'https://instagram.com/knotelleindia';
-        if (document.getElementById('footerInstagramActive')) document.getElementById('footerInstagramActive').checked = f.instagram_active !== false;
-        if (document.getElementById('footerFacebookUrl')) document.getElementById('footerFacebookUrl').value = f.facebook_url || 'https://facebook.com/knotelleindia';
-        if (document.getElementById('footerFacebookActive')) document.getElementById('footerFacebookActive').checked = f.facebook_active !== false;
-        if (document.getElementById('footerPinterestUrl')) document.getElementById('footerPinterestUrl').value = f.pinterest_url || 'https://pinterest.com/knotelleindia';
-        if (document.getElementById('footerPinterestActive')) document.getElementById('footerPinterestActive').checked = f.pinterest_active !== false;
-        if (document.getElementById('footerYouTubeUrl')) document.getElementById('footerYouTubeUrl').value = f.youtube_url || 'https://youtube.com/@knotelleindia';
-        if (document.getElementById('footerYouTubeActive')) document.getElementById('footerYouTubeActive').checked = f.youtube_active !== false;
+            setVal('footerContactPhone', f.contact_phone || '+91 97730 39243');
+            setVal('footerContactPhoneLink', f.contact_phone_link || 'tel:+919773039243');
+            setVal('footerContactEmail', f.contact_email || 'support@knotelle.in');
+            setVal('footerContactEmailLink', f.contact_email_link || 'mailto:support@knotelle.in');
+            setVal('footerContactAddress', f.contact_address || 'India');
 
-        if (document.getElementById('footerCopyrightText')) document.getElementById('footerCopyrightText').value = f.copyright_text || '© {year} Knotelle. All rights reserved.';
-        if (document.getElementById('footerHeartTagline')) document.getElementById('footerHeartTagline').value = f.heart_tagline || 'Made with ♡ for a kinder, cozier world.';
-        if (document.getElementById('footerSectionActive')) document.getElementById('footerSectionActive').checked = f.is_active !== false;
+            setVal('footerInstagramUrl', f.instagram_url || 'https://instagram.com/knotelleindia');
+            setCheck('footerInstagramActive', f.instagram_active !== false);
+            setVal('footerFacebookUrl', f.facebook_url || 'https://facebook.com/knotelleindia');
+            setCheck('footerFacebookActive', f.facebook_active !== false);
+            setVal('footerPinterestUrl', f.pinterest_url || 'https://pinterest.com/knotelleindia');
+            setCheck('footerPinterestActive', f.pinterest_active !== false);
+            setVal('footerYouTubeUrl', f.youtube_url || 'https://youtube.com/@knotelleindia');
+            setCheck('footerYouTubeActive', f.youtube_active !== false);
 
-        // Background image
-        const bgImg = f.bg_image_url || f.bg_image || f.desktop_image || '';
-        if (document.getElementById('footerBgImageUrl')) document.getElementById('footerBgImageUrl').value = bgImg;
-        if (bgImg && document.getElementById('footerBgPreviewImg')) {
-            document.getElementById('footerBgPreviewImg').src = bgImg;
-            if (document.getElementById('footerBgFileName')) document.getElementById('footerBgFileName').textContent = bgImg.split('/').pop() || 'Background Active';
-            if (document.getElementById('footerBgPreviewContainer')) document.getElementById('footerBgPreviewContainer').classList.remove('hidden');
-        } else if (document.getElementById('footerBgPreviewContainer')) {
-            document.getElementById('footerBgPreviewContainer').classList.add('hidden');
-        }
+            setVal('footerCopyrightText', f.copyright_text || '© {year} Knotelle. All rights reserved.');
+            setVal('footerHeartTagline', f.heart_tagline || 'Made with ♡ for a kinder, cozier world.');
+            setCheck('footerSectionActive', f.is_active !== false);
 
-        // Render Column 1 links
-        const col1Container = document.getElementById('footerCol1LinksContainer');
-        if (col1Container) {
-            col1Container.innerHTML = '';
-            footerCol1LinkIndex = 0;
-            const col1Links = f.col1_links && f.col1_links.length > 0 ? f.col1_links : [
-                { label: 'Home', url: '/', is_active: true },
-                { label: 'Shop', url: '/shop', is_active: true },
-                { label: 'Custom Order', url: '/custom-order', is_active: true },
-                { label: 'About', url: '/about', is_active: true },
-                { label: 'Contact', url: '/contact', is_active: true },
-            ];
-            col1Links.forEach(link => addFooterCol1Link(link));
-        }
+            // Background image
+            const bgImg = f.bg_image_url || f.bg_image || f.desktop_image || '';
+            setVal('footerBgImageUrl', bgImg);
+            const previewImg = document.getElementById('footerBgPreviewImg');
+            const previewContainer = document.getElementById('footerBgPreviewContainer');
+            const fileName = document.getElementById('footerBgFileName');
 
-        // Render Column 2 links
-        const col2Container = document.getElementById('footerCol2LinksContainer');
-        if (col2Container) {
-            col2Container.innerHTML = '';
-            footerCol2LinkIndex = 0;
-            const col2Links = f.col2_links && f.col2_links.length > 0 ? f.col2_links : [
-                { label: 'Shipping Policy', url: '/contact', is_active: true },
-                { label: 'Return & Refund', url: '/contact', is_active: true },
-                { label: 'FAQ', url: '/contact', is_active: true },
-                { label: 'Track Order', url: '/account/orders', is_active: true },
-            ];
-            col2Links.forEach(link => addFooterCol2Link(link));
+            if (bgImg && previewImg) {
+                previewImg.src = bgImg;
+                if (fileName) fileName.textContent = String(bgImg).split('/').pop() || 'Background Active';
+                if (previewContainer) {
+                    previewContainer.classList.remove('hidden');
+                    previewContainer.style.display = 'flex';
+                }
+            } else if (previewContainer) {
+                previewContainer.classList.add('hidden');
+                previewContainer.style.display = 'none';
+            }
+
+            // Render Column 1 links
+            const col1Container = document.getElementById('footerCol1LinksContainer');
+            if (col1Container) {
+                col1Container.innerHTML = '';
+                footerCol1LinkIndex = 0;
+                const col1Links = Array.isArray(f.col1_links) && f.col1_links.length > 0 ? f.col1_links : [
+                    { label: 'Home', url: '/', is_active: true },
+                    { label: 'Shop', url: '/shop', is_active: true },
+                    { label: 'Custom Order', url: '/custom-order', is_active: true },
+                    { label: 'About', url: '/about', is_active: true },
+                    { label: 'Contact', url: '/contact', is_active: true },
+                ];
+                col1Links.forEach(link => addFooterCol1Link(link));
+            }
+
+            // Render Column 2 links
+            const col2Container = document.getElementById('footerCol2LinksContainer');
+            if (col2Container) {
+                col2Container.innerHTML = '';
+                footerCol2LinkIndex = 0;
+                const col2Links = Array.isArray(f.col2_links) && f.col2_links.length > 0 ? f.col2_links : [
+                    { label: 'Shipping Policy', url: '/contact', is_active: true },
+                    { label: 'Return & Refund', url: '/contact', is_active: true },
+                    { label: 'FAQ', url: '/contact', is_active: true },
+                    { label: 'Track Order', url: '/account/orders', is_active: true },
+                ];
+                col2Links.forEach(link => addFooterCol2Link(link));
+            }
+        } catch (err) {
+            console.error('populateFooterSettingsForm error', err);
         }
     }
 
     async function openFooterSettingsModal() {
         const modal = document.getElementById('footerSettingsModal');
-        if (modal) {
-            modal.classList.remove('hidden');
-            modal.classList.add('flex');
+        if (!modal) {
+            console.error('footerSettingsModal element not found');
+            return;
         }
 
+        modal.style.setProperty('display', 'flex', 'important');
+        modal.classList.remove('hidden');
+        modal.classList.add('flex');
+
         // Immediately populate from cached managerData if available
-        let fData = managerData?.footer_settings;
-        if (!fData && managerData?.sections) {
-            const sec = managerData.sections.find(s => s.id === 'footer' || s.is_footer_section);
-            if (sec && sec.metadata) fData = sec.metadata;
-        }
-        if (fData) {
-            populateFooterSettingsForm(fData);
+        try {
+            let fData = managerData?.footer_settings;
+            if (!fData && managerData?.sections) {
+                const sec = managerData.sections.find(s => s.id === 'footer' || s.is_footer_section);
+                if (sec && sec.metadata) fData = sec.metadata;
+            }
+            if (fData) {
+                populateFooterSettingsForm(fData);
+            }
+        } catch (e) {
+            console.warn('Pre-population from managerData failed:', e);
         }
 
         try {
@@ -7169,6 +7206,7 @@
     function closeFooterSettingsModal() {
         const modal = document.getElementById('footerSettingsModal');
         if (modal) {
+            modal.style.setProperty('display', 'none', 'important');
             modal.classList.add('hidden');
             modal.classList.remove('flex');
         }
@@ -7188,7 +7226,7 @@
                 <input type="checkbox" name="col1_links[${idx}][is_active]" value="1" ${data.is_active !== false ? 'checked' : ''} class="w-3.5 h-3.5 rounded text-red-600 focus:ring-red-500">
                 <span>Active</span>
             </label>
-            <button type="button" onclick="document.getElementById('footer_col1_row_${idx}').remove()" class="w-7 h-7 rounded-lg text-stone-400 hover:text-red-600 hover:bg-red-50 flex items-center justify-center transition-colors cursor-pointer">
+            <button type="button" onclick="document.getElementById('footer_col1_row_${idx}')?.remove()" class="w-7 h-7 rounded-lg text-stone-400 hover:text-red-600 hover:bg-red-50 flex items-center justify-center transition-colors cursor-pointer">
                 <i class="fas fa-trash-alt text-xs"></i>
             </button>
         `;
@@ -7209,7 +7247,7 @@
                 <input type="checkbox" name="col2_links[${idx}][is_active]" value="1" ${data.is_active !== false ? 'checked' : ''} class="w-3.5 h-3.5 rounded text-red-600 focus:ring-red-500">
                 <span>Active</span>
             </label>
-            <button type="button" onclick="document.getElementById('footer_col2_row_${idx}').remove()" class="w-7 h-7 rounded-lg text-stone-400 hover:text-red-600 hover:bg-red-50 flex items-center justify-center transition-colors cursor-pointer">
+            <button type="button" onclick="document.getElementById('footer_col2_row_${idx}')?.remove()" class="w-7 h-7 rounded-lg text-stone-400 hover:text-red-600 hover:bg-red-50 flex items-center justify-center transition-colors cursor-pointer">
                 <i class="fas fa-trash-alt text-xs"></i>
             </button>
         `;
@@ -7221,18 +7259,30 @@
             const file = input.files[0];
             const reader = new FileReader();
             reader.onload = function(e) {
-                if (document.getElementById('footerBgPreviewImg')) document.getElementById('footerBgPreviewImg').src = e.target.result;
-                if (document.getElementById('footerBgFileName')) document.getElementById('footerBgFileName').textContent = file.name;
-                if (document.getElementById('footerBgPreviewContainer')) document.getElementById('footerBgPreviewContainer').classList.remove('hidden');
+                const previewImg = document.getElementById('footerBgPreviewImg');
+                if (previewImg) previewImg.src = e.target.result;
+                const fileName = document.getElementById('footerBgFileName');
+                if (fileName) fileName.textContent = file.name;
+                const previewContainer = document.getElementById('footerBgPreviewContainer');
+                if (previewContainer) {
+                    previewContainer.classList.remove('hidden');
+                    previewContainer.style.display = 'flex';
+                }
             };
             reader.readAsDataURL(file);
         }
     }
 
     function clearFooterBgFileInput() {
-        if (document.getElementById('footerBgFileInput')) document.getElementById('footerBgFileInput').value = '';
-        if (document.getElementById('footerBgImageUrl')) document.getElementById('footerBgImageUrl').value = '';
-        if (document.getElementById('footerBgPreviewContainer')) document.getElementById('footerBgPreviewContainer').classList.add('hidden');
+        const fileInput = document.getElementById('footerBgFileInput');
+        if (fileInput) fileInput.value = '';
+        const imgUrl = document.getElementById('footerBgImageUrl');
+        if (imgUrl) imgUrl.value = '';
+        const previewContainer = document.getElementById('footerBgPreviewContainer');
+        if (previewContainer) {
+            previewContainer.classList.add('hidden');
+            previewContainer.style.display = 'none';
+        }
     }
 
     async function handleFooterSettingsSubmit(e) {
@@ -7257,13 +7307,13 @@
                     'X-CSRF-TOKEN': csrfToken || ''
                 }
             });
-            if (res.data.success) {
+            if (res.data && res.data.success) {
                 toastr.success(res.data.message || 'Footer settings updated successfully!');
                 closeFooterSettingsModal();
                 broadcastMediaUpdate();
                 loadManagerData();
             } else {
-                toastr.error(res.data.message || 'Failed to save footer settings.');
+                toastr.error(res.data?.message || 'Failed to save footer settings.');
             }
         } catch (err) {
             toastr.error(err.response?.data?.message || 'Failed to save footer settings.');
@@ -7275,6 +7325,16 @@
         }
     }
 
+    // Expose all Footer functions directly on window
+    window.openFooterSettingsModal = openFooterSettingsModal;
+    window.closeFooterSettingsModal = closeFooterSettingsModal;
+    window.populateFooterSettingsForm = populateFooterSettingsForm;
+    window.addFooterCol1Link = addFooterCol1Link;
+    window.addFooterCol2Link = addFooterCol2Link;
+    window.handleFooterBgFileChange = handleFooterBgFileChange;
+    window.clearFooterBgFileInput = clearFooterBgFileInput;
+    window.handleFooterSettingsSubmit = handleFooterSettingsSubmit;
+
     // ==========================================
     // 18. NAVBAR & HEADER SETTINGS HANDLERS
     // ==========================================
@@ -7282,47 +7342,67 @@
 
     function populateNavbarSettingsForm(n) {
         if (!n) return;
-        if (document.getElementById('navbarAnnouncementText')) document.getElementById('navbarAnnouncementText').value = n.announcement_text || '✨ Free Pan-India Delivery on all Orders above ₹999';
-        if (document.getElementById('navbarAnnouncementLink')) document.getElementById('navbarAnnouncementLink').value = n.announcement_link || '/shop';
-        if (document.getElementById('navbarAnnouncementActive')) document.getElementById('navbarAnnouncementActive').checked = n.announcement_active === true;
+        try {
+            const setVal = (id, val) => {
+                const el = document.getElementById(id);
+                if (el) el.value = val;
+            };
+            const setCheck = (id, val) => {
+                const el = document.getElementById(id);
+                if (el) el.checked = !!val;
+            };
 
-        if (document.getElementById('navbarShowSearch')) document.getElementById('navbarShowSearch').checked = n.show_search !== false;
-        if (document.getElementById('navbarShowWishlist')) document.getElementById('navbarShowWishlist').checked = n.show_wishlist !== false;
-        if (document.getElementById('navbarShowAccount')) document.getElementById('navbarShowAccount').checked = n.show_account !== false;
-        if (document.getElementById('navbarShowCart')) document.getElementById('navbarShowCart').checked = n.show_cart !== false;
-        if (document.getElementById('navbarSectionActive')) document.getElementById('navbarSectionActive').checked = n.is_active !== false;
+            setVal('navbarAnnouncementText', n.announcement_text || '✨ Free Pan-India Delivery on all Orders above ₹999');
+            setVal('navbarAnnouncementLink', n.announcement_link || '/shop');
+            setCheck('navbarAnnouncementActive', n.announcement_active === true);
 
-        // Render Nav links
-        const container = document.getElementById('navbarLinksContainer');
-        if (container) {
-            container.innerHTML = '';
-            navbarLinkIndex = 0;
-            const links = n.nav_links && n.nav_links.length > 0 ? n.nav_links : [
-                { name: 'Home', href: '/', is_highlighted: false, is_active: true },
-                { name: 'Shop', href: '/shop', is_highlighted: false, is_active: true },
-                { name: 'Custom Order', href: '/custom-order', is_highlighted: true, is_active: true },
-                { name: 'About', href: '/about', is_highlighted: false, is_active: true },
-                { name: 'Contact', href: '/contact', is_highlighted: false, is_active: true },
-            ];
-            links.forEach(link => addNavbarLinkRow(link));
+            setCheck('navbarShowSearch', n.show_search !== false);
+            setCheck('navbarShowWishlist', n.show_wishlist !== false);
+            setCheck('navbarShowAccount', n.show_account !== false);
+            setCheck('navbarShowCart', n.show_cart !== false);
+            setCheck('navbarSectionActive', n.is_active !== false);
+
+            // Render Nav links
+            const container = document.getElementById('navbarLinksContainer');
+            if (container) {
+                container.innerHTML = '';
+                navbarLinkIndex = 0;
+                const links = Array.isArray(n.nav_links) && n.nav_links.length > 0 ? n.nav_links : [
+                    { name: 'Home', href: '/', is_highlighted: false, is_active: true },
+                    { name: 'Shop', href: '/shop', is_highlighted: false, is_active: true },
+                    { name: 'Custom Order', href: '/custom-order', is_highlighted: true, is_active: true },
+                    { name: 'About', href: '/about', is_highlighted: false, is_active: true },
+                    { name: 'Contact', href: '/contact', is_highlighted: false, is_active: true },
+                ];
+                links.forEach(link => addNavbarLinkRow(link));
+            }
+        } catch (err) {
+            console.error('populateNavbarSettingsForm error', err);
         }
     }
 
     async function openNavbarSettingsModal() {
         const modal = document.getElementById('navbarSettingsModal');
-        if (modal) {
-            modal.classList.remove('hidden');
-            modal.classList.add('flex');
+        if (!modal) {
+            console.error('navbarSettingsModal element not found');
+            return;
         }
 
-        // Immediately populate from cached managerData if available
-        let nData = managerData?.navbar_settings;
-        if (!nData && managerData?.sections) {
-            const sec = managerData.sections.find(s => s.id === 'navbar_settings');
-            if (sec && sec.metadata) nData = sec.metadata;
-        }
-        if (nData) {
-            populateNavbarSettingsForm(nData);
+        modal.style.setProperty('display', 'flex', 'important');
+        modal.classList.remove('hidden');
+        modal.classList.add('flex');
+
+        try {
+            let nData = managerData?.navbar_settings;
+            if (!nData && managerData?.sections) {
+                const sec = managerData.sections.find(s => s.id === 'navbar_settings');
+                if (sec && sec.metadata) nData = sec.metadata;
+            }
+            if (nData) {
+                populateNavbarSettingsForm(nData);
+            }
+        } catch (e) {
+            console.warn('Pre-population from managerData failed:', e);
         }
 
         try {
@@ -7339,6 +7419,7 @@
     function closeNavbarSettingsModal() {
         const modal = document.getElementById('navbarSettingsModal');
         if (modal) {
+            modal.style.setProperty('display', 'none', 'important');
             modal.classList.add('hidden');
             modal.classList.remove('flex');
         }
@@ -7362,7 +7443,7 @@
                 <input type="checkbox" name="nav_links[${idx}][is_active]" value="1" ${data.is_active !== false ? 'checked' : ''} class="w-3.5 h-3.5 rounded text-red-600 focus:ring-red-500">
                 <span>Active</span>
             </label>
-            <button type="button" onclick="document.getElementById('navbar_link_row_${idx}').remove()" class="w-7 h-7 rounded-lg text-stone-400 hover:text-red-600 hover:bg-red-50 flex items-center justify-center transition-colors cursor-pointer">
+            <button type="button" onclick="document.getElementById('navbar_link_row_${idx}')?.remove()" class="w-7 h-7 rounded-lg text-stone-400 hover:text-red-600 hover:bg-red-50 flex items-center justify-center transition-colors cursor-pointer">
                 <i class="fas fa-trash-alt text-xs"></i>
             </button>
         `;
@@ -7391,13 +7472,13 @@
                     'X-CSRF-TOKEN': csrfToken || ''
                 }
             });
-            if (res.data.success) {
+            if (res.data && res.data.success) {
                 toastr.success(res.data.message || 'Navbar settings updated successfully!');
                 closeNavbarSettingsModal();
                 broadcastMediaUpdate();
                 loadManagerData();
             } else {
-                toastr.error(res.data.message || 'Failed to save navbar settings.');
+                toastr.error(res.data?.message || 'Failed to save navbar settings.');
             }
         } catch (err) {
             toastr.error(err.response?.data?.message || 'Failed to save navbar settings.');
@@ -7408,5 +7489,12 @@
             }
         }
     }
+
+    // Expose all Navbar functions directly on window
+    window.openNavbarSettingsModal = openNavbarSettingsModal;
+    window.closeNavbarSettingsModal = closeNavbarSettingsModal;
+    window.populateNavbarSettingsForm = populateNavbarSettingsForm;
+    window.addNavbarLinkRow = addNavbarLinkRow;
+    window.handleNavbarSettingsSubmit = handleNavbarSettingsSubmit;
 </script>
 @endpush
