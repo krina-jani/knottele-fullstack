@@ -713,6 +713,10 @@
                         <i class="fas fa-save"></i>
                         <span id="testimonialSubmitBtnText">Save Review</span>
                     </button>
+                </div>
+            </form>
+        </div>
+    </div>
           <!-- MODAL 7: ADD / EDIT VIDEO & REEL MODAL -->
     <div id="videoReelModal" onclick="if(event.target === this) closeVideoReelModal()" class="fixed inset-0 bg-stone-900/60 backdrop-blur-xs hidden items-center justify-center z-[9999] p-3 sm:p-5 overflow-y-auto" style="display: none;">
         <div class="bg-white rounded-3xl max-w-5xl w-full max-h-[94vh] flex flex-col overflow-hidden shadow-2xl border border-stone-100 animate-fadeIn" onclick="event.stopPropagation()">
@@ -1250,7 +1254,11 @@
                     </div>
                 </div>
                 <button type="button" onclick="closeCraftPillarsHeaderModal()" class="w-8 h-8 rounded-full bg-stone-100 text-stone-400 hover:text-stone-700 flex items-center justify-center transition-colors cursor-pointer">
-                          <!-- Form Wrapper -->
+                    <i class="fas fa-times text-sm"></i>
+                </button>
+            </div>
+
+            <!-- Form Wrapper -->
             <form id="craftPillarsHeaderForm" novalidate onsubmit="handleCraftPillarsHeaderSubmit(event)" class="flex flex-col flex-1 min-h-0 overflow-hidden">
                 <div class="p-6 space-y-4 overflow-y-auto flex-1 overscroll-contain">
                     <div>
@@ -1316,7 +1324,6 @@
                     <div>
                         <label class="block text-xs font-bold text-stone-600 uppercase tracking-wider mb-1">Pillar Description <span class="text-red-500">*</span></label>
                         <textarea id="craftPillarDescription" name="description" rows="3" placeholder="We use 100% pure milk cotton and mercerized organic fibers..." class="w-full bg-stone-50 border border-stone-200 rounded-xl px-3.5 py-2.5 text-sm font-semibold text-stone-800 focus:bg-white focus:outline-none focus:ring-2 focus:ring-red-500"></textarea>
-                    </div>ocus:outline-none focus:ring-2 focus:ring-red-500"></textarea>
                     </div>
 
                     <!-- Icon Selector -->
@@ -1997,7 +2004,11 @@
                     </div>
                 </div>
                 <button type="button" onclick="closeContactFaqsHeaderModal()" class="w-8 h-8 rounded-full bg-stone-100 text-stone-400 hover:text-stone-700 flex items-center justify-center transition-colors cursor-pointer">
-                     <!-- Form Wrapper -->
+                    <i class="fas fa-times text-sm"></i>
+                </button>
+            </div>
+
+            <!-- Form Wrapper -->
             <form id="contactFaqsHeaderForm" novalidate onsubmit="handleContactFaqsHeaderSubmit(event)" class="flex flex-col flex-1 min-h-0 overflow-hidden">
                 <div class="p-6 space-y-4 overflow-y-auto flex-1 overscroll-contain">
                     <div>
@@ -2064,7 +2075,6 @@
                     <div>
                         <label class="block text-xs font-bold text-stone-600 uppercase tracking-wider mb-1">Answer <span class="text-red-500">*</span></label>
                         <textarea id="contactFaqAnswer" name="answer" rows="4" placeholder="e.g. Custom orders usually take 7–14 working days depending on complexity..." class="w-full bg-stone-50 border border-stone-200 rounded-xl px-3.5 py-2.5 text-sm font-semibold text-stone-800 focus:bg-white focus:outline-none focus:ring-2 focus:ring-red-500"></textarea>
-                    </div>white focus:outline-none focus:ring-2 focus:ring-red-500"></textarea>
                     </div>
 
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5 pt-1">
@@ -2645,14 +2655,14 @@
                                 <i class="fas fa-cog text-xs"></i>
                                 <span>Edit Section Settings</span>
                             </button>
-                            <button type="button" onclick="openAddVideoReelModal()" class="px-5 py-2.5 rounded-xl bg-red-600 hover:bg-red-700 text-white text-xs font-bold shadow-xs hover:shadow-md transition-all flex items-center gap-2 active:scale-95 cursor-pointer">
+                            <button type="button" onclick="window.openAddVideoReelModal ? window.openAddVideoReelModal() : openAddVideoReelModal()" class="px-5 py-2.5 rounded-xl bg-red-600 hover:bg-red-700 text-white text-xs font-bold shadow-xs hover:shadow-md transition-all flex items-center gap-2 active:scale-95 cursor-pointer">
                                 <i class="fas fa-plus-circle text-sm"></i>
                                 <span>+ Add Video / Reel</span>
                             </button>
                         </div>
                     ` : (section.is_custom_crochet_section ? `
                         <div class="flex items-center gap-2">
-                            <button type="button" onclick="openCustomCrochetModal()" class="px-5 py-2.5 rounded-xl bg-red-600 hover:bg-red-700 text-white text-xs font-bold shadow-xs hover:shadow-md transition-all flex items-center gap-2 active:scale-95 cursor-pointer">
+                            <button type="button" onclick="window.openCustomCrochetModal ? window.openCustomCrochetModal() : openCustomCrochetModal()" class="px-5 py-2.5 rounded-xl bg-red-600 hover:bg-red-700 text-white text-xs font-bold shadow-xs hover:shadow-md transition-all flex items-center gap-2 active:scale-95 cursor-pointer">
                                 <i class="fas fa-edit text-xs"></i>
                                 <span>Edit Banner & Hanging Tag</span>
                             </button>
@@ -2704,7 +2714,7 @@
                                     <i class="fas fa-cog text-xs"></i>
                                     <span>Section Settings</span>
                                 </button>
-                                <button type="button" onclick="openAddVideoReelModal()" class="px-4 py-2 rounded-xl bg-red-600 hover:bg-red-700 text-white text-xs font-bold shadow-xs hover:shadow-md transition-all flex items-center gap-1.5 active:scale-95 cursor-pointer">
+                                <button type="button" onclick="window.openAddVideoReelModal ? window.openAddVideoReelModal() : openAddVideoReelModal()" class="px-4 py-2 rounded-xl bg-red-600 hover:bg-red-700 text-white text-xs font-bold shadow-xs hover:shadow-md transition-all flex items-center gap-1.5 active:scale-95 cursor-pointer">
                                     <i class="fas fa-plus-circle text-xs"></i>
                                     <span>+ Add Video / Reel</span>
                                 </button>
@@ -7086,6 +7096,14 @@
 
         const form = document.getElementById('customCrochetForm');
         const formData = new FormData(form);
+        const isActiveCheck = document.getElementById('customCrochetActive');
+        if (isActiveCheck) {
+            formData.set('is_active', isActiveCheck.checked ? '1' : '0');
+        }
+        const isTagActiveCheck = document.getElementById('customCrochetTagActive');
+        if (isTagActiveCheck) {
+            formData.set('tag_active', isTagActiveCheck.checked ? '1' : '0');
+        }
         const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
         if (csrfToken && !formData.has('_token')) {
             formData.append('_token', csrfToken);
