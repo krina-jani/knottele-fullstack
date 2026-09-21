@@ -2747,7 +2747,7 @@
                         <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
                             ${data.best_sellers.map(p => `
                                 <div class="bg-white border border-stone-200 rounded-2xl p-3 text-center shadow-2xs hover:shadow-xs transition-all">
-                                    <img src="${p.image}" class="w-full aspect-square rounded-xl object-cover mb-2 border border-stone-100" onerror="this.src='/images/logo/Logo_1.png'">
+                                    <img src="${p.image}" class="w-full aspect-square rounded-xl object-cover mb-2 border border-stone-100" onerror="this.onerror=null; this.src=(window.location.pathname.startsWith('/knottele') ? '/knottele' : '') + '/images/logo/Logo_1.png';">
                                     <h5 class="text-xs font-bold text-stone-800 truncate" title="${p.name}">${p.name}</h5>
                                     <span class="text-[11px] font-bold text-red-600 block">₹${p.price}</span>
                                     <span class="inline-block mt-1 px-2 py-0.5 rounded-full text-[9px] font-bold ${p.is_bestseller ? 'bg-red-50 text-red-700' : 'bg-amber-50 text-amber-700'}">
@@ -2923,7 +2923,7 @@
                                 <!-- Image Preview Card with Pinned Hanging Tag -->
                                 <div class="lg:col-span-5">
                                     <div class="relative w-full aspect-[4/3] rounded-2xl overflow-hidden bg-stone-100 border-2 border-white shadow-md group">
-                                        <img src="${img}" alt="${escapeHtml(m.alt_text || m.title || 'Custom Crochet')}" class="w-full h-full object-cover group-hover:scale-103 transition-transform duration-300" onerror="this.src='/images/homepage/middleimg.png'">
+                                        <img src="${img}" alt="${escapeHtml(m.alt_text || m.title || 'Custom Crochet')}" class="w-full h-full object-cover group-hover:scale-103 transition-transform duration-300" onerror="this.onerror=null; this.src=(window.location.pathname.startsWith('/knottele') ? '/knottele' : '') + '/images/logo/Logo_1.png';">
 
                                         <!-- Hanging Paper Note Over Banner Image -->
                                         ${m.tag_active && m.tag_text ? `
@@ -2955,7 +2955,7 @@
                                 <!-- Image Preview Card -->
                                 <div class="lg:col-span-4">
                                     <div class="relative w-full aspect-[4/5] rounded-2xl overflow-hidden bg-stone-100 border border-[#E7D1CC] shadow-xs group">
-                                        <img src="${img}" alt="${escapeHtml(m.alt_text || m.title || 'About Story')}" class="w-full h-full object-cover group-hover:scale-103 transition-transform duration-300" onerror="this.src='/images/logo/Logo_1.png'">
+                                        <img src="${img}" alt="${escapeHtml(m.alt_text || m.title || 'About Story')}" class="w-full h-full object-cover group-hover:scale-103 transition-transform duration-300" onerror="this.onerror=null; this.src=(window.location.pathname.startsWith('/knottele') ? '/knottele' : '') + '/images/logo/Logo_1.png';">
                                         
                                         <!-- Floating Badge Preview on Image -->
                                         ${m.floating_badge_active ? `
@@ -3187,7 +3187,7 @@
                                 <!-- Image Preview Card -->
                                 <div class="lg:col-span-4">
                                     <div class="relative w-full aspect-[4/3] rounded-2xl overflow-hidden bg-stone-100 border border-[#E7D1CC] shadow-xs group">
-                                        <img src="${img}" alt="${escapeHtml(m.alt_text || m.title || 'Contact Hero')}" class="w-full h-full object-cover group-hover:scale-103 transition-transform duration-300" onerror="this.src='/images/logo/Logo_1.png'">
+                                        <img src="${img}" alt="${escapeHtml(m.alt_text || m.title || 'Contact Hero')}" class="w-full h-full object-cover group-hover:scale-103 transition-transform duration-300" onerror="this.onerror=null; this.src=(window.location.pathname.startsWith('/knottele') ? '/knottele' : '') + '/images/logo/Logo_1.png';">
                                         <div class="absolute bottom-3 left-3 right-3 bg-white/95 backdrop-blur-md p-3 rounded-xl border border-stone-200/80 shadow-md flex items-center gap-2.5">
                                             <div class="w-8 h-8 rounded-lg bg-red-50 text-red-600 flex items-center justify-center font-bold text-xs shrink-0">
                                                 <i class="fas fa-handshake"></i>
@@ -3509,7 +3509,7 @@
                                     <span class="text-[10px] text-stone-400 font-normal">Recommended: 1920 × 600 px</span>
                                 </div>
                                 <div class="relative w-full h-32 sm:h-40 rounded-2xl overflow-hidden bg-stone-100 border border-[#E7D1CC] shadow-inner group">
-                                    <img src="${bgImg}" alt="Footer Background" class="w-full h-full object-cover group-hover:scale-102 transition-transform duration-300" onerror="this.src='/images/categories/footer.png'">
+                                    <img src="${bgImg}" alt="Footer Background" class="w-full h-full object-cover group-hover:scale-102 transition-transform duration-300" onerror="this.onerror=null; this.src=(window.location.pathname.startsWith('/knottele') ? '/knottele' : '') + '/images/logo/Logo_1.png';">
                                     <div class="absolute inset-0 bg-[#FFF9F6]/40 pointer-events-none"></div>
                                     <div class="absolute bottom-3 left-4 bg-white/90 backdrop-blur-xs px-3 py-1 rounded-xl text-xs font-bold text-stone-800 shadow-xs border border-stone-200">
                                         Panoramic Footer Background Visual
@@ -3751,7 +3751,7 @@
                         <!-- Image Preview Container -->
                         <div class="relative w-full aspect-[16/9] rounded-xl overflow-hidden bg-[#FFF9F6] border border-stone-200/70 mb-3.5 flex items-center justify-center cursor-pointer group-hover:border-red-300 transition-colors"
                              onclick="handleSlotPreviewClick('${slot.page}', '${slot.section}', '${slot.slot}')">
-                            <img src="${m.desktop_image || imgUrl}" alt="${escapeHtml(m.title || slot.title)}" class="w-full h-full object-cover group-hover:scale-103 transition-transform duration-300" onerror="this.src='/images/logo/Logo_1.png'">
+                            <img src="${m.desktop_image || imgUrl}" alt="${escapeHtml(m.title || slot.title)}" class="w-full h-full object-cover group-hover:scale-103 transition-transform duration-300" onerror="this.onerror=null; this.src=(window.location.pathname.startsWith('/knottele') ? '/knottele' : '') + '/images/logo/Logo_1.png';">
                             
                             <div class="absolute inset-0 bg-stone-900/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
                                 <span class="px-3 py-1.5 rounded-full bg-white text-stone-800 text-xs font-bold shadow-md flex items-center gap-1">
@@ -3824,7 +3824,7 @@
                     <!-- Image Preview Container -->
                     <div class="relative w-full aspect-[16/9] rounded-xl overflow-hidden bg-[#FFF9F6] border border-stone-200/70 mb-3.5 flex items-center justify-center cursor-pointer group-hover:border-red-300 transition-colors"
                          onclick="handleSlotPreviewClick('${slot.page}', '${slot.section}', '${slot.slot}')">
-                        <img src="${imgUrl}" alt="${escapeHtml(m.title || slot.title)}" class="w-full h-full object-cover group-hover:scale-103 transition-transform duration-300" onerror="this.src='/images/logo/Logo_1.png'">
+                        <img src="${imgUrl}" alt="${escapeHtml(m.title || slot.title)}" class="w-full h-full object-cover group-hover:scale-103 transition-transform duration-300" onerror="this.onerror=null; this.src=(window.location.pathname.startsWith('/knottele') ? '/knottele' : '') + '/images/logo/Logo_1.png';">
                         
                         <div class="absolute inset-0 bg-stone-900/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
                             <span class="px-3 py-1.5 rounded-full bg-white text-stone-800 text-xs font-bold shadow-md flex items-center gap-1">
@@ -3883,7 +3883,7 @@
         return `
             <div class="bg-white border border-stone-200 rounded-2xl p-4 shadow-2xs hover:shadow-boutique transition-all flex flex-col items-center text-center group">
                 <div class="relative w-24 h-24 rounded-full overflow-hidden border-2 border-[#E7D1CC] shadow-xs mb-3 bg-[#FFF9F6]">
-                    <img src="${cat.image_url}" alt="${escapeHtml(cat.name)}" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300" onerror="this.src='/images/categories/${cat.slug}.jpg'">
+                    <img src="${cat.image_url}" alt="${escapeHtml(cat.name)}" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300" onerror="this.onerror=null; this.src=(window.location.pathname.startsWith('/knottele') ? '/knottele' : '') + '/images/logo/Logo_1.png';">
                 </div>
                 
                 <h4 class="font-bold text-stone-800 text-sm mb-0.5">${escapeHtml(cat.name)}</h4>
@@ -4989,7 +4989,7 @@
             <div onclick="selectMediaFromPicker(${item.id}, '${item.url}', '${escapeHtml(item.name || item.file_name)}')"
                  class="bg-stone-50 hover:bg-red-50/40 border border-stone-200 hover:border-red-400 rounded-2xl p-2.5 flex flex-col items-center cursor-pointer transition-all duration-200 group">
                 <div class="relative w-full aspect-square rounded-xl overflow-hidden bg-white border border-stone-100 mb-2">
-                    <img src="${item.url}" alt="${escapeHtml(item.name)}" class="w-full h-full object-cover group-hover:scale-105 transition-transform" onerror="this.src='/images/logo/Logo_1.png'">
+                    <img src="${item.url}" alt="${escapeHtml(item.name)}" class="w-full h-full object-cover group-hover:scale-105 transition-transform" onerror="this.onerror=null; this.src=(window.location.pathname.startsWith('/knottele') ? '/knottele' : '') + '/images/logo/Logo_1.png';">
                 </div>
                 <p class="text-[11px] font-bold text-stone-700 truncate w-full text-center" title="${escapeHtml(item.name || item.file_name)}">${escapeHtml(item.name || item.file_name)}</p>
                 <span class="text-[10px] text-stone-400">${item.size_formatted || ''}</span>
@@ -5091,7 +5091,7 @@
                     <!-- Thumbnail with Play Overlay -->
                     <div class="relative w-full aspect-[4/5] rounded-xl overflow-hidden bg-stone-900 border border-stone-200/70 mb-3 group/thumb flex items-center justify-center cursor-pointer"
                          onclick="openEditVideoReelModal(${reel.id})">
-                        <img src="${thumbUrl}" alt="${escapeHtml(reel.title)}" class="w-full h-full object-cover group-hover/thumb:scale-105 transition-transform duration-300" onerror="this.src='/images/logo/Logo_1.png'">
+                        <img src="${thumbUrl}" alt="${escapeHtml(reel.title)}" class="w-full h-full object-cover group-hover/thumb:scale-105 transition-transform duration-300" onerror="this.onerror=null; this.src=(window.location.pathname.startsWith('/knottele') ? '/knottele' : '') + '/images/logo/Logo_1.png';">
                         
                         <div class="absolute inset-0 bg-stone-900/30 group-hover/thumb:bg-stone-900/50 transition-colors flex items-center justify-center">
                             <div class="w-11 h-11 rounded-full bg-white/90 group-hover/thumb:bg-white text-red-600 flex items-center justify-center shadow-lg transition-transform group-hover/thumb:scale-110">
@@ -5667,7 +5667,7 @@
                     width: 70,
                     hozAlign: "center",
                     formatter: function(cell) {
-                        return `<img src="${cell.getValue()}" class="w-10 h-10 rounded-lg object-cover mx-auto" onerror="this.src='/images/logo/Logo_1.png'">`;
+                        return `<img src="${cell.getValue()}" class="w-10 h-10 rounded-lg object-cover mx-auto" onerror="this.onerror=null; this.src=(window.location.pathname.startsWith('/knottele') ? '/knottele' : '') + '/images/logo/Logo_1.png';">`;
                     }
                 },
                 { title: "Name / Title", field: "name", widthGrow: 2 },
