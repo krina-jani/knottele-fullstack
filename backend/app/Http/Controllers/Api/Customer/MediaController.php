@@ -202,12 +202,57 @@ class MediaController extends Controller
         }
 
         $footerMeta = $footerMedia && $footerMedia->metadata ? $footerMedia->metadata : [];
+        
+        // Find designated footer background slot (must be an actual image, not settings json)
         $footerBgMedia = Media::where('section', 'footer')
             ->where('slot', 'footer_bg')
             ->where('is_active', true)
-            ->first() ?: $footerMedia;
+            ->where('file_path', 'not like', '%.json%')
+            ->first();
 
-        $footerBg = $footerBgMedia ? ($footerBgMedia->desktop_image_url ?: $footerBgMedia->url) : asset('images/categories/footer.png');
+        // Fallback: any active image in footer section
+        if (!$footerBgMedia) {
+            $footerBgMedia = Media::where('section', 'footer')
+                ->where('slot', '!=', 'section_settings')
+                ->where('is_active', true)
+                ->where('file_path', 'not like', '%.json%')
+                ->first();
+        }
+
+        // Auto-heal: If slot doesn't exist or is pointing to json, auto-create/fix with valid image
+        if (!$footerBgMedia) {
+            $candidateFile = file_exists(public_path('images/footer/footer_footer_bg_1789469406_wFXK.png'))
+                ? 'images/footer/footer_footer_bg_1789469406_wFXK.png'
+                : (file_exists(public_path('images/footer/footer.png')) ? 'images/footer/footer.png' : 'images/categories/footer.png');
+
+            try {
+                $footerBgMedia = Media::updateOrCreate(
+                    ['page' => 'homepage', 'section' => 'footer', 'slot' => 'footer_bg'],
+                    [
+                        'file_name' => basename($candidateFile),
+                        'file_path' => $candidateFile,
+                        'disk' => 'local',
+                        'mime_type' => 'image/png',
+                        'file_type' => 'image',
+                        'title' => 'Footer Panoramic Background',
+                        'sort_order' => 1,
+                        'is_active' => true,
+                    ]
+                );
+            } catch (\Throwable $e) {}
+        }
+
+        $footerBg = null;
+        if ($footerBgMedia) {
+            $candidate = $footerBgMedia->desktop_image_url ?: $footerBgMedia->url;
+            if ($candidate && !str_ends_with(strtolower(parse_url($candidate, PHP_URL_PATH) ?? ''), '.json')) {
+                $footerBg = $candidate;
+            }
+        }
+
+        if (!$footerBg) {
+            $footerBg = asset('images/categories/footer.png');
+        }
 
         $footer = [
             'bg' => $footerBg,

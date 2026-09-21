@@ -14,15 +14,16 @@ import { Phone, Mail, MapPin } from "lucide-react";
 import { useWebsiteMedia } from "@/context/MediaContext";
 import { normalizeInternalLink, normalizeImageUrl } from "@/lib/api";
 
-const DEFAULT_FOOTER_BG = "/images/categories/footer.png";
+const DEFAULT_FOOTER_BG: string = "/images/categories/footer.png";
+const FALLBACK_FOOTER_BG: string = "/images/footer/footer.png";
 
 export function Footer() {
   const { media } = useWebsiteMedia();
-  const [footerBg, setFooterBg] = useState(DEFAULT_FOOTER_BG);
+  const [footerBg, setFooterBg] = useState<string>(DEFAULT_FOOTER_BG);
 
   useEffect(() => {
     const bg = media?.footer?.bg || media?.footer?.image;
-    if (bg) {
+    if (bg && !bg.toLowerCase().includes(".json")) {
       setFooterBg(normalizeImageUrl(bg, DEFAULT_FOOTER_BG));
     }
   }, [media?.footer?.bg, media?.footer?.image]);
@@ -84,7 +85,15 @@ export function Footer() {
           fill
           quality={100}
           sizes="100vw"
+          unoptimized={true}
           className="object-cover object-center lg:object-bottom pointer-events-none"
+          onError={() => {
+            if (footerBg !== DEFAULT_FOOTER_BG) {
+              setFooterBg(DEFAULT_FOOTER_BG);
+            } else if (footerBg !== FALLBACK_FOOTER_BG) {
+              setFooterBg(FALLBACK_FOOTER_BG);
+            }
+          }}
         />
         {/* Soft Contrast Gradient Overlays for Crystal-Clear Text Legibility */}
         <div className="absolute inset-0 bg-[#FFF9F6]/85 sm:bg-[#FFF9F6]/75 md:bg-[#FFF9F6]/60 lg:bg-[#FFF9F6]/40 pointer-events-none" />

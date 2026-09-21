@@ -407,8 +407,21 @@ class MediaController extends Controller
                         $m = Media::where('section', 'footer')->first();
                     }
                     $meta = $m && $m->metadata ? $m->metadata : [];
-                    $bgMedia = Media::where('section', 'footer')->where('slot', 'footer_bg')->where('is_active', true)->first() ?: $m;
-                    $bgUrl = $bgMedia ? ($bgMedia->desktop_image_url ?: $bgMedia->url) : asset('images/categories/footer.png');
+                    $bgMedia = Media::where('section', 'footer')
+                        ->where('slot', 'footer_bg')
+                        ->where('is_active', true)
+                        ->where('file_path', 'not like', '%.json%')
+                        ->first();
+                    $bgUrl = null;
+                    if ($bgMedia) {
+                        $candidate = $bgMedia->desktop_image_url ?: $bgMedia->url;
+                        if ($candidate && !str_ends_with(strtolower(parse_url($candidate, PHP_URL_PATH) ?? ''), '.json')) {
+                            $bgUrl = $candidate;
+                        }
+                    }
+                    if (!$bgUrl) {
+                        $bgUrl = asset('images/categories/footer.png');
+                    }
 
                     return [
                         'id' => $m ? $m->id : null,
@@ -3905,8 +3918,20 @@ class MediaController extends Controller
             $media = Media::where('section', 'footer')->first();
         }
 
-        $meta = $media && $media->metadata ? $media->metadata : [];
-        $bgMedia = Media::where('section', 'footer')->where('slot', 'footer_bg')->first() ?: $media;
+        $bgMedia = Media::where('section', 'footer')
+            ->where('slot', 'footer_bg')
+            ->where('file_path', 'not like', '%.json%')
+            ->first();
+        $bgUrl = null;
+        if ($bgMedia) {
+            $candidate = $bgMedia->desktop_image_url ?: $bgMedia->url;
+            if ($candidate && !str_ends_with(strtolower(parse_url($candidate, PHP_URL_PATH) ?? ''), '.json')) {
+                $bgUrl = $candidate;
+            }
+        }
+        if (!$bgUrl) {
+            $bgUrl = asset('images/categories/footer.png');
+        }
 
         return response()->json([
             'success' => true,
@@ -3917,7 +3942,7 @@ class MediaController extends Controller
                 'tagline' => $media && $media->subtitle ? $media->subtitle : 'Made with ♡ for a kinder, cozier world.',
                 'copyright_text' => $meta['copyright_text'] ?? '© ' . date('Y') . ' Knotelle. All rights reserved.',
                 'heart_tagline' => $meta['heart_tagline'] ?? 'Made with ♡ for a kinder, cozier world.',
-                'bg_image_url' => $bgMedia ? ($bgMedia->desktop_image_url ?: $bgMedia->url) : asset('images/categories/footer.png'),
+                'bg_image_url' => $bgUrl,
                 'instagram_url' => $meta['instagram_url'] ?? (Setting::where('key', 'social_instagram')->value('value') ?: 'https://instagram.com/knotelleindia'),
                 'instagram_active' => isset($meta['instagram_active']) ? (bool)$meta['instagram_active'] : true,
                 'facebook_url' => $meta['facebook_url'] ?? (Setting::where('key', 'social_facebook')->value('value') ?: 'https://facebook.com/knotelleindia'),
@@ -4059,25 +4084,28 @@ class MediaController extends Controller
             );
         } elseif ($request->filled('bg_image_url')) {
             $url = $request->input('bg_image_url');
-            $meta['bg_image'] = $url;
-            $meta['desktop_image'] = $url;
-            $meta['bg_image_url'] = $url;
+            if ($url && !str_ends_with(strtolower(parse_url($url, PHP_URL_PATH) ?? ''), '.json')) {
+                $meta['bg_image'] = $url;
+                $meta['desktop_image'] = $url;
+                $meta['bg_image_url'] = $url;
 
-            Media::updateOrCreate(
-                ['page' => 'homepage', 'section' => 'footer', 'slot' => 'footer_bg'],
-                [
-                    'file_name' => 'footer.png',
-                    'file_path' => $url,
-                    'disk' => 'local',
-                    'mime_type' => 'image/png',
-                    'file_type' => 'image',
-                    'title' => 'Footer Panoramic Background',
-                    'sort_order' => 1,
-                    'is_active' => true,
-                    'uploaded_by' => $this->getAdminId(),
-                    'uploader_type' => 'admin',
-                ]
-            );
+                Media::updateOrCreate(
+                    ['page' => 'homepage', 'section' => 'footer', 'slot' => 'footer_bg'],
+                    [
+                        'file_name' => basename($url),
+                        'file_path' => $url,
+                        'disk' => 'local',
+                        'mime_type' => 'image/png',
+                        'file_type' => 'image',
+                        'title' => 'Footer Panoramic Background',
+                        'sort_order' => 1,
+                        'is_active' => true,
+                        'uploaded_by' => $this->getAdminId(),
+                        'uploader_type' => 'admin',
+                    ]
+                );
+            }
+        }
         }
 
         $media->title = $request->input('title', 'KNOTELLE');

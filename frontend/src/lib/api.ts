@@ -375,6 +375,12 @@ export function normalizeImageUrl(url?: string | null, fallback = "/images/produ
 
   let cleanUrl = url.trim();
 
+  // If a .json file was mistakenly passed as an image URL (e.g. footer_settings.json), immediately use fallback
+  const pathWithoutQuery = cleanUrl.split("?")[0].toLowerCase();
+  if (pathWithoutQuery.endsWith(".json")) {
+    return fallback;
+  }
+
   // Strip localhost:8000 and 127.0.0.1:8000 so assets load from the host server
   cleanUrl = cleanUrl.replace(/^https?:\/\/(127\.0\.0\.1|localhost):8000/, "");
 
@@ -385,7 +391,23 @@ export function normalizeImageUrl(url?: string | null, fallback = "/images/produ
     return `/images/products/${filename}`;
   }
 
-  // If it's an external HTTP/HTTPS URL (CDN, Unsplash, Cloudinary, etc.)
+  // If it's an HTTP/HTTPS URL from current host or live VPS, convert to same-origin path to avoid mixed content / SSL cert errors
+  try {
+    if (cleanUrl.startsWith("http://") || cleanUrl.startsWith("https://")) {
+      const parsed = new URL(cleanUrl);
+      const isSameHost = typeof window !== "undefined"
+        ? (parsed.hostname === window.location.hostname || parsed.hostname === "187.127.158.24" || parsed.hostname === "localhost" || parsed.hostname === "127.0.0.1")
+        : (parsed.hostname === "187.127.158.24" || parsed.hostname === "localhost" || parsed.hostname === "127.0.0.1");
+
+      if (isSameHost) {
+        cleanUrl = parsed.pathname + parsed.search;
+      } else {
+        return cleanUrl;
+      }
+    }
+  } catch {}
+
+  // If it's another external HTTP/HTTPS URL (CDN, Unsplash, Cloudinary, etc.)
   if (cleanUrl.startsWith("http://") || cleanUrl.startsWith("https://") || cleanUrl.startsWith("data:")) {
     return cleanUrl;
   }
