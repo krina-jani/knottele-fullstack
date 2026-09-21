@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { notFound, useRouter } from "next/navigation";
+import { notFound, useRouter, useParams } from "next/navigation";
 import {
   Heart,
   ShoppingBag,
@@ -35,9 +35,21 @@ interface ProductDetailViewProps {
   slug: string;
 }
 
-export default function ProductDetailView({ slug }: ProductDetailViewProps) {
+export default function ProductDetailView({ slug: propSlug }: ProductDetailViewProps) {
   const router = useRouter();
-  const fallbackProduct = PRODUCTS.find((p) => p.slug === slug);
+  const params = useParams();
+  const rawParamSlug = typeof params?.slug === "string" ? params.slug : Array.isArray(params?.slug) ? params.slug[0] : "";
+  const pathnameSlug = typeof window !== "undefined"
+    ? window.location.pathname.replace(/^.*\/product\//, "").replace(/\/.*$/, "")
+    : "";
+  const slug = propSlug || rawParamSlug || pathnameSlug;
+
+  const fallbackProduct = PRODUCTS.find(
+    (p) =>
+      p.slug === slug ||
+      (slug === "cute-bunny-amigurumi-keychain" && p.slug === "cute-bunny-keychain") ||
+      (slug === "cute-bunny-keychain" && p.slug === "cute-bunny-amigurumi-keychain")
+  );
   const [liveProduct, setLiveProduct] = useState<Product | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(!fallbackProduct);
   const [fetchAttempted, setFetchAttempted] = useState<boolean>(false);

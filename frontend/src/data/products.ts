@@ -3,7 +3,7 @@ import { Product } from "@/types/product";
 export const PRODUCTS: Product[] = [
   {
     id: "prod-1",
-    slug: "cute-bunny-keychain",
+    slug: "cute-bunny-amigurumi-keychain",
     name: "Cute Bunny Amigurumi Keychain",
     category: "Keychain",
     categorySlug: "keychain",

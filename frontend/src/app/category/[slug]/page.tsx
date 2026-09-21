@@ -12,15 +12,37 @@ interface CategoryPageProps {
 }
 
 export async function generateStaticParams() {
+  const allSlugs = new Set<string>();
+
+  // 1. Slugs from local db-slugs.json (exported by deploy.sh / artisan)
+  try {
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const dbSlugs = require("@/data/db-slugs.json");
+    if (Array.isArray(dbSlugs?.categories)) {
+      dbSlugs.categories.forEach((s: string) => {
+        if (s) allSlugs.add(s);
+      });
+    }
+  } catch {}
+
+  // 2. Slugs from live API if reachable
   try {
     const cats = await fetchCategories();
     if (cats && cats.length > 0) {
-      return cats.map((c) => ({ slug: c.slug }));
+      cats.forEach((c) => {
+        if (c.slug) allSlugs.add(c.slug);
+      });
     }
-  } catch (e) {}
-  return CATEGORIES.map((category) => ({
-    slug: category.slug,
-  }));
+  } catch {}
+
+  // 3. Slugs from static categories
+  CATEGORIES.forEach((category) => {
+    if (category.slug) allSlugs.add(category.slug);
+  });
+
+  return Array.from(allSlugs)
+    .filter(Boolean)
+    .map((slug) => ({ slug }));
 }
 
 export default async function CategoryPage({ params }: CategoryPageProps) {

@@ -34,10 +34,18 @@ if [ -d "$PROJECT_ROOT/backend" ]; then
     composer install --no-dev --optimize-autoloader --no-interaction
 fi
 
+# 4b. Export all live product & category slugs to frontend
+if [ -d "$PROJECT_ROOT/backend" ]; then
+    echo "📋 Exporting live database slugs to frontend..."
+    cd "$PROJECT_ROOT/backend"
+    php artisan tinker --execute="file_put_contents('$PROJECT_ROOT/frontend/src/data/db-slugs.json', json_encode(['products' => \App\Models\Product::pluck('slug')->filter()->values(), 'categories' => \App\Models\Category::pluck('slug')->filter()->values()]));" 2>/dev/null || true
+fi
+
 # 5. Build Next.js customer frontend and sync to Laravel public
 if [ -d "$PROJECT_ROOT/frontend" ]; then
     echo "🛍️ Building Frontend (Next.js -> Laravel public)..."
     cd "$PROJECT_ROOT/frontend"
+    export INTERNAL_API_URL="http://127.0.0.1/knottele/api"
     npm install
     npm run build:laravel
 fi

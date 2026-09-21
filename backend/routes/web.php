@@ -461,6 +461,38 @@ Route::get('/{any}', function ($any = '') {
         return response()->file(public_path($path . '.html'));
     }
 
+    // 3b. Resilient product route fallback: serve product template and RSC tree so client-side React never redirects to home
+    if (str_starts_with($path, 'product/')) {
+        if (str_contains($path, '__next.') || str_ends_with($path, '.txt')) {
+            $fallbackTxt = glob(public_path('product/*/' . basename($path)));
+            if (!empty($fallbackTxt)) {
+                return response()->file($fallbackTxt[0], [
+                    'Content-Type' => 'text/plain; charset=utf-8',
+                ]);
+            }
+        }
+        $productIndex = glob(public_path('product/*/index.html'));
+        if (!empty($productIndex)) {
+            return response()->file($productIndex[0]);
+        }
+    }
+
+    // 3c. Resilient category route fallback
+    if (str_starts_with($path, 'category/')) {
+        if (str_contains($path, '__next.') || str_ends_with($path, '.txt')) {
+            $fallbackTxt = glob(public_path('category/*/' . basename($path)));
+            if (!empty($fallbackTxt)) {
+                return response()->file($fallbackTxt[0], [
+                    'Content-Type' => 'text/plain; charset=utf-8',
+                ]);
+            }
+        }
+        $catIndex = glob(public_path('category/*/index.html'));
+        if (!empty($catIndex)) {
+            return response()->file($catIndex[0]);
+        }
+    }
+
     // 4. If request is for a missing static asset or chunk, return real 404 (never HTML)
     if (preg_match('/\.(js|css|png|jpg|jpeg|gif|svg|ico|woff|woff2|ttf|eot|map|json|txt)$/i', $path) || str_starts_with($path, '_next/')) {
         abort(404);

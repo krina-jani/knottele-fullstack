@@ -60,6 +60,9 @@ export function getServerApiBaseUrl(): string {
   if (process.env.INTERNAL_API_URL) {
     return process.env.INTERNAL_API_URL;
   }
+  if (process.env.NODE_ENV === "production") {
+    return "http://127.0.0.1/knottele/api";
+  }
   return "http://127.0.0.1:8000/api";
 }
 

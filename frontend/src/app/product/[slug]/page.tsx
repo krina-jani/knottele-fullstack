@@ -12,25 +12,41 @@ interface ProductPageProps {
 }
 
 export async function generateStaticParams() {
+  const allSlugs = new Set<string>();
+
+  // 1. Slugs from local db-slugs.json (exported by deploy.sh / artisan)
+  try {
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const dbSlugs = require("@/data/db-slugs.json");
+    if (Array.isArray(dbSlugs?.products)) {
+      dbSlugs.products.forEach((s: string) => {
+        if (s) allSlugs.add(s);
+      });
+    }
+  } catch {}
+
+  // 2. Slugs from live API if reachable
   try {
     const res = await fetchProducts({ per_page: 500 });
-    const apiSlugs = res?.products?.map((p) => ({ slug: p.slug })) || [];
-    const staticSlugs = PRODUCTS.map((product) => ({ slug: product.slug }));
-    const merged = [...apiSlugs, ...staticSlugs];
-    const uniqueSlugs = Array.from(new Set(merged.map((item) => item.slug)))
-      .filter(Boolean)
-      .map((slug) => ({ slug }));
-
-    if (uniqueSlugs.length > 0) {
-      return uniqueSlugs;
-    }
+    res?.products?.forEach((p) => {
+      if (p.slug) allSlugs.add(p.slug);
+    });
   } catch (error) {
-    console.warn("generateStaticParams for products warning:", error);
+    console.warn("generateStaticParams for products API warning:", error);
   }
 
-  return PRODUCTS.map((product) => ({
-    slug: product.slug,
-  }));
+  // 3. Slugs from local PRODUCTS static array
+  PRODUCTS.forEach((product) => {
+    if (product.slug) allSlugs.add(product.slug);
+  });
+
+  // 4. Critical guaranteed aliases
+  allSlugs.add("cute-bunny-amigurumi-keychain");
+  allSlugs.add("cute-bunny-keychain");
+
+  return Array.from(allSlugs)
+    .filter(Boolean)
+    .map((slug) => ({ slug }));
 }
 
 export default async function ProductDetailPage({ params }: ProductPageProps) {

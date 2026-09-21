@@ -3,7 +3,7 @@
 import React, { useState, useEffect, useMemo } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { notFound } from "next/navigation";
+import { notFound, useParams } from "next/navigation";
 import { Product } from "@/types/product";
 import { fetchProducts, fetchCategories } from "@/lib/api";
 import { ProductCard } from "@/components/ui/ProductCard";
@@ -20,7 +20,14 @@ interface CategoryPageViewProps {
   slug: string;
 }
 
-export default function CategoryPageView({ slug }: CategoryPageViewProps) {
+export default function CategoryPageView({ slug: propSlug }: CategoryPageViewProps) {
+  const params = useParams();
+  const rawParamSlug = typeof params?.slug === "string" ? params.slug : Array.isArray(params?.slug) ? params.slug[0] : "";
+  const pathnameSlug = typeof window !== "undefined"
+    ? window.location.pathname.replace(/^.*\/category\//, "").replace(/\/.*$/, "")
+    : "";
+  const slug = propSlug || rawParamSlug || pathnameSlug;
+
   const { media } = useWebsiteMedia();
   const [categoriesList, setCategoriesList] = useState<any[]>([]);
   const [productsList, setProductsList] = useState<Product[]>([]);
