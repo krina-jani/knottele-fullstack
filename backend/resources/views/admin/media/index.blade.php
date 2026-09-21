@@ -2573,12 +2573,12 @@
         const loading = document.getElementById('managerLoading');
         const list = document.getElementById('sectionsList');
         
-        loading.classList.remove('hidden');
-        list.classList.add('hidden');
+        if (loading) loading.classList.remove('hidden');
+        if (list) list.classList.add('hidden');
 
         try {
-            const res = await axios.get('/admin/media/manager-data');
-            if (res.data.success) {
+            const res = await axios.get(`${adminMediaBase}/manager-data`);
+            if (res.data && res.data.success) {
                 managerData = res.data.data;
                 renderSections(managerData);
             }
@@ -2586,8 +2586,8 @@
             console.error('Failed to load manager data', err);
             toastr.error('Failed to load media manager data.');
         } finally {
-            loading.classList.add('hidden');
-            list.classList.remove('hidden');
+            if (loading) loading.classList.add('hidden');
+            if (list) list.classList.remove('hidden');
         }
     }
 
@@ -4001,40 +4001,59 @@
     }
 
     function openAddCustomOrderItemModal() {
-        document.getElementById('customOrderItemForm').reset();
-        document.getElementById('customOrderItemId').value = '';
-        document.getElementById('customOrderItemModalTitle').innerText = 'Add Custom Order Category';
-        document.getElementById('customOrderItemSubmitBtnText').innerText = 'Save Category';
-        document.getElementById('customOrderItemActive').checked = true;
+        const form = document.getElementById('customOrderItemForm');
+        if (form) form.reset();
+        if (document.getElementById('customOrderItemId')) document.getElementById('customOrderItemId').value = '';
+        if (document.getElementById('customOrderItemModalTitle')) document.getElementById('customOrderItemModalTitle').innerText = 'Add Custom Order Category';
+        if (document.getElementById('customOrderItemSubmitBtnText')) document.getElementById('customOrderItemSubmitBtnText').innerText = 'Save Category';
+        if (document.getElementById('customOrderItemActive')) document.getElementById('customOrderItemActive').checked = true;
 
         const modal = document.getElementById('customOrderItemModal');
-        modal.classList.remove('hidden');
-        modal.classList.add('flex');
+        if (modal) {
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+        }
     }
 
     async function openEditCustomOrderItemModal(id) {
-        try {
-            const res = await axios.get(`/admin/media/custom-order/items/${id}`);
-            if (!res.data.success || (!res.data.item && !res.data.data)) {
-                toastr.error('Category not found');
-                return;
-            }
-            const item = res.data.item || res.data.data;
-            document.getElementById('customOrderItemId').value = item.id;
-            document.getElementById('customOrderItemTitle').value = item.title || item.name || '';
-            document.getElementById('customOrderItemSubtitle').value = item.subtitle || '';
-            document.getElementById('customOrderItemSortOrder').value = item.sort_order || 1;
-            document.getElementById('customOrderItemActive').checked = item.is_active !== false;
-
-            document.getElementById('customOrderItemModalTitle').innerText = `Edit: ${item.title || item.name}`;
-            document.getElementById('customOrderItemSubmitBtnText').innerText = 'Update Category';
-
-            const modal = document.getElementById('customOrderItemModal');
+        const modal = document.getElementById('customOrderItemModal');
+        if (modal) {
             modal.classList.remove('hidden');
             modal.classList.add('flex');
+        }
+
+        // Immediately pre-populate from local managerData so user gets instant modal response
+        if (managerData && managerData.sections) {
+            const sec = managerData.sections.find(s => s.id === 'custom_order_items' || s.is_custom_order_items_section);
+            if (sec && sec.items) {
+                const cached = sec.items.find(i => i.id == id);
+                if (cached) {
+                    if (document.getElementById('customOrderItemId')) document.getElementById('customOrderItemId').value = cached.id;
+                    if (document.getElementById('customOrderItemTitle')) document.getElementById('customOrderItemTitle').value = cached.title || cached.name || '';
+                    if (document.getElementById('customOrderItemSubtitle')) document.getElementById('customOrderItemSubtitle').value = cached.subtitle || '';
+                    if (document.getElementById('customOrderItemSortOrder')) document.getElementById('customOrderItemSortOrder').value = cached.sort_order || 1;
+                    if (document.getElementById('customOrderItemActive')) document.getElementById('customOrderItemActive').checked = cached.is_active !== false;
+                    if (document.getElementById('customOrderItemModalTitle')) document.getElementById('customOrderItemModalTitle').innerText = `Edit: ${cached.title || cached.name}`;
+                    if (document.getElementById('customOrderItemSubmitBtnText')) document.getElementById('customOrderItemSubmitBtnText').innerText = 'Update Category';
+                }
+            }
+        }
+
+        try {
+            const res = await axios.get(`${adminMediaBase}/custom-order/items/${id}`);
+            if (res.data && res.data.success && (res.data.item || res.data.data)) {
+                const item = res.data.item || res.data.data;
+                if (document.getElementById('customOrderItemId')) document.getElementById('customOrderItemId').value = item.id;
+                if (document.getElementById('customOrderItemTitle')) document.getElementById('customOrderItemTitle').value = item.title || item.name || '';
+                if (document.getElementById('customOrderItemSubtitle')) document.getElementById('customOrderItemSubtitle').value = item.subtitle || '';
+                if (document.getElementById('customOrderItemSortOrder')) document.getElementById('customOrderItemSortOrder').value = item.sort_order || 1;
+                if (document.getElementById('customOrderItemActive')) document.getElementById('customOrderItemActive').checked = item.is_active !== false;
+
+                if (document.getElementById('customOrderItemModalTitle')) document.getElementById('customOrderItemModalTitle').innerText = `Edit: ${item.title || item.name}`;
+                if (document.getElementById('customOrderItemSubmitBtnText')) document.getElementById('customOrderItemSubmitBtnText').innerText = 'Update Category';
+            }
         } catch (err) {
-            console.error('Failed to load category', err);
-            toastr.error('Failed to load item category details.');
+            console.error('Failed to load category details', err);
         }
     }
 
@@ -4048,11 +4067,11 @@
 
     async function handleCustomOrderItemSubmit(event) {
         event.preventDefault();
-        const id = document.getElementById('customOrderItemId').value;
-        const title = document.getElementById('customOrderItemTitle').value.trim();
-        const subtitle = document.getElementById('customOrderItemSubtitle').value.trim();
-        const sortOrder = document.getElementById('customOrderItemSortOrder').value;
-        const isActive = document.getElementById('customOrderItemActive').checked;
+        const id = document.getElementById('customOrderItemId')?.value;
+        const title = document.getElementById('customOrderItemTitle')?.value?.trim();
+        const subtitle = document.getElementById('customOrderItemSubtitle')?.value?.trim() || '';
+        const sortOrder = document.getElementById('customOrderItemSortOrder')?.value || 1;
+        const isActive = document.getElementById('customOrderItemActive')?.checked ? 1 : 0;
 
         if (!title) {
             toastr.error('Item name is required.');
@@ -4060,29 +4079,36 @@
         }
 
         const submitBtn = document.getElementById('customOrderItemSubmitBtn');
-        submitBtn.disabled = true;
+        if (submitBtn) submitBtn.disabled = true;
 
         try {
-            const url = id ? `/admin/media/custom-order/items/${id}` : '/admin/media/custom-order/items';
+            const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
+            const url = id ? `${adminMediaBase}/custom-order/items/${id}` : `${adminMediaBase}/custom-order/items`;
             const res = await axios.post(url, {
+                _token: csrfToken || '',
                 title: title,
                 subtitle: subtitle,
                 sort_order: sortOrder,
                 is_active: isActive
+            }, {
+                headers: {
+                    'X-CSRF-TOKEN': csrfToken || ''
+                }
             });
 
-            if (res.data.success) {
+            if (res.data && res.data.success) {
                 toastr.success(res.data.message || 'Saved successfully!');
                 closeCustomOrderItemModal();
+                broadcastMediaUpdate();
                 loadManagerData();
             } else {
-                toastr.error(res.data.message || 'Failed to save category.');
+                toastr.error(res.data?.message || 'Failed to save category.');
             }
         } catch (err) {
             console.error('Failed to save custom order item', err);
             toastr.error(err.response?.data?.message || 'Error saving category.');
         } finally {
-            submitBtn.disabled = false;
+            if (submitBtn) submitBtn.disabled = false;
         }
     }
 
@@ -4092,12 +4118,26 @@
         }
 
         try {
-            const res = await axios.delete(`/admin/media/custom-order/items/${id}`);
-            if (res.data.success) {
-                toastr.success('Category deleted successfully.');
+            const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
+            let res;
+            try {
+                res = await axios.delete(`${adminMediaBase}/custom-order/items/${id}`, {
+                    headers: { 'X-CSRF-TOKEN': csrfToken || '' }
+                });
+            } catch (delErr) {
+                res = await axios.post(`${adminMediaBase}/custom-order/items/${id}/delete`, {
+                    _token: csrfToken || '',
+                    _method: 'DELETE'
+                }, {
+                    headers: { 'X-CSRF-TOKEN': csrfToken || '' }
+                });
+            }
+            if (res.data && res.data.success) {
+                toastr.success(res.data.message || 'Category deleted successfully.');
+                broadcastMediaUpdate();
                 loadManagerData();
             } else {
-                toastr.error(res.data.message || 'Failed to delete category.');
+                toastr.error(res.data?.message || 'Failed to delete category.');
             }
         } catch (err) {
             console.error('Failed to delete category', err);
@@ -4107,12 +4147,20 @@
 
     async function toggleCustomOrderItem(id) {
         try {
-            const res = await axios.post(`/admin/media/custom-order/items/${id}/toggle`);
-            if (res.data.success) {
-                toastr.success('Status updated.');
+            const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
+            const res = await axios.post(`${adminMediaBase}/custom-order/items/${id}/toggle`, {
+                _token: csrfToken || ''
+            }, {
+                headers: {
+                    'X-CSRF-TOKEN': csrfToken || ''
+                }
+            });
+            if (res.data && res.data.success) {
+                toastr.success(res.data.message || 'Status updated.');
+                broadcastMediaUpdate();
                 loadManagerData();
             } else {
-                toastr.error(res.data.message || 'Failed to update status.');
+                toastr.error(res.data?.message || 'Failed to update status.');
             }
         } catch (err) {
             console.error('Failed to toggle status', err);
@@ -4319,7 +4367,7 @@
         const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
 
         try {
-            const endpoint = '/admin/media/update-metadata' + (mediaId ? `/${mediaId}` : '');
+            const endpoint = `${adminMediaBase}/update-metadata` + (mediaId ? `/${mediaId}` : '');
             const res = await axios.post(endpoint, payload, {
                 headers: { 'X-CSRF-TOKEN': csrfToken || '' }
             });
@@ -4345,7 +4393,7 @@
         }
         const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
         try {
-            const res = await axios.post('/admin/media/detach-slot', {
+            const res = await axios.post(`${adminMediaBase}/detach-slot`, {
                 page: page,
                 section: section,
                 slot: slotKey
@@ -4368,7 +4416,8 @@
     }
 
     function openCategoryUploadModal(catId) {
-        window.location.href = `/admin/categories/${catId}/edit`;
+        const adminBase = window.location.pathname.startsWith('/knottele') ? '/knottele/admin' : '/admin';
+        window.location.href = `${adminBase}/categories/${catId}/edit`;
     }
 
     async function handleSlotUploadSubmit(e) {
@@ -4379,10 +4428,14 @@
 
         const form = document.getElementById('slotUploadForm');
         const formData = new FormData(form);
+        const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
 
         try {
-            const res = await axios.post('/admin/media/assign-slot', formData, {
-                headers: { 'Content-Type': 'multipart/form-data' }
+            const res = await axios.post(`${adminMediaBase}/assign-slot`, formData, {
+                headers: { 
+                    'Content-Type': 'multipart/form-data',
+                    'X-CSRF-TOKEN': csrfToken || ''
+                }
             });
 
             if (res.data.success) {
@@ -4759,7 +4812,7 @@
         modal.classList.add('flex');
 
         try {
-            const res = await axios.get(`/admin/media/testimonial/${id}`);
+            const res = await axios.get(`${adminMediaBase}/testimonial/${id}`);
             if (res.data && res.data.success) {
                 const t = res.data.data;
                 document.getElementById('testimonialName').value = t.name || '';
@@ -4814,7 +4867,7 @@
         }
 
         try {
-            const res = await axios.post('/admin/media/testimonial', formData, {
+            const res = await axios.post(`${adminMediaBase}/testimonial`, formData, {
                 headers: {
                     'Content-Type': 'multipart/form-data',
                     'X-CSRF-TOKEN': csrfToken || ''
@@ -4841,7 +4894,7 @@
         if (!confirm('Are you sure you want to delete this customer review?')) return;
         const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
         try {
-            const res = await axios.delete(`/admin/media/testimonial/${id}`, {
+            const res = await axios.delete(`${adminMediaBase}/testimonial/${id}`, {
                 headers: { 'X-CSRF-TOKEN': csrfToken || '' }
             });
             if (res.data.success) {
@@ -4873,7 +4926,7 @@
         modal.classList.add('flex');
 
         try {
-            const res = await axios.get('/admin/media/data?per_page=48');
+            const res = await axios.get(`${adminMediaBase}/data?per_page=48`);
             pickerMediaCache = res.data.data || [];
             renderMediaPickerGrid(pickerMediaCache);
         } catch (err) {
@@ -5407,7 +5460,10 @@
         }
 
         try {
-            const res = await axios.delete(`${adminMediaBase}/video-reel/${id}`);
+            const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
+            const res = await axios.delete(`${adminMediaBase}/video-reel/${id}`, {
+                headers: { 'X-CSRF-TOKEN': csrfToken || '' }
+            });
             if (res.data.success) {
                 toastr.success(res.data.message || 'Video / reel deleted successfully.');
                 broadcastMediaUpdate();
@@ -5423,7 +5479,12 @@
 
     async function toggleVideoReelStatus(id) {
         try {
-            const res = await axios.post(`${adminMediaBase}/video-reel/toggle-status/${id}`);
+            const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
+            const res = await axios.post(`${adminMediaBase}/video-reel/toggle-status/${id}`, {
+                _token: csrfToken || ''
+            }, {
+                headers: { 'X-CSRF-TOKEN': csrfToken || '' }
+            });
             if (res.data.success) {
                 toastr.success(res.data.message || 'Status updated.');
                 broadcastMediaUpdate();
@@ -5643,7 +5704,10 @@
         if (!confirm('Are you sure you want to delete this media file?')) return;
 
         try {
-            const res = await axios.delete(`${adminMediaBase}/${id}`);
+            const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
+            const res = await axios.delete(`${adminMediaBase}/${id}`, {
+                headers: { 'X-CSRF-TOKEN': csrfToken || '' }
+            });
             if (res.data.success) {
                 toastr.success(res.data.message);
                 broadcastMediaUpdate();
@@ -5695,52 +5759,80 @@
     // ABOUT STORY HANDLERS
     // ==========================================
     async function openAboutStoryModal() {
+        const modal = document.getElementById('aboutStoryModal');
+        if (modal) {
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+        }
+
+        // Try populating from cache first for instantaneous opening
+        if (managerData && managerData.sections) {
+            const sec = managerData.sections.find(s => s.id === 'about_story' || s.is_about_story_section);
+            if (sec && sec.metadata) {
+                const meta = sec.metadata;
+                if (document.getElementById('aboutStoryTagText')) document.getElementById('aboutStoryTagText').value = sec.tag_text || meta.tag_text || 'The KNOTELLE Story';
+                if (document.getElementById('aboutStoryTitle')) document.getElementById('aboutStoryTitle').value = sec.title || meta.title || 'Every Loop Tells a Story';
+                if (document.getElementById('aboutStorySubtitle')) document.getElementById('aboutStorySubtitle').value = sec.subtitle || meta.subtitle || '';
+                if (document.getElementById('aboutStoryDescription')) document.getElementById('aboutStoryDescription').value = sec.description || meta.description || '';
+                if (document.getElementById('aboutStoryParagraph2')) document.getElementById('aboutStoryParagraph2').value = meta.paragraph_2 || '';
+                if (document.getElementById('aboutStoryAlt')) document.getElementById('aboutStoryAlt').value = sec.alt_text || meta.alt_text || '';
+                if (document.getElementById('aboutStoryFloatingTitle')) document.getElementById('aboutStoryFloatingTitle').value = meta.floating_badge_title || '100% Handcrafted';
+                if (document.getElementById('aboutStoryFloatingSubtitle')) document.getElementById('aboutStoryFloatingSubtitle').value = meta.floating_badge_subtitle || 'Never mass machine produced';
+                if (document.getElementById('aboutStoryFloatingIcon')) document.getElementById('aboutStoryFloatingIcon').value = meta.floating_badge_icon || 'Heart';
+                if (document.getElementById('aboutStoryFloatingActive')) document.getElementById('aboutStoryFloatingActive').checked = meta.floating_badge_active !== false;
+                if (document.getElementById('aboutStoryCtaText')) document.getElementById('aboutStoryCtaText').value = sec.cta_text || meta.cta_text || 'Request a Custom Creation';
+                if (document.getElementById('aboutStoryCtaLink')) document.getElementById('aboutStoryCtaLink').value = sec.cta_link || meta.cta_link || '/custom-order';
+                if (document.getElementById('aboutStoryCtaVisible')) document.getElementById('aboutStoryCtaVisible').checked = meta.cta_visible !== false;
+                if (document.getElementById('aboutStoryActive')) document.getElementById('aboutStoryActive').checked = sec.is_active !== false;
+            }
+        }
+
         try {
-            const res = await axios.get('/admin/media/about/story');
-            if (res.data.success) {
+            const res = await axios.get(`${adminMediaBase}/about/story`);
+            if (res.data && res.data.success) {
                 const s = res.data.data;
-                document.getElementById('aboutStoryTagText').value = s.tag_text || 'The KNOTELLE Story';
-                document.getElementById('aboutStoryTitle').value = s.title || 'Every Loop Tells a Story';
-                document.getElementById('aboutStorySubtitle').value = s.subtitle || '';
-                document.getElementById('aboutStoryDescription').value = s.description || '';
-                document.getElementById('aboutStoryParagraph2').value = s.paragraph_2 || '';
-                document.getElementById('aboutStoryAlt').value = s.alt_text || '';
+                if (document.getElementById('aboutStoryTagText')) document.getElementById('aboutStoryTagText').value = s.tag_text || 'The KNOTELLE Story';
+                if (document.getElementById('aboutStoryTitle')) document.getElementById('aboutStoryTitle').value = s.title || 'Every Loop Tells a Story';
+                if (document.getElementById('aboutStorySubtitle')) document.getElementById('aboutStorySubtitle').value = s.subtitle || '';
+                if (document.getElementById('aboutStoryDescription')) document.getElementById('aboutStoryDescription').value = s.description || '';
+                if (document.getElementById('aboutStoryParagraph2')) document.getElementById('aboutStoryParagraph2').value = s.paragraph_2 || '';
+                if (document.getElementById('aboutStoryAlt')) document.getElementById('aboutStoryAlt').value = s.alt_text || '';
                 
-                document.getElementById('aboutStoryFloatingTitle').value = s.floating_badge_title || '100% Handcrafted';
-                document.getElementById('aboutStoryFloatingSubtitle').value = s.floating_badge_subtitle || 'Never mass machine produced';
-                document.getElementById('aboutStoryFloatingIcon').value = s.floating_badge_icon || 'Heart';
-                document.getElementById('aboutStoryFloatingActive').checked = s.floating_badge_active !== false;
+                if (document.getElementById('aboutStoryFloatingTitle')) document.getElementById('aboutStoryFloatingTitle').value = s.floating_badge_title || '100% Handcrafted';
+                if (document.getElementById('aboutStoryFloatingSubtitle')) document.getElementById('aboutStoryFloatingSubtitle').value = s.floating_badge_subtitle || 'Never mass machine produced';
+                if (document.getElementById('aboutStoryFloatingIcon')) document.getElementById('aboutStoryFloatingIcon').value = s.floating_badge_icon || 'Heart';
+                if (document.getElementById('aboutStoryFloatingActive')) document.getElementById('aboutStoryFloatingActive').checked = s.floating_badge_active !== false;
 
-                document.getElementById('aboutStoryCtaText').value = s.cta_text || 'Request a Custom Creation';
-                document.getElementById('aboutStoryCtaLink').value = s.cta_link || '/custom-order';
-                document.getElementById('aboutStoryCtaVisible').checked = s.cta_visible !== false;
-                document.getElementById('aboutStoryActive').checked = s.is_active !== false;
+                if (document.getElementById('aboutStoryCtaText')) document.getElementById('aboutStoryCtaText').value = s.cta_text || 'Request a Custom Creation';
+                if (document.getElementById('aboutStoryCtaLink')) document.getElementById('aboutStoryCtaLink').value = s.cta_link || '/custom-order';
+                if (document.getElementById('aboutStoryCtaVisible')) document.getElementById('aboutStoryCtaVisible').checked = s.cta_visible !== false;
+                if (document.getElementById('aboutStoryActive')) document.getElementById('aboutStoryActive').checked = s.is_active !== false;
 
-                document.getElementById('aboutStoryDesktopUrl').value = s.desktop_image || '';
-                document.getElementById('aboutStoryMobileUrl').value = s.mobile_image || '';
+                if (document.getElementById('aboutStoryDesktopUrl')) document.getElementById('aboutStoryDesktopUrl').value = s.desktop_image || '';
+                if (document.getElementById('aboutStoryMobileUrl')) document.getElementById('aboutStoryMobileUrl').value = s.mobile_image || '';
 
-                if (s.desktop_image) {
+                if (s.desktop_image && document.getElementById('aboutDesktopPreviewImg')) {
                     document.getElementById('aboutDesktopPreviewImg').src = s.desktop_image;
-                    document.getElementById('aboutDesktopPreviewContainer').classList.remove('hidden');
+                    document.getElementById('aboutDesktopPreviewContainer')?.classList.remove('hidden');
                 }
-                if (s.mobile_image) {
+                if (s.mobile_image && document.getElementById('aboutMobilePreviewImg')) {
                     document.getElementById('aboutMobilePreviewImg').src = s.mobile_image;
-                    document.getElementById('aboutMobilePreviewContainer').classList.remove('hidden');
-                } else {
+                    document.getElementById('aboutMobilePreviewContainer')?.classList.remove('hidden');
+                } else if (document.getElementById('aboutMobilePreviewContainer')) {
                     document.getElementById('aboutMobilePreviewContainer').classList.add('hidden');
                 }
-
-                document.getElementById('aboutStoryModal').classList.remove('hidden');
-                document.getElementById('aboutStoryModal').classList.add('flex');
             }
         } catch (err) {
-            toastr.error('Failed to load About Story data.');
+            console.error('Failed to load fresh About Story data', err);
         }
     }
 
     function closeAboutStoryModal() {
-        document.getElementById('aboutStoryModal').classList.add('hidden');
-        document.getElementById('aboutStoryModal').classList.remove('flex');
+        const modal = document.getElementById('aboutStoryModal');
+        if (modal) {
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+        }
     }
 
     function handleAboutDesktopFileChange(input) {
@@ -5784,29 +5876,38 @@
     async function handleAboutStorySubmit(e) {
         e.preventDefault();
         const btn = document.getElementById('aboutStorySubmitBtn');
-        btn.disabled = true;
-        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving...';
+        if (btn) {
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving...';
+        }
 
         const form = document.getElementById('aboutStoryForm');
         const formData = new FormData(form);
+        const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
 
         try {
-            const res = await axios.post('/admin/media/about/story', formData, {
-                headers: { 'Content-Type': 'multipart/form-data' }
+            const res = await axios.post(`${adminMediaBase}/about/story`, formData, {
+                headers: { 
+                    'Content-Type': 'multipart/form-data',
+                    'X-CSRF-TOKEN': csrfToken || ''
+                }
             });
-            if (res.data.success) {
-                toastr.success(res.data.message);
+            if (res.data && res.data.success) {
+                toastr.success(res.data.message || 'About Story saved successfully!');
                 closeAboutStoryModal();
                 broadcastMediaUpdate();
                 loadManagerData();
             } else {
-                toastr.error(res.data.message);
+                toastr.error(res.data?.message || 'Failed to save About Story.');
             }
         } catch (err) {
+            console.error('Failed to save About Story', err);
             toastr.error(err.response?.data?.message || 'Failed to save About Story.');
         } finally {
-            btn.disabled = false;
-            btn.innerHTML = '<i class="fas fa-save"></i><span>Save Story & Visuals</span>';
+            if (btn) {
+                btn.disabled = false;
+                btn.innerHTML = '<i class="fas fa-save"></i><span>Save Story & Visuals</span>';
+            }
         }
     }
 
@@ -5817,45 +5918,59 @@
         if (managerData && managerData.sections) {
             const sec = managerData.sections.find(s => s.id === 'craft_pillars');
             if (sec && sec.metadata) {
-                document.getElementById('craftPillarsHeaderTitle').value = sec.metadata.title || 'Our Craft Pillars';
-                document.getElementById('craftPillarsHeaderTagText').value = sec.metadata.tag_text || 'Artisan Standards';
-                document.getElementById('craftPillarsHeaderSubtitle').value = sec.metadata.subtitle || 'Guiding principles behind every stitch we make.';
-                document.getElementById('craftPillarsHeaderActive').checked = sec.metadata.is_active !== false;
+                if (document.getElementById('craftPillarsHeaderTitle')) document.getElementById('craftPillarsHeaderTitle').value = sec.metadata.title || 'Our Craft Pillars';
+                if (document.getElementById('craftPillarsHeaderTagText')) document.getElementById('craftPillarsHeaderTagText').value = sec.metadata.tag_text || 'Artisan Standards';
+                if (document.getElementById('craftPillarsHeaderSubtitle')) document.getElementById('craftPillarsHeaderSubtitle').value = sec.metadata.subtitle || 'Guiding principles behind every stitch we make.';
+                if (document.getElementById('craftPillarsHeaderActive')) document.getElementById('craftPillarsHeaderActive').checked = sec.metadata.is_active !== false;
             }
         }
-        document.getElementById('craftPillarsHeaderModal').classList.remove('hidden');
-        document.getElementById('craftPillarsHeaderModal').classList.add('flex');
+        const modal = document.getElementById('craftPillarsHeaderModal');
+        if (modal) {
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+        }
     }
 
     function closeCraftPillarsHeaderModal() {
-        document.getElementById('craftPillarsHeaderModal').classList.add('hidden');
-        document.getElementById('craftPillarsHeaderModal').classList.remove('flex');
+        const modal = document.getElementById('craftPillarsHeaderModal');
+        if (modal) {
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+        }
     }
 
     async function handleCraftPillarsHeaderSubmit(e) {
         e.preventDefault();
         const btn = document.getElementById('craftPillarsHeaderSubmitBtn');
-        btn.disabled = true;
-        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving...';
+        if (btn) {
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving...';
+        }
 
         const form = document.getElementById('craftPillarsHeaderForm');
         const formData = new FormData(form);
+        const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
 
         try {
-            const res = await axios.post('/admin/media/about/craft-pillars/header', formData);
-            if (res.data.success) {
-                toastr.success(res.data.message);
+            const res = await axios.post(`${adminMediaBase}/about/craft-pillars/header`, formData, {
+                headers: { 'X-CSRF-TOKEN': csrfToken || '' }
+            });
+            if (res.data && res.data.success) {
+                toastr.success(res.data.message || 'Header updated successfully!');
                 closeCraftPillarsHeaderModal();
                 broadcastMediaUpdate();
                 loadManagerData();
             } else {
-                toastr.error(res.data.message);
+                toastr.error(res.data?.message || 'Failed to update header.');
             }
         } catch (err) {
+            console.error('Craft pillars header error', err);
             toastr.error(err.response?.data?.message || 'Failed to update Craft Pillars header.');
         } finally {
-            btn.disabled = false;
-            btn.innerHTML = '<i class="fas fa-save"></i><span>Save Section Header</span>';
+            if (btn) {
+                btn.disabled = false;
+                btn.innerHTML = '<i class="fas fa-save"></i><span>Save Section Header</span>';
+            }
         }
     }
 
@@ -5863,8 +5978,10 @@
     // CRAFT PILLARS ITEM CRUD HANDLERS
     // ==========================================
     function selectPillarIcon(iconName) {
-        document.getElementById('craftPillarIconName').value = iconName;
-        document.getElementById('craftPillarIconType').value = 'preset';
+        const iconEl = document.getElementById('craftPillarIconName');
+        if (iconEl) iconEl.value = iconName;
+        const typeEl = document.getElementById('craftPillarIconType');
+        if (typeEl) typeEl.value = 'preset';
         document.querySelectorAll('.pillar-icon-btn').forEach(btn => {
             if (btn.getAttribute('data-icon') === iconName) {
                 btn.classList.add('border-red-600', 'bg-red-50', 'ring-2', 'ring-red-500/20');
@@ -5877,100 +5994,157 @@
     }
 
     function openAddCraftPillarModal() {
-        document.getElementById('craftPillarId').value = '';
-        document.getElementById('craftPillarModalTitle').textContent = 'Add Craft Pillar';
-        document.getElementById('craftPillarSubmitBtnText').textContent = 'Save Craft Pillar';
-        document.getElementById('craftPillarTitle').value = '';
-        document.getElementById('craftPillarDescription').value = '';
-        document.getElementById('craftPillarSortOrder').value = '';
-        document.getElementById('craftPillarActive').checked = true;
+        const form = document.getElementById('craftPillarForm');
+        if (form) form.reset();
+        if (document.getElementById('craftPillarId')) document.getElementById('craftPillarId').value = '';
+        if (document.getElementById('craftPillarModalTitle')) document.getElementById('craftPillarModalTitle').textContent = 'Add Craft Pillar';
+        if (document.getElementById('craftPillarSubmitBtnText')) document.getElementById('craftPillarSubmitBtnText').textContent = 'Save Craft Pillar';
+        if (document.getElementById('craftPillarTitle')) document.getElementById('craftPillarTitle').value = '';
+        if (document.getElementById('craftPillarDescription')) document.getElementById('craftPillarDescription').value = '';
+        if (document.getElementById('craftPillarSortOrder')) document.getElementById('craftPillarSortOrder').value = 1;
+        if (document.getElementById('craftPillarActive')) document.getElementById('craftPillarActive').checked = true;
         selectPillarIcon('Leaf');
 
-        document.getElementById('craftPillarModal').classList.remove('hidden');
-        document.getElementById('craftPillarModal').classList.add('flex');
+        const modal = document.getElementById('craftPillarModal');
+        if (modal) {
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+        }
     }
 
     async function openEditCraftPillarModal(id) {
+        const modal = document.getElementById('craftPillarModal');
+        if (modal) {
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+        }
+
+        // Pre-fill from managerData immediately
+        if (managerData && managerData.sections) {
+            const sec = managerData.sections.find(s => s.id === 'craft_pillars' || s.is_craft_pillars_section);
+            if (sec && sec.items) {
+                const cached = sec.items.find(p => p.id == id);
+                if (cached) {
+                    if (document.getElementById('craftPillarId')) document.getElementById('craftPillarId').value = cached.id;
+                    if (document.getElementById('craftPillarModalTitle')) document.getElementById('craftPillarModalTitle').textContent = 'Edit Craft Pillar';
+                    if (document.getElementById('craftPillarSubmitBtnText')) document.getElementById('craftPillarSubmitBtnText').textContent = 'Update Craft Pillar';
+                    if (document.getElementById('craftPillarTitle')) document.getElementById('craftPillarTitle').value = cached.title || '';
+                    if (document.getElementById('craftPillarDescription')) document.getElementById('craftPillarDescription').value = cached.description || '';
+                    if (document.getElementById('craftPillarSortOrder')) document.getElementById('craftPillarSortOrder').value = cached.sort_order || 1;
+                    if (document.getElementById('craftPillarActive')) document.getElementById('craftPillarActive').checked = cached.is_active !== false;
+                    selectPillarIcon(cached.icon_name || cached.icon || 'Leaf');
+                }
+            }
+        }
+
         try {
-            const res = await axios.get(`/admin/media/about/craft-pillars/${id}`);
-            if (res.data.success) {
+            const res = await axios.get(`${adminMediaBase}/about/craft-pillars/${id}`);
+            if (res.data && res.data.success) {
                 const p = res.data.data;
-                document.getElementById('craftPillarId').value = p.id;
-                document.getElementById('craftPillarModalTitle').textContent = 'Edit Craft Pillar';
-                document.getElementById('craftPillarSubmitBtnText').textContent = 'Update Craft Pillar';
-                document.getElementById('craftPillarTitle').value = p.title || '';
-                document.getElementById('craftPillarDescription').value = p.description || '';
-                document.getElementById('craftPillarSortOrder').value = p.sort_order || 1;
-                document.getElementById('craftPillarActive').checked = p.is_active !== false;
+                if (document.getElementById('craftPillarId')) document.getElementById('craftPillarId').value = p.id;
+                if (document.getElementById('craftPillarModalTitle')) document.getElementById('craftPillarModalTitle').textContent = 'Edit Craft Pillar';
+                if (document.getElementById('craftPillarSubmitBtnText')) document.getElementById('craftPillarSubmitBtnText').textContent = 'Update Craft Pillar';
+                if (document.getElementById('craftPillarTitle')) document.getElementById('craftPillarTitle').value = p.title || '';
+                if (document.getElementById('craftPillarDescription')) document.getElementById('craftPillarDescription').value = p.description || '';
+                if (document.getElementById('craftPillarSortOrder')) document.getElementById('craftPillarSortOrder').value = p.sort_order || 1;
+                if (document.getElementById('craftPillarActive')) document.getElementById('craftPillarActive').checked = p.is_active !== false;
                 
                 selectPillarIcon(p.icon_name || p.icon || 'Leaf');
-
-                document.getElementById('craftPillarModal').classList.remove('hidden');
-                document.getElementById('craftPillarModal').classList.add('flex');
             }
         } catch (err) {
-            toastr.error('Failed to load Craft Pillar details.');
+            console.error('Failed to load Craft Pillar details', err);
         }
     }
 
     function closeCraftPillarModal() {
-        document.getElementById('craftPillarModal').classList.add('hidden');
-        document.getElementById('craftPillarModal').classList.remove('flex');
+        const modal = document.getElementById('craftPillarModal');
+        if (modal) {
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+        }
     }
 
     async function handleCraftPillarSubmit(e) {
         e.preventDefault();
         const btn = document.getElementById('craftPillarSubmitBtn');
-        const id = document.getElementById('craftPillarId').value;
-        btn.disabled = true;
-        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving...';
+        const id = document.getElementById('craftPillarId')?.value;
+        if (btn) {
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving...';
+        }
 
         const form = document.getElementById('craftPillarForm');
         const formData = new FormData(form);
+        const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
 
-        const url = id ? `/admin/media/about/craft-pillars/${id}` : '/admin/media/about/craft-pillars';
+        const url = id ? `${adminMediaBase}/about/craft-pillars/${id}` : `${adminMediaBase}/about/craft-pillars`;
 
         try {
             const res = await axios.post(url, formData, {
-                headers: { 'Content-Type': 'multipart/form-data' }
+                headers: { 
+                    'Content-Type': 'multipart/form-data',
+                    'X-CSRF-TOKEN': csrfToken || ''
+                }
             });
-            if (res.data.success) {
-                toastr.success(res.data.message);
+            if (res.data && res.data.success) {
+                toastr.success(res.data.message || 'Pillar saved successfully!');
                 closeCraftPillarModal();
                 broadcastMediaUpdate();
                 loadManagerData();
             } else {
-                toastr.error(res.data.message);
+                toastr.error(res.data?.message || 'Failed to save pillar.');
             }
         } catch (err) {
+            console.error('Failed to save Craft Pillar', err);
             toastr.error(err.response?.data?.message || 'Failed to save Craft Pillar.');
         } finally {
-            btn.disabled = false;
-            btn.innerHTML = '<i class="fas fa-save"></i><span id="craftPillarSubmitBtnText">Save Craft Pillar</span>';
+            if (btn) {
+                btn.disabled = false;
+                btn.innerHTML = '<i class="fas fa-save"></i><span id="craftPillarSubmitBtnText">Save Craft Pillar</span>';
+            }
         }
     }
 
     async function deleteCraftPillar(id) {
         if (!confirm('Are you sure you want to delete this Craft Pillar?')) return;
         try {
-            const res = await axios.delete(`/admin/media/about/craft-pillars/${id}`);
-            if (res.data.success) {
-                toastr.success(res.data.message);
+            const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
+            let res;
+            try {
+                res = await axios.delete(`${adminMediaBase}/about/craft-pillars/${id}`, {
+                    headers: { 'X-CSRF-TOKEN': csrfToken || '' }
+                });
+            } catch (delErr) {
+                res = await axios.post(`${adminMediaBase}/about/craft-pillars/${id}/delete`, {
+                    _token: csrfToken || '',
+                    _method: 'DELETE'
+                }, {
+                    headers: { 'X-CSRF-TOKEN': csrfToken || '' }
+                });
+            }
+            if (res.data && res.data.success) {
+                toastr.success(res.data.message || 'Pillar deleted.');
                 broadcastMediaUpdate();
                 loadManagerData();
             } else {
-                toastr.error(res.data.message);
+                toastr.error(res.data?.message || 'Failed to delete.');
             }
         } catch (err) {
+            console.error('Delete pillar error', err);
             toastr.error(err.response?.data?.message || 'Failed to delete Craft Pillar.');
         }
     }
 
     async function toggleCraftPillar(id) {
         try {
-            const res = await axios.post(`/admin/media/about/craft-pillars/${id}/toggle`);
-            if (res.data.success) {
-                toastr.success(res.data.message);
+            const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
+            const res = await axios.post(`${adminMediaBase}/about/craft-pillars/${id}/toggle`, {
+                _token: csrfToken || ''
+            }, {
+                headers: { 'X-CSRF-TOKEN': csrfToken || '' }
+            });
+            if (res.data && res.data.success) {
+                toastr.success(res.data.message || 'Status updated.');
                 broadcastMediaUpdate();
                 loadManagerData();
             }
@@ -5980,56 +6154,88 @@
     }
 
     // ==========================================
+    // ==========================================
     // 12. CONTACT INTRO / HERO HANDLERS
     // ==========================================
     async function openContactIntroModal() {
-        try {
-            const res = await axios.get('/admin/media/contact/intro');
-            if (res.data.success) {
-                const s = res.data.data || {};
-                document.getElementById('contactIntroBadge').value = s.badge || s.tag_text || "Let's Connect";
-                document.getElementById('contactIntroTitle').value = s.title || "Let's Connect";
-                document.getElementById('contactIntroSubtitle').value = s.subtitle || "Have a question about a product, custom order, or collaboration? We'd love to hear from you.";
-                document.getElementById('contactIntroDescription').value = s.description || "We're here to help bring your handcrafted crochet dreams to life.";
-                document.getElementById('contactIntroAlt').value = s.alt_text || "KNOTELLE Artisan Studio Contact";
-                document.getElementById('contactIntroCtaText').value = s.cta_text || "";
-                document.getElementById('contactIntroCtaLink').value = s.cta_link || "";
-                document.getElementById('contactIntroActive').checked = s.is_active !== false;
+        const modal = document.getElementById('contactIntroModal');
+        if (modal) {
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+        }
+
+        // Instant pre-population from managerData
+        if (managerData && managerData.sections) {
+            const sec = managerData.sections.find(s => s.id === 'contact_intro' || s.is_contact_intro_section);
+            if (sec && sec.metadata) {
+                const s = sec.metadata;
+                if (document.getElementById('contactIntroBadge')) document.getElementById('contactIntroBadge').value = s.badge || s.tag_text || "Let's Connect";
+                if (document.getElementById('contactIntroTitle')) document.getElementById('contactIntroTitle').value = s.title || "Let's Connect";
+                if (document.getElementById('contactIntroSubtitle')) document.getElementById('contactIntroSubtitle').value = s.subtitle || "Have a question about a product, custom order, or collaboration? We'd love to hear from you.";
+                if (document.getElementById('contactIntroDescription')) document.getElementById('contactIntroDescription').value = s.description || "We're here to help bring your handcrafted crochet dreams to life.";
+                if (document.getElementById('contactIntroAlt')) document.getElementById('contactIntroAlt').value = s.alt_text || "KNOTELLE Artisan Studio Contact";
+                if (document.getElementById('contactIntroCtaText')) document.getElementById('contactIntroCtaText').value = s.cta_text || "";
+                if (document.getElementById('contactIntroCtaLink')) document.getElementById('contactIntroCtaLink').value = s.cta_link || "";
+                if (document.getElementById('contactIntroActive')) document.getElementById('contactIntroActive').checked = s.is_active !== false;
 
                 const img = s.image_url || s.desktop_image || s.image || '';
-                document.getElementById('contactIntroImageUrl').value = img;
-                if (img) {
+                if (document.getElementById('contactIntroImageUrl')) document.getElementById('contactIntroImageUrl').value = img;
+                if (img && document.getElementById('contactIntroPreviewImg')) {
                     document.getElementById('contactIntroPreviewImg').src = img;
-                    document.getElementById('contactIntroFileName').textContent = img.split('/').pop() || 'Contact Banner Active';
-                    document.getElementById('contactIntroFileSize').textContent = 'Ready';
-                    document.getElementById('contactIntroPreviewContainer').classList.remove('hidden');
-                } else {
+                    if (document.getElementById('contactIntroFileName')) document.getElementById('contactIntroFileName').textContent = img.split('/').pop() || 'Contact Banner Active';
+                    if (document.getElementById('contactIntroFileSize')) document.getElementById('contactIntroFileSize').textContent = 'Ready';
+                    document.getElementById('contactIntroPreviewContainer')?.classList.remove('hidden');
+                }
+            }
+        }
+
+        try {
+            const res = await axios.get(`${adminMediaBase}/contact/intro`);
+            if (res.data && res.data.success) {
+                const s = res.data.data || {};
+                if (document.getElementById('contactIntroBadge')) document.getElementById('contactIntroBadge').value = s.badge || s.tag_text || "Let's Connect";
+                if (document.getElementById('contactIntroTitle')) document.getElementById('contactIntroTitle').value = s.title || "Let's Connect";
+                if (document.getElementById('contactIntroSubtitle')) document.getElementById('contactIntroSubtitle').value = s.subtitle || "Have a question about a product, custom order, or collaboration? We'd love to hear from you.";
+                if (document.getElementById('contactIntroDescription')) document.getElementById('contactIntroDescription').value = s.description || "We're here to help bring your handcrafted crochet dreams to life.";
+                if (document.getElementById('contactIntroAlt')) document.getElementById('contactIntroAlt').value = s.alt_text || "KNOTELLE Artisan Studio Contact";
+                if (document.getElementById('contactIntroCtaText')) document.getElementById('contactIntroCtaText').value = s.cta_text || "";
+                if (document.getElementById('contactIntroCtaLink')) document.getElementById('contactIntroCtaLink').value = s.cta_link || "";
+                if (document.getElementById('contactIntroActive')) document.getElementById('contactIntroActive').checked = s.is_active !== false;
+
+                const img = s.image_url || s.desktop_image || s.image || '';
+                if (document.getElementById('contactIntroImageUrl')) document.getElementById('contactIntroImageUrl').value = img;
+                if (img && document.getElementById('contactIntroPreviewImg')) {
+                    document.getElementById('contactIntroPreviewImg').src = img;
+                    if (document.getElementById('contactIntroFileName')) document.getElementById('contactIntroFileName').textContent = img.split('/').pop() || 'Contact Banner Active';
+                    if (document.getElementById('contactIntroFileSize')) document.getElementById('contactIntroFileSize').textContent = 'Ready';
+                    document.getElementById('contactIntroPreviewContainer')?.classList.remove('hidden');
+                } else if (!img) {
                     clearContactIntroFileInput();
                 }
-
-                document.getElementById('contactIntroModal').classList.remove('hidden');
-                document.getElementById('contactIntroModal').classList.add('flex');
             }
         } catch (err) {
-            toastr.error('Failed to load Contact Intro details.');
+            console.error('Failed to load Contact Intro details', err);
         }
     }
 
     function closeContactIntroModal() {
-        document.getElementById('contactIntroModal').classList.add('hidden');
-        document.getElementById('contactIntroModal').classList.remove('flex');
+        const modal = document.getElementById('contactIntroModal');
+        if (modal) {
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+        }
     }
 
     function handleContactIntroFileChange(input) {
         if (input.files && input.files[0]) {
             const file = input.files[0];
-            document.getElementById('contactIntroFileLabel').textContent = file.name;
+            if (document.getElementById('contactIntroFileLabel')) document.getElementById('contactIntroFileLabel').textContent = file.name;
             const reader = new FileReader();
             reader.onload = function(e) {
-                document.getElementById('contactIntroPreviewImg').src = e.target.result;
-                document.getElementById('contactIntroFileName').textContent = file.name;
-                document.getElementById('contactIntroFileSize').textContent = (file.size / 1024).toFixed(1) + ' KB';
-                document.getElementById('contactIntroPreviewContainer').classList.remove('hidden');
+                if (document.getElementById('contactIntroPreviewImg')) document.getElementById('contactIntroPreviewImg').src = e.target.result;
+                if (document.getElementById('contactIntroFileName')) document.getElementById('contactIntroFileName').textContent = file.name;
+                if (document.getElementById('contactIntroFileSize')) document.getElementById('contactIntroFileSize').textContent = (file.size / 1024).toFixed(1) + ' KB';
+                document.getElementById('contactIntroPreviewContainer')?.classList.remove('hidden');
             };
             reader.readAsDataURL(file);
         }
@@ -6038,38 +6244,47 @@
     function clearContactIntroFileInput() {
         const fileInput = document.getElementById('contactIntroFileInput');
         if (fileInput) fileInput.value = '';
-        document.getElementById('contactIntroFileLabel').textContent = 'Upload Banner Image';
-        document.getElementById('contactIntroPreviewImg').src = '';
-        document.getElementById('contactIntroImageUrl').value = '';
-        document.getElementById('contactIntroPreviewContainer').classList.add('hidden');
+        if (document.getElementById('contactIntroFileLabel')) document.getElementById('contactIntroFileLabel').textContent = 'Upload Banner Image';
+        if (document.getElementById('contactIntroPreviewImg')) document.getElementById('contactIntroPreviewImg').src = '';
+        if (document.getElementById('contactIntroImageUrl')) document.getElementById('contactIntroImageUrl').value = '';
+        if (document.getElementById('contactIntroPreviewContainer')) document.getElementById('contactIntroPreviewContainer').classList.add('hidden');
     }
 
     async function handleContactIntroSubmit(e) {
         e.preventDefault();
         const btn = document.getElementById('contactIntroSubmitBtn');
-        btn.disabled = true;
-        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving...';
+        if (btn) {
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving...';
+        }
 
         const form = document.getElementById('contactIntroForm');
         const formData = new FormData(form);
+        const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
 
         try {
-            const res = await axios.post('/admin/media/contact/intro', formData, {
-                headers: { 'Content-Type': 'multipart/form-data' }
+            const res = await axios.post(`${adminMediaBase}/contact/intro`, formData, {
+                headers: { 
+                    'Content-Type': 'multipart/form-data',
+                    'X-CSRF-TOKEN': csrfToken || ''
+                }
             });
-            if (res.data.success) {
+            if (res.data && res.data.success) {
                 toastr.success(res.data.message || 'Contact Intro saved successfully.');
                 closeContactIntroModal();
                 broadcastMediaUpdate();
                 loadManagerData();
             } else {
-                toastr.error(res.data.message || 'Failed to save Contact Intro.');
+                toastr.error(res.data?.message || 'Failed to save Contact Intro.');
             }
         } catch (err) {
+            console.error('Failed to save Contact Intro', err);
             toastr.error(err.response?.data?.message || 'Failed to save Contact Intro.');
         } finally {
-            btn.disabled = false;
-            btn.innerHTML = '<i class="fas fa-save"></i><span>Save Contact Intro</span>';
+            if (btn) {
+                btn.disabled = false;
+                btn.innerHTML = '<i class="fas fa-save"></i><span>Save Contact Intro</span>';
+            }
         }
     }
 
@@ -6077,56 +6292,86 @@
     // 13. CONTACT INFO HEADER & HELPER BOX
     // ==========================================
     async function openContactInfoHeaderModal() {
-        try {
-            const res = await axios.get('/admin/media/contact/info/header');
-            if (res.data.success) {
-                const h = res.data.data || {};
-                document.getElementById('contactInfoBadgeInput').value = h.badge || h.tag_text || 'Atelier Studio';
-                document.getElementById('contactInfoTitleInput').value = h.title || 'KNOTELLE Studio';
-                document.getElementById('contactInfoSubtitleInput').value = h.subtitle || 'Handmade with love in Bengaluru, India';
-                document.getElementById('contactInfoCustomBoxTitle').value = h.custom_order_box_title || 'Looking for Custom Orders?';
-                document.getElementById('contactInfoCustomBoxText').value = h.custom_order_box_text || 'Have a specific design, color palette, or bouquet arrangement in mind? Request a bespoke piece directly.';
-                document.getElementById('contactInfoCustomBoxLink').value = h.custom_order_box_link || '/custom-order';
-                document.getElementById('contactInfoCustomBoxActive').checked = h.custom_order_box_active !== false;
-                document.getElementById('contactInfoHeaderActive').checked = h.is_active !== false;
+        const modal = document.getElementById('contactInfoHeaderModal');
+        if (modal) {
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+        }
 
-                document.getElementById('contactInfoHeaderModal').classList.remove('hidden');
-                document.getElementById('contactInfoHeaderModal').classList.add('flex');
+        // Instant pre-population from managerData
+        if (managerData && managerData.sections) {
+            const sec = managerData.sections.find(s => s.id === 'contact_info' || s.is_contact_info_section);
+            if (sec && sec.metadata) {
+                const h = sec.metadata;
+                if (document.getElementById('contactInfoBadgeInput')) document.getElementById('contactInfoBadgeInput').value = h.badge || h.tag_text || 'Atelier Studio';
+                if (document.getElementById('contactInfoTitleInput')) document.getElementById('contactInfoTitleInput').value = h.title || 'KNOTELLE Studio';
+                if (document.getElementById('contactInfoSubtitleInput')) document.getElementById('contactInfoSubtitleInput').value = h.subtitle || 'Handmade with love in Bengaluru, India';
+                if (document.getElementById('contactInfoCustomBoxTitle')) document.getElementById('contactInfoCustomBoxTitle').value = h.custom_order_box_title || 'Looking for Custom Orders?';
+                if (document.getElementById('contactInfoCustomBoxText')) document.getElementById('contactInfoCustomBoxText').value = h.custom_order_box_text || 'Have a specific design, color palette, or bouquet arrangement in mind? Request a bespoke piece directly.';
+                if (document.getElementById('contactInfoCustomBoxLink')) document.getElementById('contactInfoCustomBoxLink').value = h.custom_order_box_link || '/custom-order';
+                if (document.getElementById('contactInfoCustomBoxActive')) document.getElementById('contactInfoCustomBoxActive').checked = h.custom_order_box_active !== false;
+                if (document.getElementById('contactInfoHeaderActive')) document.getElementById('contactInfoHeaderActive').checked = h.is_active !== false;
+            }
+        }
+
+        try {
+            const res = await axios.get(`${adminMediaBase}/contact/info/header`);
+            if (res.data && res.data.success) {
+                const h = res.data.data || {};
+                if (document.getElementById('contactInfoBadgeInput')) document.getElementById('contactInfoBadgeInput').value = h.badge || h.tag_text || 'Atelier Studio';
+                if (document.getElementById('contactInfoTitleInput')) document.getElementById('contactInfoTitleInput').value = h.title || 'KNOTELLE Studio';
+                if (document.getElementById('contactInfoSubtitleInput')) document.getElementById('contactInfoSubtitleInput').value = h.subtitle || 'Handmade with love in Bengaluru, India';
+                if (document.getElementById('contactInfoCustomBoxTitle')) document.getElementById('contactInfoCustomBoxTitle').value = h.custom_order_box_title || 'Looking for Custom Orders?';
+                if (document.getElementById('contactInfoCustomBoxText')) document.getElementById('contactInfoCustomBoxText').value = h.custom_order_box_text || 'Have a specific design, color palette, or bouquet arrangement in mind? Request a bespoke piece directly.';
+                if (document.getElementById('contactInfoCustomBoxLink')) document.getElementById('contactInfoCustomBoxLink').value = h.custom_order_box_link || '/custom-order';
+                if (document.getElementById('contactInfoCustomBoxActive')) document.getElementById('contactInfoCustomBoxActive').checked = h.custom_order_box_active !== false;
+                if (document.getElementById('contactInfoHeaderActive')) document.getElementById('contactInfoHeaderActive').checked = h.is_active !== false;
             }
         } catch (err) {
-            toastr.error('Failed to load Contact Studio Header settings.');
+            console.error('Failed to load Contact Studio Header settings', err);
         }
     }
 
     function closeContactInfoHeaderModal() {
-        document.getElementById('contactInfoHeaderModal').classList.add('hidden');
-        document.getElementById('contactInfoHeaderModal').classList.remove('flex');
+        const modal = document.getElementById('contactInfoHeaderModal');
+        if (modal) {
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+        }
     }
 
     async function handleContactInfoHeaderSubmit(e) {
         e.preventDefault();
         const btn = document.getElementById('contactInfoHeaderSubmitBtn');
-        btn.disabled = true;
-        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving...';
+        if (btn) {
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving...';
+        }
 
         const form = document.getElementById('contactInfoHeaderForm');
         const formData = new FormData(form);
+        const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
 
         try {
-            const res = await axios.post('/admin/media/contact/info/header', formData);
-            if (res.data.success) {
+            const res = await axios.post(`${adminMediaBase}/contact/info/header`, formData, {
+                headers: { 'X-CSRF-TOKEN': csrfToken || '' }
+            });
+            if (res.data && res.data.success) {
                 toastr.success(res.data.message || 'Studio Header updated successfully.');
                 closeContactInfoHeaderModal();
                 broadcastMediaUpdate();
                 loadManagerData();
             } else {
-                toastr.error(res.data.message || 'Failed to update Studio Header.');
+                toastr.error(res.data?.message || 'Failed to update Studio Header.');
             }
         } catch (err) {
+            console.error('Failed to update Studio Header', err);
             toastr.error(err.response?.data?.message || 'Failed to update Studio Header.');
         } finally {
-            btn.disabled = false;
-            btn.innerHTML = '<i class="fas fa-save"></i><span>Save Studio Header</span>';
+            if (btn) {
+                btn.disabled = false;
+                btn.innerHTML = '<i class="fas fa-save"></i><span>Save Studio Header</span>';
+            }
         }
     }
 
@@ -6134,54 +6379,86 @@
     // 14. CONTACT INFO ITEMS (CRUD + TOGGLE)
     // ==========================================
     function openAddContactInfoItemModal() {
-        document.getElementById('contactInfoItemId').value = '';
-        document.getElementById('contactInfoItemModalTitle').textContent = 'Add Contact Detail';
-        document.getElementById('contactInfoItemSubmitBtnText').textContent = 'Save Contact Detail';
-        document.getElementById('contactInfoItemTitle').value = '';
-        document.getElementById('contactInfoItemValue').value = '';
-        document.getElementById('contactInfoItemAddressLine2').value = '';
-        document.getElementById('contactInfoItemLink').value = '';
-        document.getElementById('contactInfoItemSortOrder').value = 1;
-        document.getElementById('contactInfoItemActive').checked = true;
+        const form = document.getElementById('contactInfoItemForm');
+        if (form) form.reset();
+        if (document.getElementById('contactInfoItemId')) document.getElementById('contactInfoItemId').value = '';
+        if (document.getElementById('contactInfoItemModalTitle')) document.getElementById('contactInfoItemModalTitle').textContent = 'Add Contact Detail';
+        if (document.getElementById('contactInfoItemSubmitBtnText')) document.getElementById('contactInfoItemSubmitBtnText').textContent = 'Save Contact Detail';
+        if (document.getElementById('contactInfoItemTitle')) document.getElementById('contactInfoItemTitle').value = '';
+        if (document.getElementById('contactInfoItemValue')) document.getElementById('contactInfoItemValue').value = '';
+        if (document.getElementById('contactInfoItemAddressLine2')) document.getElementById('contactInfoItemAddressLine2').value = '';
+        if (document.getElementById('contactInfoItemLink')) document.getElementById('contactInfoItemLink').value = '';
+        if (document.getElementById('contactInfoItemSortOrder')) document.getElementById('contactInfoItemSortOrder').value = 1;
+        if (document.getElementById('contactInfoItemActive')) document.getElementById('contactInfoItemActive').checked = true;
 
         selectContactInfoIcon('MapPin');
 
-        document.getElementById('contactInfoItemModal').classList.remove('hidden');
-        document.getElementById('contactInfoItemModal').classList.add('flex');
+        const modal = document.getElementById('contactInfoItemModal');
+        if (modal) {
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+        }
     }
 
     async function openEditContactInfoItemModal(id) {
+        const modal = document.getElementById('contactInfoItemModal');
+        if (modal) {
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+        }
+
+        // Instant pre-population from managerData
+        if (managerData && managerData.sections) {
+            const sec = managerData.sections.find(s => s.id === 'contact_info' || s.is_contact_info_section);
+            if (sec && sec.items) {
+                const cached = sec.items.find(i => i.id == id);
+                if (cached) {
+                    if (document.getElementById('contactInfoItemId')) document.getElementById('contactInfoItemId').value = cached.id;
+                    if (document.getElementById('contactInfoItemModalTitle')) document.getElementById('contactInfoItemModalTitle').textContent = 'Edit Contact Detail';
+                    if (document.getElementById('contactInfoItemSubmitBtnText')) document.getElementById('contactInfoItemSubmitBtnText').textContent = 'Update Contact Detail';
+                    if (document.getElementById('contactInfoItemTitle')) document.getElementById('contactInfoItemTitle').value = cached.title || '';
+                    if (document.getElementById('contactInfoItemValue')) document.getElementById('contactInfoItemValue').value = cached.value || cached.description || '';
+                    if (document.getElementById('contactInfoItemAddressLine2')) document.getElementById('contactInfoItemAddressLine2').value = cached.address_line_2 || '';
+                    if (document.getElementById('contactInfoItemLink')) document.getElementById('contactInfoItemLink').value = cached.link || cached.cta_link || '';
+                    if (document.getElementById('contactInfoItemSortOrder')) document.getElementById('contactInfoItemSortOrder').value = cached.sort_order || 1;
+                    if (document.getElementById('contactInfoItemActive')) document.getElementById('contactInfoItemActive').checked = cached.is_active !== false;
+                    selectContactInfoIcon(cached.icon || cached.icon_name || 'MapPin');
+                }
+            }
+        }
+
         try {
-            const res = await axios.get(`/admin/media/contact/info/items/${id}`);
-            if (res.data.success) {
+            const res = await axios.get(`${adminMediaBase}/contact/info/items/${id}`);
+            if (res.data && res.data.success) {
                 const item = res.data.data;
-                document.getElementById('contactInfoItemId').value = item.id;
-                document.getElementById('contactInfoItemModalTitle').textContent = 'Edit Contact Detail';
-                document.getElementById('contactInfoItemSubmitBtnText').textContent = 'Update Contact Detail';
-                document.getElementById('contactInfoItemTitle').value = item.title || '';
-                document.getElementById('contactInfoItemValue').value = item.value || '';
-                document.getElementById('contactInfoItemAddressLine2').value = item.address_line_2 || '';
-                document.getElementById('contactInfoItemLink').value = item.link || item.cta_link || '';
-                document.getElementById('contactInfoItemSortOrder').value = item.sort_order || 1;
-                document.getElementById('contactInfoItemActive').checked = item.is_active !== false;
+                if (document.getElementById('contactInfoItemId')) document.getElementById('contactInfoItemId').value = item.id;
+                if (document.getElementById('contactInfoItemModalTitle')) document.getElementById('contactInfoItemModalTitle').textContent = 'Edit Contact Detail';
+                if (document.getElementById('contactInfoItemSubmitBtnText')) document.getElementById('contactInfoItemSubmitBtnText').textContent = 'Update Contact Detail';
+                if (document.getElementById('contactInfoItemTitle')) document.getElementById('contactInfoItemTitle').value = item.title || '';
+                if (document.getElementById('contactInfoItemValue')) document.getElementById('contactInfoItemValue').value = item.value || '';
+                if (document.getElementById('contactInfoItemAddressLine2')) document.getElementById('contactInfoItemAddressLine2').value = item.address_line_2 || '';
+                if (document.getElementById('contactInfoItemLink')) document.getElementById('contactInfoItemLink').value = item.link || item.cta_link || '';
+                if (document.getElementById('contactInfoItemSortOrder')) document.getElementById('contactInfoItemSortOrder').value = item.sort_order || 1;
+                if (document.getElementById('contactInfoItemActive')) document.getElementById('contactInfoItemActive').checked = item.is_active !== false;
 
                 selectContactInfoIcon(item.icon || item.icon_name || 'MapPin');
-
-                document.getElementById('contactInfoItemModal').classList.remove('hidden');
-                document.getElementById('contactInfoItemModal').classList.add('flex');
             }
         } catch (err) {
-            toastr.error('Failed to load Contact Detail.');
+            console.error('Failed to load Contact Detail', err);
         }
     }
 
     function closeContactInfoItemModal() {
-        document.getElementById('contactInfoItemModal').classList.add('hidden');
-        document.getElementById('contactInfoItemModal').classList.remove('flex');
+        const modal = document.getElementById('contactInfoItemModal');
+        if (modal) {
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+        }
     }
 
     function selectContactInfoIcon(iconName) {
-        document.getElementById('contactInfoItemIcon').value = iconName;
+        const iconEl = document.getElementById('contactInfoItemIcon');
+        if (iconEl) iconEl.value = iconName;
         document.querySelectorAll('.contact-info-icon-btn').forEach(btn => {
             if (btn.getAttribute('data-icon') === iconName) {
                 btn.classList.add('border-red-500', 'bg-red-50/50', 'ring-2', 'ring-red-300');
@@ -6196,52 +6473,79 @@
     async function handleContactInfoItemSubmit(e) {
         e.preventDefault();
         const btn = document.getElementById('contactInfoItemSubmitBtn');
-        const id = document.getElementById('contactInfoItemId').value;
-        btn.disabled = true;
-        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving...';
+        const id = document.getElementById('contactInfoItemId')?.value;
+        if (btn) {
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving...';
+        }
 
         const form = document.getElementById('contactInfoItemForm');
         const formData = new FormData(form);
-        const url = id ? `/admin/media/contact/info/items/${id}` : '/admin/media/contact/info/items';
+        const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
+        const url = id ? `${adminMediaBase}/contact/info/items/${id}` : `${adminMediaBase}/contact/info/items`;
 
         try {
-            const res = await axios.post(url, formData);
-            if (res.data.success) {
+            const res = await axios.post(url, formData, {
+                headers: { 'X-CSRF-TOKEN': csrfToken || '' }
+            });
+            if (res.data && res.data.success) {
                 toastr.success(res.data.message || 'Contact detail saved successfully.');
                 closeContactInfoItemModal();
                 broadcastMediaUpdate();
                 loadManagerData();
             } else {
-                toastr.error(res.data.message || 'Failed to save detail.');
+                toastr.error(res.data?.message || 'Failed to save detail.');
             }
         } catch (err) {
+            console.error('Failed to save detail', err);
             toastr.error(err.response?.data?.message || 'Failed to save detail.');
         } finally {
-            btn.disabled = false;
-            btn.innerHTML = '<i class="fas fa-save"></i><span id="contactInfoItemSubmitBtnText">Save Contact Detail</span>';
+            if (btn) {
+                btn.disabled = false;
+                btn.innerHTML = '<i class="fas fa-save"></i><span id="contactInfoItemSubmitBtnText">Save Contact Detail</span>';
+            }
         }
     }
 
     async function deleteContactInfoItem(id) {
         if (!confirm('Are you sure you want to delete this contact detail?')) return;
         try {
-            const res = await axios.delete(`/admin/media/contact/info/items/${id}`);
-            if (res.data.success) {
+            const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
+            let res;
+            try {
+                res = await axios.delete(`${adminMediaBase}/contact/info/items/${id}`, {
+                    headers: { 'X-CSRF-TOKEN': csrfToken || '' }
+                });
+            } catch (delErr) {
+                res = await axios.post(`${adminMediaBase}/contact/info/items/${id}/delete`, {
+                    _token: csrfToken || '',
+                    _method: 'DELETE'
+                }, {
+                    headers: { 'X-CSRF-TOKEN': csrfToken || '' }
+                });
+            }
+            if (res.data && res.data.success) {
                 toastr.success(res.data.message || 'Contact detail deleted.');
                 broadcastMediaUpdate();
                 loadManagerData();
             } else {
-                toastr.error(res.data.message);
+                toastr.error(res.data?.message || 'Failed to delete detail.');
             }
         } catch (err) {
+            console.error('Delete detail error', err);
             toastr.error(err.response?.data?.message || 'Failed to delete detail.');
         }
     }
 
     async function toggleContactInfoItem(id) {
         try {
-            const res = await axios.post(`/admin/media/contact/info/items/${id}/toggle`);
-            if (res.data.success) {
+            const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
+            const res = await axios.post(`${adminMediaBase}/contact/info/items/${id}/toggle`, {
+                _token: csrfToken || ''
+            }, {
+                headers: { 'X-CSRF-TOKEN': csrfToken || '' }
+            });
+            if (res.data && res.data.success) {
                 toastr.success(res.data.message || 'Status updated.');
                 broadcastMediaUpdate();
                 loadManagerData();
@@ -6255,18 +6559,25 @@
     // 15. CONTACT FORM SETTINGS
     // ==========================================
     async function openContactFormModal() {
-        try {
-            const res = await axios.get('/admin/media/contact/form');
-            if (res.data.success) {
-                const f = res.data.data || {};
-                document.getElementById('contactFormBadge').value = f.badge || f.tag_text || 'Get In Touch';
-                document.getElementById('contactFormTitle').value = f.title || 'Send Us a Message';
-                document.getElementById('contactFormSubtitle').value = f.subtitle || 'Fill in your details and our team will get back to you promptly.';
-                document.getElementById('contactFormCtaText').value = f.cta_text || f.submit_btn_text || 'Send Message';
-                document.getElementById('contactFormSuccessTitle').value = f.success_title || 'Message Sent!';
-                document.getElementById('contactFormSuccessMessage').value = f.success_message || 'Thank you! Your message has been sent successfully. We will get back to you shortly.';
-                document.getElementById('contactFormErrorMessage').value = f.error_message || 'Something went wrong while sending your message. Please check the form and try again.';
-                document.getElementById('contactFormActive').checked = f.is_active !== false;
+        const modal = document.getElementById('contactFormModal');
+        if (modal) {
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+        }
+
+        // Instant pre-population from managerData
+        if (managerData && managerData.sections) {
+            const sec = managerData.sections.find(s => s.id === 'contact_form' || s.is_contact_form_section);
+            if (sec && sec.metadata) {
+                const f = sec.metadata;
+                if (document.getElementById('contactFormBadge')) document.getElementById('contactFormBadge').value = f.badge || f.tag_text || 'Get In Touch';
+                if (document.getElementById('contactFormTitle')) document.getElementById('contactFormTitle').value = f.title || 'Send Us a Message';
+                if (document.getElementById('contactFormSubtitle')) document.getElementById('contactFormSubtitle').value = f.subtitle || 'Fill in your details and our team will get back to you promptly.';
+                if (document.getElementById('contactFormCtaText')) document.getElementById('contactFormCtaText').value = f.cta_text || f.submit_btn_text || 'Send Message';
+                if (document.getElementById('contactFormSuccessTitle')) document.getElementById('contactFormSuccessTitle').value = f.success_title || 'Message Sent!';
+                if (document.getElementById('contactFormSuccessMessage')) document.getElementById('contactFormSuccessMessage').value = f.success_message || 'Thank you! Your message has been sent successfully. We will get back to you shortly.';
+                if (document.getElementById('contactFormErrorMessage')) document.getElementById('contactFormErrorMessage').value = f.error_message || 'Something went wrong while sending your message. Please check the form and try again.';
+                if (document.getElementById('contactFormActive')) document.getElementById('contactFormActive').checked = f.is_active !== false;
 
                 if (f.fields && Array.isArray(f.fields)) {
                     f.fields.forEach(field => {
@@ -6276,44 +6587,76 @@
                         if (placeholderEl) placeholderEl.value = field.placeholder || '';
                     });
                 }
+            }
+        }
 
-                document.getElementById('contactFormModal').classList.remove('hidden');
-                document.getElementById('contactFormModal').classList.add('flex');
+        try {
+            const res = await axios.get(`${adminMediaBase}/contact/form`);
+            if (res.data && res.data.success) {
+                const f = res.data.data || {};
+                if (document.getElementById('contactFormBadge')) document.getElementById('contactFormBadge').value = f.badge || f.tag_text || 'Get In Touch';
+                if (document.getElementById('contactFormTitle')) document.getElementById('contactFormTitle').value = f.title || 'Send Us a Message';
+                if (document.getElementById('contactFormSubtitle')) document.getElementById('contactFormSubtitle').value = f.subtitle || 'Fill in your details and our team will get back to you promptly.';
+                if (document.getElementById('contactFormCtaText')) document.getElementById('contactFormCtaText').value = f.cta_text || f.submit_btn_text || 'Send Message';
+                if (document.getElementById('contactFormSuccessTitle')) document.getElementById('contactFormSuccessTitle').value = f.success_title || 'Message Sent!';
+                if (document.getElementById('contactFormSuccessMessage')) document.getElementById('contactFormSuccessMessage').value = f.success_message || 'Thank you! Your message has been sent successfully. We will get back to you shortly.';
+                if (document.getElementById('contactFormErrorMessage')) document.getElementById('contactFormErrorMessage').value = f.error_message || 'Something went wrong while sending your message. Please check the form and try again.';
+                if (document.getElementById('contactFormActive')) document.getElementById('contactFormActive').checked = f.is_active !== false;
+
+                if (f.fields && Array.isArray(f.fields)) {
+                    f.fields.forEach(field => {
+                        const labelEl = document.getElementById(`field_${field.key}_label`);
+                        const placeholderEl = document.getElementById(`field_${field.key}_placeholder`);
+                        if (labelEl) labelEl.value = field.label || '';
+                        if (placeholderEl) placeholderEl.value = field.placeholder || '';
+                    });
+                }
             }
         } catch (err) {
-            toastr.error('Failed to load Contact Form settings.');
+            console.error('Failed to load Contact Form settings', err);
         }
     }
 
     function closeContactFormModal() {
-        document.getElementById('contactFormModal').classList.add('hidden');
-        document.getElementById('contactFormModal').classList.remove('flex');
+        const modal = document.getElementById('contactFormModal');
+        if (modal) {
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+        }
     }
 
     async function handleContactFormSubmit(e) {
         e.preventDefault();
         const btn = document.getElementById('contactFormSubmitBtn');
-        btn.disabled = true;
-        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving...';
+        if (btn) {
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving...';
+        }
 
         const form = document.getElementById('contactFormSettingsForm');
         const formData = new FormData(form);
+        const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
 
         try {
-            const res = await axios.post('/admin/media/contact/form', formData);
-            if (res.data.success) {
+            const res = await axios.post(`${adminMediaBase}/contact/form`, formData, {
+                headers: { 'X-CSRF-TOKEN': csrfToken || '' }
+            });
+            if (res.data && res.data.success) {
                 toastr.success(res.data.message || 'Form configuration saved successfully.');
                 closeContactFormModal();
                 broadcastMediaUpdate();
                 loadManagerData();
             } else {
-                toastr.error(res.data.message || 'Failed to save form settings.');
+                toastr.error(res.data?.message || 'Failed to save form settings.');
             }
         } catch (err) {
+            console.error('Contact form error', err);
             toastr.error(err.response?.data?.message || 'Failed to save form settings.');
         } finally {
-            btn.disabled = false;
-            btn.innerHTML = '<i class="fas fa-save"></i><span>Save Form Configuration</span>';
+            if (btn) {
+                btn.disabled = false;
+                btn.innerHTML = '<i class="fas fa-save"></i><span>Save Form Configuration</span>';
+            }
         }
     }
 
@@ -6321,143 +6664,224 @@
     // 16. CONTACT FAQS (HEADER + CRUD + TOGGLE)
     // ==========================================
     async function openContactFaqsHeaderModal() {
-        try {
-            const res = await axios.get('/admin/media/contact/faqs/header');
-            if (res.data.success) {
-                const h = res.data.data || {};
-                document.getElementById('contactFaqsHeaderTagText').value = h.badge || h.tag_text || 'Help & Support';
-                document.getElementById('contactFaqsHeaderTitle').value = h.title || 'Frequently Asked Questions';
-                document.getElementById('contactFaqsHeaderSubtitle').value = h.subtitle || 'Quick answers about our handmade creations, custom orders, and delivery.';
-                document.getElementById('contactFaqsHeaderActive').checked = h.is_active !== false;
+        const modal = document.getElementById('contactFaqsHeaderModal');
+        if (modal) {
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+        }
 
-                document.getElementById('contactFaqsHeaderModal').classList.remove('hidden');
-                document.getElementById('contactFaqsHeaderModal').classList.add('flex');
+        // Instant pre-population from managerData
+        if (managerData && managerData.sections) {
+            const sec = managerData.sections.find(s => s.id === 'faqs' || s.is_contact_faqs_section);
+            if (sec && sec.metadata) {
+                const h = sec.metadata;
+                if (document.getElementById('contactFaqsHeaderTagText')) document.getElementById('contactFaqsHeaderTagText').value = h.badge || h.tag_text || 'Help & Support';
+                if (document.getElementById('contactFaqsHeaderTitle')) document.getElementById('contactFaqsHeaderTitle').value = h.title || 'Frequently Asked Questions';
+                if (document.getElementById('contactFaqsHeaderSubtitle')) document.getElementById('contactFaqsHeaderSubtitle').value = h.subtitle || 'Quick answers about our handmade creations, custom orders, and delivery.';
+                if (document.getElementById('contactFaqsHeaderActive')) document.getElementById('contactFaqsHeaderActive').checked = h.is_active !== false;
+            }
+        }
+
+        try {
+            const res = await axios.get(`${adminMediaBase}/contact/faqs/header`);
+            if (res.data && res.data.success) {
+                const h = res.data.data || {};
+                if (document.getElementById('contactFaqsHeaderTagText')) document.getElementById('contactFaqsHeaderTagText').value = h.badge || h.tag_text || 'Help & Support';
+                if (document.getElementById('contactFaqsHeaderTitle')) document.getElementById('contactFaqsHeaderTitle').value = h.title || 'Frequently Asked Questions';
+                if (document.getElementById('contactFaqsHeaderSubtitle')) document.getElementById('contactFaqsHeaderSubtitle').value = h.subtitle || 'Quick answers about our handmade creations, custom orders, and delivery.';
+                if (document.getElementById('contactFaqsHeaderActive')) document.getElementById('contactFaqsHeaderActive').checked = h.is_active !== false;
             }
         } catch (err) {
-            toastr.error('Failed to load FAQ Header settings.');
+            console.error('Failed to load FAQ Header settings', err);
         }
     }
 
     function closeContactFaqsHeaderModal() {
-        document.getElementById('contactFaqsHeaderModal').classList.add('hidden');
-        document.getElementById('contactFaqsHeaderModal').classList.remove('flex');
+        const modal = document.getElementById('contactFaqsHeaderModal');
+        if (modal) {
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+        }
     }
 
     async function handleContactFaqsHeaderSubmit(e) {
         e.preventDefault();
         const btn = document.getElementById('contactFaqsHeaderSubmitBtn');
-        btn.disabled = true;
-        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving...';
+        if (btn) {
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving...';
+        }
 
         const form = document.getElementById('contactFaqsHeaderForm');
         const formData = new FormData(form);
+        const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
 
         try {
-            const res = await axios.post('/admin/media/contact/faqs/header', formData);
-            if (res.data.success) {
+            const res = await axios.post(`${adminMediaBase}/contact/faqs/header`, formData, {
+                headers: { 'X-CSRF-TOKEN': csrfToken || '' }
+            });
+            if (res.data && res.data.success) {
                 toastr.success(res.data.message || 'FAQ Header saved successfully.');
                 closeContactFaqsHeaderModal();
                 broadcastMediaUpdate();
                 loadManagerData();
             } else {
-                toastr.error(res.data.message || 'Failed to save FAQ header.');
+                toastr.error(res.data?.message || 'Failed to save FAQ header.');
             }
         } catch (err) {
+            console.error('FAQ header error', err);
             toastr.error(err.response?.data?.message || 'Failed to save FAQ header.');
         } finally {
-            btn.disabled = false;
-            btn.innerHTML = '<i class="fas fa-save"></i><span>Save FAQ Header</span>';
+            if (btn) {
+                btn.disabled = false;
+                btn.innerHTML = '<i class="fas fa-save"></i><span>Save FAQ Header</span>';
+            }
         }
     }
 
     function openAddContactFaqModal() {
-        document.getElementById('contactFaqId').value = '';
-        document.getElementById('contactFaqModalTitle').textContent = 'Add FAQ Item';
-        document.getElementById('contactFaqSubmitBtnText').textContent = 'Save FAQ';
-        document.getElementById('contactFaqQuestion').value = '';
-        document.getElementById('contactFaqAnswer').value = '';
-        document.getElementById('contactFaqSortOrder').value = 1;
-        document.getElementById('contactFaqActive').checked = true;
+        const form = document.getElementById('contactFaqForm');
+        if (form) form.reset();
+        if (document.getElementById('contactFaqId')) document.getElementById('contactFaqId').value = '';
+        if (document.getElementById('contactFaqModalTitle')) document.getElementById('contactFaqModalTitle').textContent = 'Add FAQ Item';
+        if (document.getElementById('contactFaqSubmitBtnText')) document.getElementById('contactFaqSubmitBtnText').textContent = 'Save FAQ';
+        if (document.getElementById('contactFaqQuestion')) document.getElementById('contactFaqQuestion').value = '';
+        if (document.getElementById('contactFaqAnswer')) document.getElementById('contactFaqAnswer').value = '';
+        if (document.getElementById('contactFaqSortOrder')) document.getElementById('contactFaqSortOrder').value = 1;
+        if (document.getElementById('contactFaqActive')) document.getElementById('contactFaqActive').checked = true;
 
-        document.getElementById('contactFaqModal').classList.remove('hidden');
-        document.getElementById('contactFaqModal').classList.add('flex');
+        const modal = document.getElementById('contactFaqModal');
+        if (modal) {
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+        }
     }
 
     async function openEditContactFaqModal(id) {
-        try {
-            const res = await axios.get(`/admin/media/contact/faqs/items/${id}`);
-            if (res.data.success) {
-                const faq = res.data.data;
-                document.getElementById('contactFaqId').value = faq.id;
-                document.getElementById('contactFaqModalTitle').textContent = 'Edit FAQ Item';
-                document.getElementById('contactFaqSubmitBtnText').textContent = 'Update FAQ';
-                document.getElementById('contactFaqQuestion').value = faq.question || faq.title || '';
-                document.getElementById('contactFaqAnswer').value = faq.answer || faq.description || '';
-                document.getElementById('contactFaqSortOrder').value = faq.sort_order || 1;
-                document.getElementById('contactFaqActive').checked = faq.is_active !== false;
+        const modal = document.getElementById('contactFaqModal');
+        if (modal) {
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+        }
 
-                document.getElementById('contactFaqModal').classList.remove('hidden');
-                document.getElementById('contactFaqModal').classList.add('flex');
+        // Instant pre-population from managerData
+        if (managerData && managerData.sections) {
+            const sec = managerData.sections.find(s => s.id === 'faqs' || s.is_contact_faqs_section);
+            if (sec && sec.items) {
+                const cached = sec.items.find(q => q.id == id);
+                if (cached) {
+                    if (document.getElementById('contactFaqId')) document.getElementById('contactFaqId').value = cached.id;
+                    if (document.getElementById('contactFaqModalTitle')) document.getElementById('contactFaqModalTitle').textContent = 'Edit FAQ Item';
+                    if (document.getElementById('contactFaqSubmitBtnText')) document.getElementById('contactFaqSubmitBtnText').textContent = 'Update FAQ';
+                    if (document.getElementById('contactFaqQuestion')) document.getElementById('contactFaqQuestion').value = cached.question || cached.title || '';
+                    if (document.getElementById('contactFaqAnswer')) document.getElementById('contactFaqAnswer').value = cached.answer || cached.description || '';
+                    if (document.getElementById('contactFaqSortOrder')) document.getElementById('contactFaqSortOrder').value = cached.sort_order || 1;
+                    if (document.getElementById('contactFaqActive')) document.getElementById('contactFaqActive').checked = cached.is_active !== false;
+                }
+            }
+        }
+
+        try {
+            const res = await axios.get(`${adminMediaBase}/contact/faqs/items/${id}`);
+            if (res.data && res.data.success) {
+                const faq = res.data.data;
+                if (document.getElementById('contactFaqId')) document.getElementById('contactFaqId').value = faq.id;
+                if (document.getElementById('contactFaqModalTitle')) document.getElementById('contactFaqModalTitle').textContent = 'Edit FAQ Item';
+                if (document.getElementById('contactFaqSubmitBtnText')) document.getElementById('contactFaqSubmitBtnText').textContent = 'Update FAQ';
+                if (document.getElementById('contactFaqQuestion')) document.getElementById('contactFaqQuestion').value = faq.question || faq.title || '';
+                if (document.getElementById('contactFaqAnswer')) document.getElementById('contactFaqAnswer').value = faq.answer || faq.description || '';
+                if (document.getElementById('contactFaqSortOrder')) document.getElementById('contactFaqSortOrder').value = faq.sort_order || 1;
+                if (document.getElementById('contactFaqActive')) document.getElementById('contactFaqActive').checked = faq.is_active !== false;
             }
         } catch (err) {
-            toastr.error('Failed to load FAQ details.');
+            console.error('Failed to load FAQ details', err);
         }
     }
 
     function closeContactFaqModal() {
-        document.getElementById('contactFaqModal').classList.add('hidden');
-        document.getElementById('contactFaqModal').classList.remove('flex');
+        const modal = document.getElementById('contactFaqModal');
+        if (modal) {
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+        }
     }
 
     async function handleContactFaqSubmit(e) {
         e.preventDefault();
         const btn = document.getElementById('contactFaqSubmitBtn');
-        const id = document.getElementById('contactFaqId').value;
-        btn.disabled = true;
-        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving...';
+        const id = document.getElementById('contactFaqId')?.value;
+        if (btn) {
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving...';
+        }
 
         const form = document.getElementById('contactFaqForm');
         const formData = new FormData(form);
-        const url = id ? `/admin/media/contact/faqs/items/${id}` : '/admin/media/contact/faqs/items';
+        const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
+        const url = id ? `${adminMediaBase}/contact/faqs/items/${id}` : `${adminMediaBase}/contact/faqs/items`;
 
         try {
-            const res = await axios.post(url, formData);
-            if (res.data.success) {
+            const res = await axios.post(url, formData, {
+                headers: { 'X-CSRF-TOKEN': csrfToken || '' }
+            });
+            if (res.data && res.data.success) {
                 toastr.success(res.data.message || 'FAQ item saved successfully.');
                 closeContactFaqModal();
                 broadcastMediaUpdate();
                 loadManagerData();
             } else {
-                toastr.error(res.data.message || 'Failed to save FAQ.');
+                toastr.error(res.data?.message || 'Failed to save FAQ.');
             }
         } catch (err) {
+            console.error('Failed to save FAQ', err);
             toastr.error(err.response?.data?.message || 'Failed to save FAQ.');
         } finally {
-            btn.disabled = false;
-            btn.innerHTML = '<i class="fas fa-save"></i><span id="contactFaqSubmitBtnText">Save FAQ</span>';
+            if (btn) {
+                btn.disabled = false;
+                btn.innerHTML = '<i class="fas fa-save"></i><span id="contactFaqSubmitBtnText">Save FAQ</span>';
+            }
         }
     }
 
     async function deleteContactFaq(id) {
         if (!confirm('Are you sure you want to delete this FAQ?')) return;
         try {
-            const res = await axios.delete(`/admin/media/contact/faqs/items/${id}`);
-            if (res.data.success) {
+            const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
+            let res;
+            try {
+                res = await axios.delete(`${adminMediaBase}/contact/faqs/items/${id}`, {
+                    headers: { 'X-CSRF-TOKEN': csrfToken || '' }
+                });
+            } catch (delErr) {
+                res = await axios.post(`${adminMediaBase}/contact/faqs/items/${id}/delete`, {
+                    _token: csrfToken || '',
+                    _method: 'DELETE'
+                }, {
+                    headers: { 'X-CSRF-TOKEN': csrfToken || '' }
+                });
+            }
+            if (res.data && res.data.success) {
                 toastr.success(res.data.message || 'FAQ deleted.');
                 broadcastMediaUpdate();
                 loadManagerData();
             } else {
-                toastr.error(res.data.message);
+                toastr.error(res.data?.message || 'Failed to delete FAQ.');
             }
         } catch (err) {
+            console.error('Delete FAQ error', err);
             toastr.error(err.response?.data?.message || 'Failed to delete FAQ.');
         }
     }
 
     async function toggleContactFaq(id) {
         try {
-            const res = await axios.post(`/admin/media/contact/faqs/items/${id}/toggle`);
-            if (res.data.success) {
+            const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
+            const res = await axios.post(`${adminMediaBase}/contact/faqs/items/${id}/toggle`, {
+                _token: csrfToken || ''
+            }, {
+                headers: { 'X-CSRF-TOKEN': csrfToken || '' }
+            });
+            if (res.data && res.data.success) {
                 toastr.success(res.data.message || 'Status updated.');
                 broadcastMediaUpdate();
                 loadManagerData();
@@ -6535,14 +6959,25 @@
     async function handleCustomCrochetSubmit(e) {
         e.preventDefault();
         const btn = document.getElementById('customCrochetSubmitBtn');
-        btn.disabled = true;
-        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving...';
+        if (btn) {
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving...';
+        }
 
         const form = document.getElementById('customCrochetForm');
         const formData = new FormData(form);
+        const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
+        if (csrfToken && !formData.has('_token')) {
+            formData.append('_token', csrfToken);
+        }
 
         try {
-            const res = await axios.post(`${adminMediaBase}/homepage/custom-crochet`, formData);
+            const res = await axios.post(`${adminMediaBase}/homepage/custom-crochet`, formData, {
+                headers: {
+                    'Content-Type': 'multipart/form-data',
+                    'X-CSRF-TOKEN': csrfToken || ''
+                }
+            });
             if (res.data.success) {
                 toastr.success(res.data.message || 'Custom Crochet Banner updated successfully!');
                 closeCustomCrochetModal();
@@ -6554,8 +6989,10 @@
         } catch (err) {
             toastr.error(err.response?.data?.message || 'Failed to save Custom Crochet Banner.');
         } finally {
-            btn.disabled = false;
-            btn.innerHTML = '<i class="fas fa-save"></i><span>Save Custom Crochet Banner</span>';
+            if (btn) {
+                btn.disabled = false;
+                btn.innerHTML = '<i class="fas fa-save"></i><span>Save Custom Crochet Banner</span>';
+            }
         }
     }
 
@@ -6565,84 +7002,106 @@
     let footerCol1LinkIndex = 0;
     let footerCol2LinkIndex = 0;
 
+    function populateFooterSettingsForm(f) {
+        if (!f) return;
+        if (document.getElementById('footerCol1Title')) document.getElementById('footerCol1Title').value = f.col1_title || 'Quick Links';
+        if (document.getElementById('footerCol2Title')) document.getElementById('footerCol2Title').value = f.col2_title || 'Help';
+        if (document.getElementById('footerCol3Title')) document.getElementById('footerCol3Title').value = f.col3_title || 'Contact';
+
+        if (document.getElementById('footerContactPhone')) document.getElementById('footerContactPhone').value = f.contact_phone || '+91 97730 39243';
+        if (document.getElementById('footerContactPhoneLink')) document.getElementById('footerContactPhoneLink').value = f.contact_phone_link || 'tel:+919773039243';
+        if (document.getElementById('footerContactEmail')) document.getElementById('footerContactEmail').value = f.contact_email || 'support@knotelle.in';
+        if (document.getElementById('footerContactEmailLink')) document.getElementById('footerContactEmailLink').value = f.contact_email_link || 'mailto:support@knotelle.in';
+        if (document.getElementById('footerContactAddress')) document.getElementById('footerContactAddress').value = f.contact_address || 'India';
+
+        if (document.getElementById('footerInstagramUrl')) document.getElementById('footerInstagramUrl').value = f.instagram_url || 'https://instagram.com/knotelleindia';
+        if (document.getElementById('footerInstagramActive')) document.getElementById('footerInstagramActive').checked = f.instagram_active !== false;
+        if (document.getElementById('footerFacebookUrl')) document.getElementById('footerFacebookUrl').value = f.facebook_url || 'https://facebook.com/knotelleindia';
+        if (document.getElementById('footerFacebookActive')) document.getElementById('footerFacebookActive').checked = f.facebook_active !== false;
+        if (document.getElementById('footerPinterestUrl')) document.getElementById('footerPinterestUrl').value = f.pinterest_url || 'https://pinterest.com/knotelleindia';
+        if (document.getElementById('footerPinterestActive')) document.getElementById('footerPinterestActive').checked = f.pinterest_active !== false;
+        if (document.getElementById('footerYouTubeUrl')) document.getElementById('footerYouTubeUrl').value = f.youtube_url || 'https://youtube.com/@knotelleindia';
+        if (document.getElementById('footerYouTubeActive')) document.getElementById('footerYouTubeActive').checked = f.youtube_active !== false;
+
+        if (document.getElementById('footerCopyrightText')) document.getElementById('footerCopyrightText').value = f.copyright_text || '© {year} Knotelle. All rights reserved.';
+        if (document.getElementById('footerHeartTagline')) document.getElementById('footerHeartTagline').value = f.heart_tagline || 'Made with ♡ for a kinder, cozier world.';
+        if (document.getElementById('footerSectionActive')) document.getElementById('footerSectionActive').checked = f.is_active !== false;
+
+        // Background image
+        const bgImg = f.bg_image || f.desktop_image || '';
+        if (document.getElementById('footerBgImageUrl')) document.getElementById('footerBgImageUrl').value = bgImg;
+        if (bgImg && document.getElementById('footerBgPreviewImg')) {
+            document.getElementById('footerBgPreviewImg').src = bgImg;
+            if (document.getElementById('footerBgFileName')) document.getElementById('footerBgFileName').textContent = bgImg.split('/').pop() || 'Background Active';
+            if (document.getElementById('footerBgPreviewContainer')) document.getElementById('footerBgPreviewContainer').classList.remove('hidden');
+        } else if (document.getElementById('footerBgPreviewContainer')) {
+            document.getElementById('footerBgPreviewContainer').classList.add('hidden');
+        }
+
+        // Render Column 1 links
+        const col1Container = document.getElementById('footerCol1LinksContainer');
+        if (col1Container) {
+            col1Container.innerHTML = '';
+            footerCol1LinkIndex = 0;
+            const col1Links = f.col1_links && f.col1_links.length > 0 ? f.col1_links : [
+                { label: 'Home', url: '/', is_active: true },
+                { label: 'Shop', url: '/shop', is_active: true },
+                { label: 'Custom Order', url: '/custom-order', is_active: true },
+                { label: 'About', url: '/about', is_active: true },
+                { label: 'Contact', url: '/contact', is_active: true },
+            ];
+            col1Links.forEach(link => addFooterCol1Link(link));
+        }
+
+        // Render Column 2 links
+        const col2Container = document.getElementById('footerCol2LinksContainer');
+        if (col2Container) {
+            col2Container.innerHTML = '';
+            footerCol2LinkIndex = 0;
+            const col2Links = f.col2_links && f.col2_links.length > 0 ? f.col2_links : [
+                { label: 'Shipping Policy', url: '/contact', is_active: true },
+                { label: 'Return & Refund', url: '/contact', is_active: true },
+                { label: 'FAQ', url: '/contact', is_active: true },
+                { label: 'Track Order', url: '/account/orders', is_active: true },
+            ];
+            col2Links.forEach(link => addFooterCol2Link(link));
+        }
+    }
+
     async function openFooterSettingsModal() {
+        const modal = document.getElementById('footerSettingsModal');
+        if (modal) {
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+        }
+
+        // Immediately populate from cached managerData if available
+        if (managerData && managerData.footer_settings) {
+            populateFooterSettingsForm(managerData.footer_settings);
+        }
+
         try {
-            const res = await axios.get('/admin/media/footer/settings');
-            if (res.data.success) {
+            const res = await axios.get(`${adminMediaBase}/footer/settings`);
+            if (res.data && res.data.success) {
                 const f = res.data.data || {};
-                document.getElementById('footerCol1Title').value = f.col1_title || 'Quick Links';
-                document.getElementById('footerCol2Title').value = f.col2_title || 'Help';
-                document.getElementById('footerCol3Title').value = f.col3_title || 'Contact';
-
-                document.getElementById('footerContactPhone').value = f.contact_phone || '+91 97730 39243';
-                document.getElementById('footerContactPhoneLink').value = f.contact_phone_link || 'tel:+919773039243';
-                document.getElementById('footerContactEmail').value = f.contact_email || 'support@knotelle.in';
-                document.getElementById('footerContactEmailLink').value = f.contact_email_link || 'mailto:support@knotelle.in';
-                document.getElementById('footerContactAddress').value = f.contact_address || 'India';
-
-                document.getElementById('footerInstagramUrl').value = f.instagram_url || 'https://instagram.com/knotelleindia';
-                document.getElementById('footerInstagramActive').checked = f.instagram_active !== false;
-                document.getElementById('footerFacebookUrl').value = f.facebook_url || 'https://facebook.com/knotelleindia';
-                document.getElementById('footerFacebookActive').checked = f.facebook_active !== false;
-                document.getElementById('footerPinterestUrl').value = f.pinterest_url || 'https://pinterest.com/knotelleindia';
-                document.getElementById('footerPinterestActive').checked = f.pinterest_active !== false;
-                document.getElementById('footerYouTubeUrl').value = f.youtube_url || 'https://youtube.com/@knotelleindia';
-                document.getElementById('footerYouTubeActive').checked = f.youtube_active !== false;
-
-                document.getElementById('footerCopyrightText').value = f.copyright_text || '© {year} Knotelle. All rights reserved.';
-                document.getElementById('footerHeartTagline').value = f.heart_tagline || 'Made with ♡ for a kinder, cozier world.';
-                document.getElementById('footerSectionActive').checked = f.is_active !== false;
-
-                // Background image
-                document.getElementById('footerBgImageUrl').value = f.bg_image || f.desktop_image || '';
-                if (f.bg_image || f.desktop_image) {
-                    document.getElementById('footerBgPreviewImg').src = f.bg_image || f.desktop_image;
-                    document.getElementById('footerBgFileName').textContent = (f.bg_image || f.desktop_image).split('/').pop() || 'Background Active';
-                    document.getElementById('footerBgPreviewContainer').classList.remove('hidden');
-                } else {
-                    document.getElementById('footerBgPreviewContainer').classList.add('hidden');
-                }
-
-                // Render Column 1 links
-                const col1Container = document.getElementById('footerCol1LinksContainer');
-                col1Container.innerHTML = '';
-                footerCol1LinkIndex = 0;
-                const col1Links = f.col1_links && f.col1_links.length > 0 ? f.col1_links : [
-                    { label: 'Home', url: '/', is_active: true },
-                    { label: 'Shop', url: '/shop', is_active: true },
-                    { label: 'Custom Order', url: '/custom-order', is_active: true },
-                    { label: 'About', url: '/about', is_active: true },
-                    { label: 'Contact', url: '/contact', is_active: true },
-                ];
-                col1Links.forEach(link => addFooterCol1Link(link));
-
-                // Render Column 2 links
-                const col2Container = document.getElementById('footerCol2LinksContainer');
-                col2Container.innerHTML = '';
-                footerCol2LinkIndex = 0;
-                const col2Links = f.col2_links && f.col2_links.length > 0 ? f.col2_links : [
-                    { label: 'Shipping Policy', url: '/contact', is_active: true },
-                    { label: 'Return & Refund', url: '/contact', is_active: true },
-                    { label: 'FAQ', url: '/contact', is_active: true },
-                    { label: 'Track Order', url: '/account/orders', is_active: true },
-                ];
-                col2Links.forEach(link => addFooterCol2Link(link));
-
-                document.getElementById('footerSettingsModal').classList.remove('hidden');
-                document.getElementById('footerSettingsModal').classList.add('flex');
+                populateFooterSettingsForm(f);
             }
         } catch (err) {
-            toastr.error('Failed to load Footer settings.');
+            console.warn('Background sync of footer settings failed', err);
         }
     }
 
     function closeFooterSettingsModal() {
-        document.getElementById('footerSettingsModal').classList.add('hidden');
-        document.getElementById('footerSettingsModal').classList.remove('flex');
+        const modal = document.getElementById('footerSettingsModal');
+        if (modal) {
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+        }
     }
 
     function addFooterCol1Link(data = { label: '', url: '', is_active: true }) {
         const container = document.getElementById('footerCol1LinksContainer');
+        if (!container) return;
         const idx = footerCol1LinkIndex++;
         const row = document.createElement('div');
         row.className = 'flex items-center gap-2 p-2 bg-white rounded-xl border border-stone-200 text-xs footer-col1-row';
@@ -6663,6 +7122,7 @@
 
     function addFooterCol2Link(data = { label: '', url: '', is_active: true }) {
         const container = document.getElementById('footerCol2LinksContainer');
+        if (!container) return;
         const idx = footerCol2LinkIndex++;
         const row = document.createElement('div');
         row.className = 'flex items-center gap-2 p-2 bg-white rounded-xl border border-stone-200 text-xs footer-col2-row';
@@ -6686,31 +7146,42 @@
             const file = input.files[0];
             const reader = new FileReader();
             reader.onload = function(e) {
-                document.getElementById('footerBgPreviewImg').src = e.target.result;
-                document.getElementById('footerBgFileName').textContent = file.name;
-                document.getElementById('footerBgPreviewContainer').classList.remove('hidden');
+                if (document.getElementById('footerBgPreviewImg')) document.getElementById('footerBgPreviewImg').src = e.target.result;
+                if (document.getElementById('footerBgFileName')) document.getElementById('footerBgFileName').textContent = file.name;
+                if (document.getElementById('footerBgPreviewContainer')) document.getElementById('footerBgPreviewContainer').classList.remove('hidden');
             };
             reader.readAsDataURL(file);
         }
     }
 
     function clearFooterBgFileInput() {
-        document.getElementById('footerBgFileInput').value = '';
-        document.getElementById('footerBgImageUrl').value = '';
-        document.getElementById('footerBgPreviewContainer').classList.add('hidden');
+        if (document.getElementById('footerBgFileInput')) document.getElementById('footerBgFileInput').value = '';
+        if (document.getElementById('footerBgImageUrl')) document.getElementById('footerBgImageUrl').value = '';
+        if (document.getElementById('footerBgPreviewContainer')) document.getElementById('footerBgPreviewContainer').classList.add('hidden');
     }
 
     async function handleFooterSettingsSubmit(e) {
         e.preventDefault();
         const btn = document.getElementById('footerSettingsSubmitBtn');
-        btn.disabled = true;
-        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving...';
+        if (btn) {
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving...';
+        }
 
         const form = document.getElementById('footerSettingsForm');
         const formData = new FormData(form);
+        const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
+        if (csrfToken && !formData.has('_token')) {
+            formData.append('_token', csrfToken);
+        }
 
         try {
-            const res = await axios.post('/admin/media/footer/settings', formData);
+            const res = await axios.post(`${adminMediaBase}/footer/settings`, formData, {
+                headers: {
+                    'Content-Type': 'multipart/form-data',
+                    'X-CSRF-TOKEN': csrfToken || ''
+                }
+            });
             if (res.data.success) {
                 toastr.success(res.data.message || 'Footer settings updated successfully!');
                 closeFooterSettingsModal();
@@ -6722,8 +7193,10 @@
         } catch (err) {
             toastr.error(err.response?.data?.message || 'Failed to save footer settings.');
         } finally {
-            btn.disabled = false;
-            btn.innerHTML = '<i class="fas fa-save"></i><span>Save Footer Settings</span>';
+            if (btn) {
+                btn.disabled = false;
+                btn.innerHTML = '<i class="fas fa-save"></i><span>Save Footer Settings</span>';
+            }
         }
     }
 
@@ -6732,49 +7205,68 @@
     // ==========================================
     let navbarLinkIndex = 0;
 
+    function populateNavbarSettingsForm(n) {
+        if (!n) return;
+        if (document.getElementById('navbarAnnouncementText')) document.getElementById('navbarAnnouncementText').value = n.announcement_text || '✨ Free Pan-India Delivery on all Orders above ₹999';
+        if (document.getElementById('navbarAnnouncementLink')) document.getElementById('navbarAnnouncementLink').value = n.announcement_link || '/shop';
+        if (document.getElementById('navbarAnnouncementActive')) document.getElementById('navbarAnnouncementActive').checked = n.announcement_active === true;
+
+        if (document.getElementById('navbarShowSearch')) document.getElementById('navbarShowSearch').checked = n.show_search !== false;
+        if (document.getElementById('navbarShowWishlist')) document.getElementById('navbarShowWishlist').checked = n.show_wishlist !== false;
+        if (document.getElementById('navbarShowAccount')) document.getElementById('navbarShowAccount').checked = n.show_account !== false;
+        if (document.getElementById('navbarShowCart')) document.getElementById('navbarShowCart').checked = n.show_cart !== false;
+        if (document.getElementById('navbarSectionActive')) document.getElementById('navbarSectionActive').checked = n.is_active !== false;
+
+        // Render Nav links
+        const container = document.getElementById('navbarLinksContainer');
+        if (container) {
+            container.innerHTML = '';
+            navbarLinkIndex = 0;
+            const links = n.nav_links && n.nav_links.length > 0 ? n.nav_links : [
+                { name: 'Home', href: '/', is_highlighted: false, is_active: true },
+                { name: 'Shop', href: '/shop', is_highlighted: false, is_active: true },
+                { name: 'Custom Order', href: '/custom-order', is_highlighted: true, is_active: true },
+                { name: 'About', href: '/about', is_highlighted: false, is_active: true },
+                { name: 'Contact', href: '/contact', is_highlighted: false, is_active: true },
+            ];
+            links.forEach(link => addNavbarLinkRow(link));
+        }
+    }
+
     async function openNavbarSettingsModal() {
+        const modal = document.getElementById('navbarSettingsModal');
+        if (modal) {
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+        }
+
+        // Immediately populate from cached managerData if available
+        if (managerData && managerData.navbar_settings) {
+            populateNavbarSettingsForm(managerData.navbar_settings);
+        }
+
         try {
-            const res = await axios.get('/admin/media/navbar/settings');
-            if (res.data.success) {
+            const res = await axios.get(`${adminMediaBase}/navbar/settings`);
+            if (res.data && res.data.success) {
                 const n = res.data.data || {};
-                document.getElementById('navbarAnnouncementText').value = n.announcement_text || '✨ Free Pan-India Delivery on all Orders above ₹999';
-                document.getElementById('navbarAnnouncementLink').value = n.announcement_link || '/shop';
-                document.getElementById('navbarAnnouncementActive').checked = n.announcement_active === true;
-
-                document.getElementById('navbarShowSearch').checked = n.show_search !== false;
-                document.getElementById('navbarShowWishlist').checked = n.show_wishlist !== false;
-                document.getElementById('navbarShowAccount').checked = n.show_account !== false;
-                document.getElementById('navbarShowCart').checked = n.show_cart !== false;
-                document.getElementById('navbarSectionActive').checked = n.is_active !== false;
-
-                // Render Nav links
-                const container = document.getElementById('navbarLinksContainer');
-                container.innerHTML = '';
-                navbarLinkIndex = 0;
-                const links = n.nav_links && n.nav_links.length > 0 ? n.nav_links : [
-                    { name: 'Home', href: '/', is_highlighted: false, is_active: true },
-                    { name: 'Shop', href: '/shop', is_highlighted: false, is_active: true },
-                    { name: 'Custom Order', href: '/custom-order', is_highlighted: true, is_active: true },
-                    { name: 'About', href: '/about', is_highlighted: false, is_active: true },
-                    { name: 'Contact', href: '/contact', is_highlighted: false, is_active: true },
-                ];
-                links.forEach(link => addNavbarLinkRow(link));
-
-                document.getElementById('navbarSettingsModal').classList.remove('hidden');
-                document.getElementById('navbarSettingsModal').classList.add('flex');
+                populateNavbarSettingsForm(n);
             }
         } catch (err) {
-            toastr.error('Failed to load Navbar settings.');
+            console.warn('Background sync of navbar settings failed', err);
         }
     }
 
     function closeNavbarSettingsModal() {
-        document.getElementById('navbarSettingsModal').classList.add('hidden');
-        document.getElementById('navbarSettingsModal').classList.remove('flex');
+        const modal = document.getElementById('navbarSettingsModal');
+        if (modal) {
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+        }
     }
 
     function addNavbarLinkRow(data = { name: '', href: '', is_highlighted: false, is_active: true }) {
         const container = document.getElementById('navbarLinksContainer');
+        if (!container) return;
         const idx = navbarLinkIndex++;
         const row = document.createElement('div');
         row.className = 'flex items-center gap-2 p-2.5 bg-white rounded-xl border border-stone-200 text-xs navbar-link-row';
@@ -6800,14 +7292,25 @@
     async function handleNavbarSettingsSubmit(e) {
         e.preventDefault();
         const btn = document.getElementById('navbarSettingsSubmitBtn');
-        btn.disabled = true;
-        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving...';
+        if (btn) {
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving...';
+        }
 
         const form = document.getElementById('navbarSettingsForm');
         const formData = new FormData(form);
+        const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
+        if (csrfToken && !formData.has('_token')) {
+            formData.append('_token', csrfToken);
+        }
 
         try {
-            const res = await axios.post('/admin/media/navbar/settings', formData);
+            const res = await axios.post(`${adminMediaBase}/navbar/settings`, formData, {
+                headers: {
+                    'Content-Type': 'multipart/form-data',
+                    'X-CSRF-TOKEN': csrfToken || ''
+                }
+            });
             if (res.data.success) {
                 toastr.success(res.data.message || 'Navbar settings updated successfully!');
                 closeNavbarSettingsModal();
@@ -6819,8 +7322,10 @@
         } catch (err) {
             toastr.error(err.response?.data?.message || 'Failed to save navbar settings.');
         } finally {
-            btn.disabled = false;
-            btn.innerHTML = '<i class="fas fa-save"></i><span>Save Navbar Settings</span>';
+            if (btn) {
+                btn.disabled = false;
+                btn.innerHTML = '<i class="fas fa-save"></i><span>Save Navbar Settings</span>';
+            }
         }
     }
 </script>

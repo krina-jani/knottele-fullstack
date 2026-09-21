@@ -163,21 +163,21 @@ $adminRoutes = function () {
             Route::match(['post', 'put'], '/hero-slide', [AdminMedia::class, 'addHeroSlide'])->name('admin.media.hero-slide');
             Route::get('/hero-slide/{id}', [AdminMedia::class, 'getHeroSlide'])->name('admin.media.get-hero-slide');
             Route::match(['post', 'put', 'patch'], '/hero-slide/{id}', [AdminMedia::class, 'updateHeroSlide'])->name('admin.media.update-hero-slide');
-            Route::delete('/hero-slide/{id}', [AdminMedia::class, 'deleteHeroSlide'])->name('admin.media.delete-hero-slide');
+            Route::match(['delete', 'post'], '/hero-slide/{id}', [AdminMedia::class, 'deleteHeroSlide'])->name('admin.media.delete-hero-slide');
             Route::post('/update-metadata/{id?}', [AdminMedia::class, 'updateMetadata'])->name('admin.media.update-metadata');
             Route::post('/detach-slot', [AdminMedia::class, 'detachSlot'])->name('admin.media.detach-slot');
             Route::post('/toggle-status/{id}', [AdminMedia::class, 'toggleStatus'])->name('admin.media.toggle-status');
             Route::post('/update-category/{id}', [AdminMedia::class, 'updateCategory'])->name('admin.media.update-category');
             Route::post('/testimonial', [AdminMedia::class, 'saveTestimonial'])->name('admin.media.testimonial.save');
             Route::get('/testimonial/{id}', [AdminMedia::class, 'getTestimonial'])->name('admin.media.testimonial.get');
-            Route::delete('/testimonial/{id}', [AdminMedia::class, 'deleteTestimonial'])->name('admin.media.testimonial.delete');
+            Route::match(['delete', 'post'], '/testimonial/{id}', [AdminMedia::class, 'deleteTestimonial'])->name('admin.media.testimonial.delete');
             Route::post('/testimonial/{id}/toggle', [AdminMedia::class, 'toggleTestimonial'])->name('admin.media.testimonial.toggle');
             Route::match(['post', 'put'], '/video-reel', [AdminMedia::class, 'addVideoReel'])->name('admin.media.add-video-reel');
             Route::match(['post', 'put'], '/video-reel/add', [AdminMedia::class, 'addVideoReel']);
             Route::get('/video-reel/{id}', [AdminMedia::class, 'getVideoReel'])->name('admin.media.get-video-reel');
             Route::match(['post', 'put', 'patch'], '/video-reel/{id}', [AdminMedia::class, 'updateVideoReel'])->name('admin.media.update-video-reel');
             Route::match(['post', 'put', 'patch'], '/video-reel/update/{id}', [AdminMedia::class, 'updateVideoReel']);
-            Route::delete('/video-reel/{id}', [AdminMedia::class, 'deleteVideoReel'])->name('admin.media.delete-video-reel');
+            Route::match(['delete', 'post'], '/video-reel/{id}', [AdminMedia::class, 'deleteVideoReel'])->name('admin.media.delete-video-reel');
             Route::post('/video-reel/{id}/toggle', [AdminMedia::class, 'toggleVideoReelStatus'])->name('admin.media.toggle-video-reel');
             Route::post('/video-reel/toggle-status/{id}', [AdminMedia::class, 'toggleVideoReelStatus']);
             Route::match(['post', 'put'], '/blog-reels-settings', [AdminMedia::class, 'updateBlogReelsSettings'])->name('admin.media.blog-reels-settings');
@@ -188,67 +188,73 @@ $adminRoutes = function () {
             Route::get('/homepage/custom-crochet', [AdminMedia::class, 'getCustomCrochet'])->name('admin.media.homepage.custom-crochet.get');
 
             // About Page Routes
-            Route::post('/about/story', [AdminMedia::class, 'saveAboutStory'])->name('admin.media.about.story.save');
+            Route::match(['post', 'put'], '/about/story', [AdminMedia::class, 'saveAboutStory'])->name('admin.media.about.story.save');
             Route::get('/about/story', [AdminMedia::class, 'getAboutStory'])->name('admin.media.about.story.get');
-            Route::post('/about/craft-pillars/header', [AdminMedia::class, 'saveCraftPillarsHeader'])->name('admin.media.about.craft-pillars.header');
-            Route::post('/about/craft-pillars', [AdminMedia::class, 'addCraftPillar'])->name('admin.media.about.craft-pillars.add');
+            Route::match(['post', 'put'], '/about/craft-pillars/header', [AdminMedia::class, 'saveCraftPillarsHeader'])->name('admin.media.about.craft-pillars.header');
+            Route::match(['post', 'put'], '/about/craft-pillars', [AdminMedia::class, 'addCraftPillar'])->name('admin.media.about.craft-pillars.add');
             Route::get('/about/craft-pillars/{id}', [AdminMedia::class, 'getCraftPillar'])->name('admin.media.about.craft-pillars.get');
-            Route::post('/about/craft-pillars/{id}', [AdminMedia::class, 'updateCraftPillar'])->name('admin.media.about.craft-pillars.update');
-            Route::delete('/about/craft-pillars/{id}', [AdminMedia::class, 'deleteCraftPillar'])->name('admin.media.about.craft-pillars.delete');
+            Route::match(['post', 'put', 'patch'], '/about/craft-pillars/{id}', [AdminMedia::class, 'updateCraftPillar'])->name('admin.media.about.craft-pillars.update');
+            Route::match(['delete', 'post'], '/about/craft-pillars/{id}/delete', [AdminMedia::class, 'deleteCraftPillar']);
+            Route::match(['delete', 'post'], '/about/craft-pillars/{id}', [AdminMedia::class, 'deleteCraftPillar'])->name('admin.media.about.craft-pillars.delete');
             Route::post('/about/craft-pillars/{id}/toggle', [AdminMedia::class, 'toggleCraftPillar'])->name('admin.media.about.craft-pillars.toggle');
             Route::post('/about/craft-pillars/reorder', [AdminMedia::class, 'reorderCraftPillars'])->name('admin.media.about.craft-pillars.reorder');
 
             // Contact Page Routes
-            Route::post('/contact/intro', [AdminMedia::class, 'saveContactIntro'])->name('admin.media.contact.intro.save');
+            Route::match(['post', 'put'], '/contact/intro', [AdminMedia::class, 'saveContactIntro'])->name('admin.media.contact.intro.save');
             Route::get('/contact/intro', [AdminMedia::class, 'getContactIntro'])->name('admin.media.contact.intro.get');
 
             Route::get('/contact/info/header', [AdminMedia::class, 'getContactInfoHeader'])->name('admin.media.contact.info.header.get');
-            Route::post('/contact/info/header', [AdminMedia::class, 'saveContactInfoHeader'])->name('admin.media.contact.info.header');
-            Route::post('/contact/info', [AdminMedia::class, 'addContactInfoItem'])->name('admin.media.contact.info.add');
-            Route::post('/contact/info/items', [AdminMedia::class, 'addContactInfoItem'])->name('admin.media.contact.info.items.add');
+            Route::match(['post', 'put'], '/contact/info/header', [AdminMedia::class, 'saveContactInfoHeader'])->name('admin.media.contact.info.header');
+            Route::match(['post', 'put'], '/contact/info', [AdminMedia::class, 'addContactInfoItem'])->name('admin.media.contact.info.add');
+            Route::match(['post', 'put'], '/contact/info/items', [AdminMedia::class, 'addContactInfoItem'])->name('admin.media.contact.info.items.add');
             Route::get('/contact/info/{id}', [AdminMedia::class, 'getContactInfoItem'])->name('admin.media.contact.info.get');
             Route::get('/contact/info/items/{id}', [AdminMedia::class, 'getContactInfoItem'])->name('admin.media.contact.info.items.get');
-            Route::post('/contact/info/{id}', [AdminMedia::class, 'updateContactInfoItem'])->name('admin.media.contact.info.update');
-            Route::post('/contact/info/items/{id}', [AdminMedia::class, 'updateContactInfoItem'])->name('admin.media.contact.info.items.update');
-            Route::delete('/contact/info/{id}', [AdminMedia::class, 'deleteContactInfoItem'])->name('admin.media.contact.info.delete');
-            Route::delete('/contact/info/items/{id}', [AdminMedia::class, 'deleteContactInfoItem'])->name('admin.media.contact.info.items.delete');
+            Route::match(['post', 'put', 'patch'], '/contact/info/{id}', [AdminMedia::class, 'updateContactInfoItem'])->name('admin.media.contact.info.update');
+            Route::match(['post', 'put', 'patch'], '/contact/info/items/{id}', [AdminMedia::class, 'updateContactInfoItem'])->name('admin.media.contact.info.items.update');
+            Route::match(['delete', 'post'], '/contact/info/{id}/delete', [AdminMedia::class, 'deleteContactInfoItem']);
+            Route::match(['delete', 'post'], '/contact/info/items/{id}/delete', [AdminMedia::class, 'deleteContactInfoItem']);
+            Route::match(['delete', 'post'], '/contact/info/{id}', [AdminMedia::class, 'deleteContactInfoItem'])->name('admin.media.contact.info.delete');
+            Route::match(['delete', 'post'], '/contact/info/items/{id}', [AdminMedia::class, 'deleteContactInfoItem'])->name('admin.media.contact.info.items.delete');
             Route::post('/contact/info/{id}/toggle', [AdminMedia::class, 'toggleContactInfoItem'])->name('admin.media.contact.info.toggle');
             Route::post('/contact/info/items/{id}/toggle', [AdminMedia::class, 'toggleContactInfoItem'])->name('admin.media.contact.info.items.toggle');
             Route::post('/contact/info/reorder', [AdminMedia::class, 'reorderContactInfoItems'])->name('admin.media.contact.info.reorder');
 
-            Route::post('/contact/form', [AdminMedia::class, 'saveContactFormSettings'])->name('admin.media.contact.form.save');
+            Route::match(['post', 'put'], '/contact/form', [AdminMedia::class, 'saveContactFormSettings'])->name('admin.media.contact.form.save');
             Route::get('/contact/form', [AdminMedia::class, 'getContactFormSettings'])->name('admin.media.contact.form.get');
 
             Route::get('/contact/faqs/header', [AdminMedia::class, 'getContactFaqsHeader'])->name('admin.media.contact.faqs.header.get');
-            Route::post('/contact/faqs/header', [AdminMedia::class, 'saveContactFaqsHeader'])->name('admin.media.contact.faqs.header');
-            Route::post('/contact/faqs', [AdminMedia::class, 'addContactFaq'])->name('admin.media.contact.faqs.add');
-            Route::post('/contact/faqs/items', [AdminMedia::class, 'addContactFaq'])->name('admin.media.contact.faqs.items.add');
+            Route::match(['post', 'put'], '/contact/faqs/header', [AdminMedia::class, 'saveContactFaqsHeader'])->name('admin.media.contact.faqs.header');
+            Route::match(['post', 'put'], '/contact/faqs', [AdminMedia::class, 'addContactFaq'])->name('admin.media.contact.faqs.add');
+            Route::match(['post', 'put'], '/contact/faqs/items', [AdminMedia::class, 'addContactFaq'])->name('admin.media.contact.faqs.items.add');
             Route::get('/contact/faqs/{id}', [AdminMedia::class, 'getContactFaq'])->name('admin.media.contact.faqs.get');
             Route::get('/contact/faqs/items/{id}', [AdminMedia::class, 'getContactFaq'])->name('admin.media.contact.faqs.items.get');
-            Route::post('/contact/faqs/{id}', [AdminMedia::class, 'updateContactFaq'])->name('admin.media.contact.faqs.update');
-            Route::post('/contact/faqs/items/{id}', [AdminMedia::class, 'updateContactFaq'])->name('admin.media.contact.faqs.items.update');
-            Route::delete('/contact/faqs/{id}', [AdminMedia::class, 'deleteContactFaq'])->name('admin.media.contact.faqs.delete');
-            Route::delete('/contact/faqs/items/{id}', [AdminMedia::class, 'deleteContactFaq'])->name('admin.media.contact.faqs.items.delete');
+            Route::match(['post', 'put', 'patch'], '/contact/faqs/{id}', [AdminMedia::class, 'updateContactFaq'])->name('admin.media.contact.faqs.update');
+            Route::match(['post', 'put', 'patch'], '/contact/faqs/items/{id}', [AdminMedia::class, 'updateContactFaq'])->name('admin.media.contact.faqs.items.update');
+            Route::match(['delete', 'post'], '/contact/faqs/{id}/delete', [AdminMedia::class, 'deleteContactFaq']);
+            Route::match(['delete', 'post'], '/contact/faqs/items/{id}/delete', [AdminMedia::class, 'deleteContactFaq']);
+            Route::match(['delete', 'post'], '/contact/faqs/{id}', [AdminMedia::class, 'deleteContactFaq'])->name('admin.media.contact.faqs.delete');
+            Route::match(['delete', 'post'], '/contact/faqs/items/{id}', [AdminMedia::class, 'deleteContactFaq'])->name('admin.media.contact.faqs.items.delete');
             Route::post('/contact/faqs/{id}/toggle', [AdminMedia::class, 'toggleContactFaq'])->name('admin.media.contact.faqs.toggle');
             Route::post('/contact/faqs/items/{id}/toggle', [AdminMedia::class, 'toggleContactFaq'])->name('admin.media.contact.faqs.items.toggle');
             Route::post('/contact/faqs/reorder', [AdminMedia::class, 'reorderContactFaqs'])->name('admin.media.contact.faqs.reorder');
             
             // Footer Settings Routes
             Route::get('/footer/settings', [AdminMedia::class, 'getFooterSettings'])->name('admin.media.footer.settings.get');
-            Route::post('/footer/settings', [AdminMedia::class, 'saveFooterSettings'])->name('admin.media.footer.settings.save');
+            Route::match(['post', 'put'], '/footer/settings', [AdminMedia::class, 'saveFooterSettings'])->name('admin.media.footer.settings.save');
 
             // Navbar Settings Routes
             Route::get('/navbar/settings', [AdminMedia::class, 'getNavbarSettings'])->name('admin.media.navbar.settings.get');
-            Route::post('/navbar/settings', [AdminMedia::class, 'saveNavbarSettings'])->name('admin.media.navbar.settings.save');
+            Route::match(['post', 'put'], '/navbar/settings', [AdminMedia::class, 'saveNavbarSettings'])->name('admin.media.navbar.settings.save');
 
             // Custom Order Items Routes
-            Route::post('/custom-order/items', [AdminMedia::class, 'addCustomOrderItem'])->name('admin.media.custom-order.items.add');
+            Route::match(['post', 'put'], '/custom-order/items', [AdminMedia::class, 'addCustomOrderItem'])->name('admin.media.custom-order.items.add');
             Route::get('/custom-order/items/{id}', [AdminMedia::class, 'getCustomOrderItem'])->name('admin.media.custom-order.items.get');
-            Route::post('/custom-order/items/{id}', [AdminMedia::class, 'updateCustomOrderItem'])->name('admin.media.custom-order.items.update');
-            Route::delete('/custom-order/items/{id}', [AdminMedia::class, 'deleteCustomOrderItem'])->name('admin.media.custom-order.items.delete');
+            Route::match(['post', 'put', 'patch'], '/custom-order/items/{id}', [AdminMedia::class, 'updateCustomOrderItem'])->name('admin.media.custom-order.items.update');
+            Route::match(['delete', 'post'], '/custom-order/items/{id}/delete', [AdminMedia::class, 'deleteCustomOrderItem']);
+            Route::match(['delete', 'post'], '/custom-order/items/{id}', [AdminMedia::class, 'deleteCustomOrderItem'])->name('admin.media.custom-order.items.delete');
             Route::post('/custom-order/items/{id}/toggle', [AdminMedia::class, 'toggleCustomOrderItem'])->name('admin.media.custom-order.items.toggle');
 
-            Route::delete('/{id}', [AdminMedia::class, 'destroy'])->name('admin.media.destroy');
+            Route::match(['delete', 'post'], '/{id}', [AdminMedia::class, 'destroy'])->name('admin.media.destroy');
         });
 
 
