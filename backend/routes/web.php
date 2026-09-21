@@ -172,19 +172,19 @@ $adminRoutes = function () {
             Route::get('/testimonial/{id}', [AdminMedia::class, 'getTestimonial'])->name('admin.media.testimonial.get');
             Route::delete('/testimonial/{id}', [AdminMedia::class, 'deleteTestimonial'])->name('admin.media.testimonial.delete');
             Route::post('/testimonial/{id}/toggle', [AdminMedia::class, 'toggleTestimonial'])->name('admin.media.testimonial.toggle');
-            Route::post('/video-reel', [AdminMedia::class, 'addVideoReel'])->name('admin.media.add-video-reel');
-            Route::post('/video-reel/add', [AdminMedia::class, 'addVideoReel']);
+            Route::match(['post', 'put'], '/video-reel', [AdminMedia::class, 'addVideoReel'])->name('admin.media.add-video-reel');
+            Route::match(['post', 'put'], '/video-reel/add', [AdminMedia::class, 'addVideoReel']);
             Route::get('/video-reel/{id}', [AdminMedia::class, 'getVideoReel'])->name('admin.media.get-video-reel');
-            Route::post('/video-reel/{id}', [AdminMedia::class, 'updateVideoReel'])->name('admin.media.update-video-reel');
-            Route::post('/video-reel/update/{id}', [AdminMedia::class, 'updateVideoReel']);
+            Route::match(['post', 'put', 'patch'], '/video-reel/{id}', [AdminMedia::class, 'updateVideoReel'])->name('admin.media.update-video-reel');
+            Route::match(['post', 'put', 'patch'], '/video-reel/update/{id}', [AdminMedia::class, 'updateVideoReel']);
             Route::delete('/video-reel/{id}', [AdminMedia::class, 'deleteVideoReel'])->name('admin.media.delete-video-reel');
             Route::post('/video-reel/{id}/toggle', [AdminMedia::class, 'toggleVideoReelStatus'])->name('admin.media.toggle-video-reel');
             Route::post('/video-reel/toggle-status/{id}', [AdminMedia::class, 'toggleVideoReelStatus']);
-            Route::post('/blog-reels-settings', [AdminMedia::class, 'updateBlogReelsSettings'])->name('admin.media.blog-reels-settings');
-            Route::post('/blog-reels/settings', [AdminMedia::class, 'updateBlogReelsSettings']);
+            Route::match(['post', 'put'], '/blog-reels-settings', [AdminMedia::class, 'updateBlogReelsSettings'])->name('admin.media.blog-reels-settings');
+            Route::match(['post', 'put'], '/blog-reels/settings', [AdminMedia::class, 'updateBlogReelsSettings']);
             
             // Custom Crochet Banner (Homepage)
-            Route::post('/homepage/custom-crochet', [AdminMedia::class, 'saveCustomCrochet'])->name('admin.media.homepage.custom-crochet.save');
+            Route::match(['post', 'put'], '/homepage/custom-crochet', [AdminMedia::class, 'saveCustomCrochet'])->name('admin.media.homepage.custom-crochet.save');
             Route::get('/homepage/custom-crochet', [AdminMedia::class, 'getCustomCrochet'])->name('admin.media.homepage.custom-crochet.get');
 
             // About Page Routes
@@ -498,7 +498,19 @@ Route::get('/{any}', function ($any = '') {
         abort(404);
     }
 
-    // 5. Fallback to main index.html for client-side routing
+    // 5. Fallback: if 404.html or _not-found/index.html exists for unknown routes, serve it cleanly with 404 status to prevent React #418 hydration error
+    if (file_exists(public_path('404.html'))) {
+        return response(file_get_contents(public_path('404.html')), 404, [
+            'Content-Type' => 'text/html; charset=utf-8',
+        ]);
+    }
+
+    if (file_exists(public_path('_not-found/index.html'))) {
+        return response(file_get_contents(public_path('_not-found/index.html')), 404, [
+            'Content-Type' => 'text/html; charset=utf-8',
+        ]);
+    }
+
     if (file_exists(public_path('index.html'))) {
         return response()->file(public_path('index.html'));
     }

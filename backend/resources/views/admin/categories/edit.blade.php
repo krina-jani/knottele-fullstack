@@ -201,6 +201,48 @@
         }
     }
 
+    // Setup event listeners
+    function setupEventListeners() {
+        const nameInput = document.getElementById('name');
+        if (nameInput) {
+            nameInput.addEventListener('blur', generateSlug);
+        }
+
+        const categoryForm = document.getElementById('categoryForm');
+        if (categoryForm) {
+            categoryForm.addEventListener('submit', updateCategory);
+        }
+
+        ['name', 'slug'].forEach(fieldId => {
+            const element = document.getElementById(fieldId);
+            if (element) {
+                element.addEventListener('input', function() {
+                    const errorElement = document.getElementById(fieldId + 'Error');
+                    if (errorElement) {
+                        errorElement.classList.add('hidden');
+                        errorElement.textContent = '';
+                    }
+                });
+            }
+        });
+    }
+
+    // Generate slug from name
+    function generateSlug() {
+        const nameInput = document.getElementById('name');
+        const slugInput = document.getElementById('slug');
+        if (!nameInput || !slugInput) return;
+
+        if (nameInput.value && (!slugInput.value || slugInput.value === '')) {
+            const slug = nameInput.value.toLowerCase()
+                .replace(/[^a-z0-9 -]/g, '')
+                .replace(/\s+/g, '-')
+                .replace(/-+/g, '-')
+                .replace(/^-+|-+$/g, '');
+            slugInput.value = slug;
+        }
+    }
+
     // Render form
     function renderForm() {
         const formContent = document.getElementById('formContent');
@@ -442,46 +484,6 @@
         return options;
     }
 
-    // Setup event listeners
-    function setupEventListeners() {
-        const nameInput = document.getElementById('name');
-        if (nameInput) {
-            nameInput.addEventListener('blur', generateSlug);
-        }
-
-        const categoryForm = document.getElementById('categoryForm');
-        if (categoryForm) {
-            categoryForm.addEventListener('submit', updateCategory);
-        }
-
-        ['name', 'slug'].forEach(fieldId => {
-            const element = document.getElementById(fieldId);
-            if (element) {
-                element.addEventListener('input', function() {
-                    const errorElement = document.getElementById(fieldId + 'Error');
-                    if (errorElement) {
-                        errorElement.classList.add('hidden');
-                        errorElement.textContent = '';
-                    }
-                });
-            }
-        });
-    }
-
-    // Generate slug from name
-    function generateSlug() {
-        const nameInput = document.getElementById('name');
-        const slugInput = document.getElementById('slug');
-        if (!nameInput || !slugInput) return;
-
-        if (nameInput.value && (!slugInput.value || slugInput.value === '')) {
-            const slug = nameInput.value.toLowerCase()
-                .replace(/[^a-z0-9 -]/g, '')
-                .replace(/\s+/g, '-')
-                .replace(/-+/g, '-')
-                .replace(/^-+|-+$/g, '');
-            slugInput.value = slug;
-        }
     }
 
 

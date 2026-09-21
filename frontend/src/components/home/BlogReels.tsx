@@ -20,15 +20,57 @@ import {
 } from "lucide-react";
 import { InstagramIcon } from "@/components/ui/BotanicalDecorations";
 import { REEL_POSTS } from "@/data/blogReels";
-import { fetchHomepageMedia, recordVideoView, normalizeImageUrl, getApiBaseUrl } from "@/lib/api";
+import { fetchHomepageMedia, recordVideoView, normalizeImageUrl, getApiBaseUrl, getFullPath } from "@/lib/api";
+
+function isInstagramUrl(url?: string | null): boolean {
+  if (!url) return false;
+  return url.includes("instagram.com/reel/") || url.includes("instagram.com/p/") || url.includes("instagram.com/tv/");
+}
+
+function getInstagramEmbedUrl(url: string): string {
+  try {
+    const clean = url.split("?")[0].replace(/\/+$/, "");
+    return `${clean}/embed/`;
+  } catch {
+    return url;
+  }
+}
+
+function isYoutubeUrl(url?: string | null): boolean {
+  if (!url) return false;
+  return url.includes("youtube.com") || url.includes("youtu.be");
+}
+
+function getYoutubeEmbedUrl(url: string): string {
+  try {
+    if (url.includes("shorts/")) {
+      const id = url.split("shorts/")[1]?.split("?")[0]?.split("/")[0];
+      return `https://www.youtube.com/embed/${id}?autoplay=1&loop=1&playsinline=1`;
+    }
+    if (url.includes("watch?v=")) {
+      const id = url.split("watch?v=")[1]?.split("&")[0];
+      return `https://www.youtube.com/embed/${id}?autoplay=1&loop=1&playsinline=1`;
+    }
+    if (url.includes("youtu.be/")) {
+      const id = url.split("youtu.be/")[1]?.split("?")[0];
+      return `https://www.youtube.com/embed/${id}?autoplay=1&loop=1&playsinline=1`;
+    }
+  } catch {}
+  return url;
+}
 
 function normalizeVideoUrl(url?: string | null): string {
   if (!url) return "";
-  if (url.startsWith("http://") || url.startsWith("https://") || url.startsWith("data:") || url.startsWith("blob:")) {
-    return url;
+  const trimmed = url.trim();
+  if (
+    trimmed.startsWith("http://") ||
+    trimmed.startsWith("https://") ||
+    trimmed.startsWith("data:") ||
+    trimmed.startsWith("blob:")
+  ) {
+    return trimmed;
   }
-  const clean = url.startsWith("/") ? url : `/${url}`;
-  return `${getApiBaseUrl()}${clean}`;
+  return getFullPath(trimmed);
 }
 
 import { useWebsiteMedia } from "@/context/MediaContext";
@@ -368,20 +410,45 @@ export function BlogReels() {
           {/* Modal Container */}
           <div className="relative z-10 w-full max-w-sm sm:max-w-md aspect-[9/16] max-h-[92vh] bg-black rounded-3xl overflow-hidden shadow-2xl border border-white/20 flex flex-col justify-between p-5">
             
-            {/* Real Video Element or Poster Fallback */}
+            {/* Real Video Element, Embed (Instagram/YouTube), or Poster Fallback */}
             {selectedReel.videoUrl || selectedReel.video_url ? (
-              <video
-                ref={videoRef}
-                src={selectedReel.videoUrl || selectedReel.video_url}
-                poster={selectedReel.thumbnail}
-                playsInline
-                autoPlay
-                loop
-                muted={isMuted}
-                onTimeUpdate={handleTimeUpdate}
-                onClick={togglePlayPause}
-                className="absolute inset-0 w-full h-full object-cover cursor-pointer"
-              />
+              (() => {
+                const vSrc = selectedReel.videoUrl || selectedReel.video_url || "";
+                if (isInstagramUrl(vSrc)) {
+                  return (
+                    <iframe
+                      src={getInstagramEmbedUrl(vSrc)}
+                      className="absolute inset-0 w-full h-full border-0 z-0"
+                      allow="autoplay; clipboard-write; encrypted-media; picture-in-picture; web-share"
+                      allowFullScreen
+                    />
+                  );
+                }
+                if (isYoutubeUrl(vSrc)) {
+                  return (
+                    <iframe
+                      src={getYoutubeEmbedUrl(vSrc)}
+                      className="absolute inset-0 w-full h-full border-0 z-0"
+                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                      allowFullScreen
+                    />
+                  );
+                }
+                return (
+                  <video
+                    ref={videoRef}
+                    src={vSrc}
+                    poster={selectedReel.thumbnail}
+                    playsInline
+                    autoPlay
+                    loop
+                    muted={isMuted}
+                    onTimeUpdate={handleTimeUpdate}
+                    onClick={togglePlayPause}
+                    className="absolute inset-0 w-full h-full object-cover cursor-pointer"
+                  />
+                );
+              })()
             ) : (
               <Image
                 src={selectedReel.thumbnail}

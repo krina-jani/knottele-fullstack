@@ -2559,6 +2559,7 @@
 
 @push('scripts')
 <script>
+    const adminMediaBase = window.location.pathname.startsWith('/knottele') ? '/knottele/admin/media' : '/admin/media';
     let managerData = null;
     let currentView = 'sections';
     let currentPreviewUrl = '';
@@ -5122,7 +5123,7 @@
 
     async function openEditVideoReelModal(id) {
         try {
-            const res = await axios.get(`/admin/media/video-reel/${id}`);
+            const res = await axios.get(`${adminMediaBase}/video-reel/${id}`);
             if (!res.data.success || (!res.data.reel && !res.data.data)) {
                 toastr.error('Video reel not found');
                 return;
@@ -5268,6 +5269,9 @@
         let cleanSrc = src.trim();
         if (!cleanSrc.startsWith('http://') && !cleanSrc.startsWith('https://') && !cleanSrc.startsWith('blob:') && !cleanSrc.startsWith('data:')) {
             cleanSrc = cleanSrc.startsWith('/') ? cleanSrc : '/' + cleanSrc;
+            if (window.location.pathname.startsWith('/knottele') && !cleanSrc.startsWith('/knottele')) {
+                cleanSrc = '/knottele' + cleanSrc;
+            }
         }
 
         if (player && emptyState) {
@@ -5364,9 +5368,9 @@
             submitBtn.disabled = true;
             submitBtnText.innerHTML = '<i class="fas fa-spinner fa-spin mr-1"></i> Saving...';
 
-            let url = '/admin/media/video-reel/add';
+            let url = `${adminMediaBase}/video-reel/add`;
             if (id) {
-                url = `/admin/media/video-reel/update/${id}`;
+                url = `${adminMediaBase}/video-reel/update/${id}`;
             }
 
             const res = await axios.post(url, formData, {
@@ -5403,7 +5407,7 @@
         }
 
         try {
-            const res = await axios.delete(`/admin/media/video-reel/${id}`);
+            const res = await axios.delete(`${adminMediaBase}/video-reel/${id}`);
             if (res.data.success) {
                 toastr.success(res.data.message || 'Video / reel deleted successfully.');
                 broadcastMediaUpdate();
@@ -5419,7 +5423,7 @@
 
     async function toggleVideoReelStatus(id) {
         try {
-            const res = await axios.post(`/admin/media/video-reel/toggle-status/${id}`);
+            const res = await axios.post(`${adminMediaBase}/video-reel/toggle-status/${id}`);
             if (res.data.success) {
                 toastr.success(res.data.message || 'Status updated.');
                 broadcastMediaUpdate();
@@ -5435,19 +5439,32 @@
 
     // BLOG / REELS SECTION SETTINGS MODAL
     function openBlogReelsSettingsModal() {
-        if (!managerData || !managerData.sections) return;
-        const blogSec = managerData.sections.find(s => s.id === 'blog_reels');
-        const settings = (blogSec && blogSec.section_settings) || {};
+        const blogSec = (managerData && managerData.sections) 
+            ? managerData.sections.find(s => s.id === 'blog_reels' || s.is_blog_reels_section)
+            : null;
+        const settings = (blogSec && (blogSec.section_settings || blogSec.metadata)) || {};
 
-        document.getElementById('blogReelsSettingsTitle').value = settings.title || 'Behind the Stitches';
-        document.getElementById('blogReelsSettingsTagText').value = settings.badge || 'Studio Journal & Video Reels';
-        document.getElementById('blogReelsSettingsSubtitle').value = settings.description || 'Watch our artisans hand-craft each creation, styling guides, and cozy studio ASMR unboxings.';
-        document.getElementById('blogReelsSettingsCtaText').value = settings.cta_text || 'Follow @knotelleindia';
-        document.getElementById('blogReelsSettingsCtaLink').value = settings.cta_link || 'https://instagram.com/knotelleindia';
+        if (document.getElementById('blogReelsSettingsTitle')) {
+            document.getElementById('blogReelsSettingsTitle').value = settings.title || 'Behind the Stitches';
+        }
+        if (document.getElementById('blogReelsSettingsTagText')) {
+            document.getElementById('blogReelsSettingsTagText').value = settings.badge || settings.tag_text || 'Studio Journal & Video Reels';
+        }
+        if (document.getElementById('blogReelsSettingsSubtitle')) {
+            document.getElementById('blogReelsSettingsSubtitle').value = settings.description || settings.subtitle || 'Watch our artisans hand-craft each creation, styling guides, and cozy studio ASMR unboxings.';
+        }
+        if (document.getElementById('blogReelsSettingsCtaText')) {
+            document.getElementById('blogReelsSettingsCtaText').value = settings.cta_text || 'Follow @knotelleindia';
+        }
+        if (document.getElementById('blogReelsSettingsCtaLink')) {
+            document.getElementById('blogReelsSettingsCtaLink').value = settings.cta_link || 'https://instagram.com/knotelleindia';
+        }
 
         const modal = document.getElementById('blogReelsSettingsModal');
-        modal.classList.remove('hidden');
-        modal.classList.add('flex');
+        if (modal) {
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+        }
     }
 
     function closeBlogReelsSettingsModal() {
@@ -5464,7 +5481,7 @@
         const formData = new FormData(form);
 
         try {
-            const res = await axios.post('/admin/media/blog-reels/settings', formData);
+            const res = await axios.post(`${adminMediaBase}/blog-reels/settings`, formData);
             if (res.data.success) {
                 toastr.success(res.data.message || 'Section settings updated.');
                 closeBlogReelsSettingsModal();
@@ -5535,7 +5552,7 @@
         if (libraryTable) return;
 
         libraryTable = new Tabulator("#mediaTable", {
-            ajaxURL: "/admin/media/data",
+            ajaxURL: adminMediaBase + "/data",
             layout: "fitColumns",
             pagination: true,
             paginationMode: "remote",
@@ -5584,7 +5601,7 @@
 
         // Search in library table
         document.getElementById('librarySearchInput').addEventListener('keyup', function(e) {
-            libraryTable.setData('/admin/media/data?search=' + encodeURIComponent(this.value));
+            libraryTable.setData(adminMediaBase + '/data?search=' + encodeURIComponent(this.value));
         });
 
         // Library file dropzone input
@@ -5600,7 +5617,7 @@
 
                 try {
                     toastr.info('Uploading media files...');
-                    const res = await axios.post('/admin/media/upload', formData, {
+                    const res = await axios.post(`${adminMediaBase}/upload`, formData, {
                         headers: { 'Content-Type': 'multipart/form-data' }
                     });
                     if (res.data.success) {
@@ -5617,7 +5634,7 @@
 
     function refreshLibraryData() {
         if (libraryTable) {
-            libraryTable.setData('/admin/media/data');
+            libraryTable.setData(adminMediaBase + '/data');
             toastr.info('Media library refreshed');
         }
     }
@@ -5626,7 +5643,7 @@
         if (!confirm('Are you sure you want to delete this media file?')) return;
 
         try {
-            const res = await axios.delete(`/admin/media/${id}`);
+            const res = await axios.delete(`${adminMediaBase}/${id}`);
             if (res.data.success) {
                 toastr.success(res.data.message);
                 broadcastMediaUpdate();
@@ -6454,31 +6471,39 @@
     // CUSTOM CROCHET BANNER & HANGING TAG HANDLERS
     // ==========================================
     async function openCustomCrochetModal() {
+        const modal = document.getElementById('customCrochetModal');
+        if (modal) {
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+        }
+
         try {
-            const res = await axios.get('/admin/media/homepage/custom-crochet');
-            if (res.data.success) {
-                const c = res.data.data;
-                document.getElementById('customCrochetTitle').value = c.title || 'Custom Crochet';
-                document.getElementById('customCrochetSubtitle').value = c.subtitle || 'Just for You';
-                document.getElementById('customCrochetDescription').value = c.description || "Your imagination, our yarn. Let's create something special together.";
-                document.getElementById('customCrochetTagText').value = c.tag_text || 'Turn Your Ideas Into Handmade Reality';
-                document.getElementById('customCrochetTagActive').checked = c.tag_active !== false;
-                document.getElementById('customCrochetCtaText').value = c.cta_text || 'Request Your Custom Order';
-                document.getElementById('customCrochetCtaLink').value = c.cta_link || '/custom-order';
-                document.getElementById('customCrochetAlt').value = c.alt_text || 'Custom Crochet Banner';
-                document.getElementById('customCrochetActive').checked = c.is_active !== false;
-                document.getElementById('customCrochetImageUrl').value = c.image_url || '';
+            const res = await axios.get(`${adminMediaBase}/homepage/custom-crochet`);
+            if (res.data && res.data.success) {
+                const c = res.data.data || {};
+                if (document.getElementById('customCrochetTitle')) document.getElementById('customCrochetTitle').value = c.title || 'Custom Crochet';
+                if (document.getElementById('customCrochetSubtitle')) document.getElementById('customCrochetSubtitle').value = c.subtitle || 'Just for You';
+                if (document.getElementById('customCrochetDescription')) document.getElementById('customCrochetDescription').value = c.description || "Your imagination, our yarn. Let's create something special together.";
+                if (document.getElementById('customCrochetTagText')) document.getElementById('customCrochetTagText').value = c.tag_text || 'Turn Your Ideas Into Handmade Reality';
+                if (document.getElementById('customCrochetTagActive')) document.getElementById('customCrochetTagActive').checked = c.tag_active !== false;
+                if (document.getElementById('customCrochetCtaText')) document.getElementById('customCrochetCtaText').value = c.cta_text || 'Request Your Custom Order';
+                if (document.getElementById('customCrochetCtaLink')) document.getElementById('customCrochetCtaLink').value = c.cta_link || '/custom-order';
+                if (document.getElementById('customCrochetAlt')) document.getElementById('customCrochetAlt').value = c.alt_text || 'Custom Crochet Banner';
+                if (document.getElementById('customCrochetActive')) document.getElementById('customCrochetActive').checked = c.is_active !== false;
+                if (document.getElementById('customCrochetImageUrl')) document.getElementById('customCrochetImageUrl').value = c.image_url || '';
 
-                if (c.image_url) {
+                if (c.image_url && document.getElementById('customCrochetPreviewImg')) {
                     document.getElementById('customCrochetPreviewImg').src = c.image_url;
-                    document.getElementById('customCrochetFileName').textContent = c.image_url.split('/').pop() || 'Banner Visual';
-                    document.getElementById('customCrochetPreviewContainer').classList.remove('hidden');
+                    if (document.getElementById('customCrochetFileName')) {
+                        document.getElementById('customCrochetFileName').textContent = c.image_url.split('/').pop() || 'Banner Visual';
+                    }
+                    if (document.getElementById('customCrochetPreviewContainer')) {
+                        document.getElementById('customCrochetPreviewContainer').classList.remove('hidden');
+                    }
                 }
-
-                document.getElementById('customCrochetModal').classList.remove('hidden');
-                document.getElementById('customCrochetModal').classList.add('flex');
             }
         } catch (err) {
+            console.error('Error fetching Custom Crochet settings:', err);
             toastr.error('Failed to load Custom Crochet Banner settings.');
         }
     }
@@ -6517,7 +6542,7 @@
         const formData = new FormData(form);
 
         try {
-            const res = await axios.post('/admin/media/homepage/custom-crochet', formData);
+            const res = await axios.post(`${adminMediaBase}/homepage/custom-crochet`, formData);
             if (res.data.success) {
                 toastr.success(res.data.message || 'Custom Crochet Banner updated successfully!');
                 closeCustomCrochetModal();
