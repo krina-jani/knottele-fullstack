@@ -80,24 +80,28 @@ if [ -d "$PROJECT_ROOT/backend" ]; then
     echo "🔄 Restarting Queue..."
     php artisan queue:restart || true
 
-    # 11. Folder permissions
+    # 11. Folder permissions & storage/image directories
     echo "🔒 Updating permissions..."
-    chmod -R 775 storage bootstrap/cache || true
-    chown -R nginx:nginx storage bootstrap/cache 2>/dev/null || chown -R apache:apache storage bootstrap/cache 2>/dev/null || chown -R www-data:www-data storage bootstrap/cache 2>/dev/null || true
+    mkdir -p storage/logs public/images/products public/images/hero public/images/categories public/images/footer public/js/admin
+    touch storage/logs/laravel.log && chmod 666 storage/logs/laravel.log || true
+    chmod -R 777 storage bootstrap/cache public/images || true
+    chown -R nginx:nginx storage bootstrap/cache public/images 2>/dev/null || chown -R apache:apache storage bootstrap/cache public/images 2>/dev/null || chown -R www-data:www-data storage bootstrap/cache public/images 2>/dev/null || true
+    chcon -R -t httpd_sys_rw_content_t storage bootstrap/cache public/images 2>/dev/null || true
 
     # 12. Bring application out of maintenance mode
     php artisan up
 fi
 
-# 13. Reload PM2 & Nginx
+# 13. Reload PM2 & Nginx & PHP-FPM
 if command -v pm2 >/dev/null 2>&1; then
     echo "🔄 Reloading PM2 processes..."
     pm2 reload all --update-env 2>/dev/null || pm2 restart all 2>/dev/null || true
 fi
 
 if command -v systemctl >/dev/null 2>&1; then
-    echo "🔄 Reloading Nginx..."
+    echo "🔄 Reloading Nginx and PHP-FPM..."
     systemctl reload nginx 2>/dev/null || true
+    systemctl reload php-fpm 2>/dev/null || systemctl restart php-fpm 2>/dev/null || true
 fi
 
 echo "=========================================="

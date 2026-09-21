@@ -466,7 +466,7 @@ Route::get('/{any}', function ($any = '') {
         abort(404);
     }
 
-    // 5. Fallback to main index.html for client-side page routing
+    // 5. Fallback to main index.html for client-side routing
     if (file_exists(public_path('index.html'))) {
         return response()->file(public_path('index.html'));
     }

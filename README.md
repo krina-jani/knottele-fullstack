@@ -112,6 +112,10 @@ cd /var/www/knottele-fullstack && chmod +x deploy.sh && ./deploy.sh
 ```
 
 📖 For full Linux server setup, Nginx configuration, free SSL, queue workers, and domain setup, see [PRODUCTION_SETUP_GUIDE.md](PRODUCTION_SETUP_GUIDE.md).
+
+
+
+
 ---
 
 ## 👑 Quick Admin Panel Links

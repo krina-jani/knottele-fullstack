@@ -886,7 +886,7 @@
         loadMedia(1, e.target.value);
     }, 500));
 </script>
-<script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
+<script src="{{ asset('js/admin/Sortable.min.js') }}"></script>
 <script>
     document.addEventListener('DOMContentLoaded', function() {
         const galleryContainer = document.getElementById('gallery-container');
