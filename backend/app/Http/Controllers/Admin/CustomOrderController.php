@@ -16,6 +16,8 @@ class CustomOrderController extends Controller
      */
     public function index(Request $request): View
     {
+        \App\Http\Controllers\Api\Customer\CustomOrderController::ensureTableExists();
+
         $status = $request->query('status', 'all');
         $search = trim($request->query('search', ''));
 

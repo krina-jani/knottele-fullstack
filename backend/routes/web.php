@@ -546,6 +546,30 @@ Route::match(['GET', 'HEAD'], '/{any}', function ($any = '') {
         }
     }
 
+    // 3f. Resilient Next.js RSC Flight Payload resolver (resolves client-side navigation RSC flight requests)
+    if (str_contains($path, '__next.') && str_ends_with($path, '.txt')) {
+        if (file_exists(public_path($path))) {
+            return response()->file(public_path($path), ['Content-Type' => 'text/plain; charset=utf-8']);
+        }
+        $conv1 = preg_replace('/\.([a-zA-Z0-9_\$]+)\.__PAGE__\.txt$/', '/$1/__PAGE__.txt', $path);
+        if ($conv1 !== $path && file_exists(public_path($conv1))) {
+            return response()->file(public_path($conv1), ['Content-Type' => 'text/plain; charset=utf-8']);
+        }
+        $conv2 = preg_replace('/\.__PAGE__\.txt$/', '/__PAGE__.txt', $path);
+        if ($conv2 !== $path && file_exists(public_path($conv2))) {
+            return response()->file(public_path($conv2), ['Content-Type' => 'text/plain; charset=utf-8']);
+        }
+        $dir = dirname($path);
+        if ($dir && $dir !== '.' && $dir !== '/') {
+            if (file_exists(public_path($dir . '/index.txt'))) {
+                return response()->file(public_path($dir . '/index.txt'), ['Content-Type' => 'text/plain; charset=utf-8']);
+            }
+            if (file_exists(public_path($dir . '/__next._full.txt'))) {
+                return response()->file(public_path($dir . '/__next._full.txt'), ['Content-Type' => 'text/plain; charset=utf-8']);
+            }
+        }
+    }
+
     // 4. If request is for Next.js RSC Flight payload or missing static asset, return 404 (never HTML)
     if (
         request()->has('_rsc') ||

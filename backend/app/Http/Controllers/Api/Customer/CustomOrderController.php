@@ -4,17 +4,57 @@ namespace App\Http\Controllers\Api\Customer;
 
 use App\Http\Controllers\Controller;
 use App\Models\CustomOrderRequest;
+use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Schema;
 
 class CustomOrderController extends Controller
 {
+    /**
+     * Ensure the custom_order_requests table exists on the database
+     */
+    public static function ensureTableExists(): void
+    {
+        try {
+            if (!Schema::hasTable('custom_order_requests')) {
+                Schema::create('custom_order_requests', function (Blueprint $table) {
+                    $table->id();
+                    $table->string('reference_id', 50)->unique();
+                    $table->unsignedBigInteger('customer_id')->nullable()->index();
+                    $table->string('customer_name');
+                    $table->string('customer_email')->index();
+                    $table->string('customer_phone', 50)->nullable();
+                    $table->string('category', 100)->default('Bouquet');
+                    $table->string('selected_palette', 100)->nullable();
+                    $table->json('custom_colors')->nullable();
+                    $table->text('custom_color_notes')->nullable();
+                    $table->string('size_preference', 100)->nullable();
+                    $table->text('personalization')->nullable();
+                    $table->text('design_notes')->nullable();
+                    $table->string('urgency', 100)->nullable();
+                    $table->string('budget_range', 100)->nullable();
+                    $table->string('reference_image_url', 1000)->nullable();
+                    $table->string('reference_image_name', 255)->nullable();
+                    $table->string('status', 50)->default('pending')->index();
+                    $table->decimal('quoted_price', 10, 2)->nullable();
+                    $table->text('admin_notes')->nullable();
+                    $table->timestamps();
+                });
+            }
+        } catch (\Throwable $t) {
+            Log::warning('CustomOrder ensureTableExists: ' . $t->getMessage());
+        }
+    }
+
     /**
      * Submit a new custom crochet order request
      */
     public function store(Request $request): JsonResponse
     {
+        self::ensureTableExists();
+
         try {
             $request->validate([
                 'name' => 'required|string|max:255',
@@ -117,6 +157,8 @@ class CustomOrderController extends Controller
      */
     public function index(Request $request): JsonResponse
     {
+        self::ensureTableExists();
+
         try {
             $customer = auth('customer_api')->user();
             $email = trim(strtolower($request->query('email', '')));
