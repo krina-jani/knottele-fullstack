@@ -4,6 +4,7 @@ import React, { useState, useEffect, useMemo } from "react";
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 import { Product } from "@/types/product";
+import { PRODUCTS } from "@/data/products";
 import { fetchProducts } from "@/lib/api";
 import { ProductCard } from "@/components/ui/ProductCard";
 import { useWebsiteMedia } from "@/context/MediaContext";
@@ -13,13 +14,13 @@ const PRODUCTS_CACHE_KEY = "knotelle_cache_products";
 
 export function BestSellers() {
   const { media } = useWebsiteMedia();
-  const [productsList, setProductsList] = useState<Product[]>([]);
+  const [productsList, setProductsList] = useState<Product[]>(PRODUCTS);
   const [activeTab, setActiveTab] = useState<string>("all");
   const [startIndex, setStartIndex] = useState<number>(0);
   const [isFading, setIsFading] = useState<boolean>(false);
 
   useEffect(() => {
-    // Safely populate from local cache after mount to prevent SSR hydration mismatch
+    // Safely populate from local cache after mount
     const cached = getLocalCache<Product[]>(PRODUCTS_CACHE_KEY, []);
     if (cached && cached.length > 0) {
       setProductsList(cached);
