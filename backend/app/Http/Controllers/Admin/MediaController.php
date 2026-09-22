@@ -4106,7 +4106,6 @@ class MediaController extends Controller
                 );
             }
         }
-        }
 
         $media->title = $request->input('title', 'KNOTELLE');
         $media->subtitle = $request->input('subtitle', 'Made with ♡ for a kinder, cozier world.');
