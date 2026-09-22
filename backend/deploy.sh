@@ -107,14 +107,14 @@ if [ -d "$FRONTEND_DIR" ]; then
     echo "📦 Installing Node.js dependencies..."
     npm ci || npm install
 
-    # Build production bundle
+    # Build production bundle and sync to Laravel public
     echo "🔨 Building Next.js production bundle..."
-    npm run build
+    npm run build:laravel || npm run build
 
-    # Restart Node PM2 process if PM2 is present
+    # Restart Node PM2 process if PM2 is present (Use restart instead of reload for fork-mode apps)
     if command -v pm2 >/dev/null 2>&1; then
-        echo "🔄 Reloading PM2 process..."
-        pm2 reload knotelle-frontend --update-env || pm2 reload all --update-env || true
+        echo "🔄 Restarting PM2 processes..."
+        pm2 restart knotelle-frontend --update-env 2>/dev/null || pm2 restart all --update-env 2>/dev/null || true
     fi
 fi
 

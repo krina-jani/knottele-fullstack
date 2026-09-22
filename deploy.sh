@@ -109,10 +109,10 @@ if [ -d "$PROJECT_ROOT/backend" ]; then
     php artisan up
 fi
 
-# 13. Reload PM2 & Nginx & PHP-FPM
+# 13. Restart PM2 & Nginx & PHP-FPM
 if command -v pm2 >/dev/null 2>&1; then
-    echo "🔄 Reloading PM2 processes..."
-    pm2 reload all --update-env 2>/dev/null || pm2 restart all 2>/dev/null || true
+    echo "🔄 Restarting PM2 processes..."
+    pm2 restart all --update-env 2>/dev/null || pm2 reload all --update-env 2>/dev/null || true
 fi
 
 if command -v systemctl >/dev/null 2>&1; then
