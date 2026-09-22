@@ -14,7 +14,10 @@
             <a href="{{ route('admin.orders.index') }}" class="btn-secondary flex-1 sm:flex-initial inline-flex items-center justify-center text-center py-2 px-3 sm:px-4 text-xs sm:text-sm font-semibold rounded-xl">
                 <i class="fas fa-arrow-left mr-2"></i>Back to Orders
             </a>
-            <a href="{{ route('admin.orders.invoice', $order) }}" target="_blank" class="btn-primary flex-1 sm:flex-initial inline-flex items-center justify-center text-center py-2 px-3 sm:px-4 text-xs sm:text-sm font-semibold rounded-xl shadow-md">
+            @php
+                $invoicePdfFilename = $order->created_at->format('d-m-Y') . '-' . sprintf('%04d', $order->id) . '.pdf';
+            @endphp
+            <a href="{{ route('admin.orders.invoice', ['order' => $order, 'filename' => $invoicePdfFilename]) }}" target="_blank" class="btn-primary flex-1 sm:flex-initial inline-flex items-center justify-center text-center py-2 px-3 sm:px-4 text-xs sm:text-sm font-semibold rounded-xl shadow-md">
                 <i class="fas fa-print mr-2"></i>Print Invoice
             </a>
         </div>

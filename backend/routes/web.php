@@ -146,7 +146,7 @@ $adminRoutes = function () {
             Route::delete('/{order}', [AdminOrder::class, 'destroy'])->name('destroy');
             Route::post('/bulk-delete', [AdminOrder::class, 'bulkDelete'])->name('bulk-delete');
             Route::get('/export', [AdminOrder::class, 'export'])->name('export');
-            Route::get('/{order}/invoice', [AdminOrder::class, 'printInvoice'])->name('invoice');
+            Route::get('/{order}/invoice/{filename?}', [AdminOrder::class, 'printInvoice'])->name('invoice');
         });
 
         /*

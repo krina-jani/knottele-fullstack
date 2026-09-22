@@ -133,17 +133,21 @@
         <main class="@if ($isAdminPanel) p-4 sm:p-6 md:p-8 @endif">
             <!-- Global Print Header (Appears only on Print / PDF export) -->
             <div class="print-only" style="display: none;">
-                <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #dc2626; padding-bottom: 12px; margin-bottom: 20px;">
-                    <div style="display: flex; align-items: center; gap: 12px;">
-                        <img src="{{ asset('images/logo/knotelle-logo.png') }}?v=2" style="height: 50px; width: auto; object-fit: contain;" alt="KNOTELLE">
+                <div style="display: flex; justify-content: space-between; align-items: flex-start; border-bottom: 2px solid #dc2626; padding-bottom: 12px; margin-bottom: 20px;">
+                    <div style="display: flex; align-items: flex-start; gap: 14px;">
+                        <img src="{{ asset('images/logo/knotelle-logo.png') }}?v=2" style="height: 54px; width: auto; object-fit: contain;" alt="KNOTELLE">
                         <div>
                             <h2 style="margin: 0; font-size: 20px; font-weight: 800; color: #dc2626; letter-spacing: 0.03em;">KNOTELLE</h2>
-                            <p style="margin: 2px 0 0 0; font-size: 11px; color: #64748b;">Handcrafted with Love • {{ \App\Helpers\SettingsHelper::get('store_email', 'support@knotelle.in') }}</p>
+                            <p style="margin: 2px 0 0 0; font-size: 11px; color: #475569; line-height: 1.4;">
+                                Handcrafted with Love<br>
+                                India<br>
+                                support@knotelle.in • +91 9773055555
+                            </p>
                         </div>
                     </div>
                     <div style="text-align: right;">
-                        <p style="margin: 0; font-size: 11px; font-family: monospace; color: #475569; word-break: break-all;">{{ request()->fullUrl() }}</p>
-                        <p style="margin: 2px 0 0 0; font-size: 11px; color: #64748b;">Printed on: {{ date('M d, Y - h:i A') }}</p>
+                        <span style="display: inline-block; padding: 2px 8px; font-size: 11px; font-weight: 700; background: #fee2e2; color: #dc2626; border-radius: 9999px; text-transform: uppercase;">Admin Report</span>
+                        <p style="margin: 4px 0 0 0; font-size: 11px; color: #64748b;">Printed on: {{ date('M d, Y - h:i A') }}</p>
                     </div>
                 </div>
             </div>

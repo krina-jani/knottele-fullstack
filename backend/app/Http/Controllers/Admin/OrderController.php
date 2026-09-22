@@ -378,12 +378,15 @@ class OrderController extends Controller
     /**
      * Print invoice
      */
-    public function printInvoice(Order $order)
+    public function printInvoice(Order $order, $filename = null)
     {
         $order->load(['customer', 'items', 'items.product', 'items.variant']);
 
+        // Generate clean PDF filename: e.g. 22-09-2026-0001.pdf
+        $pdfFilename = $filename ?: ($order->created_at->format('d-m-Y') . '-' . sprintf('%04d', $order->id) . '.pdf');
+
         // Return view for printing
-        return view('admin.orders.invoice', compact('order'));
+        return view('admin.orders.invoice', compact('order', 'pdfFilename'));
     }
 
     /**

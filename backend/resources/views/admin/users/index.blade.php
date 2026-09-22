@@ -797,13 +797,21 @@
                     </style>
                 </head>
                 <body>
-                    <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #dc2626; padding-bottom: 12px; margin-bottom: 16px;">
-                        <div style="display: flex; align-items: center; gap: 12px;">
-                            <img src="{{ asset('images/logo/knotelle-logo.png') }}?v=2" style="height: 48px; width: auto; object-fit: contain;" alt="KNOTELLE">
+                    <div style="display: flex; justify-content: space-between; align-items: flex-start; border-bottom: 2px solid #dc2626; padding-bottom: 12px; margin-bottom: 16px;">
+                        <div style="display: flex; align-items: flex-start; gap: 14px;">
+                            <img src="{{ asset('images/logo/knotelle-logo.png') }}?v=2" style="height: 52px; width: auto; object-fit: contain;" alt="KNOTELLE">
                             <div>
-                                <h2 style="margin: 0; font-size: 18px; color: #dc2626; font-weight: 800;">KNOTELLE - Customers Report</h2>
-                                <p style="margin: 2px 0 0 0; font-size: 11px; color: #64748b;">Generated on: ${new Date().toLocaleDateString()} | URL: ${window.location.href}</p>
+                                <h2 style="margin: 0; font-size: 20px; color: #dc2626; font-weight: 800;">KNOTELLE</h2>
+                                <p style="margin: 2px 0 0 0; font-size: 11px; color: #475569; line-height: 1.4;">
+                                    Handcrafted with Love<br>
+                                    India<br>
+                                    support@knotelle.in • +91 9773055555
+                                </p>
                             </div>
+                        </div>
+                        <div style="text-align: right;">
+                            <span style="display: inline-block; padding: 2px 8px; font-size: 11px; font-weight: 700; background: #fee2e2; color: #dc2626; border-radius: 9999px; text-transform: uppercase;">Customers Report</span>
+                            <p style="margin: 4px 0 0 0; font-size: 11px; color: #64748b;">Generated: ${new Date().toLocaleDateString()}</p>
                         </div>
                     </div>
                     ${printContent}

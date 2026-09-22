@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Invoice - Order #{{ $order->order_number }}</title>
+    <title>{{ $pdfFilename ?? ($order->created_at->format('d-m-Y') . '-' . sprintf('%04d', $order->id) . '.pdf') }}</title>
 
     <!-- Favicon -->
     <link rel="icon" type="image/png" href="{{ asset('images/logo/Logo_1.png') }}?v=2">
@@ -58,6 +58,10 @@
         }
 
         .store-box {
+            text-align: left;
+        }
+
+        .invoice-title-box {
             text-align: right;
         }
 
@@ -155,8 +159,13 @@
             .store-box {
                 text-align: left;
                 width: 100%;
-                border-top: 1px dashed #e2e8f0;
-                padding-top: 14px;
+                border-bottom: 1px dashed #e2e8f0;
+                padding-bottom: 14px;
+            }
+
+            .invoice-title-box {
+                text-align: left;
+                width: 100%;
             }
 
             .store-logo {
@@ -253,10 +262,15 @@
             }
 
             .store-box {
+                text-align: left !important;
+                width: auto !important;
+                border-bottom: none !important;
+                padding-bottom: 0 !important;
+            }
+
+            .invoice-title-box {
                 text-align: right !important;
                 width: auto !important;
-                border-top: none !important;
-                padding-top: 0 !important;
             }
 
             .store-logo {
@@ -312,33 +326,31 @@
         <!-- Main Invoice Card -->
         <div class="invoice-card">
             
-            <!-- Header -->
+            <!-- Header: Store Details on LEFT, Invoice on RIGHT -->
             <div class="header-wrap">
-                <div>
+                <!-- Left: Store Details & Logo -->
+                <div class="store-box">
+                    <img src="{{ asset('images/logo/knotelle-logo.png') }}?v=2" alt="KNOTELLE Logo" class="store-logo">
+                    <h2 class="text-xl sm:text-2xl font-black text-red-600 tracking-wider uppercase m-0">KNOTELLE</h2>
+                    <p class="text-stone-600 text-xs sm:text-sm mt-1 mb-0 leading-relaxed font-medium">
+                        Handcrafted with Love<br>
+                        India<br>
+                        <span class="text-stone-700 font-semibold">support@knotelle.in</span><br>
+                        <span class="text-stone-700 font-semibold">+91 9773055555</span>
+                    </p>
+                </div>
+
+                <!-- Right: Invoice Info -->
+                <div class="invoice-title-box">
                     <span class="inline-block px-2.5 py-0.5 rounded-full text-[11px] font-bold tracking-wider bg-red-50 text-red-700 border border-red-100 uppercase mb-2">
                         Official Invoice
                     </span>
-                    <h1 class="text-2xl sm:text-3xl font-extrabold text-stone-900 tracking-tight m-0">INVOICE</h1>
+                    <h1 class="text-3xl sm:text-4xl font-extrabold text-stone-900 tracking-tight m-0">INVOICE</h1>
                     <p class="text-stone-500 font-medium text-xs sm:text-sm mt-1.5 mb-0">
                         Order #<span class="text-stone-900 font-bold select-all">{{ $order->order_number }}</span>
                     </p>
-                    <div class="mt-2 flex items-center gap-1.5 text-xs text-stone-500 font-mono break-all select-all">
-                        <i class="fas fa-link text-red-500 text-[10px]"></i>
-                        <a href="{{ request()->fullUrl() }}" target="_blank" class="text-stone-600 hover:text-red-600 underline decoration-stone-300">
-                            {{ request()->fullUrl() }}
-                        </a>
-                    </div>
-                </div>
-                <div class="store-box">
-                    <img src="{{ asset('images/logo/knotelle-logo.png') }}?v=2" alt="KNOTELLE Logo" class="store-logo">
-                    <h2 class="text-xl sm:text-2xl font-black text-red-600 tracking-wider uppercase m-0">
-                        {{ \App\Helpers\SettingsHelper::get('store_name', 'KNOTELLE') }}
-                    </h2>
-                    <p class="text-stone-500 text-xs sm:text-sm mt-1 mb-0 leading-relaxed">
-                        Handcrafted with Love<br>
-                        {{ \App\Helpers\SettingsHelper::get('store_address', 'Surat, Gujarat, India') }}<br>
-                        <span class="text-stone-700 font-medium">{{ \App\Helpers\SettingsHelper::get('store_email', 'support@knotelle.in') }}</span><br>
-                        {{ \App\Helpers\SettingsHelper::get('store_phone', '+91 97730 39243') }}
+                    <p class="text-stone-500 text-xs mt-1 mb-0">
+                        Date: <span class="text-stone-800 font-semibold">{{ $order->created_at->format('M d, Y') }}</span>
                     </p>
                 </div>
             </div>
@@ -396,12 +408,6 @@
                         <div class="flex justify-between items-center py-1 border-b border-stone-200/60">
                             <span class="text-stone-500">Order Placed Date:</span>
                             <span class="font-semibold text-stone-900">{{ $order->created_at->format('M d, Y - h:i A') }}</span>
-                        </div>
-                        <div class="py-1 border-b border-stone-200/60">
-                            <div class="text-[11px] text-stone-500 mb-0.5">Invoice URL (Identification):</div>
-                            <a href="{{ request()->fullUrl() }}" target="_blank" class="font-mono text-[11px] text-red-600 hover:underline break-all font-semibold select-all block leading-tight">
-                                {{ request()->fullUrl() }}
-                            </a>
                         </div>
                         <div class="flex justify-between items-center py-1 border-b border-stone-200/60">
                             <span class="text-stone-500">Order Status:</span>
@@ -544,10 +550,7 @@
             <!-- Thank You Note -->
             <div class="text-center pt-4 border-t border-stone-200/80">
                 <p class="text-xs text-stone-500 font-medium m-0">
-                    Thank you for choosing <span class="text-stone-800 font-bold">KNOTELLE</span>. For support, please contact {{ \App\Helpers\SettingsHelper::get('store_email', 'support@knotelle.in') }}
-                </p>
-                <p class="text-[11px] font-mono text-stone-400 mt-1 mb-0 select-all break-all">
-                    Invoice Verification Link: <span class="text-stone-600">{{ request()->fullUrl() }}</span>
+                    Thank you for choosing <span class="text-stone-800 font-bold">KNOTELLE</span>. For support, please contact <span class="font-semibold text-stone-700">support@knotelle.in</span> | <span class="font-semibold text-stone-700">+91 9773055555</span>
                 </p>
             </div>
 
