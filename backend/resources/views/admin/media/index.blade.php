@@ -40,7 +40,7 @@
                     <select id="filterPage" onchange="onPageFilterChange()" class="w-full bg-stone-50 border border-stone-200 rounded-xl px-3.5 py-2.5 text-sm font-semibold text-stone-700 focus:outline-none focus:ring-2 focus:ring-red-500">
                         <option value="all">All Pages</option>
                         <option value="homepage" selected>Homepage</option>
-                        <option value="shop">Shop Page</option>
+                        <option value="shop">Shop Categories ↗</option>
                         <option value="custom_order">Custom Order Page</option>
                         <option value="about">About Page</option>
                         <option value="contact">Contact Page</option>
@@ -2945,18 +2945,7 @@
                                 <span>Edit Footer Settings & Links</span>
                             </button>
                         </div>
-                    ` : (section.is_shop_categories_section ? `
-                        <div class="flex items-center gap-2">
-                            <a href="${(window.location.pathname.startsWith('/knottele') ? '/knottele' : '') + '/admin/categories/create'}" class="px-5 py-2.5 rounded-xl bg-red-600 hover:bg-red-700 text-white text-xs font-bold shadow-xs hover:shadow-md transition-all flex items-center gap-2 active:scale-95 cursor-pointer">
-                                <i class="fas fa-plus-circle text-sm"></i>
-                                <span>+ Create New Category</span>
-                            </a>
-                            <a href="${(window.location.pathname.startsWith('/knottele') ? '/knottele' : '') + '/admin/categories'}" class="btn-secondary text-xs px-4 py-2.5 flex items-center gap-1.5 cursor-pointer">
-                                <i class="fas fa-list text-xs"></i>
-                                <span>Manage Categories</span>
-                            </a>
-                        </div>
-                    ` : '')))))}
+                    ` : ''))))}
                 </div>
             `;
 
@@ -4124,8 +4113,6 @@
                         </div>
                     </div>
                 `;
-            } else if (section.is_shop_categories_section) {
-                bodyContent = renderShopCategoriesSection(data);
             } else if (section.slots && section.slots.length > 0) {
                 // Regular Slot Cards
                 const filteredSlots = section.slots.filter(s => {
@@ -4354,7 +4341,6 @@
             case 'custom_order': return 'fas fa-magic';
             case 'newsletter': return 'fas fa-envelope-open-text';
             case 'footer': return 'fas fa-shoe-prints';
-            case 'shop_categories': return 'fas fa-th-large';
             case 'about_story': return 'fas fa-heart';
             case 'about_craft_pillars': return 'fas fa-feather-alt';
             case 'contact_intro': return 'fas fa-handshake';
@@ -4388,232 +4374,6 @@
         return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#039;');
     }
 
-    // =========================================================================
-    // SHOP PAGE: STOREFRONT REPLICA & REFINE COLLECTION CATEGORIES
-    // =========================================================================
-    let currentShopPreviewCat = 'all';
-
-    function renderShopCategoriesSection(data) {
-        const createCatUrl = (window.location.pathname.startsWith('/knottele') ? '/knottele' : '') + '/admin/categories/create';
-        const indexCatUrl = (window.location.pathname.startsWith('/knottele') ? '/knottele' : '') + '/admin/categories';
-        const shopProducts = data.shop_products || [];
-        const categories = data.categories || [];
-        const totalProductsCount = shopProducts.length;
-
-        const filteredProducts = currentShopPreviewCat === 'all'
-            ? shopProducts
-            : shopProducts.filter(p => p.category_slugs && p.category_slugs.includes(currentShopPreviewCat));
-
-        return `
-            <div class="p-6 sm:p-8 bg-[#FFF8F5]">
-                
-                <!-- 1. Breadcrumb & Storefront Stats Bar -->
-                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white p-4 px-6 rounded-2xl border border-[#E8D4CF] mb-8 shadow-2xs">
-                    <div class="flex items-center gap-2 sm:gap-3 text-xs text-[#78635E] flex-wrap">
-                        <span class="flex items-center gap-1 text-[#8F3032] font-semibold">
-                            <i class="fas fa-store-alt text-xs"></i>
-                            <span>Storefront Catalog</span>
-                        </span>
-                        <i class="fas fa-chevron-right text-[10px] text-[#E7D1CC]"></i>
-                        <span>Showing <strong class="text-[#3A211D] font-bold text-sm" id="shopPreviewCounter">${filteredProducts.length}</strong> of ${totalProductsCount} handmade creations</span>
-                        ${currentShopPreviewCat !== 'all' ? `
-                            <span class="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-[#8F3032] text-white">
-                                Filter: ${escapeHtml(categories.find(c => c.slug === currentShopPreviewCat)?.name || currentShopPreviewCat)}
-                            </span>
-                        ` : ''}
-                    </div>
-
-                    <div class="flex items-center gap-2">
-                        <a href="${createCatUrl}" class="px-4 py-2 rounded-full bg-[#8F3032] hover:bg-[#74292B] text-white text-xs font-bold transition-all flex items-center gap-1.5 shadow-2xs cursor-pointer">
-                            <i class="fas fa-plus-circle text-xs"></i>
-                            <span>+ Create New Category</span>
-                        </a>
-                        <a href="${indexCatUrl}" class="px-4 py-2 rounded-full bg-white hover:bg-[#FDE9E5] text-[#3A211D] border border-[#E8D4CF] text-xs font-bold transition-all flex items-center gap-1.5 shadow-2xs cursor-pointer">
-                            <i class="fas fa-th-list text-xs text-[#8F3032]"></i>
-                            <span>Category List</span>
-                        </a>
-                    </div>
-                </div>
-
-                <!-- 2. Main Storefront Grid: Desktop Sidebar + Product Grid -->
-                <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
-                    
-                    <!-- Left Sidebar (Refine Collection Replica from Reference Image) -->
-                    <aside class="lg:col-span-4 xl:col-span-3 bg-white p-6 rounded-3xl border border-[#E8D4CF] shadow-sm">
-                        <!-- Top Header -->
-                        <div class="flex items-center justify-between pb-3.5 border-b border-[#E8D4CF] mb-4">
-                            <div class="flex items-center gap-2">
-                                <i class="fas fa-sliders-h text-[#8F3032] text-sm"></i>
-                                <h3 class="font-serif text-lg font-bold text-[#3A211D]">Refine Collection</h3>
-                            </div>
-                            <button type="button" onclick="selectShopPreviewCategory('all')" class="text-[11px] font-semibold text-[#8F3032] hover:underline cursor-pointer">
-                                Clear All
-                            </button>
-                        </div>
-
-                        <!-- Categories Title -->
-                        <div class="mb-3">
-                            <h4 class="font-serif text-base font-bold text-[#3A211D]">Categories</h4>
-                            <p class="text-[10px] text-stone-400 font-medium">Click category name to open Create / Edit Category</p>
-                        </div>
-
-                        <!-- Categories List -->
-                        <div class="space-y-1" id="shopCategoriesSidebar">
-                            <!-- All Creations Option -->
-                            <div onclick="selectShopPreviewCategory('all')" 
-                                 class="w-full text-left px-3 py-2 rounded-xl text-xs font-medium transition-colors flex items-center justify-between cursor-pointer ${currentShopPreviewCat === 'all' ? 'bg-[#8F3032] text-white font-semibold shadow-2xs' : 'text-[#78635E] hover:bg-[#FDE9E5] hover:text-[#3A211D]'}"
-                                 data-slug="all">
-                                <span>All Creations</span>
-                                <span>(${totalProductsCount})</span>
-                            </div>
-
-                            <!-- Individual Dynamic Categories from DB -->
-                            ${categories.map(cat => {
-                                const isSelected = currentShopPreviewCat === cat.slug;
-                                const count = cat.product_count ?? 0;
-                                return `
-                                    <div onclick="selectShopPreviewCategory('${cat.slug}')"
-                                         class="w-full text-left px-3 py-2 rounded-xl text-xs font-medium transition-colors flex items-center justify-between cursor-pointer group ${isSelected ? 'bg-[#8F3032] text-white font-semibold shadow-2xs' : 'text-[#78635E] hover:bg-[#FDE9E5] hover:text-[#3A211D]'}"
-                                         data-slug="${cat.slug}">
-                                        
-                                        <!-- Category Name (Redirects to Create New Category Page on click as requested) -->
-                                        <a href="${createCatUrl}" 
-                                           target="_self"
-                                           class="category-redirect-link font-medium hover:underline flex items-center gap-1.5 truncate pr-2 ${isSelected ? 'text-white' : 'text-inherit'}"
-                                           title="Click category name to open Create Category page (${createCatUrl})"
-                                           onclick="event.stopPropagation()">
-                                            <span class="truncate">${escapeHtml(cat.name)}</span>
-                                            <i class="fas fa-external-link-alt text-[9px] opacity-60 group-hover:opacity-100"></i>
-                                        </a>
-
-                                        <!-- Count -->
-                                        <span class="text-[11px] shrink-0 ${isSelected ? 'text-white/90' : 'text-inherit'}">(${count})</span>
-                                    </div>
-                                `;
-                            }).join('')}
-                        </div>
-
-                        <!-- Add Category Action Strip -->
-                        <div class="mt-6 pt-4 border-t border-[#E8D4CF] space-y-2">
-                            <a href="${createCatUrl}" class="w-full py-2.5 px-4 rounded-xl bg-red-50 hover:bg-red-100 text-red-700 text-xs font-bold transition-all flex items-center justify-center gap-2">
-                                <i class="fas fa-plus-circle text-xs"></i>
-                                <span>Create New Category</span>
-                            </a>
-                            <a href="${indexCatUrl}" class="w-full py-2 px-4 rounded-xl bg-stone-50 hover:bg-stone-100 text-stone-600 text-[11px] font-semibold transition-all flex items-center justify-center gap-1.5">
-                                <i class="fas fa-list text-[10px]"></i>
-                                <span>Manage Categories in Admin</span>
-                            </a>
-                        </div>
-                    </aside>
-
-                    <!-- Right Column: Products Showcase Grid -->
-                    <main class="lg:col-span-8 xl:col-span-9" id="shopCatalogProductsList">
-                        ${renderShopProductsGrid(filteredProducts)}
-                    </main>
-
-                </div>
-
-            </div>
-        `;
-    }
-
-    function renderShopProductsGrid(products) {
-        if (!products || products.length === 0) {
-            return `
-                <div class="bg-white rounded-3xl border border-[#E8D4CF] p-12 text-center shadow-xs">
-                    <div class="w-16 h-16 rounded-full bg-[#FFF8F5] border border-[#E8D4CF] flex items-center justify-center text-[#8F3032] mx-auto mb-4 text-2xl">
-                        <i class="fas fa-box-open"></i>
-                    </div>
-                    <h3 class="font-serif text-xl font-bold text-[#3A211D] mb-2">No items found under this category</h3>
-                    <p class="text-xs sm:text-sm text-[#78635E] max-w-sm mx-auto mb-6">You can assign products to this category in the Products Manager or create a new category.</p>
-                    <div class="flex items-center justify-center gap-3">
-                        <button type="button" onclick="selectShopPreviewCategory('all')" class="px-5 py-2 rounded-full bg-[#8F3032] text-white text-xs font-bold hover:bg-[#74292B] transition-all cursor-pointer">
-                            Show All Products
-                        </button>
-                        <a href="${(window.location.pathname.startsWith('/knottele') ? '/knottele' : '') + '/admin/products'}" class="px-5 py-2 rounded-full bg-white text-[#3A211D] border border-[#E8D4CF] text-xs font-bold hover:bg-[#FDE9E5] transition-all">
-                            Manage Products
-                        </a>
-                    </div>
-                </div>
-            `;
-        }
-
-        return `
-            <div class="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-3 gap-4 sm:gap-6">
-                ${products.map(p => `
-                    <div class="bg-white rounded-2xl border border-[#E8D4CF] overflow-hidden shadow-2xs hover:shadow-boutique transition-all flex flex-col group">
-                        <div class="relative w-full aspect-square bg-stone-100 overflow-hidden flex items-center justify-center">
-                            <img src="${p.image}" alt="${escapeHtml(p.name)}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" onerror="this.onerror=null; this.src=(window.location.pathname.startsWith('/knottele') ? '/knottele' : '') + '/images/logo/Logo_1.png';">
-                            <div class="absolute top-2.5 left-2.5 flex flex-col gap-1">
-                                ${p.is_new ? `<span class="px-2 py-0.5 rounded-full text-[9px] font-bold bg-[#FDE9E5] text-[#8F3032] border border-[#E8D4CF]">NEW</span>` : ''}
-                                ${p.is_bestseller ? `<span class="px-2 py-0.5 rounded-full text-[9px] font-bold bg-amber-50 text-amber-700 border border-amber-200">BESTSELLER</span>` : ''}
-                            </div>
-                            <span class="absolute top-2.5 right-2.5 w-7 h-7 rounded-full bg-white/90 backdrop-blur-xs flex items-center justify-center text-[#8F3032] text-xs shadow-2xs">
-                                <i class="fas fa-sparkles text-[10px]"></i>
-                            </span>
-                        </div>
-                        <div class="p-4 flex flex-col flex-1 justify-between">
-                            <div>
-                                <h4 class="font-serif text-sm font-bold text-[#3A211D] group-hover:text-[#8F3032] transition-colors truncate" title="${escapeHtml(p.name)}">
-                                    ${escapeHtml(p.name)}
-                                </h4>
-                                <div class="flex items-center text-amber-400 text-[10px] gap-0.5 my-1">
-                                    <i class="fas fa-star"></i>
-                                    <i class="fas fa-star"></i>
-                                    <i class="fas fa-star"></i>
-                                    <i class="fas fa-star"></i>
-                                    <i class="fas fa-star"></i>
-                                    <span class="text-stone-400 text-[10px] ml-1">(5.0)</span>
-                                </div>
-                            </div>
-                            <div class="pt-2 border-t border-stone-100 flex items-center justify-between mt-2">
-                                <span class="font-serif text-sm font-bold text-[#8F3032]">₹${Number(p.price).toLocaleString('en-IN')}</span>
-                                <a href="${(window.location.pathname.startsWith('/knottele') ? '/knottele' : '') + '/admin/products'}" class="text-[10px] font-bold text-stone-500 hover:text-[#8F3032] flex items-center gap-1">
-                                    <span>Edit</span>
-                                    <i class="fas fa-arrow-right text-[8px]"></i>
-                                </a>
-                            </div>
-                        </div>
-                    </div>
-                `).join('')}
-            </div>
-        `;
-    }
-
-    function selectShopPreviewCategory(slug) {
-        currentShopPreviewCat = slug;
-        if (managerData) {
-            const container = document.getElementById('shopCatalogProductsList');
-            const counter = document.getElementById('shopPreviewCounter');
-            const shopProducts = managerData.shop_products || [];
-            const filtered = slug === 'all'
-                ? shopProducts
-                : shopProducts.filter(p => p.category_slugs && p.category_slugs.includes(slug));
-
-            if (container) {
-                container.innerHTML = renderShopProductsGrid(filtered);
-            }
-            if (counter) {
-                counter.innerText = filtered.length;
-            }
-
-            // Update active pill highlight on sidebar rows
-            const rows = document.querySelectorAll('#shopCategoriesSidebar > div');
-            rows.forEach(r => {
-                const isMatch = r.getAttribute('data-slug') === slug;
-                if (isMatch) {
-                    r.className = 'w-full text-left px-3 py-2 rounded-xl text-xs font-semibold transition-colors flex items-center justify-between cursor-pointer group bg-[#8F3032] text-white shadow-2xs';
-                    const link = r.querySelector('a');
-                    if (link) link.className = 'category-redirect-link font-medium hover:underline flex items-center gap-1.5 truncate pr-2 text-white';
-                } else {
-                    r.className = 'w-full text-left px-3 py-2 rounded-xl text-xs font-medium transition-colors flex items-center justify-between cursor-pointer group text-[#78635E] hover:bg-[#FDE9E5] hover:text-[#3A211D]';
-                    const link = r.querySelector('a');
-                    if (link) link.className = 'category-redirect-link font-medium hover:underline flex items-center gap-1.5 truncate pr-2 text-inherit';
-                }
-            });
-        }
-    }
-
     const PAGE_SECTIONS_MAP = {
         all: [
             { id: 'all', name: 'All Sections' }
@@ -4631,8 +4391,7 @@
             { id: 'blog_reels', name: 'Blog / Videos & Reels' },
         ],
         shop: [
-            { id: 'all', name: 'All Shop Sections' },
-            { id: 'shop_categories', name: 'Refine Collection & Categories' }
+            { id: 'all', name: 'Redirect to Category Manager ↗' }
         ],
         custom_order: [
             { id: 'all', name: 'All Custom Order Sections' },
@@ -4658,6 +4417,11 @@
 
     function onPageFilterChange() {
         const page = document.getElementById('filterPage').value;
+        if (page === 'shop') {
+            const baseUrl = window.location.pathname.startsWith('/knottele') ? '/knottele' : '';
+            window.location.href = baseUrl + '/admin/categories';
+            return;
+        }
         const sectionSelect = document.getElementById('filterSection');
         const sections = PAGE_SECTIONS_MAP[page] || [{ id: 'all', name: 'All Sections' }];
 
@@ -8626,9 +8390,6 @@
     window.switchView = switchView;
     window.onPageFilterChange = onPageFilterChange;
     window.openGenericUploadModal = openGenericUploadModal;
-    window.selectShopPreviewCategory = selectShopPreviewCategory;
-    window.renderShopCategoriesSection = renderShopCategoriesSection;
-    window.renderShopProductsGrid = renderShopProductsGrid;
 
     // Slot Controls
     window.handleSlotPreviewClick = handleSlotPreviewClick;

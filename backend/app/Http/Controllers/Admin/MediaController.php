@@ -573,15 +573,6 @@ class MediaController extends Controller
                 ]
             ],
 
-            // SHOP PAGE SECTIONS (Replica of live Refine Collection categories & catalog showcase)
-            [
-                'id' => 'shop_categories',
-                'page' => 'shop',
-                'title' => 'Shop Page Categories & Refine Collection',
-                'description' => 'Live storefront replica of the Refine Collection categories filter and catalog items. Click any category name to manage or create new categories.',
-                'badge' => 'Refine Collection',
-                'is_shop_categories_section' => true,
-            ],
 
             // CUSTOM ORDER PAGE SECTIONS
             [
@@ -1004,30 +995,6 @@ class MediaController extends Controller
                 ];
             });
 
-        // 5. Fetch Shop Catalog Products with Categories
-        $shopProducts = Product::with(['defaultVariant.images', 'categories'])
-            ->where('status', 'active')
-            ->orderBy('sort_order', 'asc')
-            ->limit(50)
-            ->get()
-            ->map(function ($p) {
-                $img = null;
-                if ($p->defaultVariant && $p->defaultVariant->images->isNotEmpty()) {
-                    $img = $p->defaultVariant->images->first()->url;
-                }
-                return [
-                    'id' => $p->id,
-                    'name' => $p->name,
-                    'slug' => $p->slug,
-                    'price' => $p->defaultVariant ? $p->defaultVariant->price : 0,
-                    'image' => $img ?: asset('images/logo/Logo_1.png'),
-                    'is_new' => (bool)$p->is_new,
-                    'is_bestseller' => (bool)$p->is_bestseller,
-                    'is_featured' => (bool)$p->is_featured,
-                    'category_slugs' => $p->categories->pluck('slug')->toArray(),
-                ];
-            });
-
         $footerSec = collect($sections)->firstWhere('id', 'footer');
         $navbarSec = collect($sections)->firstWhere('id', 'navbar_settings');
 
@@ -1037,7 +1004,6 @@ class MediaController extends Controller
                 'sections' => $sections,
                 'categories' => $categories,
                 'best_sellers' => $bestSellers,
-                'shop_products' => $shopProducts,
                 'total_media' => $allMedia->count(),
                 'footer_settings' => $footerSec['metadata'] ?? null,
                 'navbar_settings' => $navbarSec['metadata'] ?? null,
