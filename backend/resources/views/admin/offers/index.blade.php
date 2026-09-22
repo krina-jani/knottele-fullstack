@@ -18,37 +18,37 @@
     </div>
 
     <!-- Statistics Cards -->
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
-        <div class="bg-white rounded-2xl shadow-sm border border-red-100 p-6">
+    <div class="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-6 mb-6">
+        <div class="bg-white rounded-2xl shadow-sm border border-red-100 p-3.5 sm:p-6">
             <div class="flex items-center">
-                <div class="p-3 rounded-lg bg-emerald-100 text-emerald-600 mr-4">
-                    <i class="fas fa-tags text-xl"></i>
+                <div class="p-2.5 sm:p-3 rounded-lg bg-emerald-100 text-emerald-600 mr-3 sm:mr-4 shrink-0">
+                    <i class="fas fa-tags text-lg sm:text-xl"></i>
                 </div>
                 <div>
-                    <p class="text-sm text-stone-600">Total Offers</p>
-                    <h3 class="text-2xl font-bold text-stone-800" id="totalOffers">0</h3>
+                    <p class="text-xs sm:text-sm text-stone-600 font-medium">Total Offers</p>
+                    <h3 class="text-xl sm:text-2xl font-bold text-stone-800" id="totalOffers">0</h3>
                 </div>
             </div>
         </div>
-        <div class="bg-white rounded-2xl shadow-sm border border-red-100 p-6">
+        <div class="bg-white rounded-2xl shadow-sm border border-red-100 p-3.5 sm:p-6">
             <div class="flex items-center">
-                <div class="p-3 rounded-lg bg-emerald-100 text-emerald-600 mr-4">
-                    <i class="fas fa-check-circle text-xl"></i>
+                <div class="p-2.5 sm:p-3 rounded-lg bg-emerald-100 text-emerald-600 mr-3 sm:mr-4 shrink-0">
+                    <i class="fas fa-check-circle text-lg sm:text-xl"></i>
                 </div>
                 <div>
-                    <p class="text-sm text-stone-600">Active Offers</p>
-                    <h3 class="text-2xl font-bold text-stone-800" id="activeOffers">0</h3>
+                    <p class="text-xs sm:text-sm text-stone-600 font-medium">Active Offers</p>
+                    <h3 class="text-xl sm:text-2xl font-bold text-stone-800" id="activeOffers">0</h3>
                 </div>
             </div>
         </div>
-        <div class="bg-white rounded-2xl shadow-sm border border-red-100 p-6">
+        <div class="col-span-2 sm:col-span-1 bg-white rounded-2xl shadow-sm border border-red-100 p-3.5 sm:p-6">
             <div class="flex items-center">
-                <div class="p-3 rounded-lg bg-amber-100 text-amber-600 mr-4">
-                    <i class="fas fa-clock text-xl"></i>
+                <div class="p-2.5 sm:p-3 rounded-lg bg-amber-100 text-amber-600 mr-3 sm:mr-4 shrink-0">
+                    <i class="fas fa-clock text-lg sm:text-xl"></i>
                 </div>
                 <div>
-                    <p class="text-sm text-stone-600">Expired Offers</p>
-                    <h3 class="text-2xl font-bold text-stone-800" id="expiredOffers">0</h3>
+                    <p class="text-xs sm:text-sm text-stone-600 font-medium">Expired Offers</p>
+                    <h3 class="text-xl sm:text-2xl font-bold text-stone-800" id="expiredOffers">0</h3>
                 </div>
             </div>
         </div>
@@ -97,36 +97,39 @@
 
     <!-- Offers Table - Tabulator -->
     <div class="bg-white rounded-2xl shadow-sm border border-red-100 overflow-hidden">
-        <div class="px-6 py-4 border-b border-stone-200 bg-stone-50/50">
-            <h3 class="text-lg font-semibold text-stone-800">All Offers</h3>
+        <div class="px-4 sm:px-6 py-3.5 sm:py-4 border-b border-stone-200 bg-stone-50/50 flex items-center justify-between gap-3">
+            <h3 class="text-base sm:text-lg font-bold text-stone-800">All Offers</h3>
+            <a href="{{ route('admin.offers.create') }}" class="btn-primary inline-flex items-center text-xs sm:text-sm px-3 sm:px-4 py-2">
+                <i class="fas fa-plus mr-1.5 sm:mr-2"></i>+ Add Offer
+            </a>
         </div>
-        <div class="p-6">
+        <div class="p-3 sm:p-6">
             <!-- Tabulator Toolbar -->
-            <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 mb-4">
-                <div class="order-2 sm:order-1">
-                    <div class="relative" style="width: 260px;">
+            <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3 mb-4">
+                <div class="w-full sm:w-72">
+                    <div class="relative w-full">
                         <input type="text" id="offersSearchInput" placeholder="Search offers..."
-                            class="pl-10 pr-4 py-2 rounded-lg border border-stone-300 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent w-full text-stone-900 placeholder-stone-400">
-                        <i class="fas fa-search absolute left-3 top-3 text-stone-400"></i>
+                            class="pl-10 pr-4 py-2 rounded-xl border border-stone-300 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent w-full text-stone-900 placeholder-stone-400 text-xs sm:text-sm shadow-2xs">
+                        <i class="fas fa-search absolute left-3.5 top-3 text-stone-400 text-xs sm:text-sm"></i>
                     </div>
                 </div>
-                <div class="flex flex-wrap gap-2 order-1 sm:order-2">
+                <div class="flex flex-wrap gap-2">
                     <!-- Bulk Delete Button -->
-                    <button id="tabulatorBulkDeleteBtn" class="btn-danger hidden">
-                        <i class="fas fa-trash mr-2"></i>Bulk Delete
+                    <button id="tabulatorBulkDeleteBtn" class="btn-danger hidden text-xs sm:text-sm">
+                        <i class="fas fa-trash mr-1.5 sm:mr-2"></i>Bulk Delete
                     </button>
                     <!-- Refresh Button -->
-                    <button onclick="refreshAll()" class="btn-secondary">
-                        <i class="fas fa-sync-alt mr-2"></i>Refresh
+                    <button onclick="refreshAll()" class="btn-secondary text-xs sm:text-sm">
+                        <i class="fas fa-sync-alt mr-1.5 sm:mr-2"></i>Refresh
                     </button>
                     <!-- Column Visibility Button -->
-                    <button id="offersColumnVisibilityBtn" class="btn-secondary">
-                        <i class="fas fa-columns mr-2"></i>Columns
+                    <button id="offersColumnVisibilityBtn" class="btn-secondary text-xs sm:text-sm">
+                        <i class="fas fa-columns mr-1.5 sm:mr-2"></i>Columns
                     </button>
                     <!-- Export Dropdown -->
                     <div class="relative group">
-                        <button id="offersExportBtn" class="btn-primary">
-                            <i class="fas fa-file-export mr-2"></i>Export
+                        <button id="offersExportBtn" class="btn-primary text-xs sm:text-sm">
+                            <i class="fas fa-file-export mr-1.5 sm:mr-2"></i>Export
                         </button>
                         <div
                             class="absolute mt-2 w-48 bg-white rounded-lg shadow-lg border border-stone-200 py-2 z-50 hidden group-hover:block
@@ -650,11 +653,24 @@
         /* Responsive design */
         @media (max-width: 768px) {
             .tabulator .tabulator-col {
-                min-width: 100px !important;
+                padding: 6px 4px !important;
+            }
+
+            .tabulator .tabulator-col.select-checkbox,
+            .tabulator-cell.select-checkbox {
+                min-width: 36px !important;
+                width: 36px !important;
+                max-width: 36px !important;
+                padding: 6px 2px !important;
             }
 
             .tabulator-cell {
-                padding: 8px 4px !important;
+                padding: 6px 4px !important;
+            }
+
+            .tabulator .tabulator-header-filter input {
+                padding: 3px 4px !important;
+                font-size: 11px !important;
             }
 
             #bulkActionsBar {
@@ -1127,7 +1143,7 @@
         function initializeOffersTable(data = []) {
             offersTable = new Tabulator("#offersTable", {
                 data: data,
-                layout: "fitDataFill",
+                layout: "fitColumns",
                 height: "100%",
                 responsiveLayout: "hide",
                 pagination: true,
@@ -1165,60 +1181,79 @@
                         titleFormatter: "rowSelection",
                         hozAlign: "center",
                         headerSort: false,
-                        width: 50,
+                        width: 45,
+                        minWidth: 40,
                         cssClass: "select-checkbox",
-                        responsive: 0
+                        responsive: 2
                     },
                     {
                         title: "ID",
                         field: "id",
-                        width: 70,
+                        width: 48,
+                        minWidth: 45,
                         sorter: "number",
                         hozAlign: "center",
                         headerFilter: "input",
-                        headerFilterPlaceholder: "Search ID…",
+                        headerFilterPlaceholder: "ID…",
                         responsive: 0
                     },
                     {
                         title: "Offer",
                         field: "name",
-                        widthGrow: 2,
+                        widthGrow: 3,
+                        minWidth: 160,
                         sorter: "string",
                         headerFilter: "input",
                         headerFilterPlaceholder: "Search Offers…",
+                        responsive: 0,
                         formatter: function(cell, formatterParams, onRendered) {
                             const row = cell.getRow();
                             const data = row.getData();
 
                             let statusBadge = '';
-                            if (data.is_active) {
-                                statusBadge = '<span class="status-badge status-active">Active</span>';
-                            } else if (data.status === 0) {
-                                statusBadge = '<span class="status-badge status-inactive">Inactive</span>';
+                            if (data.is_active || data.status === 1 || data.status === true) {
+                                statusBadge = '<span class="px-1.5 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 text-emerald-800 border border-emerald-200 shrink-0">Active</span>';
+                            } else if (data.status === 0 || data.status === false) {
+                                statusBadge = '<span class="px-1.5 py-0.5 rounded-full text-[10px] font-bold bg-stone-100 text-stone-600 border border-stone-200 shrink-0">Inactive</span>';
                             } else if (data.days_remaining < 0) {
-                                statusBadge = '<span class="status-badge status-expired">Expired</span>';
+                                statusBadge = '<span class="px-1.5 py-0.5 rounded-full text-[10px] font-bold bg-rose-100 text-rose-700 border border-rose-200 shrink-0">Expired</span>';
                             } else {
-                                statusBadge = '<span class="status-badge status-upcoming">Upcoming</span>';
+                                statusBadge = '<span class="px-1.5 py-0.5 rounded-full text-[10px] font-bold bg-amber-100 text-amber-800 border border-amber-200 shrink-0">Upcoming</span>';
                             }
 
                             let codeHtml = '';
                             if (data.code) {
-                                codeHtml = `<span class="text-sm text-indigo-600 bg-indigo-50 px-2 py-1 rounded ml-2">${data.code}</span>`;
+                                codeHtml = `<span class="text-[11px] font-mono font-bold text-indigo-700 bg-indigo-50 border border-indigo-200 px-1.5 py-0.2 rounded tracking-wide shrink-0">${data.code}</span>`;
+                            }
+
+                            let discountHtml = '';
+                            if (data.offer_type === 'percentage') {
+                                discountHtml = `<span class="text-xs font-bold text-red-600">${data.discount_value}% OFF</span>`;
+                            } else if (data.offer_type === 'fixed') {
+                                discountHtml = `<span class="text-xs font-bold text-red-600">₹${data.discount_value} OFF</span>`;
+                            } else if (data.offer_type === 'bogo' || data.offer_type === 'buy_x_get_y') {
+                                discountHtml = `<span class="text-xs font-bold text-amber-700">Buy ${data.buy_qty || 1} Get ${data.get_qty || 1}</span>`;
+                            } else if (data.offer_type === 'free_shipping') {
+                                discountHtml = `<span class="text-xs font-bold text-blue-700">Free Shipping</span>`;
                             }
 
                             return `
-                                <div class="space-y-1">
-                                    <div class="flex items-center">
-                                        <span class="font-semibold text-gray-900">${data.name}</span>
+                                <div class="py-1 space-y-1 min-w-0">
+                                    <div class="flex items-center gap-1.5 flex-wrap">
+                                        <span class="font-bold text-xs sm:text-sm text-stone-900 truncate">${data.name}</span>
                                         ${codeHtml}
+                                        <span class="sm:hidden">${statusBadge}</span>
                                     </div>
-                                    <div class="flex items-center space-x-3">
-                                        ${statusBadge}
-                                        <span class="text-sm text-gray-500">${data.offer_type_text}</span>
+                                    <div class="flex items-center gap-2 flex-wrap text-xs">
+                                        ${discountHtml}
+                                        <span class="text-[11px] text-stone-400 hidden sm:inline">•</span>
+                                        <span class="text-[11px] text-stone-500 hidden sm:inline">${data.offer_type_text || ''}</span>
+                                        <span class="hidden sm:inline">${statusBadge}</span>
                                     </div>
-                                    <div class="text-sm text-gray-600">
+                                    <div class="text-[10px] sm:text-xs text-stone-500 truncate">
                                         ${data.starts_at_formatted ? `Starts: ${data.starts_at_formatted}` : ''}
-                                        ${data.ends_at_formatted ? ` | Ends: ${data.ends_at_formatted}` : ''}
+                                        ${data.ends_at_formatted ? ` | Ends: ${data.ends_at_formatted}` : (data.starts_at_formatted ? '' : 'Ongoing')}
+                                        <span class="sm:hidden text-stone-400"> (${data.used_count || 0} used)</span>
                                     </div>
                                 </div>
                             `;
@@ -1227,7 +1262,7 @@
                     {
                         title: "Value",
                         field: "discount_value",
-                        width: 120,
+                        width: 110,
                         hozAlign: "center",
                         formatter: function(cell) {
                             const row = cell.getRow();
@@ -1244,12 +1279,12 @@
                             }
                             return '-';
                         },
-                        responsive: 1
+                        responsive: 2
                     },
                     {
                         title: "Uses",
                         field: "used_count",
-                        width: 100,
+                        width: 90,
                         sorter: "number",
                         hozAlign: "center",
                         formatter: function(cell) {
@@ -1259,12 +1294,12 @@
                                 <div class="text-xs text-gray-500">used</div>
                             </div>`;
                         },
-                        responsive: 1
+                        responsive: 3
                     },
                     {
                         title: "Auto Apply",
                         field: "is_auto_apply",
-                        width: 120,
+                        width: 110,
                         hozAlign: "center",
                         formatter: function(cell) {
                             const row = cell.getRow();
@@ -1278,12 +1313,12 @@
                                 </label>
                             `;
                         },
-                        responsive: 2
+                        responsive: 3
                     },
                     {
                         title: "Status",
                         field: "status",
-                        width: 120,
+                        width: 100,
                         hozAlign: "center",
                         formatter: function(cell) {
                             const row = cell.getRow();
@@ -1302,32 +1337,33 @@
                     {
                         title: "Created",
                         field: "created_at_formatted",
-                        width: 150,
+                        width: 120,
                         sorter: "date",
                         hozAlign: "center",
-                        responsive: 2
+                        responsive: 4
                     },
                     {
                         title: "Actions",
                         field: "id",
-                        width: 150,
+                        width: 90,
+                        minWidth: 85,
                         hozAlign: "center",
                         headerSort: false,
                         formatter: function(cell) {
                             const id = cell.getValue();
                             return `
-                                <div class="flex space-x-2 justify-center">
+                                <div class="flex space-x-1 sm:space-x-1.5 justify-center items-center">
                                     <button onclick="editOffer(${id})"
-                                            class="w-8 h-8 flex items-center justify-center bg-blue-50 text-blue-600 rounded-lg hover:bg-blue-100 transition-colors">
-                                        <i class="fas fa-edit text-sm"></i>
+                                            class="w-7 h-7 sm:w-8 sm:h-8 flex items-center justify-center bg-blue-50 text-blue-600 rounded-lg hover:bg-blue-100 transition-colors" title="Edit">
+                                        <i class="fas fa-edit text-xs"></i>
                                     </button>
                                     <button onclick="viewOffer(${id})"
-                                            class="w-8 h-8 flex items-center justify-center bg-green-50 text-green-600 rounded-lg hover:bg-green-100 transition-colors">
-                                        <i class="fas fa-eye text-sm"></i>
+                                            class="w-7 h-7 sm:w-8 sm:h-8 flex items-center justify-center bg-green-50 text-green-600 rounded-lg hover:bg-green-100 transition-colors" title="View">
+                                        <i class="fas fa-eye text-xs"></i>
                                     </button>
                                     <button onclick="deleteOffer(${id})"
-                                            class="w-8 h-8 flex items-center justify-center bg-rose-50 text-rose-600 rounded-lg hover:bg-rose-100 transition-colors">
-                                        <i class="fas fa-trash text-sm"></i>
+                                            class="w-7 h-7 sm:w-8 sm:h-8 flex items-center justify-center bg-rose-50 text-rose-600 rounded-lg hover:bg-rose-100 transition-colors" title="Delete">
+                                        <i class="fas fa-trash text-xs"></i>
                                     </button>
                                 </div>
                             `;
