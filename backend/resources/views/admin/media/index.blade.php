@@ -2619,6 +2619,30 @@
                                     <span>Active</span>
                                 </label>
                             </div>
+
+                            <!-- Twitter / X -->
+                            <div class="flex items-center gap-3 bg-white p-2.5 rounded-xl border border-stone-200">
+                                <span class="w-8 h-8 rounded-lg bg-stone-100 text-stone-700 flex items-center justify-center text-sm font-bold shrink-0">
+                                    <i class="fab fa-x-twitter"></i>
+                                </span>
+                                <input type="text" id="footerTwitterUrl" name="twitter_url" placeholder="https://twitter.com/knotelleindia" class="flex-1 bg-transparent border-0 text-xs font-semibold text-stone-800 focus:ring-0">
+                                <label class="flex items-center gap-1.5 text-xs text-stone-600 font-bold shrink-0 cursor-pointer">
+                                    <input type="checkbox" id="footerTwitterActive" name="twitter_active" class="w-4 h-4 rounded text-red-600 focus:ring-red-500">
+                                    <span>Active</span>
+                                </label>
+                            </div>
+
+                            <!-- LinkedIn -->
+                            <div class="flex items-center gap-3 bg-white p-2.5 rounded-xl border border-stone-200">
+                                <span class="w-8 h-8 rounded-lg bg-sky-50 text-sky-700 flex items-center justify-center text-sm font-bold shrink-0">
+                                    <i class="fab fa-linkedin-in"></i>
+                                </span>
+                                <input type="text" id="footerLinkedinUrl" name="linkedin_url" placeholder="https://linkedin.com/company/knotelle" class="flex-1 bg-transparent border-0 text-xs font-semibold text-stone-800 focus:ring-0">
+                                <label class="flex items-center gap-1.5 text-xs text-stone-600 font-bold shrink-0 cursor-pointer">
+                                    <input type="checkbox" id="footerLinkedinActive" name="linkedin_active" class="w-4 h-4 rounded text-red-600 focus:ring-red-500">
+                                    <span>Active</span>
+                                </label>
+                            </div>
                         </div>
                     </div>
 
@@ -8156,6 +8180,10 @@
             setCheck('footerPinterestActive', f.pinterest_active !== false);
             setVal('footerYouTubeUrl', f.youtube_url || 'https://youtube.com/@knotelleindia');
             setCheck('footerYouTubeActive', f.youtube_active !== false);
+            setVal('footerTwitterUrl', f.twitter_url || '');
+            setCheck('footerTwitterActive', f.twitter_active === true || (f.twitter_url && f.twitter_url.length > 0));
+            setVal('footerLinkedinUrl', f.linkedin_url || '');
+            setCheck('footerLinkedinActive', f.linkedin_active === true || (f.linkedin_url && f.linkedin_url.length > 0));
 
             setVal('footerCopyrightText', f.copyright_text || '© {year} Knotelle. All rights reserved.');
             setVal('footerHeartTagline', f.heart_tagline || 'Made with ♡ for a kinder, cozier world.');
@@ -8343,6 +8371,10 @@
 
         const form = document.getElementById('footerSettingsForm');
         const formData = new FormData(form);
+        const fileInput = document.getElementById('footerBgFileInput');
+        if (fileInput && (!fileInput.files || fileInput.files.length === 0)) {
+            formData.delete('bg_image_file');
+        }
         const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
         if (csrfToken && !formData.has('_token')) {
             formData.append('_token', csrfToken);

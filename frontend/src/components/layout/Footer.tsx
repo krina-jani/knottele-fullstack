@@ -75,6 +75,9 @@ export function Footer() {
     : rawCopyright;
 
   const heartTagline = f?.heart_tagline || "Made with ♡ for a kinder, cozier world.";
+  const isActive = f?.is_active !== false;
+
+  if (!isActive) return null;
 
   return (
     <footer className="relative w-full overflow-hidden bg-[#FFF9F6] border-t border-[#E7D1CC]/70 pt-12 sm:pt-16 pb-8 text-[#2E211E]">

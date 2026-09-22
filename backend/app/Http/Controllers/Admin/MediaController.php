@@ -3358,7 +3358,7 @@ class MediaController extends Controller
      */
     public function saveContactIntro(Request $request): JsonResponse
     {
-        $request->validate([
+        $rules = [
             'badge' => 'nullable|string|max:255',
             'title' => 'required|string|max:255',
             'subtitle' => 'nullable|string|max:500',
@@ -3366,10 +3366,15 @@ class MediaController extends Controller
             'alt_text' => 'nullable|string|max:255',
             'cta_text' => 'nullable|string|max:100',
             'cta_link' => 'nullable|string|max:255',
-            'image_file' => 'nullable|file|mimes:jpeg,png,jpg,webp,svg|max:10240',
             'image_url' => 'nullable|string|max:1000',
             'is_active' => 'nullable',
-        ]);
+        ];
+
+        if ($request->hasFile('image_file')) {
+            $rules['image_file'] = 'file|mimes:jpeg,png,jpg,webp,svg|max:10240';
+        }
+
+        $request->validate($rules);
 
         $media = Media::where('page', 'contact')
             ->where('section', 'contact_intro')
@@ -4096,6 +4101,8 @@ class MediaController extends Controller
             $media = Media::where('section', 'footer')->first();
         }
 
+        $meta = $media && $media->metadata ? $media->metadata : [];
+
         $bgMedia = Media::where('section', 'footer')
             ->where('slot', 'footer_bg')
             ->where('file_path', 'not like', '%.json%')
@@ -4129,6 +4136,10 @@ class MediaController extends Controller
                 'pinterest_active' => isset($meta['pinterest_active']) ? (bool)$meta['pinterest_active'] : true,
                 'youtube_url' => $meta['youtube_url'] ?? 'https://youtube.com/@knotelleindia',
                 'youtube_active' => isset($meta['youtube_active']) ? (bool)$meta['youtube_active'] : true,
+                'twitter_url' => $meta['twitter_url'] ?? (Setting::where('key', 'social_twitter')->value('value') ?: ''),
+                'twitter_active' => isset($meta['twitter_active']) ? (bool)$meta['twitter_active'] : false,
+                'linkedin_url' => $meta['linkedin_url'] ?? (Setting::where('key', 'social_linkedin')->value('value') ?: ''),
+                'linkedin_active' => isset($meta['linkedin_active']) ? (bool)$meta['linkedin_active'] : false,
                 'col1_title' => $meta['col1_title'] ?? 'Quick Links',
                 'col1_links' => $meta['col1_links'] ?? [
                     ['label' => 'Home', 'url' => '/', 'is_active' => true],
@@ -4161,7 +4172,7 @@ class MediaController extends Controller
      */
     public function saveFooterSettings(Request $request): JsonResponse
     {
-        $request->validate([
+        $rules = [
             'title' => 'nullable|string|max:255',
             'subtitle' => 'nullable|string|max:255',
             'copyright_text' => 'nullable|string|max:255',
@@ -4170,6 +4181,8 @@ class MediaController extends Controller
             'facebook_url' => 'nullable|string|max:500',
             'pinterest_url' => 'nullable|string|max:500',
             'youtube_url' => 'nullable|string|max:500',
+            'twitter_url' => 'nullable|string|max:500',
+            'linkedin_url' => 'nullable|string|max:500',
             'col1_title' => 'nullable|string|max:100',
             'col2_title' => 'nullable|string|max:100',
             'col3_title' => 'nullable|string|max:100',
@@ -4178,9 +4191,14 @@ class MediaController extends Controller
             'contact_email' => 'nullable|string|max:255',
             'contact_email_link' => 'nullable|string|max:255',
             'contact_address' => 'nullable|string|max:255',
-            'bg_image_file' => 'nullable|file|mimes:jpeg,png,jpg,webp|max:10240',
             'bg_image_url' => 'nullable|string',
-        ]);
+        ];
+
+        if ($request->hasFile('bg_image_file')) {
+            $rules['bg_image_file'] = 'file|mimes:jpeg,png,jpg,webp|max:10240';
+        }
+
+        $request->validate($rules);
 
         $media = Media::where('section', 'footer')->where('slot', 'section_settings')->first();
         if (!$media) {
@@ -4208,6 +4226,10 @@ class MediaController extends Controller
         $meta['pinterest_active'] = $request->has('pinterest_active') ? filter_var($request->input('pinterest_active'), FILTER_VALIDATE_BOOLEAN) : true;
         $meta['youtube_url'] = $request->input('youtube_url', 'https://youtube.com/@knotelleindia');
         $meta['youtube_active'] = $request->has('youtube_active') ? filter_var($request->input('youtube_active'), FILTER_VALIDATE_BOOLEAN) : true;
+        $meta['twitter_url'] = $request->input('twitter_url', '');
+        $meta['twitter_active'] = $request->has('twitter_active') ? filter_var($request->input('twitter_active'), FILTER_VALIDATE_BOOLEAN) : false;
+        $meta['linkedin_url'] = $request->input('linkedin_url', '');
+        $meta['linkedin_active'] = $request->has('linkedin_active') ? filter_var($request->input('linkedin_active'), FILTER_VALIDATE_BOOLEAN) : false;
 
         $meta['col1_title'] = $request->input('col1_title', 'Quick Links');
         if ($request->has('col1_links')) {
@@ -4226,6 +4248,29 @@ class MediaController extends Controller
         $meta['contact_email_link'] = $request->input('contact_email_link', 'mailto:support@knotelle.in');
         $meta['contact_address'] = $request->input('contact_address', 'India');
         $meta['contact_address_link'] = $request->input('contact_address_link', '');
+
+        // Two-way sync with store settings so both settings page and media manager stay aligned
+        if ($request->filled('contact_phone')) {
+            Setting::updateOrCreate(['key' => 'store_phone'], ['value' => $request->input('contact_phone'), 'group' => 'general']);
+        }
+        if ($request->filled('contact_email')) {
+            Setting::updateOrCreate(['key' => 'store_email'], ['value' => $request->input('contact_email'), 'group' => 'general']);
+        }
+        if ($request->filled('contact_address')) {
+            Setting::updateOrCreate(['key' => 'store_address'], ['value' => $request->input('contact_address'), 'group' => 'general']);
+        }
+        if ($request->filled('instagram_url')) {
+            Setting::updateOrCreate(['key' => 'social_instagram'], ['value' => $request->input('instagram_url'), 'group' => 'social']);
+        }
+        if ($request->filled('facebook_url')) {
+            Setting::updateOrCreate(['key' => 'social_facebook'], ['value' => $request->input('facebook_url'), 'group' => 'social']);
+        }
+        if ($request->filled('twitter_url')) {
+            Setting::updateOrCreate(['key' => 'social_twitter'], ['value' => $request->input('twitter_url'), 'group' => 'social']);
+        }
+        if ($request->filled('linkedin_url')) {
+            Setting::updateOrCreate(['key' => 'social_linkedin'], ['value' => $request->input('linkedin_url'), 'group' => 'social']);
+        }
 
         // Handle background image upload
         if ($request->hasFile('bg_image_file')) {

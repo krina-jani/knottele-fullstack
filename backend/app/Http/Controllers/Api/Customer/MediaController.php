@@ -291,6 +291,13 @@ class MediaController extends Controller
             }
         }
 
+        if (!$footerBg && !empty($footerMeta['bg_image']) && !str_ends_with(strtolower(parse_url($footerMeta['bg_image'], PHP_URL_PATH) ?? ''), '.json')) {
+            $footerBg = $footerMeta['bg_image'];
+        }
+        if (!$footerBg && !empty($footerMeta['bg_image_url']) && !str_ends_with(strtolower(parse_url($footerMeta['bg_image_url'], PHP_URL_PATH) ?? ''), '.json')) {
+            $footerBg = $footerMeta['bg_image_url'];
+        }
+
         if (!$footerBg) {
             $footerBg = asset('images/categories/footer.png');
         }
