@@ -37,12 +37,12 @@ export function ToastProvider({ children }: { children: React.ReactNode }) {
   return (
     <ToastContext.Provider value={{ showToast }}>
       {children}
-      {/* Toast Notification Container */}
-      <div className="fixed bottom-6 right-6 z-50 flex flex-col gap-3 max-w-sm w-full pointer-events-none px-4">
+      {/* Toast Notification Container - Positioned at upper side (top-center on mobile, top-right on desktop) with high z-index */}
+      <div className="fixed top-4 sm:top-6 left-1/2 -translate-x-1/2 sm:left-auto sm:translate-x-0 sm:right-6 z-[120] flex flex-col gap-2.5 max-w-sm w-full pointer-events-none px-4 sm:px-0">
         {toasts.map((toast) => (
           <div
             key={toast.id}
-            className="pointer-events-auto flex items-start gap-3 p-4 bg-white/95 backdrop-blur-md rounded-2xl border border-[#E7D1CC] shadow-boutique-hover transition-all animate-in slide-in-from-bottom-5 duration-300"
+            className="pointer-events-auto flex items-start gap-3 p-3.5 sm:p-4 bg-white/98 backdrop-blur-md rounded-2xl border border-[#E7D1CC] shadow-xl transition-all animate-in slide-in-from-top-4 fade-in duration-300"
           >
             <div className="shrink-0 mt-0.5">
               {toast.type === "cart" && (
