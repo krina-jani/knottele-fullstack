@@ -72,8 +72,8 @@ export function Newsletter() {
               )}
             </div>
 
-            {/* Right: Yarn Heart Art ("A Kinder, Cozier World. ♡") (Spans 3 cols on lg) */}
-            <div className="lg:col-span-3 flex items-center justify-center lg:justify-end gap-3 text-center lg:text-right pt-2 lg:pt-0">
+            {/* Right: Yarn Heart Art ("A Kinder, Cozier World. ♡") - Hidden in responsive mode, visible on lg desktop */}
+            <div className="hidden lg:flex lg:col-span-3 items-center justify-end gap-3 text-right pt-0">
               <YarnHeartArt className="w-12 h-12 text-[#EFB8B0] shrink-0" />
               <div className="text-left">
                 <p className="font-script-boutique text-base sm:text-lg font-bold text-[#913638] leading-tight">
