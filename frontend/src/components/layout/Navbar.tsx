@@ -69,8 +69,9 @@ export function Navbar() {
             {/* Left: Mobile Menu Button + KNOTELLE Logo */}
             <div className="flex items-center gap-1.5 sm:gap-2">
               <button
+                type="button"
                 onClick={() => setIsMobileMenuOpen(true)}
-                className="lg:hidden p-2.5 rounded-full text-[#2E211E] hover:text-[#913638] hover:bg-[#FCE9E5] transition-colors cursor-pointer"
+                className="lg:hidden p-2.5 -ml-1 rounded-full text-[#2E211E] hover:text-[#913638] hover:bg-[#FCE9E5] active:scale-95 transition-all cursor-pointer"
                 aria-label="Open mobile menu"
               >
                 <Menu className="w-6 h-6 text-[#2E211E]" />
@@ -189,11 +190,15 @@ export function Navbar() {
         onClose={() => setIsSearchOpen(false)}
       />
 
-      {/* Mobile Menu Drawer */}
+      {/* Mobile Menu Drawer (Slides from Left) */}
       <MobileDrawer
         isOpen={isMobileMenuOpen}
         onClose={() => setIsMobileMenuOpen(false)}
-        onOpenSearch={() => setIsSearchOpen(true)}
+        onOpenSearch={() => {
+          setIsMobileMenuOpen(false);
+          setIsSearchOpen(true);
+        }}
+        navLinks={navLinks}
       />
     </>
   );
