@@ -97,58 +97,44 @@
 
     <!-- Offers Table - Tabulator -->
     <div class="bg-white rounded-2xl shadow-sm border border-red-100 overflow-hidden">
-        <div class="px-4 sm:px-6 py-3.5 sm:py-4 border-b border-stone-200 bg-stone-50/50 flex items-center justify-between gap-3">
+        <div class="px-4 sm:px-6 py-3.5 sm:py-4 border-b border-stone-200 bg-stone-50/50">
             <h3 class="text-base sm:text-lg font-bold text-stone-800">All Offers</h3>
-            <a href="{{ route('admin.offers.create') }}" class="btn-primary inline-flex items-center text-xs sm:text-sm px-3 sm:px-4 py-2">
-                <i class="fas fa-plus mr-1.5 sm:mr-2"></i>+ Add Offer
-            </a>
         </div>
         <div class="p-3 sm:p-6">
             <!-- Tabulator Toolbar -->
             <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3 mb-4">
-                <div class="w-full sm:w-72">
-                    <div class="relative w-full">
+                <div class="order-2 sm:order-1 w-full sm:w-auto">
+                    <div class="relative w-full sm:w-[260px]">
                         <input type="text" id="offersSearchInput" placeholder="Search offers..."
                             class="pl-10 pr-4 py-2 rounded-xl border border-stone-300 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent w-full text-stone-900 placeholder-stone-400 text-xs sm:text-sm shadow-2xs">
                         <i class="fas fa-search absolute left-3.5 top-3 text-stone-400 text-xs sm:text-sm"></i>
                     </div>
                 </div>
-                <div class="flex flex-wrap gap-2">
-                    <!-- Bulk Delete Button -->
-                    <button id="tabulatorBulkDeleteBtn" class="btn-danger hidden text-xs sm:text-sm">
-                        <i class="fas fa-trash mr-1.5 sm:mr-2"></i>Bulk Delete
+                <div class="flex flex-wrap items-center gap-2 order-1 sm:order-2 w-full sm:w-auto">
+                    <!-- Bulk Delete Button (Small Dustbin) -->
+                    <button id="tabulatorBulkDeleteBtn" class="btn-danger btn-icon-sm hidden" title="Bulk Delete" aria-label="Bulk Delete">
+                        <i class="fas fa-trash text-xs"></i>
                     </button>
-                    <!-- Refresh Button -->
-                    <button onclick="refreshAll()" class="btn-secondary text-xs sm:text-sm">
-                        <i class="fas fa-sync-alt mr-1.5 sm:mr-2"></i>Refresh
+                    <!-- Refresh Button (Small) -->
+                    <button onclick="refreshAll()" class="btn-secondary btn-sm" title="Refresh">
+                        <i class="fas fa-sync-alt text-xs"></i>
+                        <span>Refresh</span>
                     </button>
-                    <!-- Column Visibility Button -->
-                    <button id="offersColumnVisibilityBtn" class="btn-secondary text-xs sm:text-sm">
-                        <i class="fas fa-columns mr-1.5 sm:mr-2"></i>Columns
+                    <!-- Column Visibility Button (Small) -->
+                    <button id="offersColumnVisibilityBtn" class="btn-secondary btn-sm" title="Columns">
+                        <i class="fas fa-columns text-xs"></i>
+                        <span>Columns</span>
                     </button>
-                    <!-- Export Dropdown -->
-                    <div class="relative group">
-                        <button id="offersExportBtn" class="btn-primary text-xs sm:text-sm">
-                            <i class="fas fa-file-export mr-1.5 sm:mr-2"></i>Export
-                        </button>
-                        <div
-                            class="absolute mt-2 w-48 bg-white rounded-lg shadow-lg border border-stone-200 py-2 z-50 hidden group-hover:block
-               right-0 md:right-0 md:left-auto
-               left-0 md:left-auto">
-                            <button data-export="csv"
-                                class="w-full text-left px-4 py-2 text-stone-700 hover:bg-stone-50 hover:text-red-600 text-sm">
-                                <i class="fas fa-file-csv mr-2"></i>CSV
-                            </button>
-                            <button data-export="xlsx"
-                                class="w-full text-left px-4 py-2 text-stone-700 hover:bg-stone-50 hover:text-red-600 text-sm">
-                                <i class="fas fa-file-excel mr-2"></i>Excel
-                            </button>
-                            <button data-export="print"
-                                class="w-full text-left px-4 py-2 text-stone-700 hover:bg-stone-50 hover:text-red-600 text-sm">
-                                <i class="fas fa-print mr-2"></i>Print
-                            </button>
-                        </div>
-                    </div>
+                    <!-- PDF Button (Small, PDF only) -->
+                    <button id="offersExportBtn" onclick="window.print()" class="btn-secondary btn-sm hover:text-red-600 hover:bg-stone-50" title="Export as PDF">
+                        <i class="fas fa-file-pdf text-red-500 text-xs"></i>
+                        <span>PDF</span>
+                    </button>
+                    <!-- Big Last Button: + Add Offer -->
+                    <a href="{{ route('admin.offers.create') }}" class="btn-primary btn-big w-full sm:w-auto shadow-md">
+                        <i class="fas fa-plus mr-1"></i>
+                        <span>+ Add Offer</span>
+                    </a>
                 </div>
             </div>
 
@@ -1551,7 +1537,8 @@
                 if (tabulatorBulkDeleteBtn) {
                     if (selectedCountNum > 0) {
                         tabulatorBulkDeleteBtn.classList.remove('hidden');
-                        tabulatorBulkDeleteBtn.innerHTML = `<i class="fas fa-trash mr-2"></i>Delete (${selectedCountNum})`;
+                        tabulatorBulkDeleteBtn.innerHTML = `<i class="fas fa-trash text-xs"></i><span class="ml-1 text-[11px] font-bold">(${selectedCountNum})</span>`;
+                        tabulatorBulkDeleteBtn.className = 'btn-danger btn-sm';
                     } else {
                         tabulatorBulkDeleteBtn.classList.add('hidden');
                     }
@@ -1862,28 +1849,11 @@
             columnVisibilityBtn.parentElement.appendChild(columnMenu);
         }
 
-        // Export functionality
+        // Export functionality (PDF only)
         function initOffersExport() {
-            const exportBtns = document.querySelectorAll('[data-export]');
-
-            exportBtns.forEach(btn => {
-                btn.addEventListener('click', function() {
-                    const format = this.getAttribute('data-export');
-
-                    switch (format) {
-                        case 'csv':
-                            offersTable.download("csv", "offers.csv");
-                            break;
-                        case 'xlsx':
-                            offersTable.download("xlsx", "offers.xlsx", {
-                                sheetName: "Offers"
-                            });
-                            break;
-                        case 'print':
-                            window.print();
-                            break;
-                    }
-                });
+            const offersExportBtn = document.getElementById('offersExportBtn');
+            offersExportBtn?.addEventListener('click', function() {
+                window.print();
             });
         }
 

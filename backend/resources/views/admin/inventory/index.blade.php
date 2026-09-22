@@ -156,44 +156,30 @@
     </div>
     <div class="p-6">
         <!-- Tabulator Toolbar -->
-        <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 mb-4">
-            <div class="order-2 sm:order-1">
-                <div class="relative" style="width: 260px;">
+        <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3 mb-4">
+            <div class="order-2 sm:order-1 w-full sm:w-auto">
+                <div class="relative w-full sm:w-[260px]">
                     <input type="text" id="searchInventoryInput" placeholder="Search inventory..."
-                        class="pl-10 pr-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent w-full">
-                    <i class="fas fa-search absolute left-3 top-3 text-gray-400"></i>
+                        class="pl-10 pr-4 py-2 rounded-xl border border-stone-300 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent w-full text-stone-900 placeholder-stone-400 text-xs sm:text-sm shadow-2xs">
+                    <i class="fas fa-search absolute left-3.5 top-3 text-stone-400 text-xs sm:text-sm"></i>
                 </div>
             </div>
-            <div class="flex flex-wrap gap-2 order-1 sm:order-2">
-                <!-- Bulk Update Button -->
-                <button id="bulkUpdateBtn" class="btn-secondary">
-                    <i class="fas fa-edit mr-2"></i>Bulk Update
+            <div class="flex flex-wrap items-center gap-2 order-1 sm:order-2 w-full sm:w-auto">
+                <!-- Bulk Update Button (Small) -->
+                <button id="bulkUpdateBtn" class="btn-secondary btn-sm" title="Bulk Update">
+                    <i class="fas fa-edit text-xs"></i>
+                    <span>Bulk Update</span>
                 </button>
-                <!-- Column Visibility Button -->
-                <button id="columnVisibilityBtn" class="btn-secondary">
-                    <i class="fas fa-columns mr-2"></i>Columns
+                <!-- Column Visibility Button (Small) -->
+                <button id="columnVisibilityBtn" class="btn-secondary btn-sm" title="Columns">
+                    <i class="fas fa-columns text-xs"></i>
+                    <span>Columns</span>
                 </button>
-                <!-- Export Dropdown -->
-                <div class="relative group">
-                    <button id="exportBtn" class="btn-primary">
-                        <i class="fas fa-file-export mr-2"></i>Export
-                    </button>
-                    <div class="absolute mt-2 w-48 bg-white rounded-lg shadow-lg border border-gray-200 py-2 z-50 hidden group-hover:block 
-                            right-0 md:right-0 md:left-auto left-0 md:left-auto">
-                        <button data-export="csv"
-                            class="w-full text-left px-4 py-2 text-gray-700 hover:bg-gray-50 hover:text-indigo-600 text-sm">
-                            <i class="fas fa-file-csv mr-2"></i>CSV
-                        </button>
-                        <button data-export="xlsx"
-                            class="w-full text-left px-4 py-2 text-gray-700 hover:bg-gray-50 hover:text-indigo-600 text-sm">
-                            <i class="fas fa-file-excel mr-2"></i>Excel
-                        </button>
-                        <button data-export="print"
-                            class="w-full text-left px-4 py-2 text-gray-700 hover:bg-gray-50 hover:text-indigo-600 text-sm">
-                            <i class="fas fa-print mr-2"></i>Print
-                        </button>
-                    </div>
-                </div>
+                <!-- PDF Button (Small, PDF only) -->
+                <button id="exportBtn" onclick="window.print()" class="btn-secondary btn-sm hover:text-red-600 hover:bg-stone-50" title="Export as PDF">
+                    <i class="fas fa-file-pdf text-red-500 text-xs"></i>
+                    <span>PDF</span>
+                </button>
             </div>
         </div>
 
@@ -661,23 +647,10 @@
 
         columnVisibilityBtn.parentElement.appendChild(columnMenu);
 
-        // Export functionality
-        const exportBtns = document.querySelectorAll('[data-export]');
-        exportBtns.forEach(btn => {
-            btn.addEventListener('click', function () {
-                const format = this.getAttribute('data-export');
-                switch (format) {
-                    case 'csv':
-                        inventoryTable.download("csv", "inventory.csv");
-                        break;
-                    case 'xlsx':
-                        inventoryTable.download("xlsx", "inventory.xlsx", { sheetName: "Inventory" });
-                        break;
-                    case 'print':
-                        window.print();
-                        break;
-                }
-            });
+        // Export functionality (PDF only)
+        const exportBtn = document.getElementById('exportBtn');
+        exportBtn?.addEventListener('click', function () {
+            window.print();
         });
 
         // Bulk update button

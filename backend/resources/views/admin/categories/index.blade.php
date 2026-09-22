@@ -70,54 +70,40 @@
         </div>
         <div class="p-3 sm:p-6">
             <!-- Tabulator Toolbar -->
-            <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 mb-4">
+            <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3 mb-4">
                 <div class="order-2 sm:order-1 w-full sm:w-auto">
                     <div class="relative w-full sm:w-[260px]">
                         <input type="text" id="searchInput" placeholder="Search categories..."
-                            class="pl-10 pr-4 py-2 rounded-lg border border-stone-300 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent w-full text-stone-900 placeholder-stone-400">
-                        <i class="fas fa-search absolute left-3 top-3 text-stone-400"></i>
+                            class="pl-10 pr-4 py-2 rounded-xl border border-stone-300 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent w-full text-stone-900 placeholder-stone-400 text-xs sm:text-sm shadow-2xs">
+                        <i class="fas fa-search absolute left-3.5 top-3 text-stone-400 text-xs sm:text-sm"></i>
                     </div>
                 </div>
-                <div class="flex flex-wrap gap-2 order-1 sm:order-2">
-                    <!-- Add Category Button -->
-                    <a href="{{ route('admin.categories.create') }}" class="btn-primary">
-                        <i class="fas fa-plus mr-2"></i>Add Category
+                <div class="flex flex-wrap items-center gap-2 order-1 sm:order-2 w-full sm:w-auto">
+                    <!-- Refresh Button (Small) -->
+                    <button onclick="refreshAll()" class="btn-secondary btn-sm" title="Refresh">
+                        <i class="fas fa-sync-alt text-xs"></i>
+                        <span>Refresh</span>
+                    </button>
+                    <!-- Bulk Actions Button (Small) -->
+                    <button id="bulkActionsBtn" class="btn-secondary btn-sm" title="Bulk Actions">
+                        <i class="fas fa-bolt text-xs"></i>
+                        <span>Bulk Actions</span>
+                    </button>
+                    <!-- Column Visibility Button (Small) -->
+                    <button id="columnVisibilityBtn" class="btn-secondary btn-sm" title="Columns">
+                        <i class="fas fa-columns text-xs"></i>
+                        <span>Columns</span>
+                    </button>
+                    <!-- PDF Button (Small, PDF only) -->
+                    <button id="exportBtn" onclick="window.print()" class="btn-secondary btn-sm hover:text-red-600 hover:bg-stone-50" title="Export as PDF">
+                        <i class="fas fa-file-pdf text-red-500 text-xs"></i>
+                        <span>PDF</span>
+                    </button>
+                    <!-- Big Last Button: + Add Category -->
+                    <a href="{{ route('admin.categories.create') }}" class="btn-primary btn-big w-full sm:w-auto shadow-md">
+                        <i class="fas fa-plus mr-1"></i>
+                        <span>+ Add Category</span>
                     </a>
-                    <!-- Refresh Button -->
-                    <button onclick="refreshAll()" class="btn-secondary">
-                        <i class="fas fa-sync-alt mr-2"></i>Refresh
-                    </button>
-                    <!-- Bulk Actions Button -->
-                    <button id="bulkActionsBtn" class="btn-secondary">
-                        <i class="fas fa-bolt mr-2"></i>Bulk Actions
-                    </button>
-                    <!-- Column Visibility Button -->
-                    <button id="columnVisibilityBtn" class="btn-secondary">
-                        <i class="fas fa-columns mr-2"></i>Columns
-                    </button>
-                    <!-- Export Dropdown -->
-                    <div class="relative group">
-                        <button id="exportBtn" class="btn-primary">
-                            <i class="fas fa-file-export mr-2"></i>Export
-                        </button>
-                        <div
-                            class="absolute mt-2 w-48 bg-white rounded-lg shadow-lg border border-stone-200 py-2 z-50 hidden group-hover:block
-               right-0 md:right-0 md:left-auto
-               left-0 md:left-auto">
-                            <button data-export="csv"
-                                class="w-full text-left px-4 py-2 text-stone-700 hover:bg-stone-50 hover:text-red-600 text-sm">
-                                <i class="fas fa-file-csv mr-2"></i>CSV
-                            </button>
-                            <button data-export="xlsx"
-                                class="w-full text-left px-4 py-2 text-stone-700 hover:bg-stone-50 hover:text-red-600 text-sm">
-                                <i class="fas fa-file-excel mr-2"></i>Excel
-                            </button>
-                            <button data-export="print"
-                                class="w-full text-left px-4 py-2 text-stone-700 hover:bg-stone-50 hover:text-red-600 text-sm">
-                                <i class="fas fa-print mr-2"></i>Print
-                            </button>
-                        </div>
-                    </div>
                 </div>
             </div>
 
@@ -1323,28 +1309,11 @@
             columnVisibilityBtn.parentElement.appendChild(columnMenu);
         }
 
-        // Export functionality
+        // Export functionality (PDF only)
         function initCategoriesExport() {
-            const exportBtns = document.querySelectorAll('[data-export]');
-
-            exportBtns.forEach(btn => {
-                btn.addEventListener('click', function() {
-                    const format = this.getAttribute('data-export');
-
-                    switch (format) {
-                        case 'csv':
-                            categoriesTable.download("csv", "categories.csv");
-                            break;
-                        case 'xlsx':
-                            categoriesTable.download("xlsx", "categories.xlsx", {
-                                sheetName: "Categories"
-                            });
-                            break;
-                        case 'print':
-                            window.print();
-                            break;
-                    }
-                });
+            const exportBtn = document.getElementById('exportBtn');
+            exportBtn?.addEventListener('click', function() {
+                window.print();
             });
         }
 

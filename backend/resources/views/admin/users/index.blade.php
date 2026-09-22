@@ -31,28 +31,24 @@
     </div>
     <div class="p-6">
         <!-- Toolbar -->
-        <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 mb-4">
-            <div class="order-2 sm:order-1">
-                <div class="relative" style="width: 260px;">
+        <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3 mb-4">
+            <div class="order-2 sm:order-1 w-full sm:w-auto">
+                <div class="relative w-full sm:w-[260px]">
                     <input type="text" id="searchUsersInput" placeholder="Search customers..."
-                        class="pl-10 pr-4 py-2 rounded-lg border border-stone-300 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent w-full text-stone-900 placeholder-stone-400">
-                    <i class="fas fa-search absolute left-3 top-3 text-stone-400"></i>
+                        class="pl-10 pr-4 py-2 rounded-xl border border-stone-300 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent w-full text-stone-900 placeholder-stone-400 text-xs sm:text-sm shadow-2xs">
+                    <i class="fas fa-search absolute left-3.5 top-3 text-stone-400 text-xs sm:text-sm"></i>
                 </div>
             </div>
-            <div class="flex flex-wrap gap-2 order-1 sm:order-2">
-                <!-- Bulk Actions -->
-                <button onclick="showBulkActions()" class="btn-secondary">
-                    <i class="fas fa-tasks mr-2"></i>Bulk Actions
+            <div class="flex flex-wrap items-center gap-2 order-1 sm:order-2 w-full sm:w-auto">
+                <!-- Bulk Actions Button (Small) -->
+                <button onclick="showBulkActions()" class="btn-secondary btn-sm" title="Bulk Actions">
+                    <i class="fas fa-tasks text-xs"></i>
+                    <span>Bulk Actions</span>
                 </button>
-                <!-- Export Buttons -->
-                <button onclick="exportToCSV()" class="btn-secondary">
-                    <i class="fas fa-file-csv mr-2"></i>CSV
-                </button>
-                <button onclick="exportToExcel()" class="btn-secondary">
-                    <i class="fas fa-file-excel mr-2"></i>Excel
-                </button>
-                <button onclick="printTable()" class="btn-secondary">
-                    <i class="fas fa-print mr-2"></i>Print
+                <!-- PDF Button (Small, PDF only) -->
+                <button onclick="printTable()" class="btn-secondary btn-sm hover:text-red-600 hover:bg-stone-50" title="Export as PDF">
+                    <i class="fas fa-file-pdf text-red-500 text-xs"></i>
+                    <span>PDF</span>
                 </button>
             </div>
         </div>

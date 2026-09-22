@@ -76,47 +76,39 @@
             </div>
             <div class="p-6">
                 <!-- Tabulator Toolbar -->
-                <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 mb-4">
-                    <div class="order-2 sm:order-1">
-                        <div class="relative" style="width: 260px;">
+                <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3 mb-4">
+                    <div class="order-2 sm:order-1 w-full sm:w-auto">
+                        <div class="relative w-full sm:w-[260px]">
                             <input type="text" id="taxSearchInput" placeholder="Search tax rates..."
-                                class="pl-10 pr-4 py-2 rounded-lg border border-stone-300 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent w-full text-stone-900 placeholder-stone-400">
-                            <i class="fas fa-search absolute left-3 top-3 text-stone-400"></i>
+                                class="pl-10 pr-4 py-2 rounded-xl border border-stone-300 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent w-full text-stone-900 placeholder-stone-400 text-xs sm:text-sm shadow-2xs">
+                            <i class="fas fa-search absolute left-3.5 top-3 text-stone-400 text-xs sm:text-sm"></i>
                         </div>
                     </div>
-                    <div class="flex flex-wrap gap-2 order-1 sm:order-2">
-                        <button onclick="openAddTaxRateModal()" class="btn-primary">
-                            <i class="fas fa-plus mr-2"></i>Add Tax Rate
+                    <div class="flex flex-wrap items-center gap-2 order-1 sm:order-2 w-full sm:w-auto">
+                        <!-- Bulk Delete Small Dustbin Button -->
+                        <button id="taxBulkDeleteBtn" class="btn-danger btn-icon-sm" title="Bulk Delete" aria-label="Bulk Delete">
+                            <i class="fas fa-trash text-xs"></i>
                         </button>
-                        <button id="taxBulkDeleteBtn" class="btn-danger">
-                            <i class="fas fa-trash mr-2"></i>Bulk Delete
+                        <!-- Bulk Status Small Button -->
+                        <button id="taxBulkToggleBtn" class="btn-secondary btn-sm" title="Bulk Status">
+                            <i class="fas fa-toggle-on text-xs"></i>
+                            <span>Status</span>
                         </button>
-                        <button id="taxBulkToggleBtn" class="btn-secondary">
-                            <i class="fas fa-toggle-on mr-2"></i>Bulk Status
+                        <!-- Columns Small Button -->
+                        <button id="taxColumnVisibilityBtn" class="btn-secondary btn-sm" title="Columns">
+                            <i class="fas fa-columns text-xs"></i>
+                            <span>Columns</span>
                         </button>
-                        <button id="taxColumnVisibilityBtn" class="btn-secondary">
-                            <i class="fas fa-columns mr-2"></i>Columns
+                        <!-- PDF Small Button (PDF only) -->
+                        <button id="taxExportBtn" onclick="window.print()" class="btn-secondary btn-sm hover:text-red-600 hover:bg-stone-50" title="Export as PDF">
+                            <i class="fas fa-file-pdf text-red-500 text-xs"></i>
+                            <span>PDF</span>
                         </button>
-                        <div class="relative group">
-                            <button id="taxExportBtn" class="btn-primary">
-                                <i class="fas fa-file-export mr-2"></i>Export
-                            </button>
-                            <div
-                                class="absolute mt-2 w-48 bg-white rounded-lg shadow-lg border border-stone-200 py-2 z-50 hidden group-hover:block right-0 md:right-0 md:left-auto left-0 md:left-auto">
-                                <button data-export="csv"
-                                    class="w-full text-left px-4 py-2 text-stone-700 hover:bg-stone-50 hover:text-red-600 text-sm">
-                                    <i class="fas fa-file-csv mr-2"></i>CSV
-                                </button>
-                                <button data-export="xlsx"
-                                    class="w-full text-left px-4 py-2 text-stone-700 hover:bg-stone-50 hover:text-red-600 text-sm">
-                                    <i class="fas fa-file-excel mr-2"></i>Excel
-                                </button>
-                                <button data-export="print"
-                                    class="w-full text-left px-4 py-2 text-stone-700 hover:bg-stone-50 hover:text-red-600 text-sm">
-                                    <i class="fas fa-print mr-2"></i>Print
-                                </button>
-                            </div>
-                        </div>
+                        <!-- Big Last Button: + Add Tax Rate -->
+                        <button onclick="openAddTaxRateModal()" class="btn-primary btn-big w-full sm:w-auto shadow-md">
+                            <i class="fas fa-plus mr-1"></i>
+                            <span>+ Add Tax Rate</span>
+                        </button>
                     </div>
                 </div>
                 <!-- Tabulator Container -->
@@ -133,20 +125,24 @@
             </div>
             <div class="p-6">
                 <!-- Tabulator Toolbar -->
-                <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 mb-4">
-                    <div class="order-2 sm:order-1">
-                        <div class="relative" style="width: 260px;">
+                <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3 mb-4">
+                    <div class="order-2 sm:order-1 w-full sm:w-auto">
+                        <div class="relative w-full sm:w-[260px]">
                             <input type="text" id="taxClassesSearchInput" placeholder="Search tax classes..."
-                                class="pl-10 pr-4 py-2 rounded-lg border border-stone-300 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent w-full text-stone-900 placeholder-stone-400">
-                            <i class="fas fa-search absolute left-3 top-3 text-stone-400"></i>
+                                class="pl-10 pr-4 py-2 rounded-xl border border-stone-300 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent w-full text-stone-900 placeholder-stone-400 text-xs sm:text-sm shadow-2xs">
+                            <i class="fas fa-search absolute left-3.5 top-3 text-stone-400 text-xs sm:text-sm"></i>
                         </div>
                     </div>
-                    <div class="flex flex-wrap gap-2 order-1 sm:order-2">
-                        <button onclick="openAddTaxClassModal()" class="btn-primary">
-                            <i class="fas fa-plus mr-2"></i>Add Tax Class
+                    <div class="flex flex-wrap items-center gap-2 order-1 sm:order-2 w-full sm:w-auto">
+                        <!-- Columns Small Button -->
+                        <button id="taxClassesColumnVisibilityBtn" class="btn-secondary btn-sm" title="Columns">
+                            <i class="fas fa-columns text-xs"></i>
+                            <span>Columns</span>
                         </button>
-                        <button id="taxClassesColumnVisibilityBtn" class="btn-secondary">
-                            <i class="fas fa-columns mr-2"></i>Columns
+                        <!-- Big Last Button: + Add Tax Class -->
+                        <button onclick="openAddTaxClassModal()" class="btn-primary btn-big w-full sm:w-auto shadow-md">
+                            <i class="fas fa-plus mr-1"></i>
+                            <span>+ Add Tax Class</span>
                         </button>
                     </div>
                 </div>
@@ -1033,25 +1029,10 @@
                 columnVisibilityBtn.parentElement.appendChild(columnMenu);
             }
 
-            // Export functionality
-            const exportBtns = document.querySelectorAll('#taxExportBtn ~ [data-export]');
-            exportBtns.forEach(btn => {
-                btn.addEventListener('click', function() {
-                    const format = this.getAttribute('data-export');
-                    switch (format) {
-                        case 'csv':
-                            taxesTable.download("csv", "tax_rates.csv");
-                            break;
-                        case 'xlsx':
-                            taxesTable.download("xlsx", "tax_rates.xlsx", {
-                                sheetName: "Tax Rates"
-                            });
-                            break;
-                        case 'print':
-                            window.print();
-                            break;
-                    }
-                });
+            // Export functionality (PDF only)
+            const taxExportBtn = document.getElementById('taxExportBtn');
+            taxExportBtn?.addEventListener('click', function() {
+                window.print();
             });
 
             // Bulk actions

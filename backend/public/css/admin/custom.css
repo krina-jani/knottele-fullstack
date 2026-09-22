@@ -129,6 +129,53 @@
     transition: all 0.2s ease;
 }
 
+/* Button Size Modifiers */
+.btn-sm {
+    padding: 6px 12px !important;
+    font-size: 12px !important;
+    line-height: 1.25rem !important;
+    border-radius: 10px !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 6px !important;
+    font-weight: 600 !important;
+    white-space: nowrap !important;
+}
+
+.btn-icon-sm {
+    width: 34px !important;
+    height: 34px !important;
+    min-width: 34px !important;
+    max-width: 34px !important;
+    padding: 0 !important;
+    font-size: 13px !important;
+    border-radius: 10px !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    flex-shrink: 0 !important;
+}
+
+.btn-big {
+    padding: 9px 20px !important;
+    font-size: 13px !important;
+    font-weight: 700 !important;
+    border-radius: 12px !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 7px !important;
+    box-shadow: 0 4px 10px rgba(220, 38, 38, 0.28) !important;
+    letter-spacing: 0.01em !important;
+    white-space: nowrap !important;
+}
+
+.btn-big:hover {
+    box-shadow: 0 8px 16px rgba(220, 38, 38, 0.38) !important;
+    transform: translateY(-1px) !important;
+}
+
 /* Status badges */
 .status-badge {
     display: inline-flex;
