@@ -998,17 +998,20 @@ export async function fetchCustomOrderById(referenceOrId: string, email?: string
 /**
  * Fetch Active Offers/Coupons from Laravel Backend API
  */
-export async function fetchActiveOffers(): Promise<Array<{
+export async function fetchActiveOffers(subtotal?: number): Promise<Array<{
   id: number;
   name: string;
   code: string;
   offer_type: string;
   discount_value: string | number;
   min_cart_amount?: string | number | null;
+  max_cart_amount?: string | number | null;
+  starts_at?: string | null;
   ends_at?: string | null;
 }>> {
   try {
-    const url = `${getApiBaseUrl()}/customer/offers/active?_t=${Date.now()}`;
+    const subtotalParam = subtotal != null && !isNaN(subtotal) ? `&subtotal=${encodeURIComponent(subtotal)}` : "";
+    const url = `${getApiBaseUrl()}/customer/offers/active?_t=${Date.now()}${subtotalParam}`;
     const response = await fetch(url, {
       headers: { Accept: "application/json" },
       cache: "no-store",

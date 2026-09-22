@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -67,14 +67,70 @@ export default function CheckoutPage() {
   const [availableOffers, setAvailableOffers] = useState<any[]>([]);
   const [isApplyingCoupon, setIsApplyingCoupon] = useState(false);
 
-  // Fetch active offers from backend database
+  // Fetch active offers from backend database (filtered by subtotal on server)
   useEffect(() => {
-    fetchActiveOffers().then((offers) => {
+    fetchActiveOffers(subtotal).then((offers) => {
       if (offers && Array.isArray(offers)) {
         setAvailableOffers(offers);
       }
     });
-  }, []);
+  }, [subtotal]);
+
+  // Client-side verification: Strictly filter offers valid for current subtotal & unexpired
+  const validOffers = useMemo(() => {
+    if (!availableOffers || availableOffers.length === 0) return [];
+    const now = Date.now();
+
+    return availableOffers.filter((off) => {
+      if (!off || !off.code) return false;
+
+      // 1. Check expiration
+      if (off.ends_at) {
+        const expiry = new Date(off.ends_at).getTime();
+        if (!isNaN(expiry) && expiry < now) return false;
+      }
+
+      // 2. Check starts at
+      if (off.starts_at) {
+        const start = new Date(off.starts_at).getTime();
+        if (!isNaN(start) && start > now) return false;
+      }
+
+      // 3. Check minimum cart amount against subtotal
+      const minAmount = off.min_cart_amount != null ? Number(off.min_cart_amount) : 0;
+      if (!isNaN(minAmount) && minAmount > 0 && subtotal < minAmount) {
+        return false;
+      }
+
+      // 4. Check maximum cart amount against subtotal
+      const maxAmount = off.max_cart_amount != null ? Number(off.max_cart_amount) : 0;
+      if (!isNaN(maxAmount) && maxAmount > 0 && subtotal > maxAmount) {
+        return false;
+      }
+
+      return true;
+    });
+  }, [availableOffers, subtotal]);
+
+  // Auto-remove promo code if subtotal drops below required minimum amount
+  useEffect(() => {
+    if (promoCode && availableOffers.length > 0) {
+      const currentAppliedOffer = availableOffers.find(
+        (o) => o.code?.toUpperCase() === promoCode.toUpperCase()
+      );
+      if (currentAppliedOffer) {
+        const minAmt = currentAppliedOffer.min_cart_amount != null ? Number(currentAppliedOffer.min_cart_amount) : 0;
+        if (!isNaN(minAmt) && minAmt > 0 && subtotal < minAmt) {
+          removePromoCode();
+          showToast(
+            "Coupon Removed",
+            `Coupon ${promoCode} requires a minimum cart amount of ₹${minAmt}.`,
+            "info"
+          );
+        }
+      }
+    }
+  }, [subtotal, promoCode, availableOffers, removePromoCode, showToast]);
 
   const handleApplyCouponSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -591,21 +647,28 @@ export default function CheckoutPage() {
                       </button>
                     </form>
 
-                    {availableOffers.length > 0 && (
-                      <div className="flex flex-wrap gap-1.5 pt-1">
-                        {availableOffers.map((off) => (
-                          <button
-                            key={off.id || off.code}
-                            type="button"
-                            onClick={async () => {
-                              setCouponInput(off.code);
-                              await applyPromoCode(off.code);
-                            }}
-                            className="px-2 py-0.5 rounded-lg bg-[#FCE9E5] hover:bg-[#EFB8B0] text-[#913638] text-[10px] font-bold border border-[#E7D1CC] transition-all cursor-pointer"
-                          >
-                            🏷️ {off.code} {off.discount_value ? `(${off.discount_value}% OFF)` : ""}
-                          </button>
-                        ))}
+                    {validOffers.length > 0 && (
+                      <div className="space-y-1.5 pt-1">
+                        <span className="text-[10px] font-semibold text-[#786864] block">Available Active Offers:</span>
+                        <div className="flex flex-wrap gap-1.5">
+                          {validOffers.map((off) => (
+                            <button
+                              key={off.id || off.code}
+                              type="button"
+                              disabled={isApplyingCoupon}
+                              onClick={async () => {
+                                setCouponInput(off.code);
+                                await applyPromoCode(off.code);
+                              }}
+                              className="px-2 py-0.5 rounded-lg bg-[#FCE9E5] hover:bg-[#EFB8B0] text-[#913638] text-[10px] font-bold border border-[#E7D1CC] transition-all cursor-pointer disabled:opacity-50"
+                            >
+                              <span>🏷️ {off.code}</span>
+                              {off.discount_value && (
+                                <span className="text-[9px] text-[#786864] font-semibold">({off.discount_value}% OFF)</span>
+                              )}
+                            </button>
+                          ))}
+                        </div>
                       </div>
                     )}
                   </div>
@@ -1212,19 +1275,20 @@ export default function CheckoutPage() {
                     </form>
 
                     {/* Dynamic Active Offers from Database */}
-                    {availableOffers.length > 0 && (
+                    {validOffers.length > 0 && (
                       <div className="space-y-1.5 pt-1">
                         <span className="text-[11px] font-semibold text-[#786864] block">Available Active Offers:</span>
                         <div className="flex flex-wrap gap-1.5">
-                          {availableOffers.map((off) => (
+                          {validOffers.map((off) => (
                             <button
                               key={off.id || off.code}
                               type="button"
+                              disabled={isApplyingCoupon}
                               onClick={async () => {
                                 setCouponInput(off.code);
                                 await applyPromoCode(off.code);
                               }}
-                              className="px-2.5 py-1 rounded-xl bg-[#FCE9E5]/70 hover:bg-[#FCE9E5] text-[#913638] text-[11px] font-bold border border-[#E7D1CC] hover:border-[#913638] transition-all cursor-pointer flex items-center gap-1 shadow-2xs"
+                              className="px-2.5 py-1 rounded-xl bg-[#FCE9E5]/70 hover:bg-[#FCE9E5] text-[#913638] text-[11px] font-bold border border-[#E7D1CC] hover:border-[#913638] transition-all cursor-pointer flex items-center gap-1 shadow-2xs active:scale-[0.98] disabled:opacity-50"
                             >
                               <span>🏷️ {off.code}</span>
                               {off.discount_value && (

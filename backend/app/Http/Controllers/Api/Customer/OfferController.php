@@ -9,10 +9,12 @@ use Illuminate\Http\Request;
 
 class OfferController extends Controller
 {
-    public function getActiveOffers(): JsonResponse
+    public function getActiveOffers(Request $request): JsonResponse
     {
         try {
-            $offers = Offer::active()
+            $subtotal = $request->query('subtotal') ?? $request->query('cart_amount');
+
+            $query = Offer::active()
                 ->where('status', true)
                 ->where(function($q) {
                     $q->where(function($query) {
@@ -21,11 +23,28 @@ class OfferController extends Controller
                     })
                     ->orWhereIn('offer_type', ['bogo', 'buy_x_get_y', 'free_shipping']);
                 })
-                ->select('id', 'name', 'code', 'offer_type', 'discount_value', 'buy_qty', 'get_qty', 'min_cart_amount', 'ends_at')
+                ->where(function($q) {
+                    $q->whereNull('max_uses')
+                      ->orWhereRaw('used_count < max_uses');
+                });
+
+            // If subtotal is provided, filter out offers where minimum cart amount is not satisfied or exceeds max cart amount
+            if ($subtotal !== null && is_numeric($subtotal)) {
+                $query->where(function($q) use ($subtotal) {
+                    $q->whereNull('min_cart_amount')
+                      ->orWhere('min_cart_amount', '<=', (float)$subtotal);
+                })->where(function($q) use ($subtotal) {
+                    $q->whereNull('max_cart_amount')
+                      ->orWhere('max_cart_amount', '>=', (float)$subtotal);
+                });
+            }
+
+            $offers = $query->select('id', 'name', 'code', 'offer_type', 'discount_value', 'buy_qty', 'get_qty', 'min_cart_amount', 'max_cart_amount', 'starts_at', 'ends_at')
                 ->orderByRaw('CASE WHEN discount_value IS NULL THEN 1 ELSE 0 END')
                 ->orderBy('discount_value', 'desc')
-                ->limit(5)
+                ->limit(10)
                 ->get();
+
             return response()->json([
                 'success' => true,
                 'data' => $offers,
@@ -102,6 +121,14 @@ class OfferController extends Controller
                 return response()->json([
                     'success' => false,
                     'message' => "This offer requires a minimum cart amount of ₹{$offer->min_cart_amount}"
+                ], 200);
+            }
+
+            // Check max cart amount
+            if ($offer->max_cart_amount && $request->subtotal > $offer->max_cart_amount) {
+                return response()->json([
+                    'success' => false,
+                    'message' => "This offer is only valid for cart amounts up to ₹{$offer->max_cart_amount}"
                 ], 200);
             }
 
