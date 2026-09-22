@@ -100,17 +100,21 @@
         <div class="px-6 py-4 border-b border-stone-200 bg-stone-50/50">
             <h3 class="text-lg font-semibold text-stone-800">All Brands</h3>
         </div>
-        <div class="p-6">
+        <div class="p-3 sm:p-6">
             <!-- Tabulator Toolbar -->
             <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 mb-4">
-                <div class="order-2 sm:order-1">
-                    <div class="relative" style="width: 260px;">
+                <div class="order-2 sm:order-1 w-full sm:w-auto">
+                    <div class="relative w-full sm:w-[260px]">
                         <input type="text" id="brandsSearchInput" placeholder="Search brands..."
                             class="pl-10 pr-4 py-2 rounded-lg border border-stone-300 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent w-full text-stone-900 placeholder-stone-400">
                         <i class="fas fa-search absolute left-3 top-3 text-stone-400"></i>
                     </div>
                 </div>
                 <div class="flex flex-wrap gap-2 order-1 sm:order-2">
+                    <!-- Add Brand Button -->
+                    <button onclick="showCreateBrandModal()" class="btn-primary">
+                        <i class="fas fa-plus mr-2"></i>Add Brand
+                    </button>
                     <!-- Bulk Delete Button -->
                     <button id="tabulatorBulkDeleteBtn" class="btn-danger hidden">
                         <i class="fas fa-trash mr-2"></i>Bulk Delete
@@ -660,7 +664,7 @@
         function initializeBrandsTable(data = []) {
             brandsTable = new Tabulator("#brandsTable", {
                 data: data,
-                layout: "fitDataFill",
+                layout: "fitColumns",
                 height: "100%",
                 responsiveLayout: "hide",
                 pagination: true,
@@ -674,44 +678,55 @@
                         titleFormatter: "rowSelection",
                         hozAlign: "center",
                         headerSort: false,
-                        width: 50,
+                        width: 45,
                         cssClass: "select-checkbox",
-                        responsive: 0
+                        responsive: 2
                     },
                     {
                         title: "ID",
                         field: "id",
-                        width: 70,
+                        width: 60,
                         sorter: "number",
                         hozAlign: "center",
                         headerFilter: "input",
-                        headerFilterPlaceholder: "Search ID…",
+                        headerFilterPlaceholder: "ID...",
                         responsive: 0
                     },
                     {
                         title: "Brand",
                         field: "name",
-                        widthGrow: 2,
+                        widthGrow: 3,
+                        minWidth: 160,
                         sorter: "string",
                         headerFilter: "input",
                         headerFilterPlaceholder: "Search Brand…",
+                        responsive: 0,
                         formatter: function(cell, formatterParams, onRendered) {
                             const row = cell.getRow();
                             const data = row.getData();
+                            const isActive = data.status === 'active' || data.status === true;
+                            const isFeatured = data.featured === true || data.featured === 'true';
 
                             return `
-                        <div class="flex items-center space-x-3">
-                            <div class="w-10 h-10 bg-gray-100 rounded-lg flex items-center justify-center overflow-hidden flex-shrink-0">
+                        <div class="flex items-center space-x-2.5 sm:space-x-3 py-1">
+                            <div class="w-9 h-9 sm:w-10 sm:h-10 bg-gray-100 rounded-lg flex items-center justify-center overflow-hidden shrink-0 border border-stone-200">
                                 ${data.logo ?
                                     `<img src="${data.logo}" alt="${data.name}" class="w-full h-full object-cover" onerror="this.onerror=null;this.src='/images/logo/Logo_1.png'">` :
                                     `<i class="fas fa-tag text-gray-400"></i>`
                                 }
                             </div>
                             <div class="min-w-0 flex-1">
-                                <p class="font-medium text-gray-900 truncate">${data.name}</p>
-                                ${data.description ?
-                                    `<p class="text-sm text-gray-500 truncate">${data.description}</p>` : ''
-                                }
+                                <div class="flex items-center gap-1.5 flex-wrap">
+                                    <p class="font-bold text-xs sm:text-sm text-stone-900 truncate">${data.name}</p>
+                                    ${isFeatured ? '<span class="px-1.5 py-0.2 bg-amber-100 text-amber-800 text-[10px] rounded-full font-medium">★</span>' : ''}
+                                    <span class="inline-flex sm:hidden items-center px-1.5 py-0.2 rounded-full text-[10px] font-semibold ${isActive ? 'bg-emerald-100 text-emerald-800' : 'bg-stone-100 text-stone-600'}">
+                                        ${isActive ? 'Active' : 'Inactive'}
+                                    </span>
+                                </div>
+                                ${data.description ? `<p class="text-[11px] sm:text-xs text-stone-500 truncate">${data.description}</p>` : ''}
+                                <div class="sm:hidden text-[10px] text-stone-400 font-medium">
+                                    ${data.product_count || 0} products
+                                </div>
                             </div>
                         </div>
                     `;
@@ -720,7 +735,7 @@
                     {
                         title: "Products",
                         field: "product_count",
-                        width: 120,
+                        width: 100,
                         sorter: "number",
                         hozAlign: "center",
                         formatter: function(cell) {
@@ -735,7 +750,7 @@
                     {
                         title: "Status",
                         field: "status",
-                        width: 120,
+                        width: 100,
                         hozAlign: "center",
                         headerFilter: "list",
                         headerFilterParams: {
@@ -762,7 +777,7 @@
                     {
                         title: "Featured",
                         field: "featured",
-                        width: 120,
+                        width: 100,
                         hozAlign: "center",
                         headerFilter: "list",
                         headerFilterParams: {
@@ -778,7 +793,7 @@
                             const isFeatured = data.featured === true || data.featured === 'true';
                             return `
                         <button onclick="toggleFeatured(${data.id})"
-                                class="text-2xl ${isFeatured ? 'text-amber-500' : 'text-gray-300'} hover:text-amber-600 transition-colors">
+                                class="text-xl ${isFeatured ? 'text-amber-500' : 'text-gray-300'} hover:text-amber-600 transition-colors">
                             ${isFeatured ? '<i class="fas fa-star"></i>' : '<i class="far fa-star"></i>'}
                         </button>
                     `;
@@ -788,7 +803,7 @@
                     {
                         title: "Created",
                         field: "created_at_formatted",
-                        width: 150,
+                        width: 130,
                         sorter: "date",
                         hozAlign: "center",
                         formatter: function(cell) {
@@ -800,24 +815,27 @@
                     {
                         title: "Actions",
                         field: "id",
-                        width: 150,
+                        width: 110,
                         hozAlign: "center",
                         headerSort: false,
                         formatter: function(cell) {
                             const id = cell.getValue();
                             return `
-                        <div class="flex space-x-2 justify-center">
+                        <div class="flex space-x-1.5 justify-center">
                             <button onclick="editBrand(${id})"
-                                    class="w-8 h-8 flex items-center justify-center bg-blue-50 text-blue-600 rounded-lg hover:bg-blue-100 transition-colors">
-                                <i class="fas fa-edit text-sm"></i>
+                                    class="w-7 h-7 flex items-center justify-center bg-blue-50 text-blue-600 rounded-lg hover:bg-blue-100 transition-colors"
+                                    title="Edit Brand">
+                                <i class="fas fa-edit text-xs"></i>
                             </button>
                             <button onclick="viewBrand(${id})"
-                                    class="w-8 h-8 flex items-center justify-center bg-green-50 text-green-600 rounded-lg hover:bg-green-100 transition-colors">
-                                <i class="fas fa-eye text-sm"></i>
+                                    class="w-7 h-7 flex items-center justify-center bg-green-50 text-green-600 rounded-lg hover:bg-green-100 transition-colors"
+                                    title="View Details">
+                                <i class="fas fa-eye text-xs"></i>
                             </button>
                             <button onclick="deleteBrand(${id})"
-                                    class="w-8 h-8 flex items-center justify-center bg-rose-50 text-rose-600 rounded-lg hover:bg-rose-100 transition-colors">
-                                <i class="fas fa-trash text-sm"></i>
+                                    class="w-7 h-7 flex items-center justify-center bg-rose-50 text-rose-600 rounded-lg hover:bg-rose-100 transition-colors"
+                                    title="Delete Brand">
+                                <i class="fas fa-trash text-xs"></i>
                             </button>
                         </div>
                     `;
