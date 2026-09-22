@@ -4,7 +4,7 @@ const path = require('path');
 const srcDir = path.resolve(__dirname, '../out');
 const destDir = path.resolve(__dirname, '../../backend/public');
 
-// Files and folders in Laravel public that should NEVER be deleted
+// Files and folders in Laravel public that should NEVER be deleted by frontend cleanup
 const PRESERVED_ITEMS = new Set([
   'index.php',
   '.htaccess',
@@ -18,7 +18,15 @@ const PRESERVED_ITEMS = new Set([
   'icons.svg',
   '.git',
   '.gitignore',
-  '_next',
+]);
+
+// Laravel core files that should NEVER be overwritten by frontend export
+const PROTECTED_LARAVEL_ROOT_FILES = new Set([
+  'index.php',
+  '.htaccess',
+  'storage',
+  '.git',
+  '.gitignore',
 ]);
 
 function cleanOldFrontendArtifacts(dest) {
@@ -58,8 +66,8 @@ function copyRecursive(src, dest) {
     const srcPath = path.join(src, entry.name);
     const destPath = path.join(dest, entry.name);
 
-    // Skip protected Laravel core files
-    if (PRESERVED_ITEMS.has(entry.name) && dest === destDir) {
+    // Skip protected Laravel core files at root level
+    if (PROTECTED_LARAVEL_ROOT_FILES.has(entry.name) && dest === destDir) {
       continue;
     }
 
