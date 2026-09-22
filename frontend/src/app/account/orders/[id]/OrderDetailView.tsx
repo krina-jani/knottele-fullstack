@@ -9,9 +9,10 @@ import {
   ArrowLeft,
   Sparkles,
   Loader2,
+  Download,
 } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
-import { normalizeImageUrl, fetchOrderById } from "@/lib/api";
+import { normalizeImageUrl, fetchOrderById, getFullPath } from "@/lib/api";
 import { Order } from "@/types/order";
 
 interface OrderDetailViewProps {
@@ -110,13 +111,27 @@ export default function OrderDetailView({ id: propId }: OrderDetailViewProps) {
             </p>
           </div>
 
-          <div className="text-left sm:text-right">
-            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-[#FCE9E5] text-[#913638] border border-[#E7D1CC]">
-              <Sparkles className="w-3.5 h-3.5 text-[#C69A5A]" />
-              <span>{order.status}</span>
-            </span>
+          <div className="flex flex-col sm:items-end gap-2">
+            <div className="flex items-center gap-2 flex-wrap">
+              <a
+                href={getFullPath(`/orders/${order.orderNumber || order.id}/invoice?download=1`)}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-semibold bg-[#913638] text-white hover:bg-[#74292B] active:scale-[0.98] transition-all shadow-xs group cursor-pointer"
+                title="Download or Print Official Invoice"
+              >
+                <Download className="w-3.5 h-3.5 group-hover:translate-y-0.5 transition-transform" />
+                <span>Download Invoice</span>
+              </a>
+
+              <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold bg-[#FCE9E5] text-[#913638] border border-[#E7D1CC]">
+                <Sparkles className="w-3.5 h-3.5 text-[#C69A5A]" />
+                <span>{order.status}</span>
+              </span>
+            </div>
+
             {order.trackingNumber && (
-              <p className="text-[11px] text-[#786864] mt-1">
+              <p className="text-[11px] text-[#786864] mt-0.5">
                 Tracking: <strong className="font-mono text-[#2E211E]">{order.trackingNumber}</strong> ({order.courierName})
               </p>
             )}
@@ -269,6 +284,18 @@ export default function OrderDetailView({ id: propId }: OrderDetailViewProps) {
               <p className="text-[10px] text-[#786864] pt-1">
                 Mode: {order.paymentMethod} ({order.paymentStatus})
               </p>
+            </div>
+
+            <div className="pt-3 border-t border-[#E7D1CC]">
+              <a
+                href={getFullPath(`/orders/${order.orderNumber || order.id}/invoice?download=1`)}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="w-full py-2 px-3 rounded-full bg-[#FFF9F6] text-[#913638] border border-[#EFB8B0] hover:bg-[#913638] hover:text-white text-xs font-semibold active:scale-[0.98] transition-all inline-flex items-center justify-center gap-1.5 shadow-2xs group cursor-pointer"
+              >
+                <Download className="w-3.5 h-3.5 group-hover:translate-y-0.5 transition-transform" />
+                <span>Download Tax Invoice</span>
+              </a>
             </div>
           </div>
 

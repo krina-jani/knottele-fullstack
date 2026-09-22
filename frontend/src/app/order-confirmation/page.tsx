@@ -3,8 +3,9 @@
 import React, { Suspense } from "react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
-import { CheckCircle2, Heart, Sparkles, ArrowRight, Package, Printer } from "lucide-react";
+import { CheckCircle2, Heart, Sparkles, ArrowRight, Package, Printer, Download } from "lucide-react";
 import { BotanicalFlourish, FlowerIcon } from "@/components/ui/BotanicalDecorations";
+import { getFullPath } from "@/lib/api";
 
 function ConfirmationContent() {
   const searchParams = useSearchParams();
@@ -81,17 +82,26 @@ function ConfirmationContent() {
         </div>
 
         {/* Action Buttons */}
-        <div className="flex flex-col sm:flex-row items-center justify-center gap-3.5">
+        <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
           <Link
             href={`/account/orders/${orderId}`}
-            className="w-full sm:w-auto px-8 py-3.5 rounded-full bg-[#913638] text-white text-xs sm:text-sm font-semibold hover:bg-[#74292B] active:scale-[0.98] shadow-sm hover:shadow-boutique-hover transition-all flex items-center justify-center gap-2 cursor-pointer"
+            className="w-full sm:w-auto px-6 py-3 rounded-full bg-[#913638] text-white text-xs sm:text-sm font-semibold hover:bg-[#74292B] active:scale-[0.98] shadow-sm hover:shadow-boutique-hover transition-all flex items-center justify-center gap-2 cursor-pointer"
           >
             <Package className="w-4 h-4" />
             <span>Track Order Timeline</span>
           </Link>
+          <a
+            href={getFullPath(`/orders/${orderNumber || orderId}/invoice?download=1`)}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="w-full sm:w-auto px-6 py-3 rounded-full bg-white text-[#913638] border border-[#913638]/40 hover:bg-[#FCE9E5] text-xs sm:text-sm font-semibold active:scale-[0.98] transition-all flex items-center justify-center gap-2 cursor-pointer shadow-xs group"
+          >
+            <Download className="w-4 h-4 group-hover:translate-y-0.5 transition-transform" />
+            <span>Download Invoice</span>
+          </a>
           <Link
             href="/shop"
-            className="w-full sm:w-auto px-7 py-3.5 rounded-full bg-white text-[#2E211E] border border-[#E7D1CC] hover:border-[#EFB8B0] text-xs sm:text-sm font-semibold hover:bg-[#FCE9E5] hover:text-[#913638] active:scale-[0.98] transition-all flex items-center justify-center gap-2 cursor-pointer shadow-xs"
+            className="w-full sm:w-auto px-6 py-3 rounded-full bg-white text-[#2E211E] border border-[#E7D1CC] hover:border-[#EFB8B0] text-xs sm:text-sm font-semibold hover:bg-[#FCE9E5] hover:text-[#913638] active:scale-[0.98] transition-all flex items-center justify-center gap-2 cursor-pointer shadow-xs"
           >
             <span>Continue Shopping</span>
             <ArrowRight className="w-4 h-4" />

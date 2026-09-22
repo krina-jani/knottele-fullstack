@@ -555,7 +555,7 @@
 
             <!-- Bottom Print Button (No-Print) -->
             <div class="mt-8 text-center no-print">
-                <button onclick="window.print()" class="inline-flex items-center gap-2 bg-red-600 hover:bg-red-700 active:bg-red-800 text-white font-bold py-2.5 px-7 rounded-xl shadow-md hover:shadow-lg transition-all text-sm">
+                <button onclick="window.print()" class="inline-flex items-center gap-2 bg-red-600 hover:bg-red-700 active:bg-red-800 text-white font-bold py-2.5 px-7 rounded-xl shadow-md hover:shadow-lg transition-all text-sm cursor-pointer">
                     <i class="fas fa-print"></i> Print Invoice / Save as PDF
                 </button>
             </div>
@@ -563,5 +563,16 @@
         </div>
 
     </div>
+
+    <script>
+        // If opened with ?download=1 or ?print=1, automatically trigger print/save dialog
+        if (window.location.search.includes('download=1') || window.location.search.includes('print=1')) {
+            window.addEventListener('load', function() {
+                setTimeout(function() {
+                    window.print();
+                }, 450);
+            });
+        }
+    </script>
 </body>
 </html>

@@ -13,10 +13,11 @@ import {
   ShoppingBag,
   CheckCircle2,
   ChevronRight,
+  Download,
 } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
 import { useWishlist } from "@/context/WishlistContext";
-import { fetchCustomerCustomOrders } from "@/lib/api";
+import { fetchCustomerCustomOrders, getFullPath } from "@/lib/api";
 
 export default function AccountDashboardPage() {
   const { user, orders } = useAuth();
@@ -242,10 +243,20 @@ export default function AccountDashboardPage() {
                   </div>
                 </div>
 
-                <div className="flex items-center justify-between sm:justify-end gap-4 shrink-0 pt-2 sm:pt-0 border-t sm:border-t-0 border-[#E7D1CC]/50">
+                <div className="flex items-center justify-between sm:justify-end gap-2 sm:gap-3 shrink-0 pt-2 sm:pt-0 border-t sm:border-t-0 border-[#E7D1CC]/50 flex-wrap">
                   <span className="text-sm font-bold text-[#2E211E]">
                     ₹{order.total.toLocaleString("en-IN")}
                   </span>
+                  <a
+                    href={getFullPath(`/orders/${order.orderNumber || order.id}/invoice?download=1`)}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="px-2.5 py-1.5 rounded-full bg-white text-[#913638] border border-[#913638]/40 hover:bg-[#FCE9E5] text-xs font-semibold transition-all inline-flex items-center gap-1 shadow-2xs group cursor-pointer"
+                    title="Download Invoice"
+                  >
+                    <Download className="w-3 h-3 group-hover:translate-y-0.5 transition-transform" />
+                    <span className="hidden sm:inline">Invoice</span>
+                  </a>
                   <Link
                     href={`/account/orders/${order.id}`}
                     className="px-3.5 py-1.5 rounded-full bg-white text-[#2E211E] border border-[#E7D1CC] hover:border-[#913638] text-xs font-semibold hover:bg-[#FCE9E5] hover:text-[#913638] transition-all inline-flex items-center gap-1 shadow-2xs"

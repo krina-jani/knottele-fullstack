@@ -16,10 +16,11 @@ import {
   CheckCircle2,
   HelpCircle,
   ExternalLink,
+  Download,
 } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
 import { FlowerIcon } from "@/components/ui/BotanicalDecorations";
-import { normalizeImageUrl, fetchOrderById } from "@/lib/api";
+import { normalizeImageUrl, fetchOrderById, getFullPath } from "@/lib/api";
 import { Order } from "@/types/order";
 import { useToast } from "@/context/ToastContext";
 
@@ -512,7 +513,7 @@ function OrderCard({ order }: { order: Order }) {
           </p>
         </div>
 
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-2 sm:gap-2.5 flex-wrap">
           <span
             className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold border ${getStatusBadgeStyle(
               currentStatus
@@ -521,6 +522,17 @@ function OrderCard({ order }: { order: Order }) {
             <span className="w-1.5 h-1.5 rounded-full bg-current animate-pulse" />
             <span>{currentStatus}</span>
           </span>
+
+          <a
+            href={getFullPath(`/orders/${order.orderNumber || order.id}/invoice?download=1`)}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="px-3 py-1.5 rounded-full bg-white text-[#913638] border border-[#913638]/40 hover:bg-[#FCE9E5] hover:border-[#913638] text-xs font-semibold active:scale-[0.98] transition-all inline-flex items-center gap-1.5 shadow-2xs group cursor-pointer"
+            title="Download Invoice"
+          >
+            <Download className="w-3 h-3 group-hover:translate-y-0.5 transition-transform" />
+            <span>Invoice</span>
+          </a>
 
           <Link
             href={`/account/orders/${order.id}`}

@@ -49,6 +49,7 @@ Route::prefix('customer')->group(function () {
     // Order checkout and details (public for guests with email / authenticated customers)
     Route::post('orders', [\App\Http\Controllers\Api\Customer\OrderController::class, 'store']);
     Route::get('orders/{id}', [\App\Http\Controllers\Api\Customer\OrderController::class, 'show']);
+    Route::get('orders/{id}/invoice/{filename?}', [\App\Http\Controllers\Api\Customer\OrderController::class, 'printInvoice']);
     Route::post('cart/validate', [\App\Http\Controllers\Api\Customer\OrderController::class, 'validateCart']);
 
     // Custom Order Requests (Guest submission & lookup / Customer history)

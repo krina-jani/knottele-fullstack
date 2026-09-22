@@ -157,6 +157,67 @@ class OrderController extends Controller
     }
 
     /**
+     * Print or Download Customer Invoice.
+     * Uses the exact boutique invoice layout from the admin panel.
+     *
+     * @param \Illuminate\Http\Request $request
+     * @param string|int $id
+     * @param string|null $filename
+     * @return \Illuminate\Contracts\View\View|\Illuminate\Http\JsonResponse
+     */
+    public function printInvoice(Request $request, $id, $filename = null)
+    {
+        try {
+            $cleanId = str_replace('ord-', '', $id);
+
+            $order = Order::with(['customer', 'items.product', 'items.variant.product', 'items.variant.images'])
+                ->where(function ($q) use ($id, $cleanId) {
+                    $q->where('id', $id)
+                      ->orWhere('id', $cleanId)
+                      ->orWhere('order_number', $id)
+                      ->orWhere('order_number', $cleanId);
+                })
+                ->first();
+
+            if (!$order) {
+                abort(404, 'Order not found.');
+            }
+
+            // Security check: If authenticated customer, verify ownership
+            $customer = auth('customer_api')->user() ?? auth('customer')->user() ?? auth()->user();
+            $email = trim($request->query('email') ?? '');
+
+            if ($customer) {
+                $orderCustomerEmail = strtolower($order->shipping_address['email'] ?? ($order->customer->email ?? ''));
+                $authCustomerEmail = strtolower($customer->email ?? '');
+                $isOwner = ($order->customer_id == $customer->id) || (!empty($orderCustomerEmail) && !empty($authCustomerEmail) && $orderCustomerEmail === $authCustomerEmail);
+                $isAdmin = auth('admin')->check() || auth()->guard('admin')->check();
+
+                if (!$isOwner && !$isAdmin) {
+                    abort(403, 'Unauthorized access to this order invoice.');
+                }
+            } elseif (!empty($email)) {
+                $orderCustomerEmail = strtolower($order->shipping_address['email'] ?? ($order->customer->email ?? ''));
+                if (!empty($orderCustomerEmail) && $orderCustomerEmail !== strtolower($email)) {
+                    abort(403, 'Unauthorized access to this order invoice.');
+                }
+            }
+
+            $order->loadMissing(['customer', 'items', 'items.product', 'items.variant']);
+
+            // Set clean PDF filename: e.g. Invoice-KN6AB24D3A8A49E.pdf
+            $pdfFilename = $filename ?: ('Invoice-' . ($order->order_number ?: sprintf('%04d', $order->id)) . '.pdf');
+
+            return view('admin.orders.invoice', compact('order', 'pdfFilename'));
+        } catch (\Symfony\Component\HttpKernel\Exception\HttpException $e) {
+            throw $e;
+        } catch (\Exception $e) {
+            Log::error('Error rendering customer invoice: ' . $e->getMessage());
+            abort(500, 'Unable to generate order invoice.');
+        }
+    }
+
+    /**
      * Store a newly created order.
      *
      * @param  \Illuminate\Http\Request  $request

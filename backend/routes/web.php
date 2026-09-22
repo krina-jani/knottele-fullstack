@@ -450,6 +450,17 @@ $adminRoutes = function () {
 Route::prefix('admin')->group($adminRoutes);
 Route::prefix('knottele/admin')->as('knottele.')->group($adminRoutes);
 
+/*
+|--------------------------------------------------------------------------
+| CUSTOMER INVOICE DOWNLOAD & PRINT
+|--------------------------------------------------------------------------
+*/
+$customerInvoiceHandler = [\App\Http\Controllers\Api\Customer\OrderController::class, 'printInvoice'];
+Route::get('/orders/{id}/invoice/{filename?}', $customerInvoiceHandler)->name('customer.orders.invoice');
+Route::get('/knottele/orders/{id}/invoice/{filename?}', $customerInvoiceHandler);
+Route::get('/account/orders/{id}/invoice/{filename?}', $customerInvoiceHandler);
+Route::get('/knottele/account/orders/{id}/invoice/{filename?}', $customerInvoiceHandler);
+
 Route::get('/check-contact-messages', function () {
     return \App\Models\ContactMessage::count();
 });
@@ -533,6 +544,11 @@ Route::match(['GET', 'HEAD'], '/{any}', function ($any = '') {
         if (!empty($catIndex)) {
             return response()->file($catIndex[0]);
         }
+    }
+
+    // 3c-2. Resilient order invoice route fallback
+    if (preg_match('#(?:^|/)orders/([^/]+)/invoice(?:/([^/]+))?#', $path, $matches)) {
+        return app(\App\Http\Controllers\Api\Customer\OrderController::class)->printInvoice(request(), $matches[1], $matches[2] ?? null);
     }
 
     // 3d. Resilient account/orders route fallback: serve order template and RSC tree so any order ID loads smoothly

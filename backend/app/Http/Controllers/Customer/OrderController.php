@@ -193,4 +193,12 @@ class OrderController extends Controller
             'cartCount'
         ));
     }
+
+    /**
+     * Print or Download Invoice
+     */
+    public function printInvoice(Request $request, $id, $filename = null)
+    {
+        return app(\App\Http\Controllers\Api\Customer\OrderController::class)->printInvoice($request, $id, $filename);
+    }
 }
