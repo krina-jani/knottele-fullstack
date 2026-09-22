@@ -125,11 +125,30 @@
                         <i class="fas fa-columns text-xs"></i>
                         <span>Columns</span>
                     </button>
-                    <!-- PDF Button (Small, PDF only) -->
-                    <button id="offersExportBtn" onclick="window.print()" class="btn-secondary btn-sm hover:text-red-600 hover:bg-stone-50" title="Export as PDF">
-                        <i class="fas fa-file-pdf text-red-500 text-xs"></i>
-                        <span>PDF</span>
-                    </button>
+                    <!-- Print & PDF Dropdown (Clean PDF Report) -->
+                    <div class="relative inline-block text-left" id="offersPrintDropdownWrapper">
+                        <button type="button" onclick="toggleOffersPrintDropdown(event)" id="offersExportBtn"
+                            class="btn-secondary btn-sm hover:text-red-600 hover:bg-stone-50 flex items-center gap-1.5"
+                            title="Print & PDF Options">
+                            <i class="fas fa-print text-xs"></i>
+                            <span>Print</span>
+                            <i class="fas fa-chevron-down text-[10px] ml-0.5 transition-transform duration-200" id="offersPrintChevron"></i>
+                        </button>
+                        <!-- Dropdown Menu -->
+                        <div id="offersPrintDropdownMenu"
+                            class="hidden absolute right-0 mt-1.5 w-36 bg-white rounded-xl shadow-lg border border-stone-200 py-1 z-50 text-xs font-medium text-stone-700">
+                            <button type="button" onclick="printOffersReport('print'); closeOffersPrintDropdown();"
+                                class="w-full text-left px-3.5 py-2 hover:bg-stone-50 flex items-center gap-2.5 text-stone-700 transition-colors">
+                                <i class="fas fa-print text-stone-500 text-xs w-4 text-center"></i>
+                                <span>Print</span>
+                            </button>
+                            <button type="button" onclick="printOffersReport('pdf'); closeOffersPrintDropdown();"
+                                class="w-full text-left px-3.5 py-2 hover:bg-red-50 hover:text-red-600 flex items-center gap-2.5 text-stone-700 transition-colors">
+                                <i class="fas fa-file-pdf text-red-500 text-xs w-4 text-center"></i>
+                                <span>PDF</span>
+                            </button>
+                        </div>
+                    </div>
                     <!-- Big Last Button: + Add Offer -->
                     <a href="{{ route('admin.offers.create') }}" class="btn-primary btn-big w-full sm:w-auto shadow-md">
                         <i class="fas fa-plus mr-1"></i>
@@ -1849,12 +1868,336 @@
             columnVisibilityBtn.parentElement.appendChild(columnMenu);
         }
 
-        // Export functionality (PDF only)
+        /* Print & PDF Dropdown Handlers */
+        function toggleOffersPrintDropdown(event) {
+            if (event) event.stopPropagation();
+            const menu = document.getElementById('offersPrintDropdownMenu');
+            const chevron = document.getElementById('offersPrintChevron');
+            if (!menu) return;
+            const isHidden = menu.classList.contains('hidden');
+            if (isHidden) {
+                menu.classList.remove('hidden');
+                if (chevron) chevron.classList.add('rotate-180');
+            } else {
+                menu.classList.add('hidden');
+                if (chevron) chevron.classList.remove('rotate-180');
+            }
+        }
+
+        function closeOffersPrintDropdown() {
+            const menu = document.getElementById('offersPrintDropdownMenu');
+            const chevron = document.getElementById('offersPrintChevron');
+            if (menu) menu.classList.add('hidden');
+            if (chevron) chevron.classList.remove('rotate-180');
+        }
+
+        // Export functionality (Executive Clean PDF / Print Report)
         function initOffersExport() {
-            const offersExportBtn = document.getElementById('offersExportBtn');
-            offersExportBtn?.addEventListener('click', function() {
-                window.print();
+            document.addEventListener('click', function(e) {
+                const wrapper = document.getElementById('offersPrintDropdownWrapper');
+                if (wrapper && !wrapper.contains(e.target)) {
+                    closeOffersPrintDropdown();
+                }
             });
+
+            document.addEventListener('keydown', function(e) {
+                if (e.key === 'Escape') {
+                    closeOffersPrintDropdown();
+                }
+                if ((e.ctrlKey || e.metaKey) && e.key === 'p') {
+                    e.preventDefault();
+                    printOffersReport('pdf');
+                }
+            });
+
+            // Prevent native raw window.print on this page
+            window.print = function() {
+                printOffersReport('pdf');
+            };
+        }
+
+        async function printOffersReport(format = 'pdf') {
+            let offersData = [];
+
+            // 1. First attempt: get active filtered data from Tabulator
+            if (offersTable && typeof offersTable.getData === 'function') {
+                try {
+                    offersData = offersTable.getData("active");
+                } catch (e) {
+                    console.warn('Could not get active data from Tabulator', e);
+                }
+                if (!offersData || offersData.length === 0) {
+                    try {
+                        offersData = offersTable.getData();
+                    } catch (e) {}
+                }
+            }
+
+            // 2. If data is still empty, fetch from API
+            if (!offersData || offersData.length === 0) {
+                try {
+                    const searchInput = document.getElementById('offersSearchInput');
+                    const searchTerm = searchInput ? searchInput.value : '';
+                    const params = { per_page: 500, sort: 'created_at', direction: 'desc' };
+                    if (searchTerm) params.search = searchTerm;
+                    const res = await axiosInstance.get('/offers', { params: params });
+                    if (res.data && res.data.success) {
+                        offersData = res.data.data.data || [];
+                    }
+                } catch (e) {
+                    console.error('Failed to fetch offers for print', e);
+                }
+            }
+
+            const docTitle = format === 'pdf' ? 'KNOTELLE_Offers_Report.pdf' : 'Offers Report - KNOTELLE';
+            const badgeText = format === 'pdf' ? 'Offers PDF Export' : 'Offers Report';
+
+            function escapeHtml(str) {
+                if (str === null || str === undefined) return '';
+                return String(str)
+                    .replace(/&/g, '&amp;')
+                    .replace(/</g, '&lt;')
+                    .replace(/>/g, '&gt;')
+                    .replace(/"/g, '&quot;')
+                    .replace(/'/g, '&#039;');
+            }
+
+            let rowsHtml = '';
+            if (offersData && offersData.length > 0) {
+                offersData.forEach((item, idx) => {
+                    const bg = idx % 2 === 1 ? '#fafaf9' : '#ffffff';
+
+                    // Discount & Subtitle
+                    let discountText = '';
+                    let valueBadge = '-';
+                    if (item.offer_type === 'percentage') {
+                        discountText = `${item.discount_value}% OFF`;
+                        valueBadge = `<span style="font-weight: 700; color: #dc2626;">${parseFloat(item.discount_value || 0).toFixed(2)}%</span>`;
+                    } else if (item.offer_type === 'fixed') {
+                        discountText = `₹${item.discount_value} OFF`;
+                        valueBadge = `<span style="font-weight: 700; color: #dc2626;">₹${parseFloat(item.discount_value || 0).toFixed(2)}</span>`;
+                    } else if (item.offer_type === 'bogo' || item.offer_type === 'buy_x_get_y') {
+                        discountText = `Buy ${item.buy_qty || 1} Get ${item.get_qty || 1}`;
+                        valueBadge = `<span style="font-weight: 700; color: #b45309;">${item.buy_qty || 1} &rarr; ${item.get_qty || 1}</span>`;
+                    } else if (item.offer_type === 'free_shipping') {
+                        discountText = 'Free Shipping';
+                        valueBadge = `<span style="font-weight: 700; color: #2563eb;">Free Shipping</span>`;
+                    }
+
+                    // Status badge
+                    let statusBadge = '';
+                    if (item.is_active || item.status === 1 || item.status === true) {
+                        statusBadge = '<span style="display: inline-block; padding: 2px 8px; border-radius: 9999px; font-size: 10px; font-weight: 700; background: #d1fae5; color: #065f46;">Active</span>';
+                    } else if (item.status === 0 || item.status === false) {
+                        statusBadge = '<span style="display: inline-block; padding: 2px 8px; border-radius: 9999px; font-size: 10px; font-weight: 700; background: #f3f4f6; color: #4b5563;">Inactive</span>';
+                    } else if (item.days_remaining < 0) {
+                        statusBadge = '<span style="display: inline-block; padding: 2px 8px; border-radius: 9999px; font-size: 10px; font-weight: 700; background: #fee2e2; color: #991b1b;">Expired</span>';
+                    } else {
+                        statusBadge = '<span style="display: inline-block; padding: 2px 8px; border-radius: 9999px; font-size: 10px; font-weight: 700; background: #fef3c7; color: #92400e;">Upcoming</span>';
+                    }
+
+                    // Validity
+                    let validityDates = [];
+                    if (item.starts_at_formatted) validityDates.push(`<strong>Starts:</strong> ${escapeHtml(item.starts_at_formatted)}`);
+                    if (item.ends_at_formatted) validityDates.push(`<strong>Ends:</strong> ${escapeHtml(item.ends_at_formatted)}`);
+                    if (validityDates.length === 0) validityDates.push('Ongoing');
+
+                    // Auto apply
+                    const isAutoApply = (item.is_auto_apply === 1 || item.is_auto_apply === true);
+                    const autoApplyHtml = isAutoApply
+                        ? '<span style="display: inline-block; padding: 2px 7px; border-radius: 9999px; font-size: 10px; font-weight: 700; background: #e0f2fe; color: #0369a1;">Yes</span>'
+                        : '<span style="color: #64748b; font-size: 10px;">No</span>';
+
+                    rowsHtml += `
+                        <tr style="background-color: ${bg};">
+                            <td style="border: 1px solid #e2e8f0; padding: 7px 8px; text-align: center; font-weight: 700; color: #475569;">#${item.id}</td>
+                            <td style="border: 1px solid #e2e8f0; padding: 7px 10px;">
+                                <div style="font-weight: 700; color: #0f172a; font-size: 12px;">${escapeHtml(item.name || 'Untitled Offer')}</div>
+                                ${item.code ? `<div style="margin-top: 3px;"><span style="display: inline-block; background: #eef2ff; color: #4338ca; border: 1px solid #c7d2fe; padding: 1px 6px; border-radius: 4px; font-size: 10px; font-weight: 700; font-family: monospace; letter-spacing: 0.5px;">${escapeHtml(item.code)}</span></div>` : ''}
+                                <div style="font-size: 10px; color: #64748b; margin-top: 3px;">
+                                    ${discountText ? `<strong>${discountText}</strong>` : ''}
+                                    ${item.offer_type_text ? ` &bull; ${escapeHtml(item.offer_type_text)}` : ''}
+                                </div>
+                            </td>
+                            <td style="border: 1px solid #e2e8f0; padding: 7px 8px; text-align: center; font-size: 11px;">${valueBadge}</td>
+                            <td style="border: 1px solid #e2e8f0; padding: 7px 8px; text-align: center;">
+                                <span style="font-weight: 700; color: #0f172a; font-size: 11px;">${item.used_count || 0}</span>
+                                <div style="font-size: 9px; color: #64748b;">used</div>
+                            </td>
+                            <td style="border: 1px solid #e2e8f0; padding: 7px 8px; text-align: center;">${autoApplyHtml}</td>
+                            <td style="border: 1px solid #e2e8f0; padding: 7px 8px; text-align: center;">${statusBadge}</td>
+                            <td style="border: 1px solid #e2e8f0; padding: 7px 10px; font-size: 10px; color: #334155; line-height: 1.4;">${validityDates.join('<br>')}</td>
+                            <td style="border: 1px solid #e2e8f0; padding: 7px 8px; text-align: center; font-size: 10px; color: #64748b;">${escapeHtml(item.created_at_formatted || '-')}</td>
+                        </tr>
+                    `;
+                });
+            } else {
+                rowsHtml = `<tr><td colspan="8" style="text-align: center; padding: 24px; color: #64748b; font-size: 12px;">No offers available</td></tr>`;
+            }
+
+            const printFrame = document.createElement('iframe');
+            printFrame.style.position = 'fixed';
+            printFrame.style.right = '0';
+            printFrame.style.bottom = '0';
+            printFrame.style.width = '0';
+            printFrame.style.height = '0';
+            printFrame.style.border = '0';
+            document.body.appendChild(printFrame);
+
+            const frameDoc = printFrame.contentWindow.document;
+            frameDoc.open();
+            frameDoc.write(`
+                <!DOCTYPE html>
+                <html>
+                    <head>
+                        <title>${docTitle}</title>
+                        <meta charset="utf-8">
+                        <style>
+                            @page { size: auto; margin: 12mm 10mm; }
+                            body {
+                                font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+                                margin: 0;
+                                padding: 16px;
+                                color: #1e293b;
+                                font-size: 11px;
+                                background: #ffffff;
+                                -webkit-print-color-adjust: exact;
+                                print-color-adjust: exact;
+                            }
+                            .header {
+                                display: flex;
+                                justify-content: space-between;
+                                align-items: flex-start;
+                                border-bottom: 2px solid #dc2626;
+                                padding-bottom: 12px;
+                                margin-bottom: 16px;
+                            }
+                            .brand {
+                                display: flex;
+                                align-items: flex-start;
+                                gap: 12px;
+                            }
+                            .brand img {
+                                height: 48px;
+                                width: auto;
+                                object-fit: contain;
+                            }
+                            .brand h2 {
+                                margin: 0;
+                                font-size: 20px;
+                                color: #dc2626;
+                                font-weight: 800;
+                                letter-spacing: 0.5px;
+                            }
+                            .brand p {
+                                margin: 3px 0 0 0;
+                                font-size: 11px;
+                                color: #475569;
+                                line-height: 1.4;
+                            }
+                            .meta {
+                                text-align: right;
+                            }
+                            .badge {
+                                display: inline-block;
+                                padding: 3px 10px;
+                                font-size: 11px;
+                                font-weight: 700;
+                                background: #fee2e2;
+                                color: #dc2626;
+                                border-radius: 9999px;
+                                text-transform: uppercase;
+                            }
+                            .meta p {
+                                margin: 4px 0 0 0;
+                                font-size: 10px;
+                                color: #64748b;
+                            }
+                            table {
+                                width: 100%;
+                                border-collapse: collapse;
+                                margin-top: 8px;
+                                font-size: 11px;
+                            }
+                            th, td {
+                                border: 1px solid #e2e8f0;
+                                padding: 7px 10px;
+                                text-align: left;
+                            }
+                            th {
+                                background-color: #f8fafc;
+                                font-weight: 700;
+                                color: #475569;
+                                text-transform: uppercase;
+                                font-size: 10px;
+                                letter-spacing: 0.3px;
+                            }
+                            tr:nth-child(even) {
+                                background-color: #fafaf9;
+                            }
+                            .footer {
+                                margin-top: 18px;
+                                border-top: 1px solid #e2e8f0;
+                                padding-top: 8px;
+                                display: flex;
+                                justify-content: space-between;
+                                font-size: 10px;
+                                color: #64748b;
+                            }
+                        </style>
+                    </head>
+                    <body>
+                        <div class="header">
+                            <div class="brand">
+                                <img src="{{ asset('images/logo/knotelle-logo.png') }}?v=2" alt="KNOTELLE">
+                                <div>
+                                    <h2>KNOTELLE</h2>
+                                    <p>
+                                        Handcrafted with Love India<br>
+                                        support@knotelle.in &bull; +91 9773055555
+                                    </p>
+                                </div>
+                            </div>
+                            <div class="meta">
+                                <span class="badge">${badgeText}</span>
+                                <p>Generated: ${new Date().toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' })}</p>
+                            </div>
+                        </div>
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th style="text-align: center; width: 45px;">ID</th>
+                                    <th>OFFER</th>
+                                    <th style="text-align: center; width: 100px;">VALUE</th>
+                                    <th style="text-align: center; width: 70px;">USES</th>
+                                    <th style="text-align: center; width: 85px;">AUTO APPLY</th>
+                                    <th style="text-align: center; width: 85px;">STATUS</th>
+                                    <th style="width: 170px;">VALIDITY</th>
+                                    <th style="text-align: center; width: 95px;">CREATED</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                ${rowsHtml}
+                            </tbody>
+                        </table>
+                        <div class="footer">
+                            <span>Total Offers: ${offersData ? offersData.length : 0}</span>
+                            <span>KNOTELLE Admin Management System &bull; Confidential</span>
+                        </div>
+                    </body>
+                </html>
+            `);
+            frameDoc.close();
+
+            printFrame.contentWindow.focus();
+            setTimeout(() => {
+                printFrame.contentWindow.print();
+                setTimeout(() => {
+                    if (document.body.contains(printFrame)) {
+                        document.body.removeChild(printFrame);
+                    }
+                }, 1000);
+            }, 350);
         }
 
         // Show create offer modal
