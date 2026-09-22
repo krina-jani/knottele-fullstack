@@ -17,6 +17,7 @@ interface WishlistContextType {
   wishlistIds: string[];
   wishlistItems: Product[];
   toggleWishlist: (product: Product) => void;
+  addToWishlist: (product: Product) => Promise<boolean>;
   removeFromWishlist: (productId: string) => void;
   isInWishlist: (productId: string) => boolean;
   wishlistCount: number;
@@ -66,11 +67,21 @@ export function WishlistProvider({ children }: { children: React.ReactNode }) {
   // Load wishlist when authentication state or user changes
   useEffect(() => {
     if (!isLoggedIn) {
-      // Complete User Isolation: clear state on logout
-      setWishlistIds([]);
-      setWishlistItems([]);
-      if (typeof window !== "undefined") {
-        localStorage.removeItem("knotelle_wishlist");
+      // For guests: load saved items from localStorage if present
+      try {
+        const savedIds = localStorage.getItem("knotelle_wishlist");
+        if (savedIds) {
+          const parsed = JSON.parse(savedIds);
+          setWishlistIds(parsed);
+          const filtered = PRODUCTS.filter((p) => parsed.includes(p.id) || parsed.includes(String((p as any).db_id || p.id)));
+          setWishlistItems(filtered);
+        } else {
+          setWishlistIds([]);
+          setWishlistItems([]);
+        }
+      } catch {
+        setWishlistIds([]);
+        setWishlistItems([]);
       }
     } else {
       if (typeof window !== "undefined") {
@@ -96,6 +107,37 @@ export function WishlistProvider({ children }: { children: React.ReactNode }) {
       const idStr = String(id);
       return idStr === pStr || idStr === cleanStr || idStr === `prod-${cleanStr}`;
     });
+  };
+
+  const addToWishlist = async (product: Product): Promise<boolean> => {
+    const pId = String((product as any).db_id || product.id);
+    const cleanId = pId.replace("prod-", "");
+
+    if (!isLoggedIn) {
+      if (!isInWishlist(pId)) {
+        setWishlistIds((prev) => [...prev, pId, `prod-${cleanId}`]);
+        setWishlistItems((prev) => [product, ...prev]);
+        if (typeof window !== "undefined") {
+          try {
+            const saved = JSON.parse(localStorage.getItem("knotelle_wishlist") || "[]");
+            if (!saved.includes(pId)) saved.push(pId);
+            localStorage.setItem("knotelle_wishlist", JSON.stringify(saved));
+            localStorage.setItem("knotelle_pending_wishlist", cleanId);
+          } catch (e) {
+            console.error(e);
+          }
+        }
+      }
+      return true;
+    }
+
+    if (!isInWishlist(pId)) {
+      setWishlistIds((prev) => [...prev, pId, `prod-${cleanId}`]);
+      setWishlistItems((prev) => [product, ...prev]);
+      await toggleCustomerWishlist(cleanId);
+      refetchWishlist();
+    }
+    return true;
   };
 
   const toggleWishlist = async (product: Product) => {
@@ -153,6 +195,7 @@ export function WishlistProvider({ children }: { children: React.ReactNode }) {
         wishlistIds,
         wishlistItems,
         toggleWishlist,
+        addToWishlist,
         removeFromWishlist,
         isInWishlist,
         wishlistCount: wishlistItems.length,

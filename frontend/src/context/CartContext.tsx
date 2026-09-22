@@ -10,7 +10,7 @@ import { useWebsiteMedia } from "./MediaContext";
 interface CartContextType {
   items: CartItem[];
   addItem: (product: Product, quantity?: number, customization?: CartItemCustomization) => void;
-  removeItem: (cartItemId: string) => void;
+  removeItem: (cartItemId: string, silent?: boolean) => void;
   updateQuantity: (cartItemId: string, quantity: number) => void;
   clearCart: () => void;
   isCartOpen: boolean;
@@ -108,9 +108,11 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     showToast("Added to Your Cart 🧺", `${quantity}x ${product.name} ready for you.`, "cart");
   };
 
-  const removeItem = (cartItemId: string) => {
+  const removeItem = (cartItemId: string, silent = false) => {
     setItems((prev) => prev.filter((item) => item.id !== cartItemId));
-    showToast("Item Removed", "Your cart has been updated.", "info");
+    if (!silent) {
+      showToast("Item Removed", "Your cart has been updated.", "info");
+    }
   };
 
   const updateQuantity = (cartItemId: string, quantity: number) => {

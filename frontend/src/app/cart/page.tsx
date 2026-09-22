@@ -14,12 +14,15 @@ import {
   Truck,
   Tag,
   ShieldCheck,
+  X,
 } from "lucide-react";
 import { useCart } from "@/context/CartContext";
 import { useWishlist } from "@/context/WishlistContext";
+import { useToast } from "@/context/ToastContext";
 import { Breadcrumbs } from "@/components/ui/Breadcrumbs";
 import { normalizeImageUrl } from "@/lib/api";
 import { BotanicalFlourish, FlowerIcon } from "@/components/ui/BotanicalDecorations";
+import { CartItem } from "@/types/cart";
 
 export default function CartPage() {
   const {
@@ -37,10 +40,24 @@ export default function CartPage() {
     freeShippingThreshold,
   } = useCart();
 
-  const { toggleWishlist, isInWishlist } = useWishlist();
+  const { toggleWishlist, addToWishlist, isInWishlist } = useWishlist();
+  const { showToast } = useToast();
   const [couponInput, setCouponInput] = useState("");
   const [giftNote, setGiftNote] = useState("");
   const [includeGiftWrap, setIncludeGiftWrap] = useState(false);
+  const [itemToConfirm, setItemToConfirm] = useState<CartItem | null>(null);
+
+  const handleMoveToWishlist = async (item: CartItem) => {
+    await addToWishlist(item.product);
+    removeItem(item.id, true);
+    showToast("Moved to Wishlist 💕", `${item.product.name} moved to your wishlist.`, "wishlist");
+    setItemToConfirm(null);
+  };
+
+  const handleRemoveFromCart = (item: CartItem) => {
+    removeItem(item.id, false);
+    setItemToConfirm(null);
+  };
 
   const handleApplyCoupon = (e: React.FormEvent) => {
     e.preventDefault();
@@ -200,7 +217,7 @@ export default function CartPage() {
                           </button>
                           <span className="text-[#E7D1CC]">|</span>
                           <button
-                            onClick={() => removeItem(item.id)}
+                            onClick={() => setItemToConfirm(item)}
                             className="text-[#786864] hover:text-[#913638] flex items-center gap-1 transition-colors cursor-pointer"
                           >
                             <Trash2 className="w-3.5 h-3.5" />
@@ -214,7 +231,13 @@ export default function CartPage() {
                     <div className="flex sm:flex-col items-center sm:items-end justify-between w-full sm:w-auto gap-4 pt-3 sm:pt-0 border-t sm:border-t-0 border-[#E7D1CC]/60">
                       <div className="flex items-center border border-[#E7D1CC] rounded-full bg-white overflow-hidden shadow-xs">
                         <button
-                          onClick={() => updateQuantity(item.id, item.quantity - 1)}
+                          onClick={() => {
+                            if (item.quantity > 1) {
+                              updateQuantity(item.id, item.quantity - 1);
+                            } else {
+                              setItemToConfirm(item);
+                            }
+                          }}
                           className="px-2.5 py-1 text-[#786864] hover:text-[#2E211E] hover:bg-[#FCE9E5] transition-colors cursor-pointer"
                         >
                           <Minus className="w-3 h-3" />
@@ -386,6 +409,79 @@ export default function CartPage() {
         )}
 
       </div>
+
+      {/* Move to Wishlist or Remove Confirmation Modal */}
+      {itemToConfirm && (
+        <div
+          className="fixed inset-0 z-50 bg-stone-900/50 backdrop-blur-xs flex items-center justify-center p-4 animate-in fade-in duration-200"
+          onClick={(e) => {
+            if (e.target === e.currentTarget) setItemToConfirm(null);
+          }}
+        >
+          <div className="bg-white rounded-3xl p-6 w-full max-w-sm border border-[#E7D1CC] shadow-2xl space-y-4 animate-in zoom-in-95 duration-200">
+            <div className="flex items-start justify-between gap-3">
+              <div className="flex items-center gap-3 min-w-0">
+                <div className="relative w-14 h-14 rounded-2xl bg-[#FFF9F6] border border-[#E7D1CC] overflow-hidden shrink-0">
+                  <Image
+                    src={normalizeImageUrl(itemToConfirm.product.main_image || itemToConfirm.product.images?.[0], "/images/products/bunny-keychain.jpg")}
+                    alt={itemToConfirm.product.name}
+                    fill
+                    sizes="56px"
+                    className="object-cover"
+                  />
+                </div>
+                <div className="min-w-0">
+                  <h4 className="font-serif-luxury text-sm font-bold text-[#2E211E] truncate">
+                    {itemToConfirm.product.name}
+                  </h4>
+                  <p className="text-xs text-[#913638] font-bold mt-0.5">
+                    ₹{(itemToConfirm.price * itemToConfirm.quantity).toLocaleString("en-IN")}
+                  </p>
+                </div>
+              </div>
+              <button
+                onClick={() => setItemToConfirm(null)}
+                className="p-1.5 rounded-full text-[#786864] hover:text-[#2E211E] hover:bg-[#FCE9E5] transition-colors cursor-pointer shrink-0"
+                aria-label="Close"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+
+            <div className="bg-[#FFF9F6] rounded-2xl p-3.5 border border-[#E7D1CC]/70 text-xs text-[#786864] leading-relaxed">
+              Would you like to move this handcrafted item to your <strong className="text-[#913638] font-semibold">Wishlist</strong> to save for later, or <strong className="text-[#2E211E] font-semibold">remove</strong> it from your cart?
+            </div>
+
+            <div className="grid grid-cols-2 gap-2.5 pt-1">
+              <button
+                type="button"
+                onClick={() => handleMoveToWishlist(itemToConfirm)}
+                className="flex items-center justify-center gap-1.5 py-3 px-3 rounded-2xl border-2 border-[#913638] text-[#913638] bg-[#FFF9F6] hover:bg-[#FCE9E5] active:scale-[0.98] text-xs font-bold transition-all shadow-xs cursor-pointer text-center"
+              >
+                <Heart className="w-4 h-4 fill-[#913638] shrink-0" />
+                <span className="truncate">Move to Wishlist</span>
+              </button>
+              <button
+                type="button"
+                onClick={() => handleRemoveFromCart(itemToConfirm)}
+                className="flex items-center justify-center gap-1.5 py-3 px-3 rounded-2xl bg-[#913638] hover:bg-[#74292B] active:scale-[0.98] text-white text-xs font-bold transition-all shadow-sm hover:shadow-md cursor-pointer text-center"
+              >
+                <Trash2 className="w-4 h-4 shrink-0" />
+                <span className="truncate">Remove from Cart</span>
+              </button>
+            </div>
+
+            <button
+              type="button"
+              onClick={() => setItemToConfirm(null)}
+              className="w-full py-1 text-center text-xs font-medium text-[#786864] hover:text-[#2E211E] transition-colors cursor-pointer"
+            >
+              Cancel and keep in cart
+            </button>
+          </div>
+        </div>
+      )}
+
     </div>
   );
 }

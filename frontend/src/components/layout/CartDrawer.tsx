@@ -1,11 +1,14 @@
 "use client";
 
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { X, Trash2, Plus, Minus, ShoppingBag, ArrowRight, Sparkles, Truck } from "lucide-react";
+import { X, Trash2, Plus, Minus, ShoppingBag, ArrowRight, Sparkles, Truck, Heart } from "lucide-react";
 import { useCart } from "@/context/CartContext";
+import { useWishlist } from "@/context/WishlistContext";
+import { useToast } from "@/context/ToastContext";
 import { normalizeImageUrl } from "@/lib/api";
+import { CartItem } from "@/types/cart";
 
 export function CartDrawer() {
   const {
@@ -20,12 +23,29 @@ export function CartDrawer() {
     amountToFreeShipping,
     freeShippingThreshold,
   } = useCart();
+  const { addToWishlist } = useWishlist();
+  const { showToast } = useToast();
+
+  const [itemToConfirm, setItemToConfirm] = useState<CartItem | null>(null);
+
+  const handleMoveToWishlist = async (item: CartItem) => {
+    await addToWishlist(item.product);
+    removeItem(item.id, true);
+    showToast("Moved to Wishlist 💕", `${item.product.name} moved to your wishlist.`, "wishlist");
+    setItemToConfirm(null);
+  };
+
+  const handleRemoveFromCart = (item: CartItem) => {
+    removeItem(item.id, false);
+    setItemToConfirm(null);
+  };
 
   useEffect(() => {
     if (isCartOpen) {
       document.body.style.overflow = "hidden";
     } else {
       document.body.style.overflow = "unset";
+      setItemToConfirm(null);
     }
     return () => {
       document.body.style.overflow = "unset";
@@ -48,7 +68,7 @@ export function CartDrawer() {
       />
 
       <div className="fixed inset-y-0 right-0 max-w-full flex pl-10">
-        <div className="w-screen max-w-md bg-white border-l border-[#E7D1CC] shadow-2xl flex flex-col animate-in slide-in-from-right duration-300">
+        <div className="w-screen max-w-md bg-white border-l border-[#E7D1CC] shadow-2xl flex flex-col animate-in slide-in-from-right duration-300 relative overflow-hidden">
           {/* Header */}
           <div className="p-5 border-b border-[#E7D1CC] flex items-center justify-between bg-[#FFF9F6]">
             <div className="flex items-center gap-2">
@@ -150,7 +170,7 @@ export function CartDrawer() {
                           {item.product.name}
                         </Link>
                         <button
-                          onClick={() => removeItem(item.id)}
+                          onClick={() => setItemToConfirm(item)}
                           className="text-[#786864] hover:text-[#913638] p-1 transition-colors cursor-pointer"
                           aria-label="Remove item"
                         >
@@ -186,7 +206,13 @@ export function CartDrawer() {
                     <div className="flex items-center justify-between mt-2 pt-2 border-t border-[#E7D1CC]/60">
                       <div className="flex items-center border border-[#E7D1CC] rounded-full bg-white overflow-hidden shadow-xs">
                         <button
-                          onClick={() => updateQuantity(item.id, item.quantity - 1)}
+                          onClick={() => {
+                            if (item.quantity > 1) {
+                              updateQuantity(item.id, item.quantity - 1);
+                            } else {
+                              setItemToConfirm(item);
+                            }
+                          }}
                           className="px-2 py-1 text-[#786864] hover:text-[#2E211E] hover:bg-[#FCE9E5] transition-colors cursor-pointer"
                           aria-label="Decrease quantity"
                         >
@@ -263,6 +289,78 @@ export function CartDrawer() {
               <div className="flex items-center justify-center gap-1 text-[11px] text-[#786864] text-center pt-1">
                 <Sparkles className="w-3 h-3 text-[#C69A5A]" />
                 <span>Every item is carefully handcrafted with love</span>
+              </div>
+            </div>
+          )}
+
+          {/* Move to Wishlist or Remove Confirmation Modal / Bottom Sheet */}
+          {itemToConfirm && (
+            <div
+              className="absolute inset-0 z-50 bg-stone-900/40 backdrop-blur-xs flex items-end sm:items-center justify-center p-3 sm:p-4 animate-in fade-in duration-200"
+              onClick={(e) => {
+                if (e.target === e.currentTarget) setItemToConfirm(null);
+              }}
+            >
+              <div className="bg-white rounded-3xl p-5 w-full border border-[#E7D1CC] shadow-2xl space-y-4 animate-in slide-in-from-bottom-6 duration-200">
+                <div className="flex items-start justify-between gap-3">
+                  <div className="flex items-center gap-3 min-w-0">
+                    <div className="relative w-14 h-14 rounded-2xl bg-[#FFF9F6] border border-[#E7D1CC] overflow-hidden shrink-0">
+                      <Image
+                        src={normalizeImageUrl(itemToConfirm.product.main_image || itemToConfirm.product.images?.[0], "/images/products/bunny-keychain.jpg")}
+                        alt={itemToConfirm.product.name}
+                        fill
+                        sizes="56px"
+                        className="object-cover"
+                      />
+                    </div>
+                    <div className="min-w-0">
+                      <h4 className="font-serif-luxury text-sm font-bold text-[#2E211E] truncate">
+                        {itemToConfirm.product.name}
+                      </h4>
+                      <p className="text-xs text-[#913638] font-bold mt-0.5">
+                        ₹{(itemToConfirm.price * itemToConfirm.quantity).toLocaleString("en-IN")}
+                      </p>
+                    </div>
+                  </div>
+                  <button
+                    onClick={() => setItemToConfirm(null)}
+                    className="p-1.5 rounded-full text-[#786864] hover:text-[#2E211E] hover:bg-[#FCE9E5] transition-colors cursor-pointer shrink-0"
+                    aria-label="Close"
+                  >
+                    <X className="w-4 h-4" />
+                  </button>
+                </div>
+
+                <div className="bg-[#FFF9F6] rounded-2xl p-3.5 border border-[#E7D1CC]/70 text-xs text-[#786864] leading-relaxed">
+                  Would you like to move this handcrafted item to your <strong className="text-[#913638] font-semibold">Wishlist</strong> to save for later, or <strong className="text-[#2E211E] font-semibold">remove</strong> it from your cart?
+                </div>
+
+                <div className="grid grid-cols-2 gap-2.5 pt-1">
+                  <button
+                    type="button"
+                    onClick={() => handleMoveToWishlist(itemToConfirm)}
+                    className="flex items-center justify-center gap-1.5 py-3 px-3 rounded-2xl border-2 border-[#913638] text-[#913638] bg-[#FFF9F6] hover:bg-[#FCE9E5] active:scale-[0.98] text-xs font-bold transition-all shadow-xs cursor-pointer text-center"
+                  >
+                    <Heart className="w-4 h-4 fill-[#913638] shrink-0" />
+                    <span className="truncate">Move to Wishlist</span>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => handleRemoveFromCart(itemToConfirm)}
+                    className="flex items-center justify-center gap-1.5 py-3 px-3 rounded-2xl bg-[#913638] hover:bg-[#74292B] active:scale-[0.98] text-white text-xs font-bold transition-all shadow-sm hover:shadow-md cursor-pointer text-center"
+                  >
+                    <Trash2 className="w-4 h-4 shrink-0" />
+                    <span className="truncate">Remove from Cart</span>
+                  </button>
+                </div>
+
+                <button
+                  type="button"
+                  onClick={() => setItemToConfirm(null)}
+                  className="w-full py-1 text-center text-xs font-medium text-[#786864] hover:text-[#2E211E] transition-colors cursor-pointer"
+                >
+                  Cancel and keep in cart
+                </button>
               </div>
             </div>
           )}
