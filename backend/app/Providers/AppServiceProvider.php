@@ -22,10 +22,26 @@ class AppServiceProvider extends ServiceProvider
     {
         Schema::defaultStringLength(191);
 
-        if (!app()->runningInConsole() && request()) {
-            $host = request()->getHost();
-            $scheme = request()->getScheme();
+        $host = (!app()->runningInConsole() && request()) ? request()->getHost() : parse_url(config('app.url', ''), PHP_URL_HOST);
+        $isIp = !empty($host) && (filter_var($host, FILTER_VALIDATE_IP) !== false || $host === '187.127.158.24' || $host === 'localhost' || $host === '127.0.0.1');
+        $serverPort = $_SERVER['SERVER_PORT'] ?? null;
 
+        // An IP address or port 80 must NEVER force or use HTTPS (prevents net::ERR_CERT_COMMON_NAME_INVALID)
+        if ($isIp || $serverPort == 80 || $serverPort == '80') {
+            $scheme = 'http';
+            $isHttps = false;
+        } else {
+            $isHttps = ((isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on')
+                || (isset($_SERVER['HTTP_X_FORWARDED_PROTO']) && $_SERVER['HTTP_X_FORWARDED_PROTO'] === 'https')
+                || (request() && request()->isSecure()))
+                && str_starts_with(config('app.url', ''), 'https://');
+            $scheme = $isHttps ? 'https' : 'http';
+        }
+
+        // Explicitly enforce the determined scheme so Vite and asset() never use https for IP addresses
+        \Illuminate\Support\Facades\URL::forceScheme($scheme);
+
+        if (!app()->runningInConsole() && request()) {
             // Auto-detect live VPS or /knottele subpath to ensure links never render as localhost:8000
             if ($host === '187.127.158.24' || request()->is('knottele*') || str_contains(request()->getRequestUri(), '/knottele')) {
                 \Illuminate\Support\Facades\URL::forceRootUrl($scheme . '://' . $host . '/knottele');
@@ -33,17 +49,10 @@ class AppServiceProvider extends ServiceProvider
                 \Illuminate\Support\Facades\URL::forceRootUrl($scheme . '://' . request()->getHttpHost());
             }
         } elseif ($appUrl = config('app.url')) {
+            if ($isIp) {
+                $appUrl = preg_replace('/^https:\/\//i', 'http://', $appUrl);
+            }
             \Illuminate\Support\Facades\URL::forceRootUrl($appUrl);
-        }
-
-        $isHttps = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on')
-            || (isset($_SERVER['HTTP_X_FORWARDED_PROTO']) && $_SERVER['HTTP_X_FORWARDED_PROTO'] === 'https')
-            || (request() && request()->isSecure());
-
-        if ($isHttps) {
-            \Illuminate\Support\Facades\URL::forceScheme('https');
-        } elseif (isset($_SERVER['HTTP_HOST'])) {
-            \Illuminate\Support\Facades\URL::forceScheme('http');
         }
 
         \Illuminate\Support\Facades\View::composer('customer.partials.header', function ($view) {

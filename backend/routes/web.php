@@ -583,6 +583,13 @@ Route::match(['GET', 'HEAD'], '/{any}', function ($any = '') {
         }
     }
 
+    // 3e-1. Resilient account/wishlist route fallback
+    if (str_starts_with($path, 'account/wishlist')) {
+        if (file_exists(public_path('account/wishlist/index.html'))) {
+            return response()->file(public_path('account/wishlist/index.html'));
+        }
+    }
+
     // 3e-2. Resilient custom-order route fallback (catches typos like /custom-orderrbtydsg)
     if (str_starts_with($path, 'custom-order')) {
         if (file_exists(public_path('custom-order/index.html'))) {
