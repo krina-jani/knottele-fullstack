@@ -139,8 +139,7 @@
                         <div>
                             <h2 style="margin: 0; font-size: 20px; font-weight: 800; color: #dc2626; letter-spacing: 0.03em;">KNOTELLE</h2>
                             <p style="margin: 2px 0 0 0; font-size: 11px; color: #475569; line-height: 1.4;">
-                                Handcrafted with Love<br>
-                                India<br>
+                                Handcrafted with Love India<br>
                                 support@knotelle.in • +91 9773055555
                             </p>
                         </div>

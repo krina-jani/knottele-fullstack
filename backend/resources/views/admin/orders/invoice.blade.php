@@ -333,8 +333,7 @@
                     <img src="{{ asset('images/logo/knotelle-logo.png') }}?v=2" alt="KNOTELLE Logo" class="store-logo">
                     <h2 class="text-xl sm:text-2xl font-black text-red-600 tracking-wider uppercase m-0">KNOTELLE</h2>
                     <p class="text-stone-600 text-xs sm:text-sm mt-1 mb-0 leading-relaxed font-medium">
-                        Handcrafted with Love<br>
-                        India<br>
+                        Handcrafted with Love India<br>
                         <span class="text-stone-700 font-semibold">support@knotelle.in</span><br>
                         <span class="text-stone-700 font-semibold">+91 9773055555</span>
                     </p>
