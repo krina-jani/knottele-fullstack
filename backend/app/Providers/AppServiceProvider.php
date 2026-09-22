@@ -28,6 +28,9 @@ class AppServiceProvider extends ServiceProvider
 
         // An IP address or port 80 must NEVER force or use HTTPS (prevents net::ERR_CERT_COMMON_NAME_INVALID)
         if ($isIp || $serverPort == 80 || $serverPort == '80') {
+            unset($_SERVER['HTTPS']);
+            $_SERVER['SERVER_PORT'] = '80';
+            $_SERVER['HTTP_X_FORWARDED_PROTO'] = 'http';
             $scheme = 'http';
             $isHttps = false;
         } else {
