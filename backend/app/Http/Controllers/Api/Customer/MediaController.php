@@ -249,6 +249,7 @@ class MediaController extends Controller
             ->where('slot', 'footer_bg')
             ->where('is_active', true)
             ->where('file_path', 'not like', '%.json%')
+            ->orderByDesc('updated_at')
             ->first();
 
         // Fallback: any active image in footer section
@@ -257,30 +258,8 @@ class MediaController extends Controller
                 ->where('slot', '!=', 'section_settings')
                 ->where('is_active', true)
                 ->where('file_path', 'not like', '%.json%')
+                ->orderByDesc('updated_at')
                 ->first();
-        }
-
-        // Auto-heal: If slot doesn't exist or is pointing to json, auto-create/fix with valid image
-        if (!$footerBgMedia) {
-            $candidateFile = file_exists(public_path('images/footer/footer_footer_bg_1789469406_wFXK.png'))
-                ? 'images/footer/footer_footer_bg_1789469406_wFXK.png'
-                : (file_exists(public_path('images/footer/footer.png')) ? 'images/footer/footer.png' : 'images/categories/footer.png');
-
-            try {
-                $footerBgMedia = Media::updateOrCreate(
-                    ['page' => 'homepage', 'section' => 'footer', 'slot' => 'footer_bg'],
-                    [
-                        'file_name' => basename($candidateFile),
-                        'file_path' => $candidateFile,
-                        'disk' => 'local',
-                        'mime_type' => 'image/png',
-                        'file_type' => 'image',
-                        'title' => 'Footer Panoramic Background',
-                        'sort_order' => 1,
-                        'is_active' => true,
-                    ]
-                );
-            } catch (\Throwable $e) {}
         }
 
         $footerBg = null;

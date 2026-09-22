@@ -426,6 +426,7 @@ class MediaController extends Controller
                         ->where('slot', 'footer_bg')
                         ->where('is_active', true)
                         ->where('file_path', 'not like', '%.json%')
+                        ->orderByDesc('updated_at')
                         ->first();
                     $bgUrl = null;
                     if ($bgMedia) {
@@ -433,6 +434,12 @@ class MediaController extends Controller
                         if ($candidate && !str_ends_with(strtolower(parse_url($candidate, PHP_URL_PATH) ?? ''), '.json')) {
                             $bgUrl = $candidate;
                         }
+                    }
+                    if (!$bgUrl && !empty($meta['bg_image']) && !str_ends_with(strtolower(parse_url($meta['bg_image'], PHP_URL_PATH) ?? ''), '.json')) {
+                        $bgUrl = $meta['bg_image'];
+                    }
+                    if (!$bgUrl && !empty($meta['bg_image_url']) && !str_ends_with(strtolower(parse_url($meta['bg_image_url'], PHP_URL_PATH) ?? ''), '.json')) {
+                        $bgUrl = $meta['bg_image_url'];
                     }
                     if (!$bgUrl) {
                         $bgUrl = asset('images/categories/footer.png');
@@ -4105,7 +4112,9 @@ class MediaController extends Controller
 
         $bgMedia = Media::where('section', 'footer')
             ->where('slot', 'footer_bg')
+            ->where('is_active', true)
             ->where('file_path', 'not like', '%.json%')
+            ->orderByDesc('updated_at')
             ->first();
         $bgUrl = null;
         if ($bgMedia) {
@@ -4113,6 +4122,12 @@ class MediaController extends Controller
             if ($candidate && !str_ends_with(strtolower(parse_url($candidate, PHP_URL_PATH) ?? ''), '.json')) {
                 $bgUrl = $candidate;
             }
+        }
+        if (!$bgUrl && !empty($meta['bg_image']) && !str_ends_with(strtolower(parse_url($meta['bg_image'], PHP_URL_PATH) ?? ''), '.json')) {
+            $bgUrl = $meta['bg_image'];
+        }
+        if (!$bgUrl && !empty($meta['bg_image_url']) && !str_ends_with(strtolower(parse_url($meta['bg_image_url'], PHP_URL_PATH) ?? ''), '.json')) {
+            $bgUrl = $meta['bg_image_url'];
         }
         if (!$bgUrl) {
             $bgUrl = asset('images/categories/footer.png');
@@ -4277,11 +4292,12 @@ class MediaController extends Controller
             $file = $request->file('bg_image_file');
             $uploadDir = public_path('images/footer');
             if (!file_exists($uploadDir)) {
-                mkdir($uploadDir, 0755, true);
+                File::makeDirectory($uploadDir, 0775, true, true);
             }
             $ext = strtolower($file->getClientOriginalExtension() ?: 'png');
             $uniqueName = 'footer_bg_' . time() . '.' . $ext;
             $file->move($uploadDir, $uniqueName);
+            @chmod($uploadDir . '/' . $uniqueName, 0664);
             $bgPath = 'images/footer/' . $uniqueName;
             $fullBgUrl = asset($bgPath);
 
@@ -4289,22 +4305,35 @@ class MediaController extends Controller
             $meta['desktop_image'] = $fullBgUrl;
             $meta['bg_image_url'] = $fullBgUrl;
 
-            // Update or create footer_bg media slot
-            Media::updateOrCreate(
-                ['page' => 'homepage', 'section' => 'footer', 'slot' => 'footer_bg'],
-                [
-                    'file_name' => $uniqueName,
-                    'file_path' => $bgPath,
-                    'disk' => 'local',
-                    'mime_type' => 'image/' . $ext,
-                    'file_type' => 'image',
-                    'title' => 'Footer Panoramic Background',
-                    'sort_order' => 1,
-                    'is_active' => true,
-                    'uploaded_by' => $this->getAdminId(),
-                    'uploader_type' => 'admin',
-                ]
-            );
+            // Deactivate existing footer_bg records
+            Media::where('section', 'footer')->where('slot', 'footer_bg')->update(['is_active' => false]);
+
+            // Update or create primary footer_bg media slot
+            $bgRecord = Media::where('section', 'footer')->where('slot', 'footer_bg')->first();
+            if (!$bgRecord) {
+                $bgRecord = new Media();
+                $bgRecord->page = 'homepage';
+                $bgRecord->section = 'footer';
+                $bgRecord->slot = 'footer_bg';
+            }
+            $bgRecord->file_name = $uniqueName;
+            $bgRecord->file_path = $bgPath;
+            $bgRecord->disk = 'local';
+            $bgRecord->mime_type = 'image/' . $ext;
+            $bgRecord->file_type = 'image';
+            $bgRecord->title = 'Footer Panoramic Background';
+            $bgRecord->sort_order = 1;
+            $bgRecord->is_active = true;
+            $bgRecord->uploaded_by = $this->getAdminId();
+            $bgRecord->uploader_type = 'admin';
+            $bgRecord->touch();
+            $bgRecord->save();
+
+            Media::where('section', 'footer')
+                ->where('slot', 'footer_bg')
+                ->where('id', '!=', $bgRecord->id)
+                ->update(['is_active' => false]);
+
         } elseif ($request->filled('bg_image_url')) {
             $url = $request->input('bg_image_url');
             if ($url && !str_ends_with(strtolower(parse_url($url, PHP_URL_PATH) ?? ''), '.json')) {
@@ -4312,21 +4341,32 @@ class MediaController extends Controller
                 $meta['desktop_image'] = $url;
                 $meta['bg_image_url'] = $url;
 
-                Media::updateOrCreate(
-                    ['page' => 'homepage', 'section' => 'footer', 'slot' => 'footer_bg'],
-                    [
-                        'file_name' => basename($url),
-                        'file_path' => $url,
-                        'disk' => 'local',
-                        'mime_type' => 'image/png',
-                        'file_type' => 'image',
-                        'title' => 'Footer Panoramic Background',
-                        'sort_order' => 1,
-                        'is_active' => true,
-                        'uploaded_by' => $this->getAdminId(),
-                        'uploader_type' => 'admin',
-                    ]
-                );
+                Media::where('section', 'footer')->where('slot', 'footer_bg')->update(['is_active' => false]);
+
+                $bgRecord = Media::where('section', 'footer')->where('slot', 'footer_bg')->first();
+                if (!$bgRecord) {
+                    $bgRecord = new Media();
+                    $bgRecord->page = 'homepage';
+                    $bgRecord->section = 'footer';
+                    $bgRecord->slot = 'footer_bg';
+                }
+                $bgRecord->file_name = basename($url);
+                $bgRecord->file_path = $url;
+                $bgRecord->disk = 'local';
+                $bgRecord->mime_type = 'image/png';
+                $bgRecord->file_type = 'image';
+                $bgRecord->title = 'Footer Panoramic Background';
+                $bgRecord->sort_order = 1;
+                $bgRecord->is_active = true;
+                $bgRecord->uploaded_by = $this->getAdminId();
+                $bgRecord->uploader_type = 'admin';
+                $bgRecord->touch();
+                $bgRecord->save();
+
+                Media::where('section', 'footer')
+                    ->where('slot', 'footer_bg')
+                    ->where('id', '!=', $bgRecord->id)
+                    ->update(['is_active' => false]);
             }
         }
 

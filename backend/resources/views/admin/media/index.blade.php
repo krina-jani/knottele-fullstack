@@ -605,7 +605,7 @@
     </div>
 
     <!-- MODAL 5: MEDIA LIBRARY PICKER MODAL -->
-    <div id="mediaPickerModal" onclick="if(event.target === this) closeMediaPicker()" class="fixed inset-0 bg-stone-900/60 backdrop-blur-xs hidden items-center justify-center z-[9999] p-4 overflow-y-auto" style="display: none;">
+    <div id="mediaPickerModal" onclick="if(event.target === this) closeMediaPicker()" class="fixed inset-0 bg-stone-900/60 backdrop-blur-xs hidden items-center justify-center z-[10001] p-4 overflow-y-auto" style="display: none;">
         <div class="bg-white rounded-3xl max-w-3xl w-full max-h-[85vh] flex flex-col overflow-hidden shadow-2xl border border-stone-100 animate-fadeIn" onclick="event.stopPropagation()">
             
             <div class="p-5 px-6 border-b border-stone-100 flex items-center justify-between bg-stone-50/80 shrink-0">
@@ -2475,11 +2475,19 @@
                             <label class="block text-xs font-bold text-stone-700 uppercase tracking-wider">
                                 <i class="fas fa-image mr-1 text-red-600"></i>Panoramic Footer Background Artwork
                             </label>
-                            <span class="text-[10px] text-stone-400 font-bold">1920 × 600 px (JPG/PNG/WEBP)</span>
+                            <div class="flex items-center gap-2">
+                                <span class="text-[10px] text-stone-400 font-bold">1920 × 600 px (JPG/PNG/WEBP)</span>
+                                <button type="button" onclick="openMediaPicker('footer_bg')" class="px-2.5 py-1 rounded-lg bg-white hover:bg-stone-100 border border-stone-200 text-stone-700 text-[11px] font-bold transition-all flex items-center gap-1 cursor-pointer">
+                                    <i class="fas fa-photo-video text-red-500"></i> Media Library
+                                </button>
+                            </div>
                         </div>
 
                         <div class="border-2 border-dashed border-stone-200 rounded-xl p-4 text-center hover:border-red-400 hover:bg-red-50/20 transition-all cursor-pointer"
-                             onclick="document.getElementById('footerBgFileInput').click()">
+                             onclick="document.getElementById('footerBgFileInput').click()"
+                             ondragover="event.preventDefault(); this.classList.add('border-red-500', 'bg-red-50/30');"
+                             ondragleave="this.classList.remove('border-red-500', 'bg-red-50/30');"
+                             ondrop="event.preventDefault(); this.classList.remove('border-red-500', 'bg-red-50/30'); if(event.dataTransfer.files.length) { document.getElementById('footerBgFileInput').files = event.dataTransfer.files; handleFooterBgFileChange(document.getElementById('footerBgFileInput')); }">
                             <i class="fas fa-cloud-upload-alt text-red-500 text-lg mb-1"></i>
                             <p class="text-xs font-bold text-stone-700">Upload Panoramic Background Image</p>
                             <p class="text-[10px] text-stone-400">Click or drag & drop a new background image</p>
@@ -2490,7 +2498,7 @@
                             <img id="footerBgPreviewImg" src="" class="w-20 h-10 rounded-lg object-cover border border-stone-200">
                             <div class="flex-1 min-w-0">
                                 <p class="text-xs font-bold text-stone-800 truncate" id="footerBgFileName">Current Background</p>
-                                <p class="text-[10px] text-emerald-600 font-semibold">Active Background</p>
+                                <p class="text-[10px] text-emerald-600 font-semibold" id="footerBgStatusLabel">Active Background</p>
                             </div>
                             <button type="button" onclick="clearFooterBgFileInput()" class="text-stone-400 hover:text-red-600 p-1.5 cursor-pointer"><i class="fas fa-times"></i></button>
                         </div>
@@ -5793,6 +5801,26 @@
             if (modal && (modal.style.display === 'none' || modal.classList.contains('hidden'))) {
                 openBrandStoryModal();
             }
+        } else if (pickerTarget === 'footer_bg') {
+            const input = document.getElementById('footerBgImageUrl');
+            if (input) input.value = url;
+            const fileInput = document.getElementById('footerBgFileInput');
+            if (fileInput) fileInput.value = '';
+            const previewImg = document.getElementById('footerBgPreviewImg');
+            if (previewImg) previewImg.src = url;
+            const fileName = document.getElementById('footerBgFileName');
+            if (fileName) fileName.innerText = name || url.split('/').pop() || 'Media Library Image';
+            const statusLabel = document.getElementById('footerBgStatusLabel');
+            if (statusLabel) statusLabel.innerText = 'Selected from Media Library';
+            const previewContainer = document.getElementById('footerBgPreviewContainer');
+            if (previewContainer) {
+                previewContainer.classList.remove('hidden');
+                previewContainer.style.display = 'flex';
+            }
+            const modal = document.getElementById('footerSettingsModal');
+            if (modal && (modal.style.display === 'none' || modal.classList.contains('hidden'))) {
+                openFooterSettingsModal();
+            }
         } else {
             document.getElementById('heroSlideMobileMediaId').value = id;
             document.getElementById('heroSlideMobileImagePath').value = url;
@@ -8333,6 +8361,10 @@
     function handleFooterBgFileChange(input) {
         if (input.files && input.files[0]) {
             const file = input.files[0];
+            const imgUrlInput = document.getElementById('footerBgImageUrl');
+            if (imgUrlInput) imgUrlInput.value = '';
+            const statusLabel = document.getElementById('footerBgStatusLabel');
+            if (statusLabel) statusLabel.textContent = 'Selected new upload (Click Save to apply)';
             const reader = new FileReader();
             reader.onload = function(e) {
                 const previewImg = document.getElementById('footerBgPreviewImg');
@@ -8354,6 +8386,8 @@
         if (fileInput) fileInput.value = '';
         const imgUrl = document.getElementById('footerBgImageUrl');
         if (imgUrl) imgUrl.value = '';
+        const previewImg = document.getElementById('footerBgPreviewImg');
+        if (previewImg) previewImg.src = '';
         const previewContainer = document.getElementById('footerBgPreviewContainer');
         if (previewContainer) {
             previewContainer.classList.add('hidden');
@@ -8366,7 +8400,7 @@
         const btn = document.getElementById('footerSettingsSubmitBtn');
         if (btn) {
             btn.disabled = true;
-            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving...';
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin mr-1.5"></i> Saving...';
         }
 
         const form = document.getElementById('footerSettingsForm');
@@ -8381,9 +8415,10 @@
         }
 
         try {
+            // Note: Do not specify 'Content-Type': 'multipart/form-data'; axios will automatically
+            // set multipart/form-data with the browser-generated boundary
             const res = await axios.post(`${adminMediaBase}/footer/settings`, formData, {
                 headers: {
-                    'Content-Type': 'multipart/form-data',
                     'X-CSRF-TOKEN': csrfToken || ''
                 }
             });
@@ -8391,7 +8426,9 @@
                 toastr.success(res.data.message || 'Footer settings updated successfully!');
                 closeFooterSettingsModal();
                 broadcastMediaUpdate();
-                loadManagerData();
+                if (typeof loadManagerData === 'function') {
+                    loadManagerData();
+                }
             } else {
                 toastr.error(res.data?.message || 'Failed to save footer settings.');
             }
@@ -8400,7 +8437,7 @@
         } finally {
             if (btn) {
                 btn.disabled = false;
-                btn.innerHTML = '<i class="fas fa-save"></i><span>Save Footer Settings</span>';
+                btn.innerHTML = '<i class="fas fa-save mr-1.5"></i><span>Save Footer Settings</span>';
             }
         }
     }
