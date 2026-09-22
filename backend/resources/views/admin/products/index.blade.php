@@ -4,15 +4,17 @@
 
 @section('content')
 <div class="mb-8">
-    <div class="flex justify-between items-center">
+    <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3">
         <div>
-            <h2 class="text-2xl font-bold text-stone-800 mb-2">Products</h2>
-            <p class="text-stone-600">Manage your store inventory and variants</p>
+            <h2 class="text-xl sm:text-2xl font-bold text-stone-800 mb-1">Products</h2>
+            <p class="text-stone-600 text-xs sm:text-sm">Manage your store inventory and variants</p>
         </div>
-        <a href="{{ route('admin.products.create') }}" class="btn-primary flex items-center shadow-lg shadow-red-100">
-            <i class="fas fa-plus mr-2"></i>
-            Add Product
-        </a>
+        <div class="shrink-0">
+            <a href="{{ route('admin.products.create') }}" class="btn-primary btn-sm whitespace-nowrap shadow-sm">
+                <i class="fas fa-plus text-xs"></i>
+                <span>+ Add Product</span>
+            </a>
+        </div>
     </div>
 </div>
 

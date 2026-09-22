@@ -10,8 +10,8 @@
                 <p class="text-stone-600">Manage your product brands and manufacturers</p>
             </div>
             <div class="flex space-x-3">
-                <button onclick="showCreateBrandModal()" class="btn-primary">
-                    <i class="fas fa-plus mr-2"></i>Add New Brand
+                <button onclick="showCreateBrandModal()" class="btn-primary btn-sm whitespace-nowrap shadow-sm">
+                    <i class="fas fa-plus mr-1 text-xs"></i>Add Brand
                 </button>
             </div>
         </div>
@@ -130,9 +130,9 @@
                         <i class="fas fa-file-pdf text-red-500 text-xs"></i>
                         <span>PDF</span>
                     </button>
-                    <!-- Big Last Button: + Add Brand -->
-                    <button onclick="showCreateBrandModal()" class="btn-primary btn-big w-full sm:w-auto shadow-md">
-                        <i class="fas fa-plus mr-1"></i>
+                    <!-- Add Brand Button -->
+                    <button onclick="showCreateBrandModal()" class="btn-primary btn-sm w-full sm:w-auto shadow-sm">
+                        <i class="fas fa-plus mr-1 text-xs"></i>
                         <span>+ Add Brand</span>
                     </button>
                 </div>

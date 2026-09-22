@@ -17,8 +17,9 @@
                 <option value="inactive">Inactive</option>
                 <option value="blocked">Blocked</option>
             </select>
-            <button onclick="openAddUserModal()" class="btn-primary">
-                <i class="fas fa-plus mr-2"></i>Add New Customer
+            <button onclick="openAddUserModal()" class="btn-primary btn-sm whitespace-nowrap shadow-sm">
+                <i class="fas fa-plus text-xs"></i>
+                <span>+ Add Customer</span>
             </button>
         </div>
     </div>

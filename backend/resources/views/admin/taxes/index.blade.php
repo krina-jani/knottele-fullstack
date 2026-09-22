@@ -104,9 +104,9 @@
                             <i class="fas fa-file-pdf text-red-500 text-xs"></i>
                             <span>PDF</span>
                         </button>
-                        <!-- Big Last Button: + Add Tax Rate -->
-                        <button onclick="openAddTaxRateModal()" class="btn-primary btn-big w-full sm:w-auto shadow-md">
-                            <i class="fas fa-plus mr-1"></i>
+                        <!-- Add Tax Rate Button -->
+                        <button onclick="openAddTaxRateModal()" class="btn-primary btn-sm w-full sm:w-auto shadow-sm">
+                            <i class="fas fa-plus mr-1 text-xs"></i>
                             <span>+ Add Tax Rate</span>
                         </button>
                     </div>
@@ -139,9 +139,9 @@
                             <i class="fas fa-columns text-xs"></i>
                             <span>Columns</span>
                         </button>
-                        <!-- Big Last Button: + Add Tax Class -->
-                        <button onclick="openAddTaxClassModal()" class="btn-primary btn-big w-full sm:w-auto shadow-md">
-                            <i class="fas fa-plus mr-1"></i>
+                        <!-- Add Tax Class Button -->
+                        <button onclick="openAddTaxClassModal()" class="btn-primary btn-sm w-full sm:w-auto shadow-sm">
+                            <i class="fas fa-plus mr-1 text-xs"></i>
                             <span>+ Add Tax Class</span>
                         </button>
                     </div>

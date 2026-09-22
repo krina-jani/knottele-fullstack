@@ -4,14 +4,15 @@
 
 @section('content')
 <div class="mb-8">
-    <div class="flex flex-col md:flex-row md:justify-between md:items-center gap-4">
+    <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3">
         <div>
-            <h2 class="text-2xl font-bold text-stone-800 mb-2">Pages Management</h2>
-            <p class="text-stone-600">Create and manage custom pages for your website</p>
+            <h2 class="text-xl sm:text-2xl font-bold text-stone-800 mb-1">Pages Management</h2>
+            <p class="text-stone-600 text-xs sm:text-sm">Create and manage custom pages for your website</p>
         </div>
-        <div>
-            <a href="{{ route('admin.pages.create') }}" class="btn-primary">
-                <i class="fas fa-plus mr-2"></i>Create New Page
+        <div class="shrink-0">
+            <a href="{{ route('admin.pages.create') }}" class="btn-primary btn-sm whitespace-nowrap shadow-sm">
+                <i class="fas fa-plus text-xs"></i>
+                <span>+ Create Page</span>
             </a>
         </div>
     </div>

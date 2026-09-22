@@ -10,8 +10,8 @@
                 <p class="text-stone-600">Manage special offers, discounts, and promotions</p>
             </div>
             <div class="flex space-x-3">
-                <a href="{{ route('admin.offers.create') }}" class="btn-primary">
-                    <i class="fas fa-plus mr-2"></i>Create New Offer
+                <a href="{{ route('admin.offers.create') }}" class="btn-primary btn-sm whitespace-nowrap shadow-sm">
+                    <i class="fas fa-plus mr-1 text-xs"></i>Create Offer
                 </a>
             </div>
         </div>
@@ -149,9 +149,9 @@
                             </button>
                         </div>
                     </div>
-                    <!-- Big Last Button: + Add Offer -->
-                    <a href="{{ route('admin.offers.create') }}" class="btn-primary btn-big w-full sm:w-auto shadow-md">
-                        <i class="fas fa-plus mr-1"></i>
+                    <!-- Add Offer Button -->
+                    <a href="{{ route('admin.offers.create') }}" class="btn-primary btn-sm w-full sm:w-auto shadow-sm">
+                        <i class="fas fa-plus mr-1 text-xs"></i>
                         <span>+ Add Offer</span>
                     </a>
                 </div>

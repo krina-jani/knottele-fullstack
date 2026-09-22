@@ -90,43 +90,72 @@
 .btn-primary {
     background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
     color: white;
-    font-weight: 500;
-    padding: 8px 16px;
-    border-radius: 8px;
+    font-weight: 600;
+    font-size: 12px;
+    padding: 6px 14px;
+    border-radius: 10px;
     transition: all 0.2s ease;
-    box-shadow: 0 4px 6px rgba(220, 38, 38, 0.25);
+    box-shadow: 0 2px 5px rgba(220, 38, 38, 0.25);
+    white-space: nowrap;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
 }
 
 .btn-primary:hover {
-    box-shadow: 0 10px 15px rgba(220, 38, 38, 0.4);
+    box-shadow: 0 6px 12px rgba(220, 38, 38, 0.35);
     transform: translateY(-1px);
 }
 
 .btn-secondary {
     background: linear-gradient(135deg, #6b7280 0%, #4b5563 100%);
     color: white;
-    font-weight: 500;
-    padding: 8px 16px;
-    border-radius: 8px;
+    font-weight: 600;
+    font-size: 12px;
+    padding: 6px 14px;
+    border-radius: 10px;
     transition: all 0.2s ease;
+    white-space: nowrap;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+}
+
+.btn-secondary:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba(107, 114, 128, 0.3);
 }
 
 .btn-success {
     background: linear-gradient(135deg, #10b981 0%, #059669 100%);
     color: white;
-    font-weight: 500;
-    padding: 8px 16px;
-    border-radius: 8px;
+    font-weight: 600;
+    font-size: 12px;
+    padding: 6px 14px;
+    border-radius: 10px;
     transition: all 0.2s ease;
+    white-space: nowrap;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
 }
 
 .btn-danger {
     background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
     color: white;
-    font-weight: 500;
-    padding: 8px 16px;
-    border-radius: 8px;
+    font-weight: 600;
+    font-size: 12px;
+    padding: 6px 14px;
+    border-radius: 10px;
     transition: all 0.2s ease;
+    white-space: nowrap;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
 }
 
 /* Button Size Modifiers */
@@ -144,12 +173,12 @@
 }
 
 .btn-icon-sm {
-    width: 34px !important;
-    height: 34px !important;
-    min-width: 34px !important;
-    max-width: 34px !important;
+    width: 32px !important;
+    height: 32px !important;
+    min-width: 32px !important;
+    max-width: 32px !important;
     padding: 0 !important;
-    font-size: 13px !important;
+    font-size: 12px !important;
     border-radius: 10px !important;
     display: inline-flex !important;
     align-items: center !important;
@@ -158,22 +187,30 @@
 }
 
 .btn-big {
-    padding: 9px 20px !important;
-    font-size: 13px !important;
-    font-weight: 700 !important;
-    border-radius: 12px !important;
+    padding: 6px 14px !important;
+    font-size: 12px !important;
+    font-weight: 600 !important;
+    border-radius: 10px !important;
     display: inline-flex !important;
     align-items: center !important;
     justify-content: center !important;
-    gap: 7px !important;
-    box-shadow: 0 4px 10px rgba(220, 38, 38, 0.28) !important;
-    letter-spacing: 0.01em !important;
+    gap: 6px !important;
+    box-shadow: 0 2px 6px rgba(220, 38, 38, 0.25) !important;
     white-space: nowrap !important;
 }
 
 .btn-big:hover {
-    box-shadow: 0 8px 16px rgba(220, 38, 38, 0.38) !important;
+    box-shadow: 0 6px 12px rgba(220, 38, 38, 0.35) !important;
     transform: translateY(-1px) !important;
+}
+
+@media (max-width: 640px) {
+    .btn-primary, .btn-secondary, .btn-success, .btn-danger, .btn-big, .btn-sm {
+        padding: 5px 11px !important;
+        font-size: 11px !important;
+        white-space: nowrap !important;
+        flex-shrink: 0 !important;
+    }
 }
 
 /* Status badges */

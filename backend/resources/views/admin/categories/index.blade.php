@@ -9,9 +9,9 @@
                 <h2 class="text-xl sm:text-2xl font-bold text-stone-800 mb-2">Category Management</h2>
                 <p class="text-stone-600 text-sm sm:text-base">Organize your products with categories and subcategories</p>
             </div>
-            <a href="{{ route('admin.categories.create') }}" class="btn-primary">
-    <i class="fas fa-plus mr-2"></i>Add New Category
-</a>
+            <a href="{{ route('admin.categories.create') }}" class="btn-primary btn-sm whitespace-nowrap shadow-sm">
+                <i class="fas fa-plus mr-1 text-xs"></i>Add Category
+            </a>
         </div>
     </div>
 
@@ -99,9 +99,9 @@
                         <i class="fas fa-file-pdf text-red-500 text-xs"></i>
                         <span>PDF</span>
                     </button>
-                    <!-- Big Last Button: + Add Category -->
-                    <a href="{{ route('admin.categories.create') }}" class="btn-primary btn-big w-full sm:w-auto shadow-md">
-                        <i class="fas fa-plus mr-1"></i>
+                    <!-- Add Category Button -->
+                    <a href="{{ route('admin.categories.create') }}" class="btn-primary btn-sm w-full sm:w-auto shadow-sm">
+                        <i class="fas fa-plus mr-1 text-xs"></i>
                         <span>+ Add Category</span>
                     </a>
                 </div>

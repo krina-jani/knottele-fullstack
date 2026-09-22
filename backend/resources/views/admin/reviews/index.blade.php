@@ -4,14 +4,17 @@
 
 @section('content')
     <div class="mb-8">
-        <div class="flex justify-between items-center">
+        <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3">
             <div>
-                <h2 class="text-2xl font-bold text-stone-800 mb-2">Reviews and Ratings</h2>
-                <p class="text-stone-500 font-medium">Manage customer feedback and product ratings</p>
+                <h2 class="text-xl sm:text-2xl font-bold text-stone-800 mb-1">Reviews and Ratings</h2>
+                <p class="text-stone-500 font-medium text-xs sm:text-sm">Manage customer feedback and product ratings</p>
             </div>
-            <a href="{{ route('admin.reviews.create') }}" class="btn-primary">
-                <i class="fas fa-plus mr-2 text-xs"></i>Add New Review
-            </a>
+            <div class="shrink-0">
+                <a href="{{ route('admin.reviews.create') }}" class="btn-primary btn-sm whitespace-nowrap shadow-sm">
+                    <i class="fas fa-plus text-xs"></i>
+                    <span>+ Add Review</span>
+                </a>
+            </div>
         </div>
     </div>
 

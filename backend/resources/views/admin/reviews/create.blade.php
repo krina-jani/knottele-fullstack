@@ -95,11 +95,11 @@
                         </label>
                     </div>
 
-                    <div class="flex items-center space-x-4">
-                        <a href="{{ route('admin.reviews.index') }}" class="btn-secondary px-8">
+                    <div class="flex items-center space-x-3">
+                        <a href="{{ route('admin.reviews.index') }}" class="btn-secondary btn-sm px-4">
                             Cancel
                         </a>
-                        <button type="submit" class="btn-primary px-10">
+                        <button type="submit" class="btn-primary btn-sm px-5">
                             Create Review
                         </button>
                     </div>
