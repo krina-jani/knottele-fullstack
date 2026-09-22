@@ -86,7 +86,7 @@ class CategoryController extends Controller
                 'image' => $imageUrl,
                 'featured' => (bool) $category->featured,
                 'priceFrom' => $priceFromStr,
-                'itemCount' => $productCount > 0 ? $productCount : ($priceFromFallback[$category->slug] ? 1 : 0),
+                'itemCount' => $productCount > 0 ? $productCount : (!empty($priceFromFallback[$category->slug]) ? 1 : 0),
             ];
         });
 
