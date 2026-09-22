@@ -183,20 +183,35 @@ class MediaController extends Controller
                 'id' => 'brand_story',
                 'page' => 'homepage',
                 'title' => 'Brand Story ("Every Stitch Has a Story")',
-                'description' => 'Artisan storytelling section with background craftsmanship visual and features.',
-                'badge' => 'Storytelling',
-                'slots' => [
-                    [
-                        'slot' => 'brand_story_desktop',
-                        'title' => 'Brand Story Desktop Background',
-                        'description' => 'Artisanal background image for Brand Story section.',
-                        'recommended_dimensions' => '1920 × 700',
-                        'device' => 'desktop',
+                'description' => 'Artisan storytelling section with background craftsmanship visual, narrative, and 4 trust features.',
+                'badge' => 'Storytelling & Trust',
+                'is_brand_story_section' => true,
+                'metadata' => (function() {
+                    $m = Media::where('page', 'homepage')->where('section', 'brand_story')->orderBy('updated_at', 'desc')->first();
+                    $meta = $m && $m->metadata ? $m->metadata : [];
+                    $defaultFeatures = [
+                        ['title' => 'Handmade with Love', 'icon' => 'heart'],
+                        ['title' => 'Premium Yarn Quality', 'icon' => 'sparkles'],
+                        ['title' => '100% Pure Natural Cotton', 'icon' => 'leaf'],
+                        ['title' => 'Happiness Guaranteed', 'icon' => 'smile'],
+                    ];
+                    return [
+                        'id' => $m ? $m->id : null,
                         'page' => 'homepage',
                         'section' => 'brand_story',
-                        'sort_order' => 1,
-                    ],
-                ]
+                        'slot' => 'brand_story_desktop',
+                        'badge' => $m && $m->tag_text ? $m->tag_text : 'KNOTELLE Artisanal Crochet Craftsmanship',
+                        'title' => $m && $m->title ? $m->title : 'Every Stitch',
+                        'subtitle' => $m && $m->subtitle ? $m->subtitle : 'Has a Story',
+                        'description' => $m && $m->description ? $m->description : 'More than just crochet, we create memories, happiness and a little bit of magic.',
+                        'cta_text' => $m && $m->cta_text ? $m->cta_text : 'Read Our Story',
+                        'cta_link' => $m && $m->cta_link ? $m->cta_link : '/about',
+                        'features' => !empty($meta['features']) ? $meta['features'] : $defaultFeatures,
+                        'desktop_image' => $m ? ($m->desktop_image_url ?: $m->url) : asset('images/homepage/middleimg.png'),
+                        'image_url' => $m ? ($m->desktop_image_url ?: $m->url) : asset('images/homepage/middleimg.png'),
+                        'is_active' => $m ? (bool)$m->is_active : true,
+                    ];
+                })(),
             ],
             [
                 'id' => 'bestsellers',
@@ -2749,6 +2764,133 @@ class MediaController extends Controller
         return response()->json([
             'success' => true,
             'message' => 'Custom Crochet banner and hanging tag saved successfully!',
+            'data' => $media,
+        ]);
+    }
+
+    /**
+     * Get Brand Story Section Data for Admin Media Manager
+     */
+    public function getBrandStory(): JsonResponse
+    {
+        $m = Media::where('page', 'homepage')
+            ->where('section', 'brand_story')
+            ->orderBy('updated_at', 'desc')
+            ->first();
+
+        $meta = $m && $m->metadata ? $m->metadata : [];
+        $defaultFeatures = [
+            ['title' => 'Handmade with Love', 'icon' => 'heart'],
+            ['title' => 'Premium Yarn Quality', 'icon' => 'sparkles'],
+            ['title' => '100% Pure Natural Cotton', 'icon' => 'leaf'],
+            ['title' => 'Happiness Guaranteed', 'icon' => 'smile'],
+        ];
+
+        $data = [
+            'id' => $m ? $m->id : null,
+            'page' => 'homepage',
+            'section' => 'brand_story',
+            'slot' => 'brand_story_desktop',
+            'badge' => $m && $m->tag_text ? $m->tag_text : 'KNOTELLE Artisanal Crochet Craftsmanship',
+            'title' => $m && $m->title ? $m->title : 'Every Stitch',
+            'subtitle' => $m && $m->subtitle ? $m->subtitle : 'Has a Story',
+            'description' => $m && $m->description ? $m->description : 'More than just crochet, we create memories, happiness and a little bit of magic.',
+            'cta_text' => $m && $m->cta_text ? $m->cta_text : 'Read Our Story',
+            'cta_link' => $m && $m->cta_link ? $m->cta_link : '/about',
+            'features' => !empty($meta['features']) ? $meta['features'] : $defaultFeatures,
+            'image_url' => $m ? ($m->desktop_image_url ?: $m->url) : asset('images/homepage/middleimg.png'),
+            'desktop_image' => $m ? ($m->desktop_image_url ?: $m->url) : asset('images/homepage/middleimg.png'),
+            'is_active' => $m ? (bool)$m->is_active : true,
+        ];
+
+        return response()->json(['success' => true, 'data' => $data]);
+    }
+
+    /**
+     * Save / Update Brand Story Section Content, Features, and Background
+     */
+    public function saveBrandStory(Request $request): JsonResponse
+    {
+        $request->validate([
+            'title' => 'nullable|string|max:255',
+            'subtitle' => 'nullable|string|max:255',
+            'badge' => 'nullable|string|max:255',
+            'tag_text' => 'nullable|string|max:255',
+            'description' => 'nullable|string',
+            'cta_text' => 'nullable|string|max:100',
+            'cta_link' => 'nullable|string|max:255',
+            'is_active' => 'nullable',
+            'image_file' => 'nullable|image|max:15360',
+            'image_url' => 'nullable|string',
+        ]);
+
+        $media = Media::where('page', 'homepage')
+            ->where('section', 'brand_story')
+            ->first();
+
+        if (!$media) {
+            $media = new Media();
+            $media->page = 'homepage';
+            $media->section = 'brand_story';
+            $media->slot = 'brand_story_desktop';
+            $media->file_name = 'middleimg.png';
+            $media->file_path = 'images/homepage/middleimg.png';
+            $media->disk = 'local';
+            $media->mime_type = 'image/png';
+            $media->file_type = 'image';
+            $media->uploaded_by = $this->getAdminId();
+            $media->uploader_type = 'admin';
+        }
+
+        // Handle uploaded background image file
+        if ($request->hasFile('image_file')) {
+            $file = $request->file('image_file');
+            $ext = strtolower($file->getClientOriginalExtension() ?: 'png');
+            $fileName = 'brand_story_' . time() . '_' . Str::random(4) . '.' . $ext;
+            $targetDir = public_path('images/homepage');
+            if (!File::isDirectory($targetDir)) {
+                File::makeDirectory($targetDir, 0755, true, true);
+            }
+            $file->move($targetDir, $fileName);
+            $media->file_name = $file->getClientOriginalName();
+            $media->file_path = 'images/homepage/' . $fileName;
+            $media->mime_type = 'image/' . ($ext === 'png' ? 'png' : ($ext === 'webp' ? 'webp' : 'jpeg'));
+            $media->file_size = filesize($targetDir . DIRECTORY_SEPARATOR . $fileName);
+        } elseif ($request->filled('image_url')) {
+            $media->file_path = $request->input('image_url');
+        }
+
+        $media->slot = 'brand_story_desktop';
+        $media->title = $request->input('title', 'Every Stitch');
+        $media->subtitle = $request->input('subtitle', 'Has a Story');
+        $media->tag_text = $request->input('badge', $request->input('tag_text', 'KNOTELLE Artisanal Crochet Craftsmanship'));
+        $media->description = $request->input('description', 'More than just crochet, we create memories, happiness and a little bit of magic.');
+        $media->cta_text = $request->input('cta_text', 'Read Our Story');
+        $media->cta_link = $request->input('cta_link', '/about');
+        $media->is_active = $request->has('is_active') ? filter_var($request->input('is_active'), FILTER_VALIDATE_BOOLEAN) : true;
+
+        $meta = $media->metadata ?: [];
+
+        // Save feature titles
+        if ($request->has('feature_1_title') || $request->has('features')) {
+            $f1 = $request->input('feature_1_title', 'Handmade with Love');
+            $f2 = $request->input('feature_2_title', 'Premium Yarn Quality');
+            $f3 = $request->input('feature_3_title', '100% Pure Natural Cotton');
+            $f4 = $request->input('feature_4_title', 'Happiness Guaranteed');
+            $meta['features'] = [
+                ['title' => $f1, 'icon' => 'heart'],
+                ['title' => $f2, 'icon' => 'sparkles'],
+                ['title' => $f3, 'icon' => 'leaf'],
+                ['title' => $f4, 'icon' => 'smile'],
+            ];
+        }
+
+        $media->metadata = $meta;
+        $media->save();
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Brand Story section updated successfully!',
             'data' => $media,
         ]);
     }

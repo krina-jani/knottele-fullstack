@@ -9,11 +9,17 @@ import { normalizeImageUrl } from "@/lib/api";
 
 const DEFAULT_STORY_BG = "/images/homepage/middleimg.png";
 
+interface StoryFeature {
+  title: string;
+  icon: React.ComponentType<{ className?: string }>;
+}
+
 export function BrandStory() {
   const { media } = useWebsiteMedia();
-  const bs = media?.brandStory || media?.customCrochet;
+  const bs = media?.brandStory;
 
   const bgImage = normalizeImageUrl(bs?.desktop, DEFAULT_STORY_BG);
+  const badge = bs?.badge || "KNOTELLE Artisanal Crochet Craftsmanship";
   const title = bs?.title || "Every Stitch";
   const subtitle = bs?.subtitle || "Has a Story";
   const description = bs?.description || "More than just crochet, we create memories, happiness and a little bit of magic.";
@@ -21,12 +27,26 @@ export function BrandStory() {
   const ctaLink = bs?.cta_link || "/about";
   const isActive = bs?.is_active !== false;
 
-  const storyFeatures = [
+  const defaultFeatures: StoryFeature[] = [
     { title: "Handmade with Love", icon: Heart },
     { title: "Premium Yarn Quality", icon: Sparkles },
     { title: "100% Pure Natural Cotton", icon: Leaf },
     { title: "Happiness Guaranteed", icon: Smile },
   ];
+
+  const iconMap: Record<string, React.ComponentType<{ className?: string }>> = {
+    heart: Heart,
+    sparkles: Sparkles,
+    leaf: Leaf,
+    smile: Smile,
+  };
+
+  const storyFeatures: StoryFeature[] = (bs?.features && Array.isArray(bs.features) && bs.features.length > 0)
+    ? bs.features.map((f: { title: string; icon?: string }) => ({
+        title: f.title,
+        icon: (f.icon && iconMap[f.icon]) ? iconMap[f.icon] : Heart,
+      }))
+    : defaultFeatures;
 
   if (!isActive) return null;
 
@@ -54,6 +74,11 @@ export function BrandStory() {
           
           {/* Left Column: Heading, Subtitle & CTA (Spans 6 cols on lg) */}
           <div className="lg:col-span-6 space-y-4 sm:space-y-5 text-center lg:text-left flex flex-col items-center lg:items-start max-w-lg">
+            {badge && (
+              <span className="text-[11px] sm:text-xs font-semibold uppercase tracking-wider text-[#A38F8B] font-sans block">
+                {badge}
+              </span>
+            )}
             <h2 className="font-serif-luxury text-3xl sm:text-4xl lg:text-5xl font-bold text-[#2E211E] leading-[1.12] tracking-tight">
               {title} <br />
               <span className="text-[#913638] italic font-serif font-normal">

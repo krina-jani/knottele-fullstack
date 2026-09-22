@@ -157,11 +157,13 @@ export interface HomepageMedia {
   brandStory: {
     desktop: string;
     mobile: string;
+    badge?: string;
     title?: string;
     subtitle?: string;
     description?: string;
     cta_text?: string;
     cta_link?: string;
+    features?: Array<{ title: string; icon?: string }>;
     is_active?: boolean;
   };
   customOrder: {

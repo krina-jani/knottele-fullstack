@@ -200,6 +200,12 @@ $adminRoutes = function () {
             Route::match(['post', 'put'], '/homepage/custom-crochet', [AdminMedia::class, 'saveCustomCrochet'])->name('admin.media.homepage.custom-crochet.save');
             Route::get('/homepage/custom-crochet', [AdminMedia::class, 'getCustomCrochet'])->name('admin.media.homepage.custom-crochet.get');
 
+            // Brand Story (Homepage)
+            Route::match(['post', 'put'], '/homepage/brand-story', [AdminMedia::class, 'saveBrandStory'])->name('admin.media.homepage.brand-story.save');
+            Route::get('/homepage/brand-story', [AdminMedia::class, 'getBrandStory'])->name('admin.media.homepage.brand-story.get');
+            Route::match(['post', 'put'], '/brand-story', [AdminMedia::class, 'saveBrandStory']);
+            Route::get('/brand-story', [AdminMedia::class, 'getBrandStory']);
+
             // About Page Routes
             Route::match(['post', 'put'], '/about/story', [AdminMedia::class, 'saveAboutStory'])->name('admin.media.about.story.save');
             Route::get('/about/story', [AdminMedia::class, 'getAboutStory'])->name('admin.media.about.story.get');

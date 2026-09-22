@@ -127,14 +127,24 @@ class MediaController extends Controller
             ->where('is_active', true)
             ->first();
 
+        $bsMeta = $brandStoryMedia && $brandStoryMedia->metadata ? $brandStoryMedia->metadata : [];
+        $defaultBsFeatures = [
+            ['title' => 'Handmade with Love', 'icon' => 'heart'],
+            ['title' => 'Premium Yarn Quality', 'icon' => 'sparkles'],
+            ['title' => '100% Pure Natural Cotton', 'icon' => 'leaf'],
+            ['title' => 'Happiness Guaranteed', 'icon' => 'smile'],
+        ];
+
         $brandStory = [
             'desktop' => $brandStoryMedia ? $brandStoryMedia->url : asset('images/homepage/middleimg.png'),
             'mobile' => $brandStoryMedia ? $brandStoryMedia->url : asset('images/homepage/middleimg.png'),
+            'badge' => $brandStoryMedia && $brandStoryMedia->tag_text ? $brandStoryMedia->tag_text : 'KNOTELLE Artisanal Crochet Craftsmanship',
             'title' => $brandStoryMedia && $brandStoryMedia->title ? $brandStoryMedia->title : 'Every Stitch',
             'subtitle' => $brandStoryMedia && $brandStoryMedia->subtitle ? $brandStoryMedia->subtitle : 'Has a Story',
             'description' => $brandStoryMedia && $brandStoryMedia->description ? $brandStoryMedia->description : 'More than just crochet, we create memories, happiness and a little bit of magic.',
             'cta_text' => $brandStoryMedia && $brandStoryMedia->cta_text ? $brandStoryMedia->cta_text : 'Read Our Story',
             'cta_link' => $brandStoryMedia && $brandStoryMedia->cta_link ? $brandStoryMedia->cta_link : '/about',
+            'features' => !empty($bsMeta['features']) ? $bsMeta['features'] : $defaultBsFeatures,
             'is_active' => $brandStoryMedia ? (bool)$brandStoryMedia->is_active : true,
         ];
 

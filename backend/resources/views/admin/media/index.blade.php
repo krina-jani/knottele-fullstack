@@ -2240,6 +2240,171 @@
         </div>
     </div>
 
+    <!-- MODAL 18B: BRAND STORY SECTION MODAL -->
+    <div id="brandStoryModal" onclick="if(event.target === this) closeBrandStoryModal()" class="fixed inset-0 bg-stone-900/60 backdrop-blur-xs hidden items-center justify-center z-[9999] p-4" style="display: none;">
+        <div class="bg-white rounded-3xl max-w-3xl w-full max-h-[92vh] flex flex-col overflow-hidden shadow-2xl border border-stone-100 animate-fadeIn" onclick="event.stopPropagation()">
+            <!-- Pinned Header -->
+            <div class="p-5 px-6 border-b border-stone-100 flex items-center justify-between bg-stone-50/80 shrink-0">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-2xl bg-red-50 text-red-600 flex items-center justify-center font-bold text-base shadow-2xs">
+                        <i class="fas fa-book-open"></i>
+                    </div>
+                    <div>
+                        <h3 class="text-base font-bold text-stone-800">Edit Brand Story Section ("Every Stitch Has a Story")</h3>
+                        <p class="text-xs text-stone-500 font-medium">Customize headline, italic highlight, narrative, button, artwork, and 4 trust features</p>
+                    </div>
+                </div>
+                <button type="button" onclick="closeBrandStoryModal()" class="w-8 h-8 rounded-full bg-stone-100 text-stone-400 hover:text-stone-700 flex items-center justify-center transition-colors cursor-pointer">
+                    <i class="fas fa-times text-sm"></i>
+                </button>
+            </div>
+
+            <!-- Form Wrapper -->
+            <form id="brandStoryForm" novalidate onsubmit="handleBrandStorySubmit(event)" class="flex flex-col flex-1 min-h-0 overflow-hidden">
+                <input type="hidden" id="brandStoryImageUrl" name="image_url" value="">
+
+                <div class="p-6 space-y-5 overflow-y-auto flex-1 overscroll-contain">
+                    <!-- Branding & Headings Group -->
+                    <div class="space-y-3">
+                        <div class="flex items-center gap-2 border-b border-stone-100 pb-1.5">
+                            <i class="fas fa-heading text-red-600 text-xs"></i>
+                            <span class="text-xs font-bold text-stone-700 uppercase tracking-wider">Branding & Headings</span>
+                        </div>
+
+                        <div>
+                            <label class="block text-xs font-bold text-stone-600 uppercase tracking-wider mb-1">Top Watermark Tagline / Badge</label>
+                            <input type="text" id="brandStoryBadge" name="badge" placeholder="e.g. KNOTELLE Artisanal Crochet Craftsmanship" class="w-full bg-stone-50 border border-stone-200 rounded-xl px-3.5 py-2.5 text-sm font-semibold text-stone-800 focus:bg-white focus:outline-none focus:ring-2 focus:ring-red-500">
+                        </div>
+
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+                            <div>
+                                <label class="block text-xs font-bold text-stone-600 uppercase tracking-wider mb-1">Main Headline <span class="text-red-500">*</span></label>
+                                <input type="text" id="brandStoryTitle" name="title" placeholder="e.g. Every Stitch" class="w-full bg-stone-50 border border-stone-200 rounded-xl px-3.5 py-2.5 text-sm font-semibold text-stone-800 focus:bg-white focus:outline-none focus:ring-2 focus:ring-red-500">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold text-stone-600 uppercase tracking-wider mb-1">Italic Highlight Accent</label>
+                                <input type="text" id="brandStorySubtitle" name="subtitle" placeholder="e.g. Has a Story" class="w-full bg-stone-50 border border-stone-200 rounded-xl px-3.5 py-2.5 text-sm font-semibold text-stone-800 focus:bg-white focus:outline-none focus:ring-2 focus:ring-red-500">
+                            </div>
+                        </div>
+
+                        <div>
+                            <label class="block text-xs font-bold text-stone-600 uppercase tracking-wider mb-1">Description Narrative <span class="text-red-500">*</span></label>
+                            <textarea id="brandStoryDescription" name="description" rows="2" placeholder="e.g. More than just crochet, we create memories, happiness and a little bit of magic." class="w-full bg-stone-50 border border-stone-200 rounded-xl px-3.5 py-2.5 text-sm font-semibold text-stone-800 focus:bg-white focus:outline-none focus:ring-2 focus:ring-red-500"></textarea>
+                        </div>
+                    </div>
+
+                    <!-- Button CTA Configuration -->
+                    <div class="space-y-3 pt-1">
+                        <div class="flex items-center gap-2 border-b border-stone-100 pb-1.5">
+                            <i class="fas fa-mouse-pointer text-red-600 text-xs"></i>
+                            <span class="text-xs font-bold text-stone-700 uppercase tracking-wider">Button CTA Link</span>
+                        </div>
+
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+                            <div>
+                                <label class="block text-xs font-bold text-stone-600 uppercase tracking-wider mb-1">Button Label</label>
+                                <input type="text" id="brandStoryCtaText" name="cta_text" placeholder="e.g. Read Our Story" class="w-full bg-stone-50 border border-stone-200 rounded-xl px-3.5 py-2 text-sm font-semibold text-stone-800 focus:bg-white focus:outline-none focus:ring-2 focus:ring-red-500">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold text-stone-600 uppercase tracking-wider mb-1">Button Link URL</label>
+                                <input type="text" id="brandStoryCtaLink" name="cta_link" placeholder="e.g. /about" class="w-full bg-stone-50 border border-stone-200 rounded-xl px-3.5 py-2 text-sm font-semibold text-stone-800 focus:bg-white focus:outline-none focus:ring-2 focus:ring-red-500">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- The 4 Features Group -->
+                    <div class="space-y-3 pt-1">
+                        <div class="flex items-center gap-2 border-b border-stone-100 pb-1.5">
+                            <i class="fas fa-check-circle text-emerald-600 text-xs"></i>
+                            <span class="text-xs font-bold text-stone-700 uppercase tracking-wider">4 Trust & Quality Features</span>
+                        </div>
+
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                            <div class="bg-stone-50 rounded-2xl p-3 border border-stone-200/80">
+                                <div class="flex items-center gap-2 mb-1.5">
+                                    <span class="w-6 h-6 rounded-full bg-red-50 text-red-600 flex items-center justify-center text-xs"><i class="fas fa-heart"></i></span>
+                                    <label class="text-xs font-bold text-stone-700">Feature 1</label>
+                                </div>
+                                <input type="text" id="brandStoryFeature1" name="feature_1_title" placeholder="Handmade with Love" class="w-full bg-white border border-stone-200 rounded-xl px-3 py-2 text-xs font-semibold text-stone-800 focus:outline-none focus:ring-2 focus:ring-red-500">
+                            </div>
+
+                            <div class="bg-stone-50 rounded-2xl p-3 border border-stone-200/80">
+                                <div class="flex items-center gap-2 mb-1.5">
+                                    <span class="w-6 h-6 rounded-full bg-red-50 text-red-600 flex items-center justify-center text-xs"><i class="fas fa-wand-magic-sparkles"></i></span>
+                                    <label class="text-xs font-bold text-stone-700">Feature 2</label>
+                                </div>
+                                <input type="text" id="brandStoryFeature2" name="feature_2_title" placeholder="Premium Yarn Quality" class="w-full bg-white border border-stone-200 rounded-xl px-3 py-2 text-xs font-semibold text-stone-800 focus:outline-none focus:ring-2 focus:ring-red-500">
+                            </div>
+
+                            <div class="bg-stone-50 rounded-2xl p-3 border border-stone-200/80">
+                                <div class="flex items-center gap-2 mb-1.5">
+                                    <span class="w-6 h-6 rounded-full bg-red-50 text-red-600 flex items-center justify-center text-xs"><i class="fas fa-leaf"></i></span>
+                                    <label class="text-xs font-bold text-stone-700">Feature 3</label>
+                                </div>
+                                <input type="text" id="brandStoryFeature3" name="feature_3_title" placeholder="100% Pure Natural Cotton" class="w-full bg-white border border-stone-200 rounded-xl px-3 py-2 text-xs font-semibold text-stone-800 focus:outline-none focus:ring-2 focus:ring-red-500">
+                            </div>
+
+                            <div class="bg-stone-50 rounded-2xl p-3 border border-stone-200/80">
+                                <div class="flex items-center gap-2 mb-1.5">
+                                    <span class="w-6 h-6 rounded-full bg-red-50 text-red-600 flex items-center justify-center text-xs"><i class="far fa-smile"></i></span>
+                                    <label class="text-xs font-bold text-stone-700">Feature 4</label>
+                                </div>
+                                <input type="text" id="brandStoryFeature4" name="feature_4_title" placeholder="Happiness Guaranteed" class="w-full bg-white border border-stone-200 rounded-xl px-3 py-2 text-xs font-semibold text-stone-800 focus:outline-none focus:ring-2 focus:ring-red-500">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Background Artwork -->
+                    <div class="space-y-3 pt-1">
+                        <div class="flex items-center gap-2 border-b border-stone-100 pb-1.5">
+                            <i class="fas fa-image text-red-600 text-xs"></i>
+                            <span class="text-xs font-bold text-stone-700 uppercase tracking-wider">Panoramic Background Image</span>
+                        </div>
+
+                        <div class="bg-stone-50/80 border border-stone-200/90 rounded-2xl p-4 space-y-3">
+                            <div class="flex items-center justify-between">
+                                <span class="text-xs font-bold text-stone-800">Background Artwork</span>
+                                <button type="button" onclick="openMediaPicker('brand_story')" class="px-2.5 py-1 rounded-lg bg-white hover:bg-stone-100 border border-stone-200 text-stone-700 text-[11px] font-bold transition-all flex items-center gap-1 cursor-pointer">
+                                    <i class="fas fa-photo-video text-red-500"></i> Media Library
+                                </button>
+                            </div>
+
+                            <div class="border-2 border-dashed border-stone-200 rounded-xl p-3 text-center hover:border-red-400 hover:bg-red-50/20 transition-all cursor-pointer" onclick="document.getElementById('brandStoryFileInput').click()">
+                                <i class="fas fa-cloud-upload-alt text-red-500 text-lg mb-1"></i>
+                                <p class="text-xs font-bold text-stone-700" id="brandStoryFileLabel">Upload Background Image</p>
+                                <p class="text-[10px] text-stone-400">Recommended: 1920 × 700 px (JPG/PNG/WEBP)</p>
+                                <input type="file" id="brandStoryFileInput" name="image_file" class="hidden" accept=".jpg,.jpeg,.png,.webp" onchange="handleBrandStoryFileChange(this)">
+                            </div>
+
+                            <div id="brandStoryPreviewContainer" class="bg-white rounded-xl p-2.5 border border-stone-200 flex items-center gap-3">
+                                <img id="brandStoryPreviewImg" src="" class="w-14 h-14 rounded-lg object-cover border border-stone-200" onerror="this.src='/images/homepage/middleimg.png';">
+                                <div class="flex-1 min-w-0">
+                                    <p class="text-xs font-bold text-stone-800 truncate" id="brandStoryFileName">Background Visual</p>
+                                    <p class="text-[10px] text-emerald-600 font-semibold">Active</p>
+                                </div>
+                                <button type="button" onclick="clearBrandStoryFileInput()" class="text-stone-400 hover:text-red-600 p-1.5 cursor-pointer"><i class="fas fa-times"></i></button>
+                            </div>
+                        </div>
+
+                        <div class="flex items-center gap-2 pt-2">
+                            <input type="checkbox" id="brandStoryActive" name="is_active" checked class="w-4 h-4 rounded text-red-600 focus:ring-red-500">
+                            <label for="brandStoryActive" class="text-xs font-bold text-stone-700">Brand Story Section Active on Homepage</label>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Sticky Footer with Action Buttons -->
+                <div class="p-4 px-6 bg-stone-50 border-t border-stone-100 shrink-0 flex items-center justify-end gap-3">
+                    <button type="button" onclick="closeBrandStoryModal()" class="btn-secondary text-xs px-5 py-2.5 cursor-pointer">Cancel</button>
+                    <button type="submit" id="brandStorySubmitBtn" class="btn-primary text-xs px-6 py-2.5 flex items-center gap-2 shadow-sm cursor-pointer">
+                        <i class="fas fa-save"></i>
+                        <span>Save Brand Story</span>
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
     <!-- MODAL 19: FOOTER SETTINGS & NAVIGATION MODAL -->
     <div id="footerSettingsModal" class="fixed inset-0 bg-stone-900/60 backdrop-blur-xs hidden items-center justify-center z-[9999] p-4" style="display: none;" onclick="if(event.target === this) closeFooterSettingsModal()">
         <div class="bg-white rounded-3xl max-w-3xl w-full max-h-[92vh] flex flex-col overflow-hidden shadow-2xl border border-stone-100 animate-fadeIn" onclick="event.stopPropagation()">
@@ -2667,6 +2832,13 @@
                                 <span>Edit Banner & Hanging Tag</span>
                             </button>
                         </div>
+                    ` : (section.is_brand_story_section ? `
+                        <div class="flex items-center gap-2">
+                            <button type="button" onclick="window.openBrandStoryModal ? window.openBrandStoryModal() : openBrandStoryModal()" class="px-5 py-2.5 rounded-xl bg-red-600 hover:bg-red-700 text-white text-xs font-bold shadow-xs hover:shadow-md transition-all flex items-center gap-2 active:scale-95 cursor-pointer">
+                                <i class="fas fa-edit text-xs"></i>
+                                <span>Edit Brand Story</span>
+                            </button>
+                        </div>
                     ` : (section.is_footer_section ? `
                         <div class="flex items-center gap-2">
                             <button type="button" onclick="openFooterSettingsModal()" class="px-5 py-2.5 rounded-xl bg-red-600 hover:bg-red-700 text-white text-xs font-bold shadow-xs hover:shadow-md transition-all flex items-center gap-2 active:scale-95 cursor-pointer">
@@ -2674,7 +2846,7 @@
                                 <span>Edit Footer Settings & Links</span>
                             </button>
                         </div>
-                    ` : '')))}
+                    ` : ''))))}
                 </div>
             `;
 
@@ -2951,6 +3123,142 @@
                                     </div>
                                 </div>
                             </div>
+                        </div>
+                    </div>
+                `;
+            } else if (section.is_brand_story_section) {
+                // Full-Width Storefront Replica Brand Story Section Manager
+                const m = section.metadata || {};
+                let img = m.desktop_image || m.image_url || '/images/homepage/middleimg.png';
+                const knottelePrefix = window.location.pathname.startsWith('/knottele') ? '/knottele' : '';
+                if (img.startsWith('/') && !img.startsWith(knottelePrefix) && knottelePrefix) {
+                    img = knottelePrefix + img;
+                }
+                const features = (m.features && Array.isArray(m.features) && m.features.length > 0) ? m.features : [
+                    { title: 'Handmade with Love', icon: 'heart' },
+                    { title: 'Premium Yarn Quality', icon: 'sparkles' },
+                    { title: '100% Pure Natural Cotton', icon: 'leaf' },
+                    { title: 'Happiness Guaranteed', icon: 'smile' }
+                ];
+                
+                const iconClassMap = {
+                    heart: 'fas fa-heart',
+                    sparkles: 'fas fa-wand-magic-sparkles',
+                    leaf: 'fas fa-leaf',
+                    smile: 'far fa-smile'
+                };
+
+                bodyContent = `
+                    <div class="p-6 sm:p-8 space-y-6">
+                        <!-- Top Toolbar / Meta Bar -->
+                        <div class="flex flex-wrap items-center justify-between gap-4 pb-2 border-b border-stone-100">
+                            <div class="flex items-center gap-2.5">
+                                <span class="px-3 py-1 rounded-full text-xs font-bold bg-red-50 text-red-700 border border-red-200 flex items-center gap-1.5">
+                                    <i class="fas fa-book-open text-[10px]"></i>
+                                    <span>Storefront Brand Story Narrative</span>
+                                </span>
+                                <span class="px-2.5 py-0.5 rounded-full text-[11px] font-bold ${m.is_active ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' : 'bg-stone-100 text-stone-500 border border-stone-200'}">
+                                    ${m.is_active ? '● Live on Storefront' : '○ Hidden'}
+                                </span>
+                            </div>
+
+                            <div class="flex items-center gap-2">
+                                <button type="button" onclick="openMediaPicker('brand_story')"
+                                        class="px-3.5 py-2 rounded-xl bg-white hover:bg-stone-50 text-stone-700 text-xs font-bold border border-stone-200 shadow-2xs hover:shadow-xs transition-all flex items-center gap-1.5 cursor-pointer">
+                                    <i class="fas fa-images text-red-500 text-xs"></i>
+                                    <span>Change Background</span>
+                                </button>
+                                <button type="button" onclick="window.openBrandStoryModal ? window.openBrandStoryModal() : openBrandStoryModal()"
+                                        class="px-5 py-2 rounded-xl bg-red-600 hover:bg-red-700 text-white text-xs font-bold shadow-xs hover:shadow-md transition-all flex items-center gap-2 active:scale-95 cursor-pointer">
+                                    <i class="fas fa-edit text-xs"></i>
+                                    <span>Edit Brand Story</span>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- FULL-WIDTH LIVE STOREFRONT PREVIEW BANNER -->
+                        <div class="relative w-full rounded-3xl overflow-hidden bg-[#FCE9E5] border border-[#E7D1CC]/80 shadow-sm py-10 sm:py-14 lg:py-16 px-6 sm:px-10 lg:px-14 group">
+                            <!-- Background Image Layer -->
+                            <div class="absolute inset-0 z-0 w-full h-full pointer-events-none">
+                                <img src="${escapeHtml(img)}" alt="Brand Story Background" class="w-full h-full object-cover object-center lg:object-right" onerror="this.onerror=null; this.src=(window.location.pathname.startsWith('/knottele') ? '/knottele' : '') + '/images/homepage/middleimg.png';">
+                                <!-- Multi-Layer Gradient Overlays for Storefront Contrast -->
+                                <div class="absolute inset-0 bg-gradient-to-r from-[#FFF5F2]/95 via-[#FFF5F2]/85 to-transparent w-full md:w-[60%]"></div>
+                                <div class="absolute inset-0 bg-gradient-to-l from-[#FFF5F2]/90 via-[#FFF5F2]/60 to-transparent w-full md:w-[45%] ml-auto hidden lg:block"></div>
+                            </div>
+
+                            <!-- Live Content Layer -->
+                            <div class="relative z-10 w-full">
+                                <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center justify-between">
+                                    
+                                    <!-- Left Column: Branding, Heading, Narrative & CTA Button -->
+                                    <div class="lg:col-span-7 space-y-4 max-w-xl text-left">
+                                        <div class="flex items-center gap-2">
+                                            <span class="text-[11px] sm:text-xs font-semibold uppercase tracking-wider text-[#A38F8B] font-sans block">
+                                                ${escapeHtml(m.badge || "KNOTELLE Artisanal Crochet Craftsmanship")}
+                                            </span>
+                                            <button type="button" onclick="window.openBrandStoryModal ? window.openBrandStoryModal() : openBrandStoryModal()" class="text-[#A38F8B] hover:text-[#913638] text-[10px] cursor-pointer" title="Edit Brand Story">
+                                                <i class="fas fa-pencil-alt"></i>
+                                            </button>
+                                        </div>
+
+                                        <h2 class="font-serif text-3xl sm:text-4xl lg:text-5xl font-bold text-[#2E211E] leading-[1.15] tracking-tight cursor-pointer" onclick="window.openBrandStoryModal ? window.openBrandStoryModal() : openBrandStoryModal()" title="Click to edit headline">
+                                            ${escapeHtml(m.title || "Every Stitch")} <br>
+                                            <span class="text-[#913638] italic font-normal font-serif">${escapeHtml(m.subtitle || "Has a Story")}</span>
+                                        </h2>
+
+                                        <p class="text-xs sm:text-sm md:text-base text-[#786864] leading-relaxed whitespace-pre-line cursor-pointer" onclick="window.openBrandStoryModal ? window.openBrandStoryModal() : openBrandStoryModal()" title="Click to edit narrative">
+                                            ${escapeHtml(m.description || "More than just crochet, we create memories, happiness and a little bit of magic.")}
+                                        </p>
+
+                                        <div class="pt-2 flex items-center gap-3">
+                                            <button type="button" onclick="window.openBrandStoryModal ? window.openBrandStoryModal() : openBrandStoryModal()"
+                                                    class="inline-flex items-center gap-2 px-6 sm:px-7 py-3 rounded-full bg-[#913638] hover:bg-[#74292B] text-white text-xs sm:text-sm font-semibold shadow-xs hover:shadow-md transition-all cursor-pointer">
+                                                <span>${escapeHtml(m.cta_text || "Read Our Story")}</span>
+                                                <i class="fas fa-arrow-right text-xs"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+
+                                    <!-- Right Column: 4 Feature Items Stacked -->
+                                    <div class="lg:col-span-5 space-y-3.5">
+                                        ${features.map((feat, idx) => {
+                                            const iconClass = iconClassMap[feat.icon] || 'fas fa-heart';
+                                            return `
+                                                <div onclick="window.openBrandStoryModal ? window.openBrandStoryModal() : openBrandStoryModal()"
+                                                     title="Click to edit feature"
+                                                     class="flex items-center gap-3.5 px-4 sm:px-5 py-3.5 rounded-2xl bg-white/95 backdrop-blur-md border border-[#E7D1CC]/80 shadow-xs hover:shadow-md hover:border-[#913638]/40 transition-all cursor-pointer group/feat">
+                                                    <div class="w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-[#FFF9F6] border border-[#E7D1CC] flex items-center justify-center text-[#913638] shrink-0 shadow-2xs group-hover/feat:scale-110 transition-transform">
+                                                        <i class="${iconClass} text-sm"></i>
+                                                    </div>
+                                                    <span class="text-xs sm:text-sm font-semibold text-[#2E211E] flex-1">
+                                                        ${escapeHtml(feat.title || '')}
+                                                    </span>
+                                                    <i class="fas fa-pencil-alt text-[10px] text-stone-300 group-hover/feat:text-[#913638] opacity-0 group-hover/feat:opacity-100 transition-opacity"></i>
+                                                </div>
+                                            `;
+                                        }).join('')}
+                                    </div>
+
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Info Footer with Quick Details -->
+                        <div class="bg-stone-50/80 rounded-2xl p-4 border border-stone-100 flex flex-wrap items-center justify-between gap-3 text-xs text-stone-500">
+                            <div class="flex items-center gap-3">
+                                <span class="inline-flex items-center gap-1.5 font-medium">
+                                    <i class="fas fa-link text-stone-400"></i>
+                                    <span>Button Link: <strong class="text-stone-700">${escapeHtml(m.cta_link || '/about')}</strong></span>
+                                </span>
+                                <span class="text-stone-300">|</span>
+                                <span class="inline-flex items-center gap-1.5 font-medium">
+                                    <i class="fas fa-image text-stone-400"></i>
+                                    <span>Background: <strong class="text-stone-700">${escapeHtml(String(img).split('/').pop() || 'middleimg.png')}</strong></span>
+                                </span>
+                            </div>
+                            <button type="button" onclick="window.openBrandStoryModal ? window.openBrandStoryModal() : openBrandStoryModal()" class="text-red-600 hover:text-red-700 font-bold flex items-center gap-1 cursor-pointer">
+                                <i class="fas fa-edit text-xs"></i> Edit Section Content & Artwork
+                            </button>
                         </div>
                     </div>
                 `;
@@ -5060,6 +5368,22 @@
             document.getElementById('customCrochetPreviewImg').src = url;
             document.getElementById('customCrochetFileName').innerText = name || 'Media Library Image';
             document.getElementById('customCrochetPreviewContainer').classList.remove('hidden');
+        } else if (pickerTarget === 'brand_story') {
+            const input = document.getElementById('brandStoryImageUrl');
+            if (input) input.value = url;
+            const previewImg = document.getElementById('brandStoryPreviewImg');
+            if (previewImg) previewImg.src = url;
+            const fileName = document.getElementById('brandStoryFileName');
+            if (fileName) fileName.innerText = name || 'Media Library Image';
+            const previewContainer = document.getElementById('brandStoryPreviewContainer');
+            if (previewContainer) {
+                previewContainer.classList.remove('hidden');
+                previewContainer.style.display = 'flex';
+            }
+            const modal = document.getElementById('brandStoryModal');
+            if (modal && (modal.style.display === 'none' || modal.classList.contains('hidden'))) {
+                openBrandStoryModal();
+            }
         } else {
             document.getElementById('heroSlideMobileMediaId').value = id;
             document.getElementById('heroSlideMobileImagePath').value = url;
@@ -7143,6 +7467,204 @@
     window.handleCustomCrochetSubmit = handleCustomCrochetSubmit;
 
     // ==========================================
+    // BRAND STORY SECTION HANDLERS ("Every Stitch Has a Story")
+    // ==========================================
+    function populateBrandStoryForm(data) {
+        if (!data) return;
+        try {
+            const setVal = (id, val) => {
+                const el = document.getElementById(id);
+                if (el) el.value = (val !== null && val !== undefined) ? val : '';
+            };
+            const setCheck = (id, val) => {
+                const el = document.getElementById(id);
+                if (el) el.checked = !!val;
+            };
+
+            setVal('brandStoryBadge', data.badge || data.tag_text || 'KNOTELLE Artisanal Crochet Craftsmanship');
+            setVal('brandStoryTitle', data.title || 'Every Stitch');
+            setVal('brandStorySubtitle', data.subtitle || 'Has a Story');
+            setVal('brandStoryDescription', data.description || 'More than just crochet, we create memories, happiness and a little bit of magic.');
+            setVal('brandStoryCtaText', data.cta_text || 'Read Our Story');
+            setVal('brandStoryCtaLink', data.cta_link || '/about');
+            setCheck('brandStoryActive', data.is_active !== false && data.is_active !== 0 && data.is_active !== '0');
+
+            // Populate features
+            const features = Array.isArray(data.features) ? data.features : [];
+            const defaultFeatures = [
+                'Handmade with Love',
+                'Premium Yarn Quality',
+                '100% Pure Natural Cotton',
+                'Happiness Guaranteed'
+            ];
+            for (let i = 1; i <= 4; i++) {
+                const feat = features[i - 1];
+                const title = (feat && (feat.title || feat.text)) ? (feat.title || feat.text) : defaultFeatures[i - 1];
+                setVal(`brandStoryFeature${i}`, title);
+            }
+
+            // Background Image URL & preview
+            let imgUrl = data.image_url || data.desktop_image || data.image || '';
+            const knottelePrefix = window.location.pathname.startsWith('/knottele') ? '/knottele' : '';
+            if (imgUrl && imgUrl.startsWith('/') && !imgUrl.startsWith(knottelePrefix) && knottelePrefix) {
+                imgUrl = knottelePrefix + imgUrl;
+            }
+            setVal('brandStoryImageUrl', imgUrl);
+
+            const previewImg = document.getElementById('brandStoryPreviewImg');
+            if (previewImg && imgUrl) {
+                previewImg.src = imgUrl;
+            }
+            const fileName = document.getElementById('brandStoryFileName');
+            if (fileName && imgUrl) {
+                fileName.textContent = String(imgUrl).split('/').pop() || 'Background Visual';
+            }
+            const previewContainer = document.getElementById('brandStoryPreviewContainer');
+            if (previewContainer) {
+                if (imgUrl) {
+                    previewContainer.classList.remove('hidden');
+                    previewContainer.style.display = 'flex';
+                }
+            }
+        } catch (err) {
+            console.error('populateBrandStoryForm error', err);
+        }
+    }
+
+    async function openBrandStoryModal() {
+        const modal = document.getElementById('brandStoryModal');
+        if (!modal) {
+            console.error('brandStoryModal element not found');
+            return;
+        }
+
+        // Force modal visible immediately
+        modal.style.setProperty('display', 'flex', 'important');
+        modal.classList.remove('hidden');
+        modal.classList.add('flex');
+
+        // Immediately populate from cached managerData if available
+        try {
+            let bsData = null;
+            if (managerData && managerData.sections) {
+                const sec = managerData.sections.find(s => s.id === 'brand_story' || s.is_brand_story_section);
+                if (sec && sec.metadata) bsData = sec.metadata;
+            }
+            if (bsData) {
+                populateBrandStoryForm(bsData);
+            }
+        } catch (e) {
+            console.warn('Pre-population from managerData failed:', e);
+        }
+
+        // Background sync with API
+        try {
+            const res = await axios.get(`${adminMediaBase}/homepage/brand-story`);
+            if (res.data && res.data.success) {
+                populateBrandStoryForm(res.data.data || {});
+            }
+        } catch (err) {
+            console.warn('Background sync of Brand Story settings failed', err);
+        }
+    }
+
+    function closeBrandStoryModal() {
+        const modal = document.getElementById('brandStoryModal');
+        if (modal) {
+            modal.style.setProperty('display', 'none', 'important');
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+        }
+    }
+
+    function handleBrandStoryFileChange(input) {
+        if (input.files && input.files[0]) {
+            const file = input.files[0];
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const previewImg = document.getElementById('brandStoryPreviewImg');
+                if (previewImg) previewImg.src = e.target.result;
+                const fileName = document.getElementById('brandStoryFileName');
+                if (fileName) fileName.textContent = file.name;
+                const container = document.getElementById('brandStoryPreviewContainer');
+                if (container) {
+                    container.classList.remove('hidden');
+                    container.style.display = 'flex';
+                }
+                const label = document.getElementById('brandStoryFileLabel');
+                if (label) label.textContent = 'Selected: ' + file.name;
+            };
+            reader.readAsDataURL(file);
+        }
+    }
+
+    function clearBrandStoryFileInput() {
+        const fileInput = document.getElementById('brandStoryFileInput');
+        if (fileInput) fileInput.value = '';
+        const imgUrl = document.getElementById('brandStoryImageUrl');
+        if (imgUrl) imgUrl.value = '';
+        const label = document.getElementById('brandStoryFileLabel');
+        if (label) label.textContent = 'Upload Background Image';
+        const container = document.getElementById('brandStoryPreviewContainer');
+        if (container) {
+            container.classList.add('hidden');
+            container.style.display = 'none';
+        }
+    }
+
+    async function handleBrandStorySubmit(e) {
+        e.preventDefault();
+        const btn = document.getElementById('brandStorySubmitBtn');
+        if (btn) {
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving...';
+        }
+
+        const form = document.getElementById('brandStoryForm');
+        const formData = new FormData(form);
+        const isActiveCheck = document.getElementById('brandStoryActive');
+        if (isActiveCheck) {
+            formData.set('is_active', isActiveCheck.checked ? '1' : '0');
+        }
+        const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
+        if (csrfToken && !formData.has('_token')) {
+            formData.append('_token', csrfToken);
+        }
+
+        try {
+            const res = await axios.post(`${adminMediaBase}/homepage/brand-story`, formData, {
+                headers: {
+                    'Content-Type': 'multipart/form-data',
+                    'X-CSRF-TOKEN': csrfToken || ''
+                }
+            });
+            if (res.data.success) {
+                toastr.success(res.data.message || 'Brand Story section updated successfully!');
+                closeBrandStoryModal();
+                broadcastMediaUpdate();
+                loadManagerData();
+            } else {
+                toastr.error(res.data.message || 'Failed to save Brand Story section.');
+            }
+        } catch (err) {
+            toastr.error(err.response?.data?.message || 'Failed to save Brand Story section.');
+        } finally {
+            if (btn) {
+                btn.disabled = false;
+                btn.innerHTML = '<i class="fas fa-save"></i><span>Save Brand Story</span>';
+            }
+        }
+    }
+
+    // Expose all Brand Story functions directly on window
+    window.openBrandStoryModal = openBrandStoryModal;
+    window.closeBrandStoryModal = closeBrandStoryModal;
+    window.populateBrandStoryForm = populateBrandStoryForm;
+    window.handleBrandStoryFileChange = handleBrandStoryFileChange;
+    window.clearBrandStoryFileInput = clearBrandStoryFileInput;
+    window.handleBrandStorySubmit = handleBrandStorySubmit;
+
+    // ==========================================
     // ==========================================
     // 17. FOOTER SETTINGS & NAVIGATION HANDLERS
     // ==========================================
@@ -7643,6 +8165,14 @@
     window.handleCustomCrochetSubmit = handleCustomCrochetSubmit;
     window.handleCustomCrochetFileChange = handleCustomCrochetFileChange;
     window.clearCustomCrochetFileInput = clearCustomCrochetFileInput;
+
+    // Homepage Brand Story ("Every Stitch Has a Story")
+    window.openBrandStoryModal = openBrandStoryModal;
+    window.closeBrandStoryModal = closeBrandStoryModal;
+    window.populateBrandStoryForm = populateBrandStoryForm;
+    window.handleBrandStorySubmit = handleBrandStorySubmit;
+    window.handleBrandStoryFileChange = handleBrandStoryFileChange;
+    window.clearBrandStoryFileInput = clearBrandStoryFileInput;
 
     // About Us - Brand Story
     window.openAboutStoryModal = openAboutStoryModal;
