@@ -54,11 +54,30 @@
                     <i class="fas fa-tasks text-xs"></i>
                     <span>Bulk Actions</span>
                 </button>
-                <!-- PDF Button (Small, PDF only) -->
-                <button onclick="printTable()" class="btn-secondary btn-sm hover:text-red-600 hover:bg-stone-50" title="Export as PDF">
-                    <i class="fas fa-file-pdf text-red-500 text-xs"></i>
-                    <span>PDF</span>
-                </button>
+                <!-- Print Dropdown (with PDF Option) -->
+                <div class="relative inline-block text-left" id="printDropdownWrapper">
+                    <button type="button" onclick="togglePrintDropdown(event)" id="printDropdownBtn"
+                        class="btn-secondary btn-sm hover:text-red-600 hover:bg-stone-50 flex items-center gap-1.5"
+                        title="Print & PDF Options">
+                        <i class="fas fa-print text-xs"></i>
+                        <span>Print</span>
+                        <i class="fas fa-chevron-down text-[10px] ml-0.5 transition-transform duration-200" id="printChevron"></i>
+                    </button>
+                    <!-- Dropdown Menu -->
+                    <div id="printDropdownMenu"
+                        class="hidden absolute right-0 mt-1.5 w-36 bg-white rounded-xl shadow-lg border border-stone-200 py-1 z-50 text-xs font-medium text-stone-700">
+                        <button type="button" onclick="printTable('print'); closePrintDropdown();"
+                            class="w-full text-left px-3.5 py-2 hover:bg-stone-50 flex items-center gap-2.5 text-stone-700 transition-colors">
+                            <i class="fas fa-print text-stone-500 text-xs w-4 text-center"></i>
+                            <span>Print</span>
+                        </button>
+                        <button type="button" onclick="printTable('pdf'); closePrintDropdown();"
+                            class="w-full text-left px-3.5 py-2 hover:bg-red-50 hover:text-red-600 flex items-center gap-2.5 text-stone-700 transition-colors">
+                            <i class="fas fa-file-pdf text-red-500 text-xs w-4 text-center"></i>
+                            <span>PDF</span>
+                        </button>
+                    </div>
+                </div>
             </div>
         </div>
 
@@ -848,48 +867,122 @@
         setTimeout(hideLoading, 1000);
     }
 
-    function printTable() {
-        const printContent = document.getElementById('ordersTable').outerHTML;
-        const originalContent = document.body.innerHTML;
+    /* Print & PDF Dropdown Handlers */
+    function togglePrintDropdown(event) {
+        if (event) event.stopPropagation();
+        const menu = document.getElementById('printDropdownMenu');
+        const chevron = document.getElementById('printChevron');
+        if (!menu) return;
+        const isHidden = menu.classList.contains('hidden');
+        if (isHidden) {
+            menu.classList.remove('hidden');
+            if (chevron) chevron.classList.add('rotate-180');
+        } else {
+            menu.classList.add('hidden');
+            if (chevron) chevron.classList.remove('rotate-180');
+        }
+    }
 
-        document.body.innerHTML = `
+    function closePrintDropdown() {
+        const menu = document.getElementById('printDropdownMenu');
+        const chevron = document.getElementById('printChevron');
+        if (menu) menu.classList.add('hidden');
+        if (chevron) chevron.classList.remove('rotate-180');
+    }
+
+    document.addEventListener('click', function(e) {
+        const wrapper = document.getElementById('printDropdownWrapper');
+        if (wrapper && !wrapper.contains(e.target)) {
+            closePrintDropdown();
+        }
+    });
+
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape') {
+            closePrintDropdown();
+        }
+    });
+
+    function printTable(format = 'print') {
+        const table = document.getElementById('ordersTable');
+        if (!table) return;
+
+        // Clone table to exclude checkbox column and action column for a clean printed document
+        const clone = table.cloneNode(true);
+        clone.querySelectorAll('th:first-child, td:first-child, th:last-child, td:last-child').forEach(el => el.remove());
+
+        const docTitle = format === 'pdf' ? 'KNOTELLE_Orders_Report.pdf' : 'Orders Report - KNOTELLE';
+        const badgeText = format === 'pdf' ? 'Orders PDF Export' : 'Orders Report';
+
+        const printFrame = document.createElement('iframe');
+        printFrame.style.position = 'fixed';
+        printFrame.style.right = '0';
+        printFrame.style.bottom = '0';
+        printFrame.style.width = '0';
+        printFrame.style.height = '0';
+        printFrame.style.border = '0';
+        document.body.appendChild(printFrame);
+
+        const frameDoc = printFrame.contentWindow.document;
+        frameDoc.open();
+        frameDoc.write(`
+            <!DOCTYPE html>
             <html>
                 <head>
-                    <title>Orders Report</title>
+                    <title>${docTitle}</title>
                     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
                     <style>
-                        body { font-family: Arial, sans-serif; }
-                        table { width: 100%; border-collapse: collapse; }
-                        th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
-                        th { background-color: #f8f9fa; }
-                        .status-badge { padding: 2px 8px; border-radius: 12px; font-size: 12px; }
+                        @page { size: auto; margin: 12mm 10mm; }
+                        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; margin: 0; padding: 16px; color: #1e293b; font-size: 11px; }
+                        .header { display: flex; justify-content: space-between; align-items: flex-start; border-bottom: 2px solid #dc2626; padding-bottom: 12px; margin-bottom: 16px; }
+                        .brand { display: flex; align-items: flex-start; gap: 12px; }
+                        .brand img { height: 48px; width: auto; object-fit: contain; }
+                        .brand h2 { margin: 0; font-size: 18px; color: #dc2626; font-weight: 800; letter-spacing: 0.5px; }
+                        .brand p { margin: 3px 0 0 0; font-size: 11px; color: #475569; line-height: 1.4; }
+                        .meta { text-align: right; }
+                        .badge { display: inline-block; padding: 3px 10px; font-size: 11px; font-weight: 700; background: #fee2e2; color: #dc2626; border-radius: 9999px; text-transform: uppercase; }
+                        .meta p { margin: 4px 0 0 0; font-size: 10px; color: #64748b; }
+                        table { width: 100%; border-collapse: collapse; margin-top: 8px; font-size: 11px; }
+                        th, td { border: 1px solid #e2e8f0; padding: 7px 10px; text-align: left; }
+                        th { background-color: #f8fafc; font-weight: 700; color: #475569; text-transform: uppercase; font-size: 10px; }
+                        tr:nth-child(even) { background-color: #fafaf9; }
+                        .text-center { text-align: center; }
+                        .text-right { text-align: right; }
+                        .status-badge { display: inline-block; padding: 2px 8px; border-radius: 9999px; font-size: 10px; font-weight: 600; }
                     </style>
                 </head>
                 <body>
-                    <div style="display: flex; justify-content: space-between; align-items: flex-start; border-bottom: 2px solid #dc2626; padding-bottom: 12px; margin-bottom: 16px;">
-                        <div style="display: flex; align-items: flex-start; gap: 14px;">
-                            <img src="{{ asset('images/logo/knotelle-logo.png') }}?v=2" style="height: 52px; width: auto; object-fit: contain;" alt="KNOTELLE">
+                    <div class="header">
+                        <div class="brand">
+                            <img src="{{ asset('images/logo/knotelle-logo.png') }}?v=2" alt="KNOTELLE">
                             <div>
-                                <h2 style="margin: 0; font-size: 20px; color: #dc2626; font-weight: 800;">KNOTELLE</h2>
-                                <p style="margin: 2px 0 0 0; font-size: 11px; color: #475569; line-height: 1.4;">
+                                <h2>KNOTELLE</h2>
+                                <p>
                                     Handcrafted with Love India<br>
-                                    support@knotelle.in • +91 9773055555
+                                    support@knotelle.in &bull; +91 97730 39243
                                 </p>
                             </div>
                         </div>
-                        <div style="text-align: right;">
-                            <span style="display: inline-block; padding: 2px 8px; font-size: 11px; font-weight: 700; background: #fee2e2; color: #dc2626; border-radius: 9999px; text-transform: uppercase;">Orders Report</span>
-                            <p style="margin: 4px 0 0 0; font-size: 11px; color: #64748b;">Generated: ${new Date().toLocaleDateString()}</p>
+                        <div class="meta">
+                            <span class="badge">${badgeText}</span>
+                            <p>Generated: ${new Date().toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' })}</p>
                         </div>
                     </div>
-                    ${printContent}
+                    ${clone.outerHTML}
                 </body>
             </html>
-        `;
+        `);
+        frameDoc.close();
 
-        window.print();
-        document.body.innerHTML = originalContent;
-        location.reload();
+        printFrame.contentWindow.focus();
+        setTimeout(() => {
+            printFrame.contentWindow.print();
+            setTimeout(() => {
+                if (document.body.contains(printFrame)) {
+                    document.body.removeChild(printFrame);
+                }
+            }, 1000);
+        }, 350);
     }
 
     function showLoading() {
