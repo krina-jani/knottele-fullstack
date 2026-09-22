@@ -53,6 +53,56 @@
             -moz-appearance: textfield !important;
             appearance: textfield !important;
         }
+
+        /* Responsive Print / PDF Export Styling */
+        @media print {
+            #sidebar,
+            header,
+            .admin-header,
+            .no-print,
+            button,
+            .tabulator-header-filter,
+            .tabulator-paginator,
+            #loadingSpinner,
+            .btn-primary,
+            .btn-secondary,
+            .btn-success,
+            .btn-danger {
+                display: none !important;
+            }
+
+            #main-content {
+                margin-left: 0 !important;
+                padding: 0 !important;
+                width: 100% !important;
+            }
+
+            body {
+                background: #ffffff !important;
+                color: #000000 !important;
+                padding: 0 !important;
+                margin: 0 !important;
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+            }
+
+            .tabulator,
+            table {
+                width: 100% !important;
+                max-width: 100% !important;
+                box-shadow: none !important;
+                border: 1px solid #cbd5e1 !important;
+            }
+
+            .print-only {
+                display: block !important;
+            }
+
+            @page {
+                size: auto;
+                margin: 10mm;
+            }
+        }
     </style>
 
 
@@ -81,6 +131,23 @@
         @endif
 
         <main class="@if ($isAdminPanel) p-4 sm:p-6 md:p-8 @endif">
+            <!-- Global Print Header (Appears only on Print / PDF export) -->
+            <div class="print-only" style="display: none;">
+                <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #dc2626; padding-bottom: 12px; margin-bottom: 20px;">
+                    <div style="display: flex; align-items: center; gap: 12px;">
+                        <img src="{{ asset('images/logo/knotelle-logo.png') }}?v=2" style="height: 50px; width: auto; object-fit: contain;" alt="KNOTELLE">
+                        <div>
+                            <h2 style="margin: 0; font-size: 20px; font-weight: 800; color: #dc2626; letter-spacing: 0.03em;">KNOTELLE</h2>
+                            <p style="margin: 2px 0 0 0; font-size: 11px; color: #64748b;">Handcrafted with Love • {{ \App\Helpers\SettingsHelper::get('store_email', 'support@knotelle.in') }}</p>
+                        </div>
+                    </div>
+                    <div style="text-align: right;">
+                        <p style="margin: 0; font-size: 11px; font-family: monospace; color: #475569; word-break: break-all;">{{ request()->fullUrl() }}</p>
+                        <p style="margin: 2px 0 0 0; font-size: 11px; color: #64748b;">Printed on: {{ date('M d, Y - h:i A') }}</p>
+                    </div>
+                </div>
+            </div>
+
             @yield('content')
         </main>
     </div>

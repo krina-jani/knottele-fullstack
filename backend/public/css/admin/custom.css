@@ -426,3 +426,50 @@ input[type="number"] {
     appearance: textfield !important;
 }
 
+/* Responsive Print / PDF Export Styling */
+@media print {
+    #sidebar,
+    header,
+    .admin-header,
+    .no-print,
+    button,
+    .tabulator-header-filter,
+    .tabulator-paginator,
+    #loadingSpinner,
+    .btn-primary,
+    .btn-secondary,
+    .btn-success,
+    .btn-danger {
+        display: none !important;
+    }
+
+    #main-content {
+        margin-left: 0 !important;
+        padding: 0 !important;
+        width: 100% !important;
+    }
+
+    body {
+        background: #ffffff !important;
+        color: #000000 !important;
+        padding: 0 !important;
+        margin: 0 !important;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+    }
+
+    .tabulator,
+    table {
+        width: 100% !important;
+        max-width: 100% !important;
+        box-shadow: none !important;
+        border: 1px solid #cbd5e1 !important;
+    }
+
+    @page {
+        size: auto;
+        margin: 10mm;
+    }
+}
+
+

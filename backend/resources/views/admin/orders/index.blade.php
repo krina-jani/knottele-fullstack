@@ -867,8 +867,15 @@
                     </style>
                 </head>
                 <body>
-                    <h2>Orders Report</h2>
-                    <p>Generated on: ${new Date().toLocaleDateString()}</p>
+                    <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #dc2626; padding-bottom: 12px; margin-bottom: 16px;">
+                        <div style="display: flex; align-items: center; gap: 12px;">
+                            <img src="{{ asset('images/logo/knotelle-logo.png') }}?v=2" style="height: 48px; width: auto; object-fit: contain;" alt="KNOTELLE">
+                            <div>
+                                <h2 style="margin: 0; font-size: 18px; color: #dc2626; font-weight: 800;">KNOTELLE - Orders Report</h2>
+                                <p style="margin: 2px 0 0 0; font-size: 11px; color: #64748b;">Generated on: ${new Date().toLocaleDateString()} | URL: ${window.location.href}</p>
+                            </div>
+                        </div>
+                    </div>
                     ${printContent}
                 </body>
             </html>
