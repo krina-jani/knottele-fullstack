@@ -4,23 +4,41 @@
 @section('title', 'Knotelle Media Manager')
 
 @section('content')
-    <div class="mb-8">
-        <div class="flex flex-col md:flex-row md:justify-between md:items-center gap-4">
+    <style>
+        /* Mobile layout & modal form responsiveness helpers */
+        @media (max-width: 640px) {
+            .footer-col1-row,
+            .footer-col2-row,
+            .navbar-link-row {
+                width: 100% !important;
+                min-width: 0 !important;
+            }
+            .footer-col1-row input,
+            .footer-col2-row input,
+            .navbar-link-row input {
+                min-width: 0 !important;
+                width: 100% !important;
+            }
+        }
+    </style>
+
+    <div class="mb-4 sm:mb-8">
+        <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3 sm:gap-4">
             <div>
-                <div class="flex items-center gap-3">
-                    <h2 class="text-2xl font-bold text-stone-800">Website Media Manager</h2>
-                    <span class="px-3 py-1 bg-red-50 text-red-700 text-xs font-bold rounded-full border border-red-200 uppercase tracking-wider">
+                <div class="flex items-center gap-2 sm:gap-3 flex-wrap">
+                    <h2 class="text-xl sm:text-2xl font-bold text-stone-800">Media Manager</h2>
+                    <span class="hidden sm:inline-block px-2.5 py-0.5 bg-red-50 text-red-700 text-[11px] font-bold rounded-full border border-red-200 uppercase tracking-wider">
                         Structured Taxonomy
                     </span>
                 </div>
-                <p class="text-stone-500 font-medium mt-1">Manage, organize, and replace website visual assets by Page, Section, Slot, and Device.</p>
+                <p class="text-xs text-stone-500 font-medium mt-0.5 hidden sm:block">Manage and replace website visual assets by Page, Section, and Device.</p>
             </div>
-            <div class="flex flex-wrap items-center gap-3">
-                <button onclick="openGenericUploadModal()" class="btn-primary flex items-center gap-2">
-                    <i class="fas fa-cloud-upload-alt text-sm"></i>
+            <div class="flex items-center gap-2">
+                <button onclick="openGenericUploadModal()" class="btn-primary text-xs px-3.5 py-2 sm:px-4 sm:py-2.5 flex items-center gap-1.5 shadow-2xs cursor-pointer">
+                    <i class="fas fa-cloud-upload-alt text-xs sm:text-sm"></i>
                     <span>Upload Media</span>
                 </button>
-                <button onclick="loadManagerData()" class="btn-secondary flex items-center gap-2">
+                <button onclick="loadManagerData()" class="btn-secondary text-xs px-3.5 py-2 sm:px-4 sm:py-2.5 flex items-center gap-1.5 cursor-pointer">
                     <i class="fas fa-sync-alt text-xs"></i>
                     <span>Refresh</span>
                 </button>
@@ -29,15 +47,15 @@
     </div>
 
     <!-- Filter & View Controls Toolbar -->
-    <div class="bg-white rounded-3xl shadow-sm border border-stone-100 p-6 mb-8">
-        <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+    <div class="bg-white rounded-2xl sm:rounded-3xl shadow-xs border border-stone-100 p-3.5 sm:p-6 mb-4 sm:mb-8">
+        <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-3 sm:gap-4">
             
             <!-- Filters Group -->
-            <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 flex-1">
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-2.5 sm:gap-3 flex-1">
                 <!-- Page Filter (Strictly 7 options) -->
                 <div>
-                    <label class="block text-xs font-bold text-stone-500 uppercase tracking-wider mb-1.5">Page</label>
-                    <select id="filterPage" onchange="onPageFilterChange()" class="w-full bg-stone-50 border border-stone-200 rounded-xl px-3.5 py-2.5 text-sm font-semibold text-stone-700 focus:outline-none focus:ring-2 focus:ring-red-500">
+                    <label class="block text-[11px] font-bold text-stone-500 uppercase tracking-wider mb-1">Page</label>
+                    <select id="filterPage" onchange="onPageFilterChange()" class="w-full bg-stone-50 border border-stone-200 rounded-xl px-3 py-2 text-xs sm:text-sm font-semibold text-stone-700 focus:outline-none focus:ring-2 focus:ring-red-500">
                         <option value="all">All Pages</option>
                         <option value="homepage" selected>Homepage</option>
                         <option value="shop">Shop Categories ↗</option>
@@ -50,8 +68,8 @@
 
                 <!-- Section Filter (Dynamically populated based on Page) -->
                 <div>
-                    <label class="block text-xs font-bold text-stone-500 uppercase tracking-wider mb-1.5">Section</label>
-                    <select id="filterSection" onchange="applyFilters()" class="w-full bg-stone-50 border border-stone-200 rounded-xl px-3.5 py-2.5 text-sm font-semibold text-stone-700 focus:outline-none focus:ring-2 focus:ring-red-500">
+                    <label class="block text-[11px] font-bold text-stone-500 uppercase tracking-wider mb-1">Section</label>
+                    <select id="filterSection" onchange="applyFilters()" class="w-full bg-stone-50 border border-stone-200 rounded-xl px-3 py-2 text-xs sm:text-sm font-semibold text-stone-700 focus:outline-none focus:ring-2 focus:ring-red-500">
                         <option value="all">All Sections</option>
                         <option value="hero">Hero Banner</option>
                         <option value="categories">Shop by Category</option>
@@ -67,8 +85,8 @@
 
                 <!-- Device Target (Desktop Only) -->
                 <div>
-                    <label class="block text-xs font-bold text-stone-500 uppercase tracking-wider mb-1.5">Device Target</label>
-                    <select id="filterDevice" onchange="applyFilters()" class="w-full bg-stone-50 border border-stone-200 rounded-xl px-3.5 py-2.5 text-sm font-semibold text-stone-700 focus:outline-none focus:ring-2 focus:ring-red-500">
+                    <label class="block text-[11px] font-bold text-stone-500 uppercase tracking-wider mb-1">Device Target</label>
+                    <select id="filterDevice" onchange="applyFilters()" class="w-full bg-stone-50 border border-stone-200 rounded-xl px-3 py-2 text-xs sm:text-sm font-semibold text-stone-700 focus:outline-none focus:ring-2 focus:ring-red-500">
                         <option value="desktop" selected>Desktop / All Desktop</option>
                     </select>
                 </div>
@@ -131,16 +149,16 @@
     </div>
 
     <!-- MODAL 1: DIRECT SLOT REPLACE / UPLOAD MODAL -->
-    <div id="slotUploadModal" class="fixed inset-0 bg-stone-900/60 backdrop-blur-xs hidden items-center justify-center z-[9999] p-4 overflow-y-auto" style="display: none;" onclick="if(event.target === this) closeSlotUploadModal()">
-        <div class="bg-white rounded-3xl max-w-xl w-full max-h-[90vh] flex flex-col overflow-hidden shadow-2xl border border-stone-100 animate-fadeIn">
+    <div id="slotUploadModal" class="fixed inset-0 bg-stone-900/60 backdrop-blur-xs hidden items-center justify-center z-[9999] p-2 sm:p-4 overflow-y-auto" style="display: none;" onclick="if(event.target === this) closeSlotUploadModal()">
+        <div class="bg-white rounded-2xl sm:rounded-3xl max-w-xl w-full max-h-[94vh] sm:max-h-[90vh] flex flex-col overflow-hidden shadow-2xl border border-stone-100 animate-fadeIn">
             
             <!-- Sticky / Pinned Header -->
-            <div class="p-5 px-6 border-b border-stone-100 flex items-center justify-between bg-stone-50/80 shrink-0">
-                <div>
-                    <h3 class="text-lg font-bold text-stone-800" id="slotModalTitle">Replace Image</h3>
-                    <p class="text-xs text-stone-500 font-medium" id="slotModalSubtitle">Assign a new image to this website slot</p>
+            <div class="p-3.5 sm:p-5 px-4 sm:px-6 border-b border-stone-100 flex items-center justify-between bg-stone-50/80 shrink-0">
+                <div class="min-w-0 pr-2">
+                    <h3 class="text-sm sm:text-base font-bold text-stone-800 truncate" id="slotModalTitle">Replace Image</h3>
+                    <p class="hidden sm:block text-xs text-stone-500 font-medium truncate" id="slotModalSubtitle">Assign a new image to this website slot</p>
                 </div>
-                <button type="button" onclick="closeSlotUploadModal()" class="w-8 h-8 rounded-full bg-stone-100 text-stone-400 hover:text-stone-700 flex items-center justify-center transition-colors">
+                <button type="button" onclick="closeSlotUploadModal()" class="w-8 h-8 rounded-full bg-stone-100 text-stone-400 hover:text-stone-700 flex items-center justify-center transition-colors shrink-0">
                     <i class="fas fa-times text-sm"></i>
                 </button>
             </div>
@@ -154,91 +172,91 @@
                 <input type="hidden" id="selectedMediaId" name="media_id">
 
                 <!-- Scrollable Body Content -->
-                <div class="p-6 space-y-4 overflow-y-auto flex-1 overscroll-contain">
+                <div class="p-3.5 sm:p-6 space-y-3 sm:space-y-4 overflow-y-auto overflow-x-hidden flex-1 overscroll-contain">
                     <!-- Recommended Dimensions Info Box -->
-                    <div class="bg-amber-50 border border-amber-200/80 rounded-2xl p-3.5 flex items-center gap-3 text-amber-800">
-                        <div class="w-8 h-8 rounded-xl bg-amber-100 flex items-center justify-center shrink-0">
-                            <i class="fas fa-ruler-combined text-amber-700"></i>
+                    <div class="bg-amber-50 border border-amber-200/80 rounded-2xl p-3 sm:p-3.5 flex items-center gap-2.5 sm:gap-3 text-amber-800">
+                        <div class="w-7 h-7 sm:w-8 sm:h-8 rounded-xl bg-amber-100 flex items-center justify-center shrink-0">
+                            <i class="fas fa-ruler-combined text-amber-700 text-xs sm:text-sm"></i>
                         </div>
-                        <div>
-                            <span class="text-xs font-bold block uppercase tracking-wider">Recommended Aspect Ratio & Dimensions</span>
-                            <span class="text-sm font-bold" id="slotModalDimensions">1920 × 700 px</span>
+                        <div class="min-w-0">
+                            <span class="text-[10px] sm:text-xs font-bold block uppercase tracking-wider">Recommended Aspect Ratio & Dimensions</span>
+                            <span class="text-xs sm:text-sm font-bold truncate block" id="slotModalDimensions">1920 × 700 px</span>
                         </div>
                     </div>
 
                     <!-- Dropzone / File Selector -->
-                    <div class="border-2 border-dashed border-stone-200 rounded-2xl p-5 text-center hover:border-red-400 hover:bg-red-50/20 transition-all cursor-pointer"
+                    <div class="border-2 border-dashed border-stone-200 rounded-2xl p-4 sm:p-5 text-center hover:border-red-400 hover:bg-red-50/20 transition-all cursor-pointer"
                          onclick="document.getElementById('slotFileInput').click()">
-                        <div class="w-10 h-10 bg-red-50 rounded-xl flex items-center justify-center mx-auto mb-2 text-red-600">
-                            <i class="fas fa-image text-lg"></i>
+                        <div class="w-9 h-9 sm:w-10 sm:h-10 bg-red-50 rounded-xl flex items-center justify-center mx-auto mb-2 text-red-600">
+                            <i class="fas fa-image text-base sm:text-lg"></i>
                         </div>
-                        <p class="text-sm font-bold text-stone-800" id="slotFileLabel">Choose a file from Phone / Desktop</p>
-                        <p class="text-xs text-stone-400 mt-0.5">Supports JPG, PNG, WEBP (Max 20MB)</p>
+                        <p class="text-xs sm:text-sm font-bold text-stone-800" id="slotFileLabel">Choose a file from Phone / Desktop</p>
+                        <p class="text-[10px] sm:text-xs text-stone-400 mt-0.5">Supports JPG, PNG, WEBP (Max 20MB)</p>
                         <input type="file" id="slotFileInput" name="file" class="hidden" accept=".jpg,.jpeg,.png,.webp,.svg" onchange="handleSlotFileChange(this)">
                     </div>
 
                     <!-- Live Preview of chosen file -->
-                    <div id="slotFilePreviewContainer" class="hidden bg-stone-50 rounded-2xl p-3 border border-stone-200 flex items-center gap-3">
-                        <img id="slotFilePreviewImg" src="" class="w-16 h-16 rounded-xl object-cover border border-stone-200">
+                    <div id="slotFilePreviewContainer" class="hidden bg-stone-50 rounded-2xl p-2.5 sm:p-3 border border-stone-200 flex items-center gap-2.5 sm:gap-3">
+                        <img id="slotFilePreviewImg" src="" class="w-12 h-12 sm:w-16 sm:h-16 rounded-xl object-cover border border-stone-200 shrink-0">
                         <div class="flex-1 min-w-0">
                             <p class="text-xs font-bold text-stone-800 truncate" id="slotFileName"></p>
-                            <p class="text-[11px] text-stone-500" id="slotFileSize"></p>
+                            <p class="text-[10px] sm:text-[11px] text-stone-500" id="slotFileSize"></p>
                         </div>
-                        <button type="button" onclick="clearSlotFileInput()" class="text-stone-400 hover:text-red-600 p-2">
+                        <button type="button" onclick="clearSlotFileInput()" class="text-stone-400 hover:text-red-600 p-2 shrink-0">
                             <i class="fas fa-times"></i>
                         </button>
                     </div>
 
                     <!-- Metadata Inputs -->
                     <div class="space-y-3 pt-1">
-                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5 sm:gap-3">
                             <div>
                                 <label class="block text-xs font-bold text-stone-600 uppercase tracking-wider mb-1">Title / Headline</label>
-                                <input type="text" id="slotTitleInput" name="title" placeholder="e.g. Custom Crochet" class="w-full bg-stone-50 border border-stone-200 rounded-xl px-3.5 py-2 text-sm font-semibold text-stone-800 focus:bg-white focus:outline-none focus:ring-2 focus:ring-red-500">
+                                <input type="text" id="slotTitleInput" name="title" placeholder="e.g. Custom Crochet" class="w-full bg-stone-50 border border-stone-200 rounded-xl px-3 py-2 text-xs sm:text-sm font-semibold text-stone-800 focus:bg-white focus:outline-none focus:ring-2 focus:ring-red-500">
                             </div>
                             <div>
                                 <label class="block text-xs font-bold text-stone-600 uppercase tracking-wider mb-1">Subtitle / Highlight</label>
-                                <input type="text" id="slotSubtitleInput" name="subtitle" placeholder="e.g. Just for You" class="w-full bg-stone-50 border border-stone-200 rounded-xl px-3.5 py-2 text-sm font-semibold text-stone-800 focus:bg-white focus:outline-none focus:ring-2 focus:ring-red-500">
+                                <input type="text" id="slotSubtitleInput" name="subtitle" placeholder="e.g. Just for You" class="w-full bg-stone-50 border border-stone-200 rounded-xl px-3 py-2 text-xs sm:text-sm font-semibold text-stone-800 focus:bg-white focus:outline-none focus:ring-2 focus:ring-red-500">
                             </div>
                         </div>
 
                         <div>
                             <label class="block text-xs font-bold text-stone-600 uppercase tracking-wider mb-1">Description Paragraph</label>
-                            <textarea id="slotDescInput" name="description" rows="2" placeholder="e.g. Your imagination, our yarn. Let's create something special together." class="w-full bg-stone-50 border border-stone-200 rounded-xl px-3.5 py-2 text-sm font-semibold text-stone-800 focus:bg-white focus:outline-none focus:ring-2 focus:ring-red-500"></textarea>
+                            <textarea id="slotDescInput" name="description" rows="2" placeholder="e.g. Your imagination, our yarn. Let's create something special together." class="w-full bg-stone-50 border border-stone-200 rounded-xl px-3 py-2 text-xs sm:text-sm font-semibold text-stone-800 focus:bg-white focus:outline-none focus:ring-2 focus:ring-red-500"></textarea>
                         </div>
 
-                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5 sm:gap-3">
                             <div>
                                 <label class="block text-xs font-bold text-stone-600 uppercase tracking-wider mb-1">Button Label (CTA)</label>
-                                <input type="text" id="slotCtaTextInput" name="cta_text" placeholder="e.g. Request Your Custom Order" class="w-full bg-stone-50 border border-stone-200 rounded-xl px-3.5 py-2 text-sm font-semibold text-stone-800 focus:bg-white focus:outline-none focus:ring-2 focus:ring-red-500">
+                                <input type="text" id="slotCtaTextInput" name="cta_text" placeholder="e.g. Request Your Custom Order" class="w-full bg-stone-50 border border-stone-200 rounded-xl px-3 py-2 text-xs sm:text-sm font-semibold text-stone-800 focus:bg-white focus:outline-none focus:ring-2 focus:ring-red-500">
                             </div>
                             <div>
                                 <label class="block text-xs font-bold text-stone-600 uppercase tracking-wider mb-1">Button Link URL</label>
-                                <input type="text" id="slotCtaLinkInput" name="cta_link" placeholder="e.g. /custom-order" class="w-full bg-stone-50 border border-stone-200 rounded-xl px-3.5 py-2 text-sm font-semibold text-stone-800 focus:bg-white focus:outline-none focus:ring-2 focus:ring-red-500">
+                                <input type="text" id="slotCtaLinkInput" name="cta_link" placeholder="e.g. /custom-order" class="w-full bg-stone-50 border border-stone-200 rounded-xl px-3 py-2 text-xs sm:text-sm font-semibold text-stone-800 focus:bg-white focus:outline-none focus:ring-2 focus:ring-red-500">
                             </div>
                         </div>
 
-                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5 sm:gap-3">
                             <div>
                                 <label class="block text-xs font-bold text-stone-600 uppercase tracking-wider mb-1">Hanging Tag / Badge Text</label>
-                                <input type="text" id="slotTagTextInput" name="tag_text" placeholder="e.g. Turn Your Ideas Into Handmade Reality" class="w-full bg-stone-50 border border-stone-200 rounded-xl px-3.5 py-2 text-sm font-semibold text-stone-800 focus:bg-white focus:outline-none focus:ring-2 focus:ring-red-500">
+                                <input type="text" id="slotTagTextInput" name="tag_text" placeholder="e.g. Turn Your Ideas Into Handmade Reality" class="w-full bg-stone-50 border border-stone-200 rounded-xl px-3 py-2 text-xs sm:text-sm font-semibold text-stone-800 focus:bg-white focus:outline-none focus:ring-2 focus:ring-red-500">
                             </div>
                             <div>
                                 <label class="block text-xs font-bold text-stone-600 uppercase tracking-wider mb-1">Alt Text (SEO & Accessibility)</label>
-                                <input type="text" id="slotAltInput" name="alt_text" placeholder="e.g. Handmade crochet creations boutique" class="w-full bg-stone-50 border border-stone-200 rounded-xl px-3.5 py-2 text-sm font-semibold text-stone-800 focus:bg-white focus:outline-none focus:ring-2 focus:ring-red-500">
+                                <input type="text" id="slotAltInput" name="alt_text" placeholder="e.g. Handmade crochet creations boutique" class="w-full bg-stone-50 border border-stone-200 rounded-xl px-3 py-2 text-xs sm:text-sm font-semibold text-stone-800 focus:bg-white focus:outline-none focus:ring-2 focus:ring-red-500">
                             </div>
                         </div>
                     </div>
                 </div>
 
                 <!-- Sticky Footer with Action Buttons -->
-                <div class="p-4 px-6 bg-stone-50 border-t border-stone-100 shrink-0 flex items-center justify-end gap-3">
-                    <button type="button" onclick="closeSlotUploadModal()" class="btn-secondary text-xs px-4 py-2.5">
+                <div class="p-3 sm:p-4 px-4 sm:px-6 bg-stone-50 border-t border-stone-100 shrink-0 flex flex-wrap items-center justify-end gap-2 sm:gap-3">
+                    <button type="button" onclick="closeSlotUploadModal()" class="btn-secondary text-xs px-3.5 sm:px-4 py-2 sm:py-2.5">
                         Cancel
                     </button>
-                    <button type="submit" id="slotUploadSubmitBtn" class="btn-primary text-xs px-6 py-2.5 flex items-center gap-2 shadow-sm">
+                    <button type="submit" id="slotUploadSubmitBtn" class="btn-primary text-xs px-4 sm:px-6 py-2 sm:py-2.5 flex items-center gap-2 shadow-sm">
                         <i class="fas fa-save"></i>
-                        <span>Save & Apply to Website</span>
+                        <span>Save & Apply</span>
                     </button>
                 </div>
 
@@ -247,53 +265,55 @@
     </div>
 
     <!-- MODAL 2: RESPONSIVE DEVICE PREVIEW MODAL -->
-    <div id="devicePreviewModal" class="fixed inset-0 bg-stone-900/70 backdrop-blur-sm hidden items-center justify-center z-[9999] p-4 overflow-y-auto" style="display: none;" onclick="if(event.target === this) closeDevicePreviewModal()">
-        <div class="bg-white rounded-3xl max-w-4xl w-full max-h-[92vh] flex flex-col overflow-hidden shadow-2xl border border-stone-100">
+    <div id="devicePreviewModal" class="fixed inset-0 bg-stone-900/70 backdrop-blur-sm hidden items-center justify-center z-[9999] p-2 sm:p-4 overflow-y-auto" style="display: none;" onclick="if(event.target === this) closeDevicePreviewModal()">
+        <div class="bg-white rounded-2xl sm:rounded-3xl max-w-4xl w-full max-h-[94vh] sm:max-h-[92vh] flex flex-col overflow-hidden shadow-2xl border border-stone-100">
             
             <!-- Header with device switcher -->
-            <div class="p-5 border-b border-stone-100 flex items-center justify-between bg-stone-50/80 shrink-0">
-                <div class="flex items-center gap-3">
-                    <div class="w-9 h-9 rounded-xl bg-red-50 text-red-600 flex items-center justify-center font-bold">
-                        <i class="fas fa-eye"></i>
+            <div class="p-3.5 sm:p-5 px-4 sm:px-6 border-b border-stone-100 flex flex-wrap items-center justify-between gap-2.5 bg-stone-50/80 shrink-0">
+                <div class="flex items-center gap-2.5 sm:gap-3 min-w-0">
+                    <div class="w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-red-50 text-red-600 flex items-center justify-center font-bold shrink-0">
+                        <i class="fas fa-eye text-xs sm:text-sm"></i>
                     </div>
-                    <div>
-                        <h3 class="text-base font-bold text-stone-800" id="previewModalSlotTitle">Hero Banner Preview</h3>
-                        <span class="text-xs text-stone-400 font-medium" id="previewModalSlotPath">Homepage → Hero Banner</span>
+                    <div class="min-w-0">
+                        <h3 class="text-sm sm:text-base font-bold text-stone-800 truncate" id="previewModalSlotTitle">Hero Banner Preview</h3>
+                        <span class="hidden sm:block text-xs text-stone-400 font-medium truncate" id="previewModalSlotPath">Homepage → Hero Banner</span>
                     </div>
                 </div>
 
                 <!-- Device Preview Tabs -->
-                <div class="bg-stone-200/80 p-1 rounded-2xl flex items-center gap-1">
-                    <button onclick="setPreviewDevice('desktop')" id="previewTabDesktop" class="px-3 py-1.5 rounded-xl text-xs font-bold transition-all bg-white text-stone-800 shadow-xs flex items-center gap-1.5">
-                        <i class="fas fa-desktop"></i>
-                        <span>Desktop</span>
-                    </button>
-                    <button onclick="setPreviewDevice('tablet')" id="previewTabTablet" class="px-3 py-1.5 rounded-xl text-xs font-bold transition-all text-stone-500 hover:text-stone-800 flex items-center gap-1.5">
-                        <i class="fas fa-tablet-alt"></i>
-                        <span>Tablet</span>
-                    </button>
-                    <button onclick="setPreviewDevice('mobile')" id="previewTabMobile" class="px-3 py-1.5 rounded-xl text-xs font-bold transition-all text-stone-500 hover:text-stone-800 flex items-center gap-1.5">
-                        <i class="fas fa-mobile-alt"></i>
-                        <span>Mobile</span>
+                <div class="flex items-center gap-2 ml-auto">
+                    <div class="bg-stone-200/80 p-0.5 sm:p-1 rounded-xl sm:rounded-2xl flex items-center gap-0.5 sm:gap-1">
+                        <button onclick="setPreviewDevice('desktop')" id="previewTabDesktop" class="px-2 sm:px-3 py-1 sm:py-1.5 rounded-lg sm:rounded-xl text-[11px] sm:text-xs font-bold transition-all bg-white text-stone-800 shadow-xs flex items-center gap-1 sm:gap-1.5">
+                            <i class="fas fa-desktop text-xs"></i>
+                            <span class="hidden xs:inline">Desktop</span>
+                        </button>
+                        <button onclick="setPreviewDevice('tablet')" id="previewTabTablet" class="px-2 sm:px-3 py-1 sm:py-1.5 rounded-lg sm:rounded-xl text-[11px] sm:text-xs font-bold transition-all text-stone-500 hover:text-stone-800 flex items-center gap-1 sm:gap-1.5">
+                            <i class="fas fa-tablet-alt text-xs"></i>
+                            <span class="hidden xs:inline">Tablet</span>
+                        </button>
+                        <button onclick="setPreviewDevice('mobile')" id="previewTabMobile" class="px-2 sm:px-3 py-1 sm:py-1.5 rounded-lg sm:rounded-xl text-[11px] sm:text-xs font-bold transition-all text-stone-500 hover:text-stone-800 flex items-center gap-1 sm:gap-1.5">
+                            <i class="fas fa-mobile-alt text-xs"></i>
+                            <span class="hidden xs:inline">Mobile</span>
+                        </button>
+                    </div>
+
+                    <button onclick="closeDevicePreviewModal()" class="w-8 h-8 rounded-full bg-stone-100 text-stone-400 hover:text-stone-700 flex items-center justify-center transition-colors shrink-0">
+                        <i class="fas fa-times text-sm"></i>
                     </button>
                 </div>
-
-                <button onclick="closeDevicePreviewModal()" class="w-8 h-8 rounded-full bg-stone-100 text-stone-400 hover:text-stone-700 flex items-center justify-center transition-colors">
-                    <i class="fas fa-times text-sm"></i>
-                </button>
             </div>
 
             <!-- Preview Canvas -->
-            <div class="p-8 flex-1 bg-stone-100 overflow-y-auto flex items-center justify-center min-h-[360px]">
+            <div class="p-3 sm:p-8 flex-1 bg-stone-100 overflow-y-auto overflow-x-hidden flex items-center justify-center min-h-[280px] sm:min-h-[360px]">
                 <div id="previewFrame" class="bg-white rounded-2xl shadow-xl overflow-hidden border border-stone-300 transition-all duration-300 w-full max-w-full">
-                    <div class="bg-stone-200 px-4 py-2 border-b border-stone-300 flex items-center gap-2">
-                        <span class="w-2.5 h-2.5 rounded-full bg-red-400"></span>
-                        <span class="w-2.5 h-2.5 rounded-full bg-amber-400"></span>
-                        <span class="w-2.5 h-2.5 rounded-full bg-emerald-400"></span>
+                    <div class="bg-stone-200 px-3 sm:px-4 py-1.5 sm:py-2 border-b border-stone-300 flex items-center gap-2">
+                        <span class="w-2 sm:w-2.5 h-2 sm:h-2.5 rounded-full bg-red-400"></span>
+                        <span class="w-2 sm:w-2.5 h-2 sm:h-2.5 rounded-full bg-amber-400"></span>
+                        <span class="w-2 sm:w-2.5 h-2 sm:h-2.5 rounded-full bg-emerald-400"></span>
                         <span class="text-[10px] font-mono text-stone-500 ml-2" id="previewFrameResolution">1920 × 700</span>
                     </div>
-                    <div class="p-4 flex items-center justify-center bg-[#FFF9F6]">
-                        <img id="previewModalImg" src="" alt="" class="max-h-[50vh] w-auto object-contain rounded-xl shadow-xs">
+                    <div class="p-2 sm:p-4 flex items-center justify-center bg-[#FFF9F6]">
+                        <img id="previewModalImg" src="" alt="" class="max-h-[45vh] sm:max-h-[50vh] w-auto object-contain rounded-xl shadow-xs">
                     </div>
                 </div>
             </div>
@@ -302,15 +322,15 @@
     </div>
 
     <!-- MODAL 3: EDIT SECTION OPTIONS & METADATA MODAL -->
-    <div id="editMetadataModal" class="fixed inset-0 bg-stone-900/60 backdrop-blur-xs hidden items-center justify-center z-[9999] p-4 overflow-y-auto" style="display: none;" onclick="if(event.target === this) closeEditMetadataModal()">
-        <div class="bg-white rounded-3xl max-w-xl w-full max-h-[90vh] flex flex-col overflow-hidden shadow-2xl border border-stone-100">
+    <div id="editMetadataModal" class="fixed inset-0 bg-stone-900/60 backdrop-blur-xs hidden items-center justify-center z-[9999] p-2 sm:p-4 overflow-y-auto" style="display: none;" onclick="if(event.target === this) closeEditMetadataModal()">
+        <div class="bg-white rounded-2xl sm:rounded-3xl max-w-xl w-full max-h-[94vh] sm:max-h-[90vh] flex flex-col overflow-hidden shadow-2xl border border-stone-100">
             <!-- Pinned Header -->
-            <div class="p-5 px-6 border-b border-stone-100 flex items-center justify-between bg-stone-50/80 shrink-0">
-                <div>
-                    <h3 class="text-base font-bold text-stone-800" id="editModalHeaderTitle">Edit Section Content & Options</h3>
-                    <p class="text-xs text-stone-500 font-medium" id="editModalHeaderSubtitle">Customize headings, button text, and visibility</p>
+            <div class="p-3.5 sm:p-5 px-4 sm:px-6 border-b border-stone-100 flex items-center justify-between bg-stone-50/80 shrink-0">
+                <div class="min-w-0 pr-2">
+                    <h3 class="text-sm sm:text-base font-bold text-stone-800 truncate" id="editModalHeaderTitle">Edit Section Content & Options</h3>
+                    <p class="hidden sm:block text-xs text-stone-500 font-medium truncate" id="editModalHeaderSubtitle">Customize headings, button text, and visibility</p>
                 </div>
-                <button type="button" onclick="closeEditMetadataModal()" class="w-8 h-8 rounded-full bg-stone-100 text-stone-400 hover:text-stone-700 flex items-center justify-center">
+                <button type="button" onclick="closeEditMetadataModal()" class="w-8 h-8 rounded-full bg-stone-100 text-stone-400 hover:text-stone-700 flex items-center justify-center shrink-0">
                     <i class="fas fa-times text-sm"></i>
                 </button>
             </div>
@@ -323,49 +343,49 @@
                 <input type="hidden" id="editMediaSlot">
                 
                 <!-- Scrollable Body Content -->
-                <div class="p-6 space-y-4 overflow-y-auto flex-1 overscroll-contain">
-                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div class="p-3.5 sm:p-6 space-y-3 sm:space-y-4 overflow-y-auto overflow-x-hidden flex-1 overscroll-contain">
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5 sm:gap-3">
                         <div>
                             <label class="block text-xs font-bold text-stone-600 uppercase tracking-wider mb-1">Title / Headline</label>
-                            <input type="text" id="editMediaTitle" placeholder="e.g. Custom Crochet" class="w-full bg-stone-50 border border-stone-200 rounded-xl px-3.5 py-2.5 text-sm font-semibold text-stone-800 focus:bg-white focus:outline-none focus:ring-2 focus:ring-red-500">
+                            <input type="text" id="editMediaTitle" placeholder="e.g. Custom Crochet" class="w-full bg-stone-50 border border-stone-200 rounded-xl px-3 py-2 text-xs sm:text-sm font-semibold text-stone-800 focus:bg-white focus:outline-none focus:ring-2 focus:ring-red-500">
                         </div>
                         <div>
                             <label class="block text-xs font-bold text-stone-600 uppercase tracking-wider mb-1">Subtitle / Highlight</label>
-                            <input type="text" id="editMediaSubtitle" placeholder="e.g. Just for You" class="w-full bg-stone-50 border border-stone-200 rounded-xl px-3.5 py-2.5 text-sm font-semibold text-stone-800 focus:bg-white focus:outline-none focus:ring-2 focus:ring-red-500">
+                            <input type="text" id="editMediaSubtitle" placeholder="e.g. Just for You" class="w-full bg-stone-50 border border-stone-200 rounded-xl px-3 py-2 text-xs sm:text-sm font-semibold text-stone-800 focus:bg-white focus:outline-none focus:ring-2 focus:ring-red-500">
                         </div>
                     </div>
 
                     <div>
                         <label class="block text-xs font-bold text-stone-600 uppercase tracking-wider mb-1">Description Paragraph</label>
-                        <textarea id="editMediaDesc" rows="2" placeholder="e.g. Your imagination, our yarn. Let's create something special together." class="w-full bg-stone-50 border border-stone-200 rounded-xl px-3.5 py-2.5 text-sm font-semibold text-stone-800 focus:bg-white focus:outline-none focus:ring-2 focus:ring-red-500"></textarea>
+                        <textarea id="editMediaDesc" rows="2" placeholder="e.g. Your imagination, our yarn. Let's create something special together." class="w-full bg-stone-50 border border-stone-200 rounded-xl px-3 py-2 text-xs sm:text-sm font-semibold text-stone-800 focus:bg-white focus:outline-none focus:ring-2 focus:ring-red-500"></textarea>
                     </div>
 
-                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5 sm:gap-3">
                         <div>
                             <label class="block text-xs font-bold text-stone-600 uppercase tracking-wider mb-1">Button Label (CTA)</label>
-                            <input type="text" id="editMediaCtaText" placeholder="e.g. Request Your Custom Order" class="w-full bg-stone-50 border border-stone-200 rounded-xl px-3.5 py-2.5 text-sm font-semibold text-stone-800 focus:bg-white focus:outline-none focus:ring-2 focus:ring-red-500">
+                            <input type="text" id="editMediaCtaText" placeholder="e.g. Request Your Custom Order" class="w-full bg-stone-50 border border-stone-200 rounded-xl px-3 py-2 text-xs sm:text-sm font-semibold text-stone-800 focus:bg-white focus:outline-none focus:ring-2 focus:ring-red-500">
                         </div>
                         <div>
                             <label class="block text-xs font-bold text-stone-600 uppercase tracking-wider mb-1">Button Link URL</label>
-                            <input type="text" id="editMediaCtaLink" placeholder="e.g. /custom-order" class="w-full bg-stone-50 border border-stone-200 rounded-xl px-3.5 py-2.5 text-sm font-semibold text-stone-800 focus:bg-white focus:outline-none focus:ring-2 focus:ring-red-500">
+                            <input type="text" id="editMediaCtaLink" placeholder="e.g. /custom-order" class="w-full bg-stone-50 border border-stone-200 rounded-xl px-3 py-2 text-xs sm:text-sm font-semibold text-stone-800 focus:bg-white focus:outline-none focus:ring-2 focus:ring-red-500">
                         </div>
                     </div>
 
-                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5 sm:gap-3">
                         <div>
                             <label class="block text-xs font-bold text-stone-600 uppercase tracking-wider mb-1">Hanging Tag / Badge Text</label>
-                            <input type="text" id="editMediaTagText" placeholder="e.g. Turn Your Ideas Into Handmade Reality" class="w-full bg-stone-50 border border-stone-200 rounded-xl px-3.5 py-2.5 text-sm font-semibold text-stone-800 focus:bg-white focus:outline-none focus:ring-2 focus:ring-red-500">
+                            <input type="text" id="editMediaTagText" placeholder="e.g. Turn Your Ideas Into Handmade Reality" class="w-full bg-stone-50 border border-stone-200 rounded-xl px-3 py-2 text-xs sm:text-sm font-semibold text-stone-800 focus:bg-white focus:outline-none focus:ring-2 focus:ring-red-500">
                         </div>
                         <div>
                             <label class="block text-xs font-bold text-stone-600 uppercase tracking-wider mb-1">Alt Text (SEO & Accessibility)</label>
-                            <input type="text" id="editMediaAlt" placeholder="e.g. Handmade crochet creations" class="w-full bg-stone-50 border border-stone-200 rounded-xl px-3.5 py-2.5 text-sm font-semibold text-stone-800 focus:bg-white focus:outline-none focus:ring-2 focus:ring-red-500">
+                            <input type="text" id="editMediaAlt" placeholder="e.g. Handmade crochet creations" class="w-full bg-stone-50 border border-stone-200 rounded-xl px-3 py-2 text-xs sm:text-sm font-semibold text-stone-800 focus:bg-white focus:outline-none focus:ring-2 focus:ring-red-500">
                         </div>
                     </div>
 
-                    <div class="grid grid-cols-2 gap-3">
+                    <div class="grid grid-cols-2 gap-2.5 sm:gap-3">
                         <div>
                             <label class="block text-xs font-bold text-stone-600 uppercase tracking-wider mb-1">Device</label>
-                            <select id="editMediaDevice" class="w-full bg-stone-50 border border-stone-200 rounded-xl px-3.5 py-2.5 text-sm font-semibold text-stone-800">
+                            <select id="editMediaDevice" class="w-full bg-stone-50 border border-stone-200 rounded-xl px-3 py-2 text-xs sm:text-sm font-semibold text-stone-800">
                                 <option value="all">All Devices</option>
                                 <option value="desktop">Desktop</option>
                                 <option value="mobile">Mobile</option>
@@ -373,7 +393,7 @@
                         </div>
                         <div>
                             <label class="block text-xs font-bold text-stone-600 uppercase tracking-wider mb-1">Sort Order</label>
-                            <input type="number" id="editMediaSort" min="0" class="w-full bg-stone-50 border border-stone-200 rounded-xl px-3.5 py-2.5 text-sm font-semibold text-stone-800">
+                            <input type="number" id="editMediaSort" min="0" class="w-full bg-stone-50 border border-stone-200 rounded-xl px-3 py-2 text-xs sm:text-sm font-semibold text-stone-800">
                         </div>
                     </div>
 
@@ -384,9 +404,9 @@
                 </div>
 
                 <!-- Sticky Footer with Action Buttons -->
-                <div class="p-4 px-6 bg-stone-50 border-t border-stone-100 shrink-0 flex items-center justify-end gap-3">
-                    <button type="button" onclick="closeEditMetadataModal()" class="btn-secondary text-xs px-4 py-2">Cancel</button>
-                    <button type="submit" class="btn-primary text-xs px-5 py-2 flex items-center gap-2 shadow-sm">
+                <div class="p-3 sm:p-4 px-4 sm:px-6 bg-stone-50 border-t border-stone-100 shrink-0 flex flex-wrap items-center justify-end gap-2 sm:gap-3">
+                    <button type="button" onclick="closeEditMetadataModal()" class="btn-secondary text-xs px-3.5 sm:px-4 py-2">Cancel</button>
+                    <button type="submit" class="btn-primary text-xs px-4 sm:px-5 py-2 flex items-center gap-2 shadow-sm">
                         <i class="fas fa-save"></i>
                         <span>Save Options</span>
                     </button>
@@ -396,21 +416,21 @@
     </div>
 
     <!-- MODAL 4: HERO SLIDE MODAL (CREATE & EDIT) -->
-    <div id="heroSlideModal" onclick="if(event.target === this) closeHeroSlideModal()" class="fixed inset-0 bg-stone-900/60 backdrop-blur-xs hidden items-center justify-center z-[9999] p-4 overflow-y-auto" style="display: none;">
-        <div class="bg-white rounded-3xl max-w-2xl w-full max-h-[92vh] flex flex-col overflow-hidden shadow-2xl border border-stone-100 animate-fadeIn" onclick="event.stopPropagation()">
+    <div id="heroSlideModal" onclick="if(event.target === this) closeHeroSlideModal()" class="fixed inset-0 bg-stone-900/60 backdrop-blur-xs hidden items-center justify-center z-[9999] p-2 sm:p-4 overflow-y-auto" style="display: none;">
+        <div class="bg-white rounded-2xl sm:rounded-3xl max-w-2xl w-full max-h-[94vh] sm:max-h-[92vh] flex flex-col overflow-hidden shadow-2xl border border-stone-100 animate-fadeIn" onclick="event.stopPropagation()">
             
             <!-- Pinned Header -->
-            <div class="p-5 px-6 border-b border-stone-100 flex items-center justify-between bg-stone-50/80 shrink-0">
-                <div class="flex items-center gap-3">
-                    <div class="w-10 h-10 rounded-2xl bg-red-50 text-red-600 flex items-center justify-center font-bold text-base shadow-2xs" id="heroModalIcon">
+            <div class="p-3.5 sm:p-5 px-4 sm:px-6 border-b border-stone-100 flex items-center justify-between bg-stone-50/80 shrink-0">
+                <div class="flex items-center gap-2.5 sm:gap-3 min-w-0 pr-2">
+                    <div class="w-8 h-8 sm:w-10 sm:h-10 rounded-xl sm:rounded-2xl bg-red-50 text-red-600 flex items-center justify-center font-bold text-xs sm:text-base shadow-2xs shrink-0" id="heroModalIcon">
                         <i class="fas fa-images"></i>
                     </div>
-                    <div>
-                        <h3 class="text-base font-bold text-stone-800" id="heroModalTitle">Add Hero Slide</h3>
-                        <p class="text-xs text-stone-500 font-medium" id="heroModalSubtitle">Configure homepage panoramic visual slide & call-to-actions</p>
+                    <div class="min-w-0">
+                        <h3 class="text-sm sm:text-base font-bold text-stone-800 truncate" id="heroModalTitle">Add Hero Slide</h3>
+                        <p class="hidden sm:block text-xs text-stone-500 font-medium truncate" id="heroModalSubtitle">Configure homepage panoramic visual slide & call-to-actions</p>
                     </div>
                 </div>
-                <button type="button" onclick="closeHeroSlideModal()" class="w-8 h-8 rounded-full bg-stone-100 text-stone-400 hover:text-stone-700 flex items-center justify-center transition-colors cursor-pointer">
+                <button type="button" onclick="closeHeroSlideModal()" class="w-8 h-8 rounded-full bg-stone-100 text-stone-400 hover:text-stone-700 flex items-center justify-center transition-colors cursor-pointer shrink-0">
                     <i class="fas fa-times text-sm"></i>
                 </button>
             </div>
@@ -424,72 +444,72 @@
                 <input type="hidden" id="heroSlideMobileImagePath" name="mobile_image_path" value="">
 
                 <!-- Scrollable Body Content -->
-                <div class="p-6 space-y-5 overflow-y-auto flex-1 overscroll-contain">
+                <div class="p-3.5 sm:p-6 space-y-3.5 sm:space-y-5 overflow-y-auto overflow-x-hidden flex-1 overscroll-contain">
                     
                     <!-- Section: Content Details -->
-                    <div class="space-y-3">
+                    <div class="space-y-2.5 sm:space-y-3">
                         <div class="flex items-center gap-2 border-b border-stone-100 pb-1.5">
                             <i class="fas fa-heading text-red-600 text-xs"></i>
                             <span class="text-xs font-bold text-stone-700 uppercase tracking-wider">Slide Content & Typography</span>
                         </div>
 
-                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5 sm:gap-3.5">
                             <div>
                                 <label class="block text-xs font-bold text-stone-600 uppercase tracking-wider mb-1">Slide Title / Headline <span class="text-red-500">*</span></label>
-                                <input type="text" id="heroSlideTitle" name="title" placeholder="e.g. Everyday Elegance" class="w-full bg-stone-50 border border-stone-200 rounded-xl px-3.5 py-2.5 text-sm font-semibold text-stone-800 focus:bg-white focus:outline-none focus:ring-2 focus:ring-red-500">
+                                <input type="text" id="heroSlideTitle" name="title" placeholder="e.g. Everyday Elegance" class="w-full bg-stone-50 border border-stone-200 rounded-xl px-3 sm:px-3.5 py-2 sm:py-2.5 text-xs sm:text-sm font-semibold text-stone-800 focus:bg-white focus:outline-none focus:ring-2 focus:ring-red-500">
                             </div>
                             <div>
                                 <label class="block text-xs font-bold text-stone-600 uppercase tracking-wider mb-1">Slide Tagline / Accent Badge</label>
-                                <input type="text" id="heroSlideTagline" name="tagline" placeholder="e.g. Handcrafted Bags" class="w-full bg-stone-50 border border-stone-200 rounded-xl px-3.5 py-2.5 text-sm font-semibold text-stone-800 focus:bg-white focus:outline-none focus:ring-2 focus:ring-red-500">
+                                <input type="text" id="heroSlideTagline" name="tagline" placeholder="e.g. Handcrafted Bags" class="w-full bg-stone-50 border border-stone-200 rounded-xl px-3 sm:px-3.5 py-2 sm:py-2.5 text-xs sm:text-sm font-semibold text-stone-800 focus:bg-white focus:outline-none focus:ring-2 focus:ring-red-500">
                             </div>
                         </div>
 
                         <div>
                             <label class="block text-xs font-bold text-stone-600 uppercase tracking-wider mb-1">Slide Description</label>
-                            <textarea id="heroSlideDesc" name="description" rows="2" placeholder="e.g. Artisanal crochet bags & wearable creations woven with love." class="w-full bg-stone-50 border border-stone-200 rounded-xl px-3.5 py-2.5 text-sm font-semibold text-stone-800 focus:bg-white focus:outline-none focus:ring-2 focus:ring-red-500"></textarea>
+                            <textarea id="heroSlideDesc" name="description" rows="2" placeholder="e.g. Artisanal crochet bags & wearable creations woven with love." class="w-full bg-stone-50 border border-stone-200 rounded-xl px-3 sm:px-3.5 py-2 sm:py-2.5 text-xs sm:text-sm font-semibold text-stone-800 focus:bg-white focus:outline-none focus:ring-2 focus:ring-red-500"></textarea>
                         </div>
                     </div>
 
                     <!-- Section: Call-To-Action Buttons -->
-                    <div class="space-y-3 pt-2">
+                    <div class="space-y-2.5 sm:space-y-3 pt-1 sm:pt-2">
                         <div class="flex items-center gap-2 border-b border-stone-100 pb-1.5">
                             <i class="fas fa-mouse-pointer text-red-600 text-xs"></i>
                             <span class="text-xs font-bold text-stone-700 uppercase tracking-wider">Call-to-Action Buttons</span>
                         </div>
 
-                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5 sm:gap-3.5">
                             <div>
                                 <label class="block text-xs font-bold text-stone-600 uppercase tracking-wider mb-1">Primary Button Text</label>
-                                <input type="text" id="heroSlidePrimaryBtnText" name="primary_button_text" value="Shop Now" placeholder="e.g. Shop Now" class="w-full bg-stone-50 border border-stone-200 rounded-xl px-3.5 py-2 text-sm font-semibold text-stone-800 focus:bg-white focus:outline-none focus:ring-2 focus:ring-red-500">
+                                <input type="text" id="heroSlidePrimaryBtnText" name="primary_button_text" value="Shop Now" placeholder="e.g. Shop Now" class="w-full bg-stone-50 border border-stone-200 rounded-xl px-3 sm:px-3.5 py-2 text-xs sm:text-sm font-semibold text-stone-800 focus:bg-white focus:outline-none focus:ring-2 focus:ring-red-500">
                             </div>
                             <div>
                                 <label class="block text-xs font-bold text-stone-600 uppercase tracking-wider mb-1">Primary Button Link URL</label>
-                                <input type="text" id="heroSlidePrimaryBtnLink" name="primary_button_link" value="/shop" placeholder="e.g. /shop or /category/bags" class="w-full bg-stone-50 border border-stone-200 rounded-xl px-3.5 py-2 text-sm font-semibold text-stone-800 focus:bg-white focus:outline-none focus:ring-2 focus:ring-red-500">
+                                <input type="text" id="heroSlidePrimaryBtnLink" name="primary_button_link" value="/shop" placeholder="e.g. /shop or /category/bags" class="w-full bg-stone-50 border border-stone-200 rounded-xl px-3 sm:px-3.5 py-2 text-xs sm:text-sm font-semibold text-stone-800 focus:bg-white focus:outline-none focus:ring-2 focus:ring-red-500">
                             </div>
                         </div>
 
-                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5 sm:gap-3.5">
                             <div>
                                 <label class="block text-xs font-bold text-stone-600 uppercase tracking-wider mb-1">Secondary Button Text</label>
-                                <input type="text" id="heroSlideSecondaryBtnText" name="secondary_button_text" value="Explore Collections" placeholder="e.g. Explore Collections" class="w-full bg-stone-50 border border-stone-200 rounded-xl px-3.5 py-2 text-sm font-semibold text-stone-800 focus:bg-white focus:outline-none focus:ring-2 focus:ring-red-500">
+                                <input type="text" id="heroSlideSecondaryBtnText" name="secondary_button_text" value="Explore Collections" placeholder="e.g. Explore Collections" class="w-full bg-stone-50 border border-stone-200 rounded-xl px-3 sm:px-3.5 py-2 text-xs sm:text-sm font-semibold text-stone-800 focus:bg-white focus:outline-none focus:ring-2 focus:ring-red-500">
                             </div>
                             <div>
                                 <label class="block text-xs font-bold text-stone-600 uppercase tracking-wider mb-1">Secondary Button Link URL</label>
-                                <input type="text" id="heroSlideSecondaryBtnLink" name="secondary_button_link" value="/shop" placeholder="e.g. /shop" class="w-full bg-stone-50 border border-stone-200 rounded-xl px-3.5 py-2 text-sm font-semibold text-stone-800 focus:bg-white focus:outline-none focus:ring-2 focus:ring-red-500">
+                                <input type="text" id="heroSlideSecondaryBtnLink" name="secondary_button_link" value="/shop" placeholder="e.g. /shop" class="w-full bg-stone-50 border border-stone-200 rounded-xl px-3 sm:px-3.5 py-2 text-xs sm:text-sm font-semibold text-stone-800 focus:bg-white focus:outline-none focus:ring-2 focus:ring-red-500">
                             </div>
                         </div>
                     </div>
 
                     <!-- Section: Media Imagery -->
-                    <div class="space-y-3 pt-2">
+                    <div class="space-y-2.5 sm:space-y-3 pt-1 sm:pt-2">
                         <div class="flex items-center gap-2 border-b border-stone-100 pb-1.5">
                             <i class="fas fa-image text-red-600 text-xs"></i>
                             <span class="text-xs font-bold text-stone-700 uppercase tracking-wider">Slide Imagery (Desktop & Mobile)</span>
                         </div>
 
                         <!-- Desktop Image Box -->
-                        <div class="bg-stone-50/70 border border-stone-200/80 rounded-2xl p-4 space-y-2.5">
-                            <div class="flex items-center justify-between">
+                        <div class="bg-stone-50/70 border border-stone-200/80 rounded-2xl p-3 sm:p-4 space-y-2.5">
+                            <div class="flex flex-wrap items-center justify-between gap-2">
                                 <div class="flex items-center gap-2">
                                     <i class="fas fa-desktop text-stone-600 text-xs"></i>
                                     <span class="text-xs font-bold text-stone-800">Desktop Image <span class="text-red-500">*</span></span>
@@ -497,12 +517,12 @@
                                 </div>
                                 <button type="button" onclick="openMediaPicker('desktop')" class="px-2.5 py-1 rounded-lg bg-white hover:bg-stone-100 border border-stone-200 text-stone-700 text-[11px] font-bold transition-all flex items-center gap-1 cursor-pointer">
                                     <i class="fas fa-photo-video text-xs text-red-500"></i>
-                                    <span>Select from Media Library</span>
+                                    <span>Select Library</span>
                                 </button>
                             </div>
 
                             <!-- Desktop Dropzone / File Picker -->
-                            <div class="border-2 border-dashed border-stone-200 rounded-xl p-3.5 text-center hover:border-red-400 hover:bg-red-50/20 transition-all cursor-pointer"
+                            <div class="border-2 border-dashed border-stone-200 rounded-xl p-3 sm:p-3.5 text-center hover:border-red-400 hover:bg-red-50/20 transition-all cursor-pointer"
                                  onclick="document.getElementById('heroSlideDesktopFileInput').click()">
                                 <i class="fas fa-cloud-upload-alt text-red-500 text-base mb-1"></i>
                                 <p class="text-xs font-bold text-stone-700" id="heroDesktopFileLabel">Click to upload Desktop Image</p>
@@ -512,33 +532,33 @@
 
                             <!-- Desktop Live Preview -->
                             <div id="heroDesktopPreviewContainer" class="hidden bg-white rounded-xl p-2.5 border border-stone-200 flex items-center gap-3">
-                                <img id="heroDesktopPreviewImg" src="" class="w-16 h-12 rounded-lg object-cover border border-stone-200">
+                                <img id="heroDesktopPreviewImg" src="" class="w-16 h-12 rounded-lg object-cover border border-stone-200 shrink-0">
                                 <div class="flex-1 min-w-0">
                                     <p class="text-xs font-bold text-stone-800 truncate" id="heroDesktopFileName">Desktop Image Selected</p>
                                     <p class="text-[11px] text-emerald-600 font-semibold" id="heroDesktopFileSize">Ready to save</p>
                                 </div>
-                                <button type="button" onclick="clearHeroDesktopFileInput()" class="text-stone-400 hover:text-red-600 p-1.5 cursor-pointer">
+                                <button type="button" onclick="clearHeroDesktopFileInput()" class="text-stone-400 hover:text-red-600 p-1.5 cursor-pointer shrink-0">
                                     <i class="fas fa-times"></i>
                                 </button>
                             </div>
                         </div>
 
                         <!-- Mobile Image Box -->
-                        <div class="bg-stone-50/70 border border-stone-200/80 rounded-2xl p-4 space-y-2.5">
-                            <div class="flex items-center justify-between">
+                        <div class="bg-stone-50/70 border border-stone-200/80 rounded-2xl p-3 sm:p-4 space-y-2.5">
+                            <div class="flex flex-wrap items-center justify-between gap-2">
                                 <div class="flex items-center gap-2">
                                     <i class="fas fa-mobile-alt text-stone-600 text-xs"></i>
-                                    <span class="text-xs font-bold text-stone-800">Mobile Image <span class="text-stone-400 text-[11px] font-normal">(Optional — fallback to Desktop)</span></span>
+                                    <span class="text-xs font-bold text-stone-800">Mobile Image <span class="text-stone-400 text-[10px] font-normal">(Optional fallback)</span></span>
                                     <span class="text-[10px] font-bold text-stone-400 bg-stone-200/70 px-2 py-0.5 rounded-md">768 × 1000 px</span>
                                 </div>
                                 <button type="button" onclick="openMediaPicker('mobile')" class="px-2.5 py-1 rounded-lg bg-white hover:bg-stone-100 border border-stone-200 text-stone-700 text-[11px] font-bold transition-all flex items-center gap-1 cursor-pointer">
                                     <i class="fas fa-photo-video text-xs text-red-500"></i>
-                                    <span>Select from Media Library</span>
+                                    <span>Select Library</span>
                                 </button>
                             </div>
 
                             <!-- Mobile Dropzone / File Picker -->
-                            <div class="border-2 border-dashed border-stone-200 rounded-xl p-3.5 text-center hover:border-red-400 hover:bg-red-50/20 transition-all cursor-pointer"
+                            <div class="border-2 border-dashed border-stone-200 rounded-xl p-3 sm:p-3.5 text-center hover:border-red-400 hover:bg-red-50/20 transition-all cursor-pointer"
                                  onclick="document.getElementById('heroSlideMobileFileInput').click()">
                                 <i class="fas fa-cloud-upload-alt text-red-500 text-base mb-1"></i>
                                 <p class="text-xs font-bold text-stone-700" id="heroMobileFileLabel">Click to upload Mobile Image</p>
@@ -548,12 +568,12 @@
 
                             <!-- Mobile Live Preview -->
                             <div id="heroMobilePreviewContainer" class="hidden bg-white rounded-xl p-2.5 border border-stone-200 flex items-center gap-3">
-                                <img id="heroMobilePreviewImg" src="" class="w-12 h-14 rounded-lg object-cover border border-stone-200">
+                                <img id="heroMobilePreviewImg" src="" class="w-12 h-14 rounded-lg object-cover border border-stone-200 shrink-0">
                                 <div class="flex-1 min-w-0">
                                     <p class="text-xs font-bold text-stone-800 truncate" id="heroMobileFileName">Mobile Image Selected</p>
                                     <p class="text-[11px] text-emerald-600 font-semibold" id="heroMobileFileSize">Ready to save</p>
                                 </div>
-                                <button type="button" onclick="clearHeroMobileFileInput()" class="text-stone-400 hover:text-red-600 p-1.5 cursor-pointer">
+                                <button type="button" onclick="clearHeroMobileFileInput()" class="text-stone-400 hover:text-red-600 p-1.5 cursor-pointer shrink-0">
                                     <i class="fas fa-times"></i>
                                 </button>
                             </div>
@@ -562,27 +582,27 @@
                     </div>
 
                     <!-- Section: Slide Settings & Order -->
-                    <div class="space-y-3 pt-2">
+                    <div class="space-y-2.5 sm:space-y-3 pt-1 sm:pt-2">
                         <div class="flex items-center gap-2 border-b border-stone-100 pb-1.5">
                             <i class="fas fa-sliders-h text-red-600 text-xs"></i>
-                            <span class="text-xs font-bold text-stone-700 uppercase tracking-wider">Status & Carousel Sequence</span>
+                            <span class="text-xs font-bold text-stone-700 uppercase tracking-wider">Status & Order</span>
                         </div>
 
-                        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3.5">
+                        <div class="grid grid-cols-1 sm:grid-cols-3 gap-2.5 sm:gap-3.5">
                             <div>
                                 <label class="block text-xs font-bold text-stone-600 uppercase tracking-wider mb-1">Status</label>
-                                <select id="heroSlideStatus" name="status" class="w-full bg-stone-50 border border-stone-200 rounded-xl px-3.5 py-2.5 text-sm font-semibold text-stone-800 focus:bg-white focus:outline-none focus:ring-2 focus:ring-red-500">
-                                    <option value="1">Active (Visible on Storefront)</option>
-                                    <option value="0">Inactive (Hidden)</option>
+                                <select id="heroSlideStatus" name="status" class="w-full bg-stone-50 border border-stone-200 rounded-xl px-3 sm:px-3.5 py-2 sm:py-2.5 text-xs sm:text-sm font-semibold text-stone-800 focus:bg-white focus:outline-none focus:ring-2 focus:ring-red-500">
+                                    <option value="1">Active</option>
+                                    <option value="0">Inactive</option>
                                 </select>
                             </div>
                             <div>
-                                <label class="block text-xs font-bold text-stone-600 uppercase tracking-wider mb-1">Sort Order (Sequence)</label>
-                                <input type="number" id="heroSlideSortOrder" name="sort_order" min="1" placeholder="e.g. 1" class="w-full bg-stone-50 border border-stone-200 rounded-xl px-3.5 py-2.5 text-sm font-semibold text-stone-800 focus:bg-white focus:outline-none focus:ring-2 focus:ring-red-500">
+                                <label class="block text-xs font-bold text-stone-600 uppercase tracking-wider mb-1">Sort Order</label>
+                                <input type="number" id="heroSlideSortOrder" name="sort_order" min="1" placeholder="e.g. 1" class="w-full bg-stone-50 border border-stone-200 rounded-xl px-3 sm:px-3.5 py-2 sm:py-2.5 text-xs sm:text-sm font-semibold text-stone-800 focus:bg-white focus:outline-none focus:ring-2 focus:ring-red-500">
                             </div>
                             <div>
                                 <label class="block text-xs font-bold text-stone-600 uppercase tracking-wider mb-1">Alt Text (SEO)</label>
-                                <input type="text" id="heroSlideAlt" name="alt_text" placeholder="e.g. Handcrafted Crochet" class="w-full bg-stone-50 border border-stone-200 rounded-xl px-3.5 py-2.5 text-sm font-semibold text-stone-800 focus:bg-white focus:outline-none focus:ring-2 focus:ring-red-500">
+                                <input type="text" id="heroSlideAlt" name="alt_text" placeholder="e.g. Handcrafted Crochet" class="w-full bg-stone-50 border border-stone-200 rounded-xl px-3 sm:px-3.5 py-2 sm:py-2.5 text-xs sm:text-sm font-semibold text-stone-800 focus:bg-white focus:outline-none focus:ring-2 focus:ring-red-500">
                             </div>
                         </div>
                     </div>
@@ -590,11 +610,11 @@
                 </div>
 
                 <!-- Sticky Footer with Action Buttons -->
-                <div class="p-4 px-6 bg-stone-50 border-t border-stone-100 shrink-0 flex items-center justify-end gap-3">
-                    <button type="button" onclick="closeHeroSlideModal()" class="btn-secondary text-xs px-5 py-2.5 cursor-pointer">
+                <div class="p-3 sm:p-4 px-4 sm:px-6 bg-stone-50 border-t border-stone-100 shrink-0 flex flex-wrap items-center justify-end gap-2 sm:gap-3">
+                    <button type="button" onclick="closeHeroSlideModal()" class="btn-secondary text-xs px-4 sm:px-5 py-2 sm:py-2.5 cursor-pointer">
                         Cancel
                     </button>
-                    <button type="submit" id="heroSlideSubmitBtn" class="btn-primary text-xs px-6 py-2.5 flex items-center gap-2 shadow-sm cursor-pointer">
+                    <button type="submit" id="heroSlideSubmitBtn" class="btn-primary text-xs px-5 sm:px-6 py-2 sm:py-2.5 flex items-center gap-2 shadow-sm cursor-pointer">
                         <i class="fas fa-save"></i>
                         <span id="heroSlideSubmitBtnText">Save Slide</span>
                     </button>
@@ -605,60 +625,60 @@
     </div>
 
     <!-- MODAL 5: MEDIA LIBRARY PICKER MODAL -->
-    <div id="mediaPickerModal" onclick="if(event.target === this) closeMediaPicker()" class="fixed inset-0 bg-stone-900/60 backdrop-blur-xs hidden items-center justify-center z-[10001] p-4 overflow-y-auto" style="display: none;">
-        <div class="bg-white rounded-3xl max-w-3xl w-full max-h-[85vh] flex flex-col overflow-hidden shadow-2xl border border-stone-100 animate-fadeIn" onclick="event.stopPropagation()">
+    <div id="mediaPickerModal" onclick="if(event.target === this) closeMediaPicker()" class="fixed inset-0 bg-stone-900/60 backdrop-blur-xs hidden items-center justify-center z-[10001] p-2 sm:p-4 overflow-y-auto" style="display: none;">
+        <div class="bg-white rounded-2xl sm:rounded-3xl max-w-3xl w-full max-h-[92vh] sm:max-h-[85vh] flex flex-col overflow-hidden shadow-2xl border border-stone-100 animate-fadeIn" onclick="event.stopPropagation()">
             
-            <div class="p-5 px-6 border-b border-stone-100 flex items-center justify-between bg-stone-50/80 shrink-0">
-                <div class="flex items-center gap-3">
-                    <div class="w-9 h-9 rounded-xl bg-red-50 text-red-600 flex items-center justify-center font-bold">
-                        <i class="fas fa-photo-video"></i>
+            <div class="p-3.5 sm:p-5 px-4 sm:px-6 border-b border-stone-100 flex items-center justify-between bg-stone-50/80 shrink-0">
+                <div class="flex items-center gap-2.5 sm:gap-3 min-w-0 pr-2">
+                    <div class="w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-red-50 text-red-600 flex items-center justify-center font-bold shrink-0">
+                        <i class="fas fa-photo-video text-xs sm:text-sm"></i>
                     </div>
-                    <div>
-                        <h3 class="text-base font-bold text-stone-800">Select Image from Media Library</h3>
-                        <p class="text-xs text-stone-500 font-medium">Choose an existing media file from your catalogue</p>
+                    <div class="min-w-0">
+                        <h3 class="text-sm sm:text-base font-bold text-stone-800 truncate">Select from Media Library</h3>
+                        <p class="hidden sm:block text-xs text-stone-500 font-medium truncate">Choose an existing media file from your catalogue</p>
                     </div>
                 </div>
-                <button type="button" onclick="closeMediaPicker()" class="w-8 h-8 rounded-full bg-stone-100 text-stone-400 hover:text-stone-700 flex items-center justify-center cursor-pointer">
+                <button type="button" onclick="closeMediaPicker()" class="w-8 h-8 rounded-full bg-stone-100 text-stone-400 hover:text-stone-700 flex items-center justify-center cursor-pointer shrink-0">
                     <i class="fas fa-times text-sm"></i>
                 </button>
             </div>
 
             <!-- Search Bar -->
-            <div class="p-4 border-b border-stone-100 bg-white">
+            <div class="p-3 sm:p-4 border-b border-stone-100 bg-white">
                 <div class="relative">
-                    <input type="text" id="mediaPickerSearch" oninput="filterMediaPicker(this.value)" placeholder="Search media library by file name or title..." class="w-full pl-10 pr-4 py-2 bg-stone-50 border border-stone-200 rounded-xl text-xs font-semibold text-stone-800 focus:bg-white focus:outline-none focus:ring-2 focus:ring-red-500">
-                    <i class="fas fa-search absolute left-3.5 top-3 text-stone-400 text-xs"></i>
+                    <input type="text" id="mediaPickerSearch" oninput="filterMediaPicker(this.value)" placeholder="Search media library..." class="w-full pl-9 sm:pl-10 pr-4 py-2 bg-stone-50 border border-stone-200 rounded-xl text-xs font-semibold text-stone-800 focus:bg-white focus:outline-none focus:ring-2 focus:ring-red-500">
+                    <i class="fas fa-search absolute left-3 top-2.5 text-stone-400 text-xs"></i>
                 </div>
             </div>
 
             <!-- Media Grid -->
-            <div class="p-6 overflow-y-auto flex-1 overscroll-contain">
-                <div id="mediaPickerGrid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
+            <div class="p-3.5 sm:p-6 overflow-y-auto overflow-x-hidden flex-1 overscroll-contain">
+                <div id="mediaPickerGrid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2.5 sm:gap-4">
                     <div class="col-span-full py-8 text-center text-stone-400">Loading media library...</div>
                 </div>
             </div>
 
-            <div class="p-4 px-6 bg-stone-50 border-t border-stone-100 flex justify-end">
+            <div class="p-3 sm:p-4 px-4 sm:px-6 bg-stone-50 border-t border-stone-100 flex justify-end">
                 <button type="button" onclick="closeMediaPicker()" class="btn-secondary text-xs px-4 py-2 cursor-pointer">Close</button>
             </div>
         </div>
     </div>
 
     <!-- MODAL 6: CUSTOMER REVIEW (TESTIMONIAL) MODAL -->
-    <div id="testimonialModal" onclick="if(event.target === this) closeTestimonialModal()" class="fixed inset-0 bg-stone-900/60 backdrop-blur-xs hidden items-center justify-center z-[9999] p-4 overflow-y-auto" style="display: none;">
-        <div class="bg-white rounded-3xl max-w-lg w-full max-h-[90vh] flex flex-col overflow-hidden shadow-2xl border border-stone-100 animate-fadeIn" onclick="event.stopPropagation()">
+    <div id="testimonialModal" onclick="if(event.target === this) closeTestimonialModal()" class="fixed inset-0 bg-stone-900/60 backdrop-blur-xs hidden items-center justify-center z-[9999] p-2 sm:p-4 overflow-y-auto" style="display: none;">
+        <div class="bg-white rounded-2xl sm:rounded-3xl max-w-lg w-full max-h-[94vh] sm:max-h-[90vh] flex flex-col overflow-hidden shadow-2xl border border-stone-100 animate-fadeIn" onclick="event.stopPropagation()">
             <!-- Pinned Header -->
-            <div class="p-5 px-6 border-b border-stone-100 flex items-center justify-between bg-stone-50/80 shrink-0">
-                <div class="flex items-center gap-3">
-                    <div class="w-10 h-10 rounded-2xl bg-red-50 text-red-600 flex items-center justify-center font-bold text-base shadow-2xs">
+            <div class="p-3.5 sm:p-5 px-4 sm:px-6 border-b border-stone-100 flex items-center justify-between bg-stone-50/80 shrink-0">
+                <div class="flex items-center gap-2.5 sm:gap-3 min-w-0 pr-2">
+                    <div class="w-8 h-8 sm:w-10 sm:h-10 rounded-xl sm:rounded-2xl bg-red-50 text-red-600 flex items-center justify-center font-bold text-xs sm:text-base shadow-2xs shrink-0">
                         <i class="fas fa-star"></i>
                     </div>
-                    <div>
-                        <h3 class="text-base font-bold text-stone-800" id="testimonialModalTitle">Add Customer Review</h3>
-                        <p class="text-xs text-stone-500 font-medium">Customer reviews rotate in the homepage reviews carousel</p>
+                    <div class="min-w-0">
+                        <h3 class="text-sm sm:text-base font-bold text-stone-800 truncate" id="testimonialModalTitle">Add Customer Review</h3>
+                        <p class="hidden sm:block text-xs text-stone-500 font-medium truncate">Customer reviews rotate in the homepage reviews carousel</p>
                     </div>
                 </div>
-                <button type="button" onclick="closeTestimonialModal()" class="w-8 h-8 rounded-full bg-stone-100 text-stone-400 hover:text-stone-700 flex items-center justify-center transition-colors cursor-pointer">
+                <button type="button" onclick="closeTestimonialModal()" class="w-8 h-8 rounded-full bg-stone-100 text-stone-400 hover:text-stone-700 flex items-center justify-center transition-colors cursor-pointer shrink-0">
                     <i class="fas fa-times text-sm"></i>
                 </button>
             </div>
@@ -668,48 +688,48 @@
                 <input type="hidden" id="testimonialId" name="id" value="">
                 
                 <!-- Scrollable Body Content -->
-                <div class="p-6 space-y-4 overflow-y-auto flex-1 overscroll-contain">
-                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+                <div class="p-3.5 sm:p-6 space-y-3 sm:space-y-4 overflow-y-auto overflow-x-hidden flex-1 overscroll-contain">
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5 sm:gap-3.5">
                         <div>
                             <label class="block text-xs font-bold text-stone-600 uppercase tracking-wider mb-1">Customer Name <span class="text-red-500">*</span></label>
-                            <input type="text" id="testimonialName" name="name" required placeholder="e.g. Priya Sharma" class="w-full bg-stone-50 border border-stone-200 rounded-xl px-3.5 py-2.5 text-sm font-semibold text-stone-800 focus:bg-white focus:outline-none focus:ring-2 focus:ring-red-500">
+                            <input type="text" id="testimonialName" name="name" required placeholder="e.g. Priya Sharma" class="w-full bg-stone-50 border border-stone-200 rounded-xl px-3 sm:px-3.5 py-2 sm:py-2.5 text-xs sm:text-sm font-semibold text-stone-800 focus:bg-white focus:outline-none focus:ring-2 focus:ring-red-500">
                         </div>
                         <div>
                             <label class="block text-xs font-bold text-stone-600 uppercase tracking-wider mb-1">Location / Tagline</label>
-                            <input type="text" id="testimonialDesignation" name="designation" placeholder="e.g. Bengaluru, India or Verified Patron" class="w-full bg-stone-50 border border-stone-200 rounded-xl px-3.5 py-2.5 text-sm font-semibold text-stone-800 focus:bg-white focus:outline-none focus:ring-2 focus:ring-red-500">
+                            <input type="text" id="testimonialDesignation" name="designation" placeholder="e.g. Bengaluru, India" class="w-full bg-stone-50 border border-stone-200 rounded-xl px-3 sm:px-3.5 py-2 sm:py-2.5 text-xs sm:text-sm font-semibold text-stone-800 focus:bg-white focus:outline-none focus:ring-2 focus:ring-red-500">
                         </div>
                     </div>
 
-                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5 sm:gap-3.5">
                         <div>
                             <label class="block text-xs font-bold text-stone-600 uppercase tracking-wider mb-1">Star Rating <span class="text-red-500">*</span></label>
-                            <select id="testimonialRating" name="rating" class="w-full bg-stone-50 border border-stone-200 rounded-xl px-3.5 py-2.5 text-sm font-semibold text-stone-800 focus:bg-white focus:outline-none focus:ring-2 focus:ring-red-500">
-                                <option value="5">★★★★★ (5 Stars - Exceptional)</option>
-                                <option value="4">★★★★☆ (4 Stars - Very Good)</option>
-                                <option value="3">★★★☆☆ (3 Stars - Good)</option>
-                                <option value="2">★★☆☆☆ (2 Stars - Fair)</option>
-                                <option value="1">★☆☆☆☆ (1 Star - Poor)</option>
+                            <select id="testimonialRating" name="rating" class="w-full bg-stone-50 border border-stone-200 rounded-xl px-3 sm:px-3.5 py-2 sm:py-2.5 text-xs sm:text-sm font-semibold text-stone-800 focus:bg-white focus:outline-none focus:ring-2 focus:ring-red-500">
+                                <option value="5">★★★★★ (5 Stars)</option>
+                                <option value="4">★★★★☆ (4 Stars)</option>
+                                <option value="3">★★★☆☆ (3 Stars)</option>
+                                <option value="2">★★☆☆☆ (2 Stars)</option>
+                                <option value="1">★☆☆☆☆ (1 Star)</option>
                             </select>
                         </div>
                         <div>
                             <label class="block text-xs font-bold text-stone-600 uppercase tracking-wider mb-1">Status</label>
-                            <div class="flex items-center gap-2 pt-2.5">
+                            <div class="flex items-center gap-2 pt-2 sm:pt-2.5">
                                 <input type="checkbox" id="testimonialActive" name="is_active" checked class="w-4 h-4 rounded text-red-600 focus:ring-red-500">
-                                <label for="testimonialActive" class="text-xs font-bold text-stone-700">Show on Website Carousel</label>
+                                <label for="testimonialActive" class="text-xs font-bold text-stone-700">Show on Website</label>
                             </div>
                         </div>
                     </div>
 
                     <div>
                         <label class="block text-xs font-bold text-stone-600 uppercase tracking-wider mb-1">Customer Review Message <span class="text-red-500">*</span></label>
-                        <textarea id="testimonialMessage" name="message" rows="3" required placeholder="Write customer feedback or quote..." class="w-full bg-stone-50 border border-stone-200 rounded-xl px-3.5 py-2.5 text-sm font-semibold text-stone-800 focus:bg-white focus:outline-none focus:ring-2 focus:ring-red-500"></textarea>
+                        <textarea id="testimonialMessage" name="message" rows="3" required placeholder="Write customer feedback or quote..." class="w-full bg-stone-50 border border-stone-200 rounded-xl px-3 sm:px-3.5 py-2 sm:py-2.5 text-xs sm:text-sm font-semibold text-stone-800 focus:bg-white focus:outline-none focus:ring-2 focus:ring-red-500"></textarea>
                     </div>
                 </div>
 
                 <!-- Sticky Footer with Action Buttons -->
-                <div class="p-4 px-6 bg-stone-50 border-t border-stone-100 shrink-0 flex items-center justify-end gap-3">
-                    <button type="button" onclick="closeTestimonialModal()" class="btn-secondary text-xs px-5 py-2.5 cursor-pointer">Cancel</button>
-                    <button type="submit" id="testimonialSubmitBtn" class="btn-primary text-xs px-6 py-2.5 flex items-center gap-2 shadow-sm cursor-pointer">
+                <div class="p-3 sm:p-4 px-4 sm:px-6 bg-stone-50 border-t border-stone-100 shrink-0 flex flex-wrap items-center justify-end gap-2 sm:gap-3">
+                    <button type="button" onclick="closeTestimonialModal()" class="btn-secondary text-xs px-4 sm:px-5 py-2 sm:py-2.5 cursor-pointer">Cancel</button>
+                    <button type="submit" id="testimonialSubmitBtn" class="btn-primary text-xs px-5 sm:px-6 py-2 sm:py-2.5 flex items-center gap-2 shadow-sm cursor-pointer">
                         <i class="fas fa-save"></i>
                         <span id="testimonialSubmitBtnText">Save Review</span>
                     </button>
@@ -717,22 +737,22 @@
             </form>
         </div>
     </div>
-          <!-- MODAL 7: ADD / EDIT VIDEO & REEL MODAL -->
-    <div id="videoReelModal" onclick="if(event.target === this) closeVideoReelModal()" class="fixed inset-0 bg-stone-900/60 backdrop-blur-xs hidden items-center justify-center z-[9999] p-3 sm:p-5 overflow-y-auto" style="display: none;">
-        <div class="bg-white rounded-3xl max-w-5xl w-full max-h-[94vh] flex flex-col overflow-hidden shadow-2xl border border-stone-100 animate-fadeIn" onclick="event.stopPropagation()">
+    <!-- MODAL 7: ADD / EDIT VIDEO & REEL MODAL -->
+    <div id="videoReelModal" onclick="if(event.target === this) closeVideoReelModal()" class="fixed inset-0 bg-stone-900/60 backdrop-blur-xs hidden items-center justify-center z-[9999] p-2 sm:p-4 overflow-y-auto" style="display: none;">
+        <div class="bg-white rounded-2xl sm:rounded-3xl max-w-5xl w-full max-h-[94vh] sm:max-h-[92vh] flex flex-col overflow-hidden shadow-2xl border border-stone-100 animate-fadeIn" onclick="event.stopPropagation()">
             
             <!-- Pinned Header -->
-            <div class="p-4 sm:p-5 px-6 border-b border-stone-100 flex items-center justify-between bg-stone-50/90 shrink-0">
-                <div class="flex items-center gap-3">
-                    <div class="w-10 h-10 rounded-2xl bg-red-50 text-red-600 flex items-center justify-center font-bold text-base shadow-2xs shrink-0">
-                        <i class="fas fa-play-circle text-lg"></i>
+            <div class="p-3.5 sm:p-5 px-4 sm:px-6 border-b border-stone-100 flex items-center justify-between bg-stone-50/90 shrink-0">
+                <div class="flex items-center gap-2.5 sm:gap-3 min-w-0 pr-2">
+                    <div class="w-8 h-8 sm:w-10 sm:h-10 rounded-xl sm:rounded-2xl bg-red-50 text-red-600 flex items-center justify-center font-bold text-sm sm:text-base shadow-2xs shrink-0">
+                        <i class="fas fa-play-circle text-base sm:text-lg"></i>
                     </div>
-                    <div>
-                        <h3 class="text-base font-bold text-stone-800" id="videoReelModalTitle">Add Video / Reel</h3>
-                        <p class="text-xs text-stone-500 font-medium" id="videoReelModalSubtitle">Manage website video reels, studio journals, tutorials, and social content</p>
+                    <div class="min-w-0">
+                        <h3 class="text-sm sm:text-base font-bold text-stone-800 truncate" id="videoReelModalTitle">Add Video / Reel</h3>
+                        <p class="hidden sm:block text-xs text-stone-500 font-medium truncate" id="videoReelModalSubtitle">Manage website video reels, studio journals, tutorials, and social content</p>
                     </div>
                 </div>
-                <button type="button" onclick="closeVideoReelModal()" class="w-8 h-8 rounded-full bg-stone-100 text-stone-400 hover:text-stone-700 flex items-center justify-center transition-colors cursor-pointer">
+                <button type="button" onclick="closeVideoReelModal()" class="w-8 h-8 rounded-full bg-stone-100 text-stone-400 hover:text-stone-700 flex items-center justify-center transition-colors cursor-pointer shrink-0">
                     <i class="fas fa-times text-sm"></i>
                 </button>
             </div>
@@ -746,14 +766,14 @@
                 <input type="hidden" id="videoReelThumbnailUrl" name="thumbnail_url" value="">
 
                 <!-- Scrollable Body Content (2-Column Grid on Desktop) -->
-                <div id="videoReelScrollContainer" class="p-5 sm:p-6 overflow-y-auto flex-1 overscroll-contain">
-                    <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+                <div id="videoReelScrollContainer" class="p-3.5 sm:p-6 overflow-y-auto overflow-x-hidden flex-1 overscroll-contain">
+                    <div class="grid grid-cols-1 lg:grid-cols-12 gap-4 sm:gap-6 items-start">
                         
                         <!-- LEFT COLUMN (col-span-7): Primary Video Info, Descriptions & Settings -->
-                        <div class="lg:col-span-7 space-y-4">
+                        <div class="lg:col-span-7 space-y-3.5 sm:space-y-4">
                             
                             <!-- 1. Title / Headline (Most Prominent - Always Visible) -->
-                            <div class="bg-red-50/40 border-2 border-red-200/80 rounded-2xl p-4 shadow-2xs">
+                            <div class="bg-red-50/40 border-2 border-red-200/80 rounded-2xl p-3.5 sm:p-4 shadow-2xs">
                                 <label class="block text-xs font-bold text-stone-800 uppercase tracking-wider mb-1.5 flex items-center justify-between">
                                     <span class="flex items-center gap-1.5">
                                         <i class="fas fa-heading text-red-600 text-xs"></i>
@@ -761,16 +781,16 @@
                                     </span>
                                     <span class="text-[10px] text-stone-400 font-normal">Primary video title</span>
                                 </label>
-                                <input type="text" id="videoReelTitle" name="title" placeholder="e.g. Crafting the Everlasting Sunflower" class="w-full bg-white border border-stone-200 rounded-xl px-4 py-2.5 text-sm font-bold text-stone-800 focus:outline-none focus:ring-2 focus:ring-red-500 transition-all shadow-2xs">
-                                <p class="text-[10px] text-stone-400 mt-1">If empty when selecting a video file, the file name will auto-populate as the title.</p>
+                                <input type="text" id="videoReelTitle" name="title" placeholder="e.g. Crafting the Everlasting Sunflower" class="w-full bg-white border border-stone-200 rounded-xl px-3.5 sm:px-4 py-2 sm:py-2.5 text-xs sm:text-sm font-bold text-stone-800 focus:outline-none focus:ring-2 focus:ring-red-500 transition-all shadow-2xs">
+                                <p class="text-[10px] text-stone-400 mt-1">If empty, file name will be used.</p>
                             </div>
 
                             <!-- 2. Content Type & Category -->
-                            <div class="bg-stone-50/80 border border-stone-200/80 rounded-2xl p-4 space-y-3">
-                                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+                            <div class="bg-stone-50/80 border border-stone-200/80 rounded-2xl p-3.5 sm:p-4 space-y-2.5 sm:space-y-3">
+                                <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5 sm:gap-3.5">
                                     <div>
                                         <label class="block text-xs font-bold text-stone-700 uppercase tracking-wider mb-1">Content Type <span class="text-red-500">*</span></label>
-                                        <select id="videoReelContentType" name="content_type" class="w-full bg-white border border-stone-200 rounded-xl px-3.5 py-2 text-xs font-semibold text-stone-800 focus:outline-none focus:ring-2 focus:ring-red-500">
+                                        <select id="videoReelContentType" name="content_type" class="w-full bg-white border border-stone-200 rounded-xl px-3 sm:px-3.5 py-2 text-xs font-semibold text-stone-800 focus:outline-none focus:ring-2 focus:ring-red-500">
                                             <option value="reel">Reel (Vertical 9:16)</option>
                                             <option value="video">Video (Standard / Adaptive)</option>
                                             <option value="blog_video">Blog / Video Story</option>
@@ -778,7 +798,7 @@
                                     </div>
                                     <div>
                                         <label class="block text-xs font-bold text-stone-700 uppercase tracking-wider mb-1">Category / Label <span class="text-red-500">*</span></label>
-                                        <input type="text" id="videoReelCategory" name="category_name" placeholder="e.g. Studio ASMR" class="w-full bg-white border border-stone-200 rounded-xl px-3.5 py-2 text-xs font-semibold text-stone-800 focus:outline-none focus:ring-2 focus:ring-red-500">
+                                        <input type="text" id="videoReelCategory" name="category_name" placeholder="e.g. Studio ASMR" class="w-full bg-white border border-stone-200 rounded-xl px-3 sm:px-3.5 py-2 text-xs font-semibold text-stone-800 focus:outline-none focus:ring-2 focus:ring-red-500">
                                     </div>
                                 </div>
                                 <div class="flex flex-wrap gap-1.5 pt-0.5">
@@ -790,48 +810,48 @@
                             </div>
 
                             <!-- 3. Tagline & Story -->
-                            <div class="bg-stone-50/80 border border-stone-200/80 rounded-2xl p-4 space-y-3">
+                            <div class="bg-stone-50/80 border border-stone-200/80 rounded-2xl p-3.5 sm:p-4 space-y-2.5 sm:space-y-3">
                                 <div>
                                     <label class="block text-xs font-bold text-stone-700 uppercase tracking-wider mb-1">Tagline / Subtitle</label>
-                                    <input type="text" id="videoReelTagline" name="tagline" placeholder="e.g. Watch the petal-by-petal stitch technique" class="w-full bg-white border border-stone-200 rounded-xl px-3.5 py-2 text-xs font-semibold text-stone-800 focus:outline-none focus:ring-2 focus:ring-red-500">
+                                    <input type="text" id="videoReelTagline" name="tagline" placeholder="e.g. Watch the petal-by-petal stitch technique" class="w-full bg-white border border-stone-200 rounded-xl px-3 sm:px-3.5 py-2 text-xs font-semibold text-stone-800 focus:outline-none focus:ring-2 focus:ring-red-500">
                                 </div>
                                 <div>
                                     <label class="block text-xs font-bold text-stone-700 uppercase tracking-wider mb-1">Story / Description</label>
-                                    <textarea id="videoReelDesc" name="description" rows="2" placeholder="Story or description of this video..." class="w-full bg-white border border-stone-200 rounded-xl px-3.5 py-2 text-xs font-semibold text-stone-800 focus:outline-none focus:ring-2 focus:ring-red-500"></textarea>
+                                    <textarea id="videoReelDesc" name="description" rows="2" placeholder="Story or description of this video..." class="w-full bg-white border border-stone-200 rounded-xl px-3 sm:px-3.5 py-2 text-xs font-semibold text-stone-800 focus:outline-none focus:ring-2 focus:ring-red-500"></textarea>
                                 </div>
                             </div>
 
                             <!-- 4. Track Details & Settings -->
-                            <div class="bg-stone-50/80 border border-stone-200/80 rounded-2xl p-4 space-y-3">
-                                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                            <div class="bg-stone-50/80 border border-stone-200/80 rounded-2xl p-3.5 sm:p-4 space-y-2.5 sm:space-y-3">
+                                <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5 sm:gap-3">
                                     <div>
                                         <label class="block text-xs font-bold text-stone-700 uppercase tracking-wider mb-1">Duration <span class="text-stone-400 font-normal">(e.g. 00:48)</span></label>
-                                        <input type="text" id="videoReelDuration" name="duration" value="00:48" class="w-full bg-white border border-stone-200 rounded-xl px-3.5 py-2 text-xs font-semibold text-stone-800 focus:outline-none focus:ring-2 focus:ring-red-500">
+                                        <input type="text" id="videoReelDuration" name="duration" value="00:48" class="w-full bg-white border border-stone-200 rounded-xl px-3 sm:px-3.5 py-2 text-xs font-semibold text-stone-800 focus:outline-none focus:ring-2 focus:ring-red-500">
                                     </div>
                                     <div>
                                         <label class="block text-xs font-bold text-stone-700 uppercase tracking-wider mb-1">Audio / Music Name</label>
-                                        <input type="text" id="videoReelAudioName" name="audio_name" placeholder="Original Audio • Knotelle" class="w-full bg-white border border-stone-200 rounded-xl px-3.5 py-2 text-xs font-semibold text-stone-800 focus:outline-none focus:ring-2 focus:ring-red-500">
+                                        <input type="text" id="videoReelAudioName" name="audio_name" placeholder="Original Audio • Knotelle" class="w-full bg-white border border-stone-200 rounded-xl px-3 sm:px-3.5 py-2 text-xs font-semibold text-stone-800 focus:outline-none focus:ring-2 focus:ring-red-500">
                                     </div>
                                 </div>
 
-                                <div class="grid grid-cols-3 gap-2.5 pt-1">
+                                <div class="grid grid-cols-3 gap-2 sm:gap-2.5 pt-1">
                                     <div>
                                         <label class="block text-[11px] font-bold text-stone-700 uppercase tracking-wider mb-1">Status</label>
-                                        <select id="videoReelStatus" name="status" class="w-full bg-white border border-stone-200 rounded-xl px-2.5 py-2 text-xs font-semibold text-stone-800 focus:outline-none focus:ring-2 focus:ring-red-500">
+                                        <select id="videoReelStatus" name="status" class="w-full bg-white border border-stone-200 rounded-xl px-2 sm:px-2.5 py-1.5 sm:py-2 text-xs font-semibold text-stone-800 focus:outline-none focus:ring-2 focus:ring-red-500">
                                             <option value="1">Active</option>
                                             <option value="0">Inactive</option>
                                         </select>
                                     </div>
                                     <div>
                                         <label class="block text-[11px] font-bold text-stone-700 uppercase tracking-wider mb-1">Featured</label>
-                                        <select id="videoReelFeatured" name="is_featured" class="w-full bg-white border border-stone-200 rounded-xl px-2.5 py-2 text-xs font-semibold text-stone-800 focus:outline-none focus:ring-2 focus:ring-red-500">
+                                        <select id="videoReelFeatured" name="is_featured" class="w-full bg-white border border-stone-200 rounded-xl px-2 sm:px-2.5 py-1.5 sm:py-2 text-xs font-semibold text-stone-800 focus:outline-none focus:ring-2 focus:ring-red-500">
                                             <option value="1">Yes</option>
                                             <option value="0">No</option>
                                         </select>
                                     </div>
                                     <div>
                                         <label class="block text-[11px] font-bold text-stone-700 uppercase tracking-wider mb-1">Sort Order</label>
-                                        <input type="number" id="videoReelSortOrder" name="sort_order" value="1" min="1" class="w-full bg-white border border-stone-200 rounded-xl px-2.5 py-2 text-xs font-semibold text-stone-800 focus:outline-none focus:ring-2 focus:ring-red-500">
+                                        <input type="number" id="videoReelSortOrder" name="sort_order" value="1" min="1" class="w-full bg-white border border-stone-200 rounded-xl px-2 sm:px-2.5 py-1.5 sm:py-2 text-xs font-semibold text-stone-800 focus:outline-none focus:ring-2 focus:ring-red-500">
                                     </div>
                                 </div>
                             </div>
@@ -839,10 +859,10 @@
                         </div>
 
                         <!-- RIGHT COLUMN (col-span-5): Video Upload, Live Player & Cover Thumbnail -->
-                        <div class="lg:col-span-5 space-y-4">
+                        <div class="lg:col-span-5 space-y-3.5 sm:space-y-4">
                             
                             <!-- Video Source Box -->
-                            <div class="bg-stone-50/80 border border-stone-200/80 rounded-2xl p-4 space-y-3">
+                            <div class="bg-stone-50/80 border border-stone-200/80 rounded-2xl p-3.5 sm:p-4 space-y-2.5 sm:space-y-3">
                                 <div class="flex items-center justify-between">
                                     <div class="flex items-center gap-1.5">
                                         <i class="fas fa-video text-red-600 text-xs"></i>
@@ -852,44 +872,44 @@
                                 </div>
 
                                 <!-- File dropzone -->
-                                <div class="border-2 border-dashed border-stone-200 rounded-xl p-3.5 text-center hover:border-red-400 hover:bg-red-50/20 transition-all cursor-pointer bg-white"
+                                <div class="border-2 border-dashed border-stone-200 rounded-xl p-3 sm:p-3.5 text-center hover:border-red-400 hover:bg-red-50/20 transition-all cursor-pointer bg-white"
                                      onclick="document.getElementById('videoReelFileInput').click()">
-                                    <i class="fas fa-file-video text-red-500 text-xl mb-1"></i>
-                                    <p class="text-xs font-bold text-stone-700" id="videoReelFileLabel">Click or drop MP4 / WEBM / MOV</p>
-                                    <p class="text-[10px] text-stone-400">Uploads directly and streams on website</p>
+                                    <i class="fas fa-file-video text-red-500 text-lg sm:text-xl mb-1"></i>
+                                    <p class="text-xs font-bold text-stone-700" id="videoReelFileLabel">Click or drop MP4 / WEBM</p>
+                                    <p class="text-[10px] text-stone-400">Uploads and streams on website</p>
                                     <input type="file" id="videoReelFileInput" name="video_file" class="hidden" accept="video/mp4,video/webm,video/quicktime,video/ogg,video/x-matroska,.mp4,.webm,.mov" onchange="handleVideoFileInputChange(this)">
                                 </div>
 
                                 <div class="relative flex py-0.5 items-center">
                                     <div class="flex-grow border-t border-stone-200"></div>
-                                    <span class="flex-shrink mx-2 text-stone-400 text-[9px] font-bold uppercase tracking-wider">OR ENTER DIRECT URL</span>
+                                    <span class="flex-shrink mx-2 text-stone-400 text-[9px] font-bold uppercase tracking-wider">OR DIRECT URL</span>
                                     <div class="flex-grow border-t border-stone-200"></div>
                                 </div>
 
                                 <div>
-                                    <input type="text" id="videoReelUrlInput" name="video_url" oninput="handleVideoUrlInputChange(this.value)" placeholder="https://assets.example.com/video.mp4 or /videos/reels/..." class="w-full bg-white border border-stone-200 rounded-xl px-3 py-2 text-xs font-semibold text-stone-800 focus:outline-none focus:ring-2 focus:ring-red-500">
+                                    <input type="text" id="videoReelUrlInput" name="video_url" oninput="handleVideoUrlInputChange(this.value)" placeholder="https://assets... or /videos/..." class="w-full bg-white border border-stone-200 rounded-xl px-3 py-2 text-xs font-semibold text-stone-800 focus:outline-none focus:ring-2 focus:ring-red-500">
                                 </div>
 
                                 <!-- Live Video Player Preview -->
                                 <div id="videoPlayerPreviewContainer" class="bg-black rounded-2xl overflow-hidden border border-stone-800 p-2 text-center space-y-2 shadow-sm">
                                     <div class="flex items-center justify-between px-2 text-stone-400 text-[10px] font-bold uppercase">
-                                        <span class="flex items-center gap-1.5"><i class="fas fa-play text-red-500 text-xs"></i> Video Preview Player</span>
-                                        <span id="videoPlayerStatusBadge" class="text-stone-400 font-normal">No video selected</span>
+                                        <span class="flex items-center gap-1.5"><i class="fas fa-play text-red-500 text-xs"></i> Video Preview</span>
+                                        <span id="videoPlayerStatusBadge" class="text-stone-400 font-normal">No video</span>
                                     </div>
-                                    <div class="relative w-full aspect-video max-h-48 bg-stone-900 rounded-xl overflow-hidden flex items-center justify-center">
+                                    <div class="relative w-full aspect-video max-h-40 sm:max-h-48 bg-stone-900 rounded-xl overflow-hidden flex items-center justify-center">
                                         <video id="videoReelPreviewPlayer" controls playsinline loop autoplay muted class="w-full h-full object-contain"
                                                oncanplay="handleVideoPlayerCanPlay()"
                                                onerror="handleVideoPlayerError()"></video>
                                         <div id="videoPlayerEmptyState" class="absolute inset-0 flex flex-col items-center justify-center text-stone-500 bg-stone-900/90 pointer-events-none">
-                                            <i class="fas fa-film text-2xl mb-1 text-stone-600"></i>
-                                            <p class="text-[11px] font-medium">Select a video file or URL to preview (auto-loops)</p>
+                                            <i class="fas fa-film text-xl sm:text-2xl mb-1 text-stone-600"></i>
+                                            <p class="text-[10px] sm:text-[11px] font-medium">Select a video file or URL</p>
                                         </div>
                                     </div>
                                 </div>
                             </div>
 
                             <!-- Cover Image / Thumbnail Box -->
-                            <div class="bg-stone-50/80 border border-stone-200/80 rounded-2xl p-4 space-y-3">
+                            <div class="bg-stone-50/80 border border-stone-200/80 rounded-2xl p-3.5 sm:p-4 space-y-2.5 sm:space-y-3">
                                 <div class="flex items-center justify-between">
                                     <div class="flex items-center gap-1.5">
                                         <i class="fas fa-image text-red-600 text-xs"></i>
@@ -903,9 +923,9 @@
 
                                 <div class="border-2 border-dashed border-stone-200 rounded-xl p-3 text-center hover:border-red-400 hover:bg-red-50/20 transition-all cursor-pointer bg-white"
                                      onclick="document.getElementById('videoReelThumbnailInput').click()">
-                                    <i class="fas fa-cloud-upload-alt text-red-500 text-lg mb-1"></i>
+                                    <i class="fas fa-cloud-upload-alt text-red-500 text-base sm:text-lg mb-1"></i>
                                     <p class="text-xs font-bold text-stone-700" id="videoReelThumbnailLabel">Upload Cover Image</p>
-                                    <p class="text-[10px] text-stone-400">JPG, PNG, WEBP (Default image used if empty)</p>
+                                    <p class="text-[10px] text-stone-400">JPG, PNG, WEBP (Optional)</p>
                                     <input type="file" id="videoReelThumbnailInput" name="thumbnail_file" class="hidden" accept=".jpg,.jpeg,.png,.webp,.svg" onchange="handleReelCoverInputChange(this)">
                                 </div>
 
@@ -915,27 +935,27 @@
                                         <p class="text-xs font-bold text-stone-800 truncate" id="videoReelThumbnailName">Thumbnail Selected</p>
                                         <p class="text-[11px] text-emerald-600 font-semibold" id="videoReelThumbnailSize">Ready to save</p>
                                     </div>
-                                    <button type="button" onclick="clearReelCoverInput()" class="text-stone-400 hover:text-red-600 p-1 cursor-pointer">
+                                    <button type="button" onclick="clearReelCoverInput()" class="text-stone-400 hover:text-red-600 p-1 cursor-pointer shrink-0">
                                         <i class="fas fa-times text-xs"></i>
                                     </button>
                                 </div>
                             </div>
 
                             <!-- Social Counters (Compact Row) -->
-                            <div class="bg-stone-50/80 border border-stone-200/80 rounded-2xl p-3.5">
+                            <div class="bg-stone-50/80 border border-stone-200/80 rounded-2xl p-3 sm:p-3.5">
                                 <span class="block text-[11px] font-bold text-stone-700 uppercase tracking-wider mb-2">Display Counters</span>
                                 <div class="grid grid-cols-3 gap-2">
                                     <div>
                                         <label class="block text-[10px] text-stone-500 font-semibold mb-0.5">Likes</label>
-                                        <input type="number" id="videoReelLikes" name="likes" value="0" min="0" class="w-full bg-white border border-stone-200 rounded-lg px-2 py-1.5 text-xs font-semibold text-stone-800 focus:outline-none focus:ring-1 focus:ring-red-500">
+                                        <input type="number" id="videoReelLikes" name="likes" value="0" min="0" class="w-full bg-white border border-stone-200 rounded-lg px-2 py-1 text-xs font-semibold text-stone-800 focus:outline-none focus:ring-1 focus:ring-red-500">
                                     </div>
                                     <div>
                                         <label class="block text-[10px] text-stone-500 font-semibold mb-0.5">Comments</label>
-                                        <input type="number" id="videoReelComments" name="comments" value="0" min="0" class="w-full bg-white border border-stone-200 rounded-lg px-2 py-1.5 text-xs font-semibold text-stone-800 focus:outline-none focus:ring-1 focus:ring-red-500">
+                                        <input type="number" id="videoReelComments" name="comments" value="0" min="0" class="w-full bg-white border border-stone-200 rounded-lg px-2 py-1 text-xs font-semibold text-stone-800 focus:outline-none focus:ring-1 focus:ring-red-500">
                                     </div>
                                     <div>
                                         <label class="block text-[10px] text-stone-500 font-semibold mb-0.5">Views</label>
-                                        <input type="number" id="videoReelViews" name="views" value="0" min="0" class="w-full bg-white border border-stone-200 rounded-lg px-2 py-1.5 text-xs font-semibold text-stone-800 focus:outline-none focus:ring-1 focus:ring-red-500">
+                                        <input type="number" id="videoReelViews" name="views" value="0" min="0" class="w-full bg-white border border-stone-200 rounded-lg px-2 py-1 text-xs font-semibold text-stone-800 focus:outline-none focus:ring-1 focus:ring-red-500">
                                     </div>
                                 </div>
                             </div>
@@ -946,15 +966,15 @@
                 </div>
 
                 <!-- Sticky Footer with Action Buttons -->
-                <div class="p-4 px-6 bg-stone-50 border-t border-stone-100 shrink-0 flex items-center justify-between gap-3">
-                    <span class="text-xs text-stone-400 font-medium">All video changes sync to public website immediately</span>
-                    <div class="flex items-center gap-3">
-                        <button type="button" onclick="closeVideoReelModal()" class="btn-secondary text-xs px-5 py-2.5 cursor-pointer">
+                <div class="p-3 sm:p-4 px-4 sm:px-6 bg-stone-50 border-t border-stone-100 shrink-0 flex flex-wrap items-center justify-between gap-2 sm:gap-3">
+                    <span class="hidden sm:inline text-xs text-stone-400 font-medium">All changes sync to website</span>
+                    <div class="flex items-center gap-2 sm:gap-3 ml-auto">
+                        <button type="button" onclick="closeVideoReelModal()" class="btn-secondary text-xs px-4 sm:px-5 py-2 sm:py-2.5 cursor-pointer">
                             Cancel
                         </button>
-                        <button type="submit" id="videoReelSubmitBtn" class="btn-primary text-xs px-6 py-2.5 flex items-center gap-2 shadow-sm cursor-pointer">
+                        <button type="submit" id="videoReelSubmitBtn" class="btn-primary text-xs px-5 sm:px-6 py-2 sm:py-2.5 flex items-center gap-2 shadow-sm cursor-pointer">
                             <i class="fas fa-save"></i>
-                            <span id="videoReelSubmitBtnText">Save Video / Reel</span>
+                            <span id="videoReelSubmitBtnText">Save Video</span>
                         </button>
                     </div>
                 </div>
@@ -964,15 +984,15 @@
     </div>
 
     <!-- MODAL 7B: VIDEO WATCH & AUTO-REPLAY MODAL -->
-    <div id="videoWatchModal" onclick="if(event.target === this) closeVideoWatchModal()" class="fixed inset-0 bg-black/80 backdrop-blur-sm hidden items-center justify-center z-[9999] p-4" style="display: none;">
-        <div class="bg-stone-950 rounded-3xl max-w-md w-full overflow-hidden shadow-2xl border border-stone-800 animate-fadeIn flex flex-col" onclick="event.stopPropagation()">
+    <div id="videoWatchModal" onclick="if(event.target === this) closeVideoWatchModal()" class="fixed inset-0 bg-black/80 backdrop-blur-sm hidden items-center justify-center z-[9999] p-2 sm:p-4" style="display: none;">
+        <div class="bg-stone-950 rounded-2xl sm:rounded-3xl max-w-md w-full max-h-[94vh] overflow-hidden shadow-2xl border border-stone-800 animate-fadeIn flex flex-col" onclick="event.stopPropagation()">
             <!-- Top bar -->
-            <div class="p-4 px-5 border-b border-stone-800/80 flex items-center justify-between bg-stone-900/60">
+            <div class="p-3.5 sm:p-4 px-4 sm:px-5 border-b border-stone-800/80 flex items-center justify-between bg-stone-900/60">
                 <div class="flex-1 min-w-0 mr-3">
                     <span id="videoWatchCategory" class="text-[10px] font-bold text-red-400 uppercase tracking-wider block truncate">Studio Reel</span>
                     <h3 id="videoWatchTitle" class="text-sm font-bold text-white truncate">Reel Player</h3>
                 </div>
-                <button type="button" onclick="closeVideoWatchModal()" class="w-8 h-8 rounded-full bg-stone-800 text-stone-400 hover:text-white flex items-center justify-center transition-colors cursor-pointer">
+                <button type="button" onclick="closeVideoWatchModal()" class="w-8 h-8 rounded-full bg-stone-800 text-stone-400 hover:text-white flex items-center justify-center transition-colors cursor-pointer shrink-0">
                     <i class="fas fa-times text-sm"></i>
                 </button>
             </div>
@@ -981,62 +1001,62 @@
                 <video id="videoWatchPlayer" controls playsinline loop autoplay class="w-full h-full object-contain"></video>
             </div>
             <!-- Bottom bar -->
-            <div class="p-3 px-5 border-t border-stone-800/80 flex items-center justify-between bg-stone-900/60 text-xs text-stone-400">
+            <div class="p-3 px-4 sm:px-5 border-t border-stone-800/80 flex items-center justify-between bg-stone-900/60 text-xs text-stone-400">
                 <span class="flex items-center gap-1.5 text-emerald-400 text-[11px] font-semibold">
-                    <i class="fas fa-redo text-[10px]"></i> Auto-replay loop active
+                    <i class="fas fa-redo text-[10px]"></i> Auto-replay
                 </span>
                 <button type="button" id="videoWatchEditBtn" class="px-3 py-1.5 rounded-xl bg-red-600 hover:bg-red-700 text-white font-bold text-xs flex items-center gap-1 cursor-pointer">
-                    <i class="fas fa-edit text-xs"></i> Edit Details
+                    <i class="fas fa-edit text-xs"></i> Edit
                 </button>
             </div>
         </div>
     </div>
 
     <!-- MODAL 8: BLOG / VIDEOS SECTION SETTINGS MODAL -->
-    <div id="blogReelsSettingsModal" onclick="if(event.target === this) closeBlogReelsSettingsModal()" class="fixed inset-0 bg-stone-900/60 backdrop-blur-xs hidden items-center justify-center z-[9999] p-4 overflow-y-auto" style="display: none;">
-        <div class="bg-white rounded-3xl max-w-xl w-full max-h-[90vh] flex flex-col overflow-hidden shadow-2xl border border-stone-100 animate-fadeIn" onclick="event.stopPropagation()">
+    <div id="blogReelsSettingsModal" onclick="if(event.target === this) closeBlogReelsSettingsModal()" class="fixed inset-0 bg-stone-900/60 backdrop-blur-xs hidden items-center justify-center z-[9999] p-2 sm:p-4 overflow-y-auto" style="display: none;">
+        <div class="bg-white rounded-2xl sm:rounded-3xl max-w-xl w-full max-h-[94vh] sm:max-h-[90vh] flex flex-col overflow-hidden shadow-2xl border border-stone-100 animate-fadeIn" onclick="event.stopPropagation()">
             <!-- Pinned Header -->
-            <div class="p-5 px-6 border-b border-stone-100 flex items-center justify-between bg-stone-50/80 shrink-0">
-                <div class="flex items-center gap-3">
-                    <div class="w-10 h-10 rounded-2xl bg-red-50 text-red-600 flex items-center justify-center font-bold text-base shadow-2xs">
+            <div class="p-3.5 sm:p-5 px-4 sm:px-6 border-b border-stone-100 flex items-center justify-between bg-stone-50/80 shrink-0">
+                <div class="flex items-center gap-2.5 sm:gap-3 min-w-0 pr-2">
+                    <div class="w-8 h-8 sm:w-10 sm:h-10 rounded-xl sm:rounded-2xl bg-red-50 text-red-600 flex items-center justify-center font-bold text-xs sm:text-base shadow-2xs shrink-0">
                         <i class="fas fa-cog"></i>
                     </div>
-                    <div>
-                        <h3 class="text-base font-bold text-stone-800">Behind the Stitches Section Settings</h3>
-                        <p class="text-xs text-stone-500 font-medium">Customize section headline, subtitle, Instagram CTA button, and links</p>
+                    <div class="min-w-0">
+                        <h3 class="text-sm sm:text-base font-bold text-stone-800 truncate">Behind the Stitches Settings</h3>
+                        <p class="hidden sm:block text-xs text-stone-500 font-medium truncate">Customize headline, subtitle, and Instagram CTA</p>
                     </div>
                 </div>
-                <button type="button" onclick="closeBlogReelsSettingsModal()" class="w-8 h-8 rounded-full bg-stone-100 text-stone-400 hover:text-stone-700 flex items-center justify-center transition-colors cursor-pointer">
+                <button type="button" onclick="closeBlogReelsSettingsModal()" class="w-8 h-8 rounded-full bg-stone-100 text-stone-400 hover:text-stone-700 flex items-center justify-center transition-colors cursor-pointer shrink-0">
                     <i class="fas fa-times text-sm"></i>
                 </button>
             </div>
 
             <!-- Form Wrapper -->
             <form id="blogReelsSettingsForm" novalidate onsubmit="handleBlogReelsSettingsSubmit(event)" class="flex flex-col flex-1 min-h-0 overflow-hidden">
-                <div class="p-6 space-y-4 overflow-y-auto flex-1 overscroll-contain">
+                <div class="p-3.5 sm:p-6 space-y-3 sm:space-y-4 overflow-y-auto overflow-x-hidden flex-1 overscroll-contain">
                     <div>
                         <label class="block text-xs font-bold text-stone-600 uppercase tracking-wider mb-1">Section Title <span class="text-red-500">*</span></label>
-                        <input type="text" id="blogReelsSettingsTitle" name="title" value="Behind the Stitches" placeholder="e.g. Behind the Stitches" class="w-full bg-stone-50 border border-stone-200 rounded-xl px-3.5 py-2.5 text-sm font-semibold text-stone-800 focus:bg-white focus:outline-none focus:ring-2 focus:ring-red-500">
+                        <input type="text" id="blogReelsSettingsTitle" name="title" value="Behind the Stitches" placeholder="e.g. Behind the Stitches" class="w-full bg-stone-50 border border-stone-200 rounded-xl px-3 sm:px-3.5 py-2 sm:py-2.5 text-xs sm:text-sm font-semibold text-stone-800 focus:bg-white focus:outline-none focus:ring-2 focus:ring-red-500">
                     </div>
 
                     <div>
                         <label class="block text-xs font-bold text-stone-600 uppercase tracking-wider mb-1">Tagline / Badge Text</label>
-                        <input type="text" id="blogReelsSettingsTagText" name="tag_text" value="Studio Journal & Video Reels" placeholder="e.g. Studio Journal & Video Reels" class="w-full bg-stone-50 border border-stone-200 rounded-xl px-3.5 py-2.5 text-sm font-semibold text-stone-800 focus:bg-white focus:outline-none focus:ring-2 focus:ring-red-500">
+                        <input type="text" id="blogReelsSettingsTagText" name="tag_text" value="Studio Journal & Video Reels" placeholder="e.g. Studio Journal & Video Reels" class="w-full bg-stone-50 border border-stone-200 rounded-xl px-3 sm:px-3.5 py-2 sm:py-2.5 text-xs sm:text-sm font-semibold text-stone-800 focus:bg-white focus:outline-none focus:ring-2 focus:ring-red-500">
                     </div>
 
                     <div>
                         <label class="block text-xs font-bold text-stone-600 uppercase tracking-wider mb-1">Section Subtitle Paragraph</label>
-                        <textarea id="blogReelsSettingsSubtitle" name="subtitle" rows="3" placeholder="Description of what this section showcases..." class="w-full bg-stone-50 border border-stone-200 rounded-xl px-3.5 py-2.5 text-sm font-semibold text-stone-800 focus:bg-white focus:outline-none focus:ring-2 focus:ring-red-500">Watch our artisans hand-craft each creation, styling guides, and cozy studio ASMR unboxings.</textarea>
+                        <textarea id="blogReelsSettingsSubtitle" name="subtitle" rows="3" placeholder="Description of what this section showcases..." class="w-full bg-stone-50 border border-stone-200 rounded-xl px-3 sm:px-3.5 py-2 sm:py-2.5 text-xs sm:text-sm font-semibold text-stone-800 focus:bg-white focus:outline-none focus:ring-2 focus:ring-red-500">Watch our artisans hand-craft each creation, styling guides, and cozy studio ASMR unboxings.</textarea>
                     </div>
 
-                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5 sm:gap-3.5">
                         <div>
                             <label class="block text-xs font-bold text-stone-600 uppercase tracking-wider mb-1">Social CTA Text</label>
-                            <input type="text" id="blogReelsSettingsCtaText" name="cta_text" value="Follow @knotelleindia" placeholder="e.g. Follow @knotelleindia" class="w-full bg-stone-50 border border-stone-200 rounded-xl px-3.5 py-2.5 text-sm font-semibold text-stone-800 focus:bg-white focus:outline-none focus:ring-2 focus:ring-red-500">
+                            <input type="text" id="blogReelsSettingsCtaText" name="cta_text" value="Follow @knotelleindia" placeholder="e.g. Follow @knotelleindia" class="w-full bg-stone-50 border border-stone-200 rounded-xl px-3 sm:px-3.5 py-2 sm:py-2.5 text-xs sm:text-sm font-semibold text-stone-800 focus:bg-white focus:outline-none focus:ring-2 focus:ring-red-500">
                         </div>
                         <div>
                             <label class="block text-xs font-bold text-stone-600 uppercase tracking-wider mb-1">Social CTA Link URL</label>
-                            <input type="text" id="blogReelsSettingsCtaLink" name="cta_link" value="https://instagram.com/knotelleindia" placeholder="e.g. https://instagram.com/knotelleindia" class="w-full bg-stone-50 border border-stone-200 rounded-xl px-3.5 py-2.5 text-sm font-semibold text-stone-800 focus:bg-white focus:outline-none focus:ring-2 focus:ring-red-500">
+                            <input type="text" id="blogReelsSettingsCtaLink" name="cta_link" value="https://instagram.com/knotelleindia" placeholder="e.g. https://instagram.com/knotelleindia" class="w-full bg-stone-50 border border-stone-200 rounded-xl px-3 sm:px-3.5 py-2 sm:py-2.5 text-xs sm:text-sm font-semibold text-stone-800 focus:bg-white focus:outline-none focus:ring-2 focus:ring-red-500">
                         </div>
                     </div>
 
@@ -1047,11 +1067,11 @@
                 </div>
 
                 <!-- Sticky Footer with Action Buttons -->
-                <div class="p-4 px-6 bg-stone-50 border-t border-stone-100 shrink-0 flex items-center justify-end gap-3">
-                    <button type="button" onclick="closeBlogReelsSettingsModal()" class="btn-secondary text-xs px-5 py-2.5 cursor-pointer">Cancel</button>
-                    <button type="submit" id="blogReelsSettingsSubmitBtn" class="btn-primary text-xs px-6 py-2.5 flex items-center gap-2 shadow-sm cursor-pointer">
+                <div class="p-3 sm:p-4 px-4 sm:px-6 bg-stone-50 border-t border-stone-100 shrink-0 flex flex-wrap items-center justify-end gap-2 sm:gap-3">
+                    <button type="button" onclick="closeBlogReelsSettingsModal()" class="btn-secondary text-xs px-4 sm:px-5 py-2 sm:py-2.5 cursor-pointer">Cancel</button>
+                    <button type="submit" id="blogReelsSettingsSubmitBtn" class="btn-primary text-xs px-5 sm:px-6 py-2 sm:py-2.5 flex items-center gap-2 shadow-sm cursor-pointer">
                         <i class="fas fa-save"></i>
-                        <span>Save Section Settings</span>
+                        <span>Save Settings</span>
                     </button>
                 </div>
             </form>
@@ -1059,20 +1079,20 @@
     </div>
 
     <!-- MODAL 9: ABOUT STORY MODAL -->
-    <div id="aboutStoryModal" onclick="if(event.target === this) closeAboutStoryModal()" class="fixed inset-0 bg-stone-900/60 backdrop-blur-xs hidden items-center justify-center z-[9999] p-4 overflow-y-auto" style="display: none;">
-        <div class="bg-white rounded-3xl max-w-3xl w-full max-h-[92vh] flex flex-col overflow-hidden shadow-2xl border border-stone-100 animate-fadeIn" onclick="event.stopPropagation()">
+    <div id="aboutStoryModal" onclick="if(event.target === this) closeAboutStoryModal()" class="fixed inset-0 bg-stone-900/60 backdrop-blur-xs hidden items-center justify-center z-[9999] p-2 sm:p-4 overflow-y-auto" style="display: none;">
+        <div class="bg-white rounded-2xl sm:rounded-3xl max-w-3xl w-full max-h-[94vh] sm:max-h-[92vh] flex flex-col overflow-hidden shadow-2xl border border-stone-100 animate-fadeIn" onclick="event.stopPropagation()">
             <!-- Pinned Header -->
-            <div class="p-5 px-6 border-b border-stone-100 flex items-center justify-between bg-stone-50/80 shrink-0">
-                <div class="flex items-center gap-3">
-                    <div class="w-10 h-10 rounded-2xl bg-red-50 text-red-600 flex items-center justify-center font-bold text-base shadow-2xs">
+            <div class="p-3.5 sm:p-5 px-4 sm:px-6 border-b border-stone-100 flex items-center justify-between bg-stone-50/80 shrink-0">
+                <div class="flex items-center gap-2.5 sm:gap-3 min-w-0 pr-2">
+                    <div class="w-8 h-8 sm:w-10 sm:h-10 rounded-xl sm:rounded-2xl bg-red-50 text-red-600 flex items-center justify-center font-bold text-xs sm:text-base shadow-2xs shrink-0">
                         <i class="fas fa-book-open"></i>
                     </div>
-                    <div>
-                        <h3 class="text-base font-bold text-stone-800">Edit The KNOTELLE Story & Atelier</h3>
-                        <p class="text-xs text-stone-500 font-medium">Manage story headings, descriptive paragraphs, visuals, floating badge, and CTA</p>
+                    <div class="min-w-0">
+                        <h3 class="text-sm sm:text-base font-bold text-stone-800 truncate">Edit The KNOTELLE Story</h3>
+                        <p class="hidden sm:block text-xs text-stone-500 font-medium truncate">Manage story headings, descriptive paragraphs, visuals, floating badge, and CTA</p>
                     </div>
                 </div>
-                <button type="button" onclick="closeAboutStoryModal()" class="w-8 h-8 rounded-full bg-stone-100 text-stone-400 hover:text-stone-700 flex items-center justify-center transition-colors cursor-pointer">
+                <button type="button" onclick="closeAboutStoryModal()" class="w-8 h-8 rounded-full bg-stone-100 text-stone-400 hover:text-stone-700 flex items-center justify-center transition-colors cursor-pointer shrink-0">
                     <i class="fas fa-times text-sm"></i>
                 </button>
             </div>
@@ -1082,33 +1102,33 @@
                 <input type="hidden" id="aboutStoryDesktopUrl" name="desktop_image_url" value="">
                 <input type="hidden" id="aboutStoryMobileUrl" name="mobile_image_url" value="">
 
-                <div class="p-6 space-y-5 overflow-y-auto flex-1 overscroll-contain">
+                <div class="p-3.5 sm:p-6 space-y-3.5 sm:space-y-5 overflow-y-auto overflow-x-hidden flex-1 overscroll-contain">
                     <!-- Headings Group -->
-                    <div class="space-y-3">
+                    <div class="space-y-2.5 sm:space-y-3">
                         <div class="flex items-center gap-2 border-b border-stone-100 pb-1.5">
                             <i class="fas fa-heading text-red-600 text-xs"></i>
                             <span class="text-xs font-bold text-stone-700 uppercase tracking-wider">Story Headings & Tagline</span>
                         </div>
 
-                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5 sm:gap-3.5">
                             <div>
                                 <label class="block text-xs font-bold text-stone-600 uppercase tracking-wider mb-1">Eyebrow Badge <span class="text-red-500">*</span></label>
-                                <input type="text" id="aboutStoryTagText" name="tag_text" placeholder="e.g. The KNOTELLE Story" class="w-full bg-stone-50 border border-stone-200 rounded-xl px-3.5 py-2.5 text-sm font-semibold text-stone-800 focus:bg-white focus:outline-none focus:ring-2 focus:ring-red-500">
+                                <input type="text" id="aboutStoryTagText" name="tag_text" placeholder="e.g. The KNOTELLE Story" class="w-full bg-stone-50 border border-stone-200 rounded-xl px-3 sm:px-3.5 py-2 sm:py-2.5 text-xs sm:text-sm font-semibold text-stone-800 focus:bg-white focus:outline-none focus:ring-2 focus:ring-red-500">
                             </div>
                             <div>
                                 <label class="block text-xs font-bold text-stone-600 uppercase tracking-wider mb-1">Main Headline Title <span class="text-red-500">*</span></label>
-                                <input type="text" id="aboutStoryTitle" name="title" placeholder="e.g. Every Loop Tells a Story" class="w-full bg-stone-50 border border-stone-200 rounded-xl px-3.5 py-2.5 text-sm font-semibold text-stone-800 focus:bg-white focus:outline-none focus:ring-2 focus:ring-red-500">
+                                <input type="text" id="aboutStoryTitle" name="title" placeholder="e.g. Every Loop Tells a Story" class="w-full bg-stone-50 border border-stone-200 rounded-xl px-3 sm:px-3.5 py-2 sm:py-2.5 text-xs sm:text-sm font-semibold text-stone-800 focus:bg-white focus:outline-none focus:ring-2 focus:ring-red-500">
                             </div>
                         </div>
 
                         <div>
                             <label class="block text-xs font-bold text-stone-600 uppercase tracking-wider mb-1">Subtitle / Catchphrase</label>
-                            <input type="text" id="aboutStorySubtitle" name="subtitle" placeholder="e.g. Handcrafted slow-made warmth from Bengaluru" class="w-full bg-stone-50 border border-stone-200 rounded-xl px-3.5 py-2.5 text-sm font-semibold text-stone-800 focus:bg-white focus:outline-none focus:ring-2 focus:ring-red-500">
+                            <input type="text" id="aboutStorySubtitle" name="subtitle" placeholder="e.g. Handcrafted slow-made warmth from Bengaluru" class="w-full bg-stone-50 border border-stone-200 rounded-xl px-3 sm:px-3.5 py-2 sm:py-2.5 text-xs sm:text-sm font-semibold text-stone-800 focus:bg-white focus:outline-none focus:ring-2 focus:ring-red-500">
                         </div>
                     </div>
 
                     <!-- Story Paragraphs -->
-                    <div class="space-y-3 pt-1">
+                    <div class="space-y-2.5 sm:space-y-3 pt-1">
                         <div class="flex items-center gap-2 border-b border-stone-100 pb-1.5">
                             <i class="fas fa-paragraph text-red-600 text-xs"></i>
                             <span class="text-xs font-bold text-stone-700 uppercase tracking-wider">Story Narrative (2 Paragraphs)</span>
@@ -1116,53 +1136,53 @@
 
                         <div>
                             <label class="block text-xs font-bold text-stone-600 uppercase tracking-wider mb-1">Paragraph 1 (Primary Narrative) <span class="text-red-500">*</span></label>
-                            <textarea id="aboutStoryDescription" name="description" rows="3" placeholder="In a world flooded with disposable factory goods..." class="w-full bg-stone-50 border border-stone-200 rounded-xl px-3.5 py-2.5 text-sm font-semibold text-stone-800 focus:bg-white focus:outline-none focus:ring-2 focus:ring-red-500"></textarea>
+                            <textarea id="aboutStoryDescription" name="description" rows="3" placeholder="In a world flooded with disposable factory goods..." class="w-full bg-stone-50 border border-stone-200 rounded-xl px-3 sm:px-3.5 py-2 sm:py-2.5 text-xs sm:text-sm font-semibold text-stone-800 focus:bg-white focus:outline-none focus:ring-2 focus:ring-red-500"></textarea>
                         </div>
 
                         <div>
                             <label class="block text-xs font-bold text-stone-600 uppercase tracking-wider mb-1">Paragraph 2 (Secondary Narrative)</label>
-                            <textarea id="aboutStoryParagraph2" name="paragraph_2" rows="3" placeholder="When you order a bouquet of crochet roses, a customized bunny keychain..." class="w-full bg-stone-50 border border-stone-200 rounded-xl px-3.5 py-2.5 text-sm font-semibold text-stone-800 focus:bg-white focus:outline-none focus:ring-2 focus:ring-red-500"></textarea>
+                            <textarea id="aboutStoryParagraph2" name="paragraph_2" rows="3" placeholder="When you order a bouquet of crochet roses, a customized bunny keychain..." class="w-full bg-stone-50 border border-stone-200 rounded-xl px-3 sm:px-3.5 py-2 sm:py-2.5 text-xs sm:text-sm font-semibold text-stone-800 focus:bg-white focus:outline-none focus:ring-2 focus:ring-red-500"></textarea>
                         </div>
                     </div>
 
                     <!-- Story Imagery -->
-                    <div class="space-y-3 pt-1">
+                    <div class="space-y-2.5 sm:space-y-3 pt-1">
                         <div class="flex items-center gap-2 border-b border-stone-100 pb-1.5">
                             <i class="fas fa-image text-red-600 text-xs"></i>
                             <span class="text-xs font-bold text-stone-700 uppercase tracking-wider">Artisan Crafting Visual (Desktop & Mobile)</span>
                         </div>
 
-                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                             <!-- Desktop Box -->
-                            <div class="bg-stone-50/80 border border-stone-200/90 rounded-2xl p-4 space-y-2.5">
+                            <div class="bg-stone-50/80 border border-stone-200/90 rounded-2xl p-3 sm:p-4 space-y-2 sm:space-y-2.5">
                                 <div class="flex items-center justify-between">
-                                    <span class="text-xs font-bold text-stone-800">Desktop / Main Photo</span>
+                                    <span class="text-xs font-bold text-stone-800">Desktop Photo</span>
                                     <button type="button" onclick="openMediaPicker('about_desktop')" class="px-2 py-0.5 rounded-lg bg-white hover:bg-stone-100 border border-stone-200 text-stone-700 text-[10px] font-bold transition-all flex items-center gap-1 cursor-pointer">
-                                        <i class="fas fa-photo-video text-red-500"></i> Media Library
+                                        <i class="fas fa-photo-video text-red-500"></i> Library
                                     </button>
                                 </div>
                                 <div class="border-2 border-dashed border-stone-200 rounded-xl p-3 text-center hover:border-red-400 hover:bg-red-50/20 transition-all cursor-pointer" onclick="document.getElementById('aboutStoryDesktopFileInput').click()">
                                     <i class="fas fa-cloud-upload-alt text-red-500 text-base mb-1"></i>
                                     <p class="text-xs font-bold text-stone-700" id="aboutDesktopFileLabel">Upload Desktop Photo</p>
-                                    <p class="text-[10px] text-stone-400">1000 × 1100 px (JPG/PNG/WEBP)</p>
+                                    <p class="text-[10px] text-stone-400">1000 × 1100 px</p>
                                     <input type="file" id="aboutStoryDesktopFileInput" name="image" class="hidden" accept=".jpg,.jpeg,.png,.webp" onchange="handleAboutDesktopFileChange(this)">
                                 </div>
                                 <div id="aboutDesktopPreviewContainer" class="bg-white rounded-xl p-2 border border-stone-200 flex items-center gap-3">
-                                    <img id="aboutDesktopPreviewImg" src="" class="w-14 h-14 rounded-lg object-cover border border-stone-200">
+                                    <img id="aboutDesktopPreviewImg" src="" class="w-12 h-12 sm:w-14 sm:h-14 rounded-lg object-cover border border-stone-200 shrink-0">
                                     <div class="flex-1 min-w-0">
                                         <p class="text-xs font-bold text-stone-800 truncate" id="aboutDesktopFileName">Main Photo Active</p>
                                         <p class="text-[10px] text-emerald-600 font-semibold" id="aboutDesktopFileSize">Ready</p>
                                     </div>
-                                    <button type="button" onclick="clearAboutDesktopFileInput()" class="text-stone-400 hover:text-red-600 p-1 cursor-pointer"><i class="fas fa-times"></i></button>
+                                    <button type="button" onclick="clearAboutDesktopFileInput()" class="text-stone-400 hover:text-red-600 p-1 cursor-pointer shrink-0"><i class="fas fa-times"></i></button>
                                 </div>
                             </div>
 
                             <!-- Mobile Box -->
-                            <div class="bg-stone-50/80 border border-stone-200/90 rounded-2xl p-4 space-y-2.5">
+                            <div class="bg-stone-50/80 border border-stone-200/90 rounded-2xl p-3 sm:p-4 space-y-2 sm:space-y-2.5">
                                 <div class="flex items-center justify-between">
                                     <span class="text-xs font-bold text-stone-800">Mobile Photo <span class="text-stone-400 text-[10px]">(Optional)</span></span>
                                     <button type="button" onclick="openMediaPicker('about_mobile')" class="px-2 py-0.5 rounded-lg bg-white hover:bg-stone-100 border border-stone-200 text-stone-700 text-[10px] font-bold transition-all flex items-center gap-1 cursor-pointer">
-                                        <i class="fas fa-photo-video text-red-500"></i> Media Library
+                                        <i class="fas fa-photo-video text-red-500"></i> Library
                                     </button>
                                 </div>
                                 <div class="border-2 border-dashed border-stone-200 rounded-xl p-3 text-center hover:border-red-400 hover:bg-red-50/20 transition-all cursor-pointer" onclick="document.getElementById('aboutStoryMobileFileInput').click()">
@@ -1172,41 +1192,41 @@
                                     <input type="file" id="aboutStoryMobileFileInput" name="mobile_image" class="hidden" accept=".jpg,.jpeg,.png,.webp" onchange="handleAboutMobileFileChange(this)">
                                 </div>
                                 <div id="aboutMobilePreviewContainer" class="hidden bg-white rounded-xl p-2 border border-stone-200 flex items-center gap-3">
-                                    <img id="aboutMobilePreviewImg" src="" class="w-14 h-14 rounded-lg object-cover border border-stone-200">
+                                    <img id="aboutMobilePreviewImg" src="" class="w-12 h-12 sm:w-14 sm:h-14 rounded-lg object-cover border border-stone-200 shrink-0">
                                     <div class="flex-1 min-w-0">
                                         <p class="text-xs font-bold text-stone-800 truncate" id="aboutMobileFileName">Mobile Photo Active</p>
                                         <p class="text-[10px] text-emerald-600 font-semibold" id="aboutMobileFileSize">Ready</p>
                                     </div>
-                                    <button type="button" onclick="clearAboutMobileFileInput()" class="text-stone-400 hover:text-red-600 p-1 cursor-pointer"><i class="fas fa-times"></i></button>
+                                    <button type="button" onclick="clearAboutMobileFileInput()" class="text-stone-400 hover:text-red-600 p-1 cursor-pointer shrink-0"><i class="fas fa-times"></i></button>
                                 </div>
                             </div>
                         </div>
 
                         <div>
                             <label class="block text-xs font-bold text-stone-600 uppercase tracking-wider mb-1">Alt Text (SEO & Accessibility)</label>
-                            <input type="text" id="aboutStoryAlt" name="alt_text" placeholder="e.g. Artisan stitching crochet with wooden hook" class="w-full bg-stone-50 border border-stone-200 rounded-xl px-3.5 py-2 text-sm font-semibold text-stone-800 focus:bg-white focus:outline-none focus:ring-2 focus:ring-red-500">
+                            <input type="text" id="aboutStoryAlt" name="alt_text" placeholder="e.g. Artisan stitching crochet with wooden hook" class="w-full bg-stone-50 border border-stone-200 rounded-xl px-3 sm:px-3.5 py-2 text-xs sm:text-sm font-semibold text-stone-800 focus:bg-white focus:outline-none focus:ring-2 focus:ring-red-500">
                         </div>
                     </div>
 
                     <!-- Floating Badge Settings -->
-                    <div class="space-y-3 pt-1">
+                    <div class="space-y-2.5 sm:space-y-3 pt-1">
                         <div class="flex items-center gap-2 border-b border-stone-100 pb-1.5">
                             <i class="fas fa-certificate text-red-600 text-xs"></i>
                             <span class="text-xs font-bold text-stone-700 uppercase tracking-wider">Floating Handcrafted Badge</span>
                         </div>
 
-                        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3.5">
+                        <div class="grid grid-cols-1 sm:grid-cols-3 gap-2.5 sm:gap-3.5">
                             <div>
                                 <label class="block text-xs font-bold text-stone-600 uppercase tracking-wider mb-1">Badge Title</label>
-                                <input type="text" id="aboutStoryFloatingTitle" name="floating_badge_title" placeholder="e.g. 100% Handcrafted" class="w-full bg-stone-50 border border-stone-200 rounded-xl px-3.5 py-2 text-sm font-semibold text-stone-800 focus:bg-white focus:outline-none focus:ring-2 focus:ring-red-500">
+                                <input type="text" id="aboutStoryFloatingTitle" name="floating_badge_title" placeholder="e.g. 100% Handcrafted" class="w-full bg-stone-50 border border-stone-200 rounded-xl px-3 sm:px-3.5 py-2 text-xs sm:text-sm font-semibold text-stone-800 focus:bg-white focus:outline-none focus:ring-2 focus:ring-red-500">
                             </div>
                             <div>
                                 <label class="block text-xs font-bold text-stone-600 uppercase tracking-wider mb-1">Badge Subtitle</label>
-                                <input type="text" id="aboutStoryFloatingSubtitle" name="floating_badge_subtitle" placeholder="e.g. Never mass machine produced" class="w-full bg-stone-50 border border-stone-200 rounded-xl px-3.5 py-2 text-sm font-semibold text-stone-800 focus:bg-white focus:outline-none focus:ring-2 focus:ring-red-500">
+                                <input type="text" id="aboutStoryFloatingSubtitle" name="floating_badge_subtitle" placeholder="e.g. Never mass produced" class="w-full bg-stone-50 border border-stone-200 rounded-xl px-3 sm:px-3.5 py-2 text-xs sm:text-sm font-semibold text-stone-800 focus:bg-white focus:outline-none focus:ring-2 focus:ring-red-500">
                             </div>
                             <div>
                                 <label class="block text-xs font-bold text-stone-600 uppercase tracking-wider mb-1">Badge Icon</label>
-                                <select id="aboutStoryFloatingIcon" name="floating_badge_icon" class="w-full bg-stone-50 border border-stone-200 rounded-xl px-3.5 py-2.5 text-sm font-semibold text-stone-800 focus:bg-white focus:outline-none focus:ring-2 focus:ring-red-500">
+                                <select id="aboutStoryFloatingIcon" name="floating_badge_icon" class="w-full bg-stone-50 border border-stone-200 rounded-xl px-3 sm:px-3.5 py-2 text-xs sm:text-sm font-semibold text-stone-800 focus:bg-white focus:outline-none focus:ring-2 focus:ring-red-500">
                                     <option value="Heart">Heart (♡)</option>
                                     <option value="Sparkles">Sparkles (✨)</option>
                                     <option value="Leaf">Leaf (🌿)</option>
@@ -1225,43 +1245,43 @@
                     </div>
 
                     <!-- Call To Action Button -->
-                    <div class="space-y-3 pt-1">
+                    <div class="space-y-2.5 sm:space-y-3 pt-1">
                         <div class="flex items-center gap-2 border-b border-stone-100 pb-1.5">
                             <i class="fas fa-mouse-pointer text-red-600 text-xs"></i>
                             <span class="text-xs font-bold text-stone-700 uppercase tracking-wider">Custom Creation Call-To-Action</span>
                         </div>
 
-                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5 sm:gap-3.5">
                             <div>
                                 <label class="block text-xs font-bold text-stone-600 uppercase tracking-wider mb-1">CTA Button Text</label>
-                                <input type="text" id="aboutStoryCtaText" name="cta_text" placeholder="e.g. Request a Custom Creation" class="w-full bg-stone-50 border border-stone-200 rounded-xl px-3.5 py-2 text-sm font-semibold text-stone-800 focus:bg-white focus:outline-none focus:ring-2 focus:ring-red-500">
+                                <input type="text" id="aboutStoryCtaText" name="cta_text" placeholder="e.g. Request a Custom Creation" class="w-full bg-stone-50 border border-stone-200 rounded-xl px-3 sm:px-3.5 py-2 text-xs sm:text-sm font-semibold text-stone-800 focus:bg-white focus:outline-none focus:ring-2 focus:ring-red-500">
                             </div>
                             <div>
                                 <label class="block text-xs font-bold text-stone-600 uppercase tracking-wider mb-1">CTA Button Link</label>
-                                <input type="text" id="aboutStoryCtaLink" name="cta_link" placeholder="e.g. /custom-order" class="w-full bg-stone-50 border border-stone-200 rounded-xl px-3.5 py-2 text-sm font-semibold text-stone-800 focus:bg-white focus:outline-none focus:ring-2 focus:ring-red-500">
+                                <input type="text" id="aboutStoryCtaLink" name="cta_link" placeholder="e.g. /custom-order" class="w-full bg-stone-50 border border-stone-200 rounded-xl px-3 sm:px-3.5 py-2 text-xs sm:text-sm font-semibold text-stone-800 focus:bg-white focus:outline-none focus:ring-2 focus:ring-red-500">
                             </div>
                         </div>
 
-                        <div class="flex items-center justify-between gap-4 pt-1">
+                        <div class="flex flex-wrap items-center justify-between gap-3 pt-1">
                             <div class="flex items-center gap-2">
                                 <input type="checkbox" id="aboutStoryCtaVisible" name="cta_visible" checked class="w-4 h-4 rounded text-red-600 focus:ring-red-500">
-                                <label for="aboutStoryCtaVisible" class="text-xs font-bold text-stone-700">Display CTA Button on Story</label>
+                                <label for="aboutStoryCtaVisible" class="text-xs font-bold text-stone-700">Display CTA Button</label>
                             </div>
 
                             <div class="flex items-center gap-2">
                                 <input type="checkbox" id="aboutStoryActive" name="is_active" checked class="w-4 h-4 rounded text-red-600 focus:ring-red-500">
-                                <label for="aboutStoryActive" class="text-xs font-bold text-stone-700">Section Active on public /about page</label>
+                                <label for="aboutStoryActive" class="text-xs font-bold text-stone-700">Section Active on /about page</label>
                             </div>
                         </div>
                     </div>
                 </div>
 
                 <!-- Sticky Footer with Action Buttons -->
-                <div class="p-4 px-6 bg-stone-50 border-t border-stone-100 shrink-0 flex items-center justify-end gap-3">
-                    <button type="button" onclick="closeAboutStoryModal()" class="btn-secondary text-xs px-5 py-2.5 cursor-pointer">Cancel</button>
-                    <button type="submit" id="aboutStorySubmitBtn" class="btn-primary text-xs px-6 py-2.5 flex items-center gap-2 shadow-sm cursor-pointer">
+                <div class="p-3 sm:p-4 px-4 sm:px-6 bg-stone-50 border-t border-stone-100 shrink-0 flex flex-wrap items-center justify-end gap-2 sm:gap-3">
+                    <button type="button" onclick="closeAboutStoryModal()" class="btn-secondary text-xs px-4 sm:px-5 py-2 sm:py-2.5 cursor-pointer">Cancel</button>
+                    <button type="submit" id="aboutStorySubmitBtn" class="btn-primary text-xs px-5 sm:px-6 py-2 sm:py-2.5 flex items-center gap-2 shadow-sm cursor-pointer">
                         <i class="fas fa-save"></i>
-                        <span>Save Story & Visuals</span>
+                        <span>Save Story</span>
                     </button>
                 </div>
             </form>
@@ -1269,50 +1289,50 @@
     </div>
 
     <!-- MODAL 10: CRAFT PILLARS HEADER SETTINGS MODAL -->
-    <div id="craftPillarsHeaderModal" onclick="if(event.target === this) closeCraftPillarsHeaderModal()" class="fixed inset-0 bg-stone-900/60 backdrop-blur-xs hidden items-center justify-center z-[9999] p-4 overflow-y-auto" style="display: none;">
-        <div class="bg-white rounded-3xl max-w-lg w-full max-h-[90vh] flex flex-col overflow-hidden shadow-2xl border border-stone-100 animate-fadeIn" onclick="event.stopPropagation()">
+    <div id="craftPillarsHeaderModal" onclick="if(event.target === this) closeCraftPillarsHeaderModal()" class="fixed inset-0 bg-stone-900/60 backdrop-blur-xs hidden items-center justify-center z-[9999] p-2 sm:p-4 overflow-y-auto" style="display: none;">
+        <div class="bg-white rounded-2xl sm:rounded-3xl max-w-lg w-full max-h-[94vh] sm:max-h-[90vh] flex flex-col overflow-hidden shadow-2xl border border-stone-100 animate-fadeIn" onclick="event.stopPropagation()">
             <!-- Pinned Header -->
-            <div class="p-5 px-6 border-b border-stone-100 flex items-center justify-between bg-stone-50/80 shrink-0">
-                <div class="flex items-center gap-3">
-                    <div class="w-10 h-10 rounded-2xl bg-red-50 text-red-600 flex items-center justify-center font-bold text-base shadow-2xs">
+            <div class="p-3.5 sm:p-5 px-4 sm:px-6 border-b border-stone-100 flex items-center justify-between bg-stone-50/80 shrink-0">
+                <div class="flex items-center gap-2.5 sm:gap-3 min-w-0 pr-2">
+                    <div class="w-8 h-8 sm:w-10 sm:h-10 rounded-xl sm:rounded-2xl bg-red-50 text-red-600 flex items-center justify-center font-bold text-xs sm:text-base shadow-2xs shrink-0">
                         <i class="fas fa-cog"></i>
                     </div>
-                    <div>
-                        <h3 class="text-base font-bold text-stone-800">Our Craft Pillars Section Header</h3>
-                        <p class="text-xs text-stone-500 font-medium">Customize section title, subtitle, and badge</p>
+                    <div class="min-w-0">
+                        <h3 class="text-sm sm:text-base font-bold text-stone-800 truncate">Craft Pillars Header</h3>
+                        <p class="hidden sm:block text-xs text-stone-500 font-medium truncate">Customize section title, subtitle, and badge</p>
                     </div>
                 </div>
-                <button type="button" onclick="closeCraftPillarsHeaderModal()" class="w-8 h-8 rounded-full bg-stone-100 text-stone-400 hover:text-stone-700 flex items-center justify-center transition-colors cursor-pointer">
+                <button type="button" onclick="closeCraftPillarsHeaderModal()" class="w-8 h-8 rounded-full bg-stone-100 text-stone-400 hover:text-stone-700 flex items-center justify-center transition-colors cursor-pointer shrink-0">
                     <i class="fas fa-times text-sm"></i>
                 </button>
             </div>
 
             <!-- Form Wrapper -->
             <form id="craftPillarsHeaderForm" novalidate onsubmit="handleCraftPillarsHeaderSubmit(event)" class="flex flex-col flex-1 min-h-0 overflow-hidden">
-                <div class="p-6 space-y-4 overflow-y-auto flex-1 overscroll-contain">
+                <div class="p-3.5 sm:p-6 space-y-3 sm:space-y-4 overflow-y-auto overflow-x-hidden flex-1 overscroll-contain">
                     <div>
                         <label class="block text-xs font-bold text-stone-600 uppercase tracking-wider mb-1">Section Title <span class="text-red-500">*</span></label>
-                        <input type="text" id="craftPillarsHeaderTitle" name="title" value="Our Craft Pillars" placeholder="e.g. Our Craft Pillars" class="w-full bg-stone-50 border border-stone-200 rounded-xl px-3.5 py-2.5 text-sm font-semibold text-stone-800 focus:bg-white focus:outline-none focus:ring-2 focus:ring-red-500">
+                        <input type="text" id="craftPillarsHeaderTitle" name="title" value="Our Craft Pillars" placeholder="e.g. Our Craft Pillars" class="w-full bg-stone-50 border border-stone-200 rounded-xl px-3 sm:px-3.5 py-2 sm:py-2.5 text-xs sm:text-sm font-semibold text-stone-800 focus:bg-white focus:outline-none focus:ring-2 focus:ring-red-500">
                     </div>
                     <div>
                         <label class="block text-xs font-bold text-stone-600 uppercase tracking-wider mb-1">Eyebrow Badge Text</label>
-                        <input type="text" id="craftPillarsHeaderTagText" name="tag_text" value="Artisan Standards" placeholder="e.g. Artisan Standards" class="w-full bg-stone-50 border border-stone-200 rounded-xl px-3.5 py-2.5 text-sm font-semibold text-stone-800 focus:bg-white focus:outline-none focus:ring-2 focus:ring-red-500">
+                        <input type="text" id="craftPillarsHeaderTagText" name="tag_text" value="Artisan Standards" placeholder="e.g. Artisan Standards" class="w-full bg-stone-50 border border-stone-200 rounded-xl px-3 sm:px-3.5 py-2 sm:py-2.5 text-xs sm:text-sm font-semibold text-stone-800 focus:bg-white focus:outline-none focus:ring-2 focus:ring-red-500">
                     </div>
                     <div>
                         <label class="block text-xs font-bold text-stone-600 uppercase tracking-wider mb-1">Section Subtitle / Description</label>
-                        <textarea id="craftPillarsHeaderSubtitle" name="subtitle" rows="3" placeholder="Guiding principles behind every stitch we make..." class="w-full bg-stone-50 border border-stone-200 rounded-xl px-3.5 py-2.5 text-sm font-semibold text-stone-800 focus:bg-white focus:outline-none focus:ring-2 focus:ring-red-500">Guiding principles behind every stitch we make.</textarea>
+                        <textarea id="craftPillarsHeaderSubtitle" name="subtitle" rows="3" placeholder="Guiding principles behind every stitch we make..." class="w-full bg-stone-50 border border-stone-200 rounded-xl px-3 sm:px-3.5 py-2 sm:py-2.5 text-xs sm:text-sm font-semibold text-stone-800 focus:bg-white focus:outline-none focus:ring-2 focus:ring-red-500">Guiding principles behind every stitch we make.</textarea>
                     </div>
-                    <div class="flex items-center gap-2 pt-2">
+                    <div class="flex items-center gap-2 pt-1 sm:pt-2">
                         <input type="checkbox" id="craftPillarsHeaderActive" name="is_active" checked class="w-4 h-4 rounded text-red-600 focus:ring-red-500">
-                        <label for="craftPillarsHeaderActive" class="text-xs font-bold text-stone-700">Section Active (Visible on About Page)</label>
+                        <label for="craftPillarsHeaderActive" class="text-xs font-bold text-stone-700">Section Active on About Page</label>
                     </div>
                 </div>
                 <!-- Sticky Footer with Action Buttons -->
-                <div class="p-4 px-6 bg-stone-50 border-t border-stone-100 shrink-0 flex items-center justify-end gap-3">
-                    <button type="button" onclick="closeCraftPillarsHeaderModal()" class="btn-secondary text-xs px-5 py-2.5 cursor-pointer">Cancel</button>
-                    <button type="submit" id="craftPillarsHeaderSubmitBtn" class="btn-primary text-xs px-6 py-2.5 flex items-center gap-2 shadow-sm cursor-pointer">
+                <div class="p-3 sm:p-4 px-4 sm:px-6 bg-stone-50 border-t border-stone-100 shrink-0 flex flex-wrap items-center justify-end gap-2 sm:gap-3">
+                    <button type="button" onclick="closeCraftPillarsHeaderModal()" class="btn-secondary text-xs px-4 sm:px-5 py-2 sm:py-2.5 cursor-pointer">Cancel</button>
+                    <button type="submit" id="craftPillarsHeaderSubmitBtn" class="btn-primary text-xs px-5 sm:px-6 py-2 sm:py-2.5 flex items-center gap-2 shadow-sm cursor-pointer">
                         <i class="fas fa-save"></i>
-                        <span>Save Section Header</span>
+                        <span>Save Header</span>
                     </button>
                 </div>
             </form>
@@ -1320,20 +1340,20 @@
     </div>
 
     <!-- MODAL 11: ADD / EDIT CRAFT PILLAR MODAL -->
-    <div id="craftPillarModal" onclick="if(event.target === this) closeCraftPillarModal()" class="fixed inset-0 bg-stone-900/60 backdrop-blur-xs hidden items-center justify-center z-[9999] p-4 overflow-y-auto" style="display: none;">
-        <div class="bg-white rounded-3xl max-w-xl w-full max-h-[92vh] flex flex-col overflow-hidden shadow-2xl border border-stone-100 animate-fadeIn" onclick="event.stopPropagation()">
+    <div id="craftPillarModal" onclick="if(event.target === this) closeCraftPillarModal()" class="fixed inset-0 bg-stone-900/60 backdrop-blur-xs hidden items-center justify-center z-[9999] p-2 sm:p-4 overflow-y-auto" style="display: none;">
+        <div class="bg-white rounded-2xl sm:rounded-3xl max-w-xl w-full max-h-[94vh] sm:max-h-[92vh] flex flex-col overflow-hidden shadow-2xl border border-stone-100 animate-fadeIn" onclick="event.stopPropagation()">
             <!-- Pinned Header -->
-            <div class="p-5 px-6 border-b border-stone-100 flex items-center justify-between bg-stone-50/80 shrink-0">
-                <div class="flex items-center gap-3">
-                    <div class="w-10 h-10 rounded-2xl bg-red-50 text-red-600 flex items-center justify-center font-bold text-base shadow-2xs">
+            <div class="p-3.5 sm:p-5 px-4 sm:px-6 border-b border-stone-100 flex items-center justify-between bg-stone-50/80 shrink-0">
+                <div class="flex items-center gap-2.5 sm:gap-3 min-w-0 pr-2">
+                    <div class="w-8 h-8 sm:w-10 sm:h-10 rounded-xl sm:rounded-2xl bg-red-50 text-red-600 flex items-center justify-center font-bold text-xs sm:text-base shadow-2xs shrink-0">
                         <i class="fas fa-cube"></i>
                     </div>
-                    <div>
-                        <h3 class="text-base font-bold text-stone-800" id="craftPillarModalTitle">Add Craft Pillar</h3>
-                        <p class="text-xs text-stone-500 font-medium">Add or edit craftsmanship pillars displayed on the About page</p>
+                    <div class="min-w-0">
+                        <h3 class="text-sm sm:text-base font-bold text-stone-800 truncate" id="craftPillarModalTitle">Add Craft Pillar</h3>
+                        <p class="hidden sm:block text-xs text-stone-500 font-medium truncate">Add or edit craftsmanship pillars displayed on the About page</p>
                     </div>
                 </div>
-                <button type="button" onclick="closeCraftPillarModal()" class="w-8 h-8 rounded-full bg-stone-100 text-stone-400 hover:text-stone-700 flex items-center justify-center transition-colors cursor-pointer">
+                <button type="button" onclick="closeCraftPillarModal()" class="w-8 h-8 rounded-full bg-stone-100 text-stone-400 hover:text-stone-700 flex items-center justify-center transition-colors cursor-pointer shrink-0">
                     <i class="fas fa-times text-sm"></i>
                 </button>
             </div>
@@ -1344,15 +1364,15 @@
                 <input type="hidden" id="craftPillarIconName" name="icon_name" value="Leaf">
                 <input type="hidden" id="craftPillarIconType" name="icon_type" value="preset">
 
-                <div class="p-6 space-y-4 overflow-y-auto flex-1 overscroll-contain">
+                <div class="p-3.5 sm:p-6 space-y-3 sm:space-y-4 overflow-y-auto overflow-x-hidden flex-1 overscroll-contain">
                     <div>
                         <label class="block text-xs font-bold text-stone-600 uppercase tracking-wider mb-1">Pillar Title <span class="text-red-500">*</span></label>
-                        <input type="text" id="craftPillarTitle" name="title" placeholder="e.g. Natural Materials" class="w-full bg-stone-50 border border-stone-200 rounded-xl px-3.5 py-2.5 text-sm font-semibold text-stone-800 focus:bg-white focus:outline-none focus:ring-2 focus:ring-red-500">
+                        <input type="text" id="craftPillarTitle" name="title" placeholder="e.g. Natural Materials" class="w-full bg-stone-50 border border-stone-200 rounded-xl px-3 sm:px-3.5 py-2 sm:py-2.5 text-xs sm:text-sm font-semibold text-stone-800 focus:bg-white focus:outline-none focus:ring-2 focus:ring-red-500">
                     </div>
 
                     <div>
                         <label class="block text-xs font-bold text-stone-600 uppercase tracking-wider mb-1">Pillar Description <span class="text-red-500">*</span></label>
-                        <textarea id="craftPillarDescription" name="description" rows="3" placeholder="We use 100% pure milk cotton and mercerized organic fibers..." class="w-full bg-stone-50 border border-stone-200 rounded-xl px-3.5 py-2.5 text-sm font-semibold text-stone-800 focus:bg-white focus:outline-none focus:ring-2 focus:ring-red-500"></textarea>
+                        <textarea id="craftPillarDescription" name="description" rows="3" placeholder="We use 100% pure milk cotton and mercerized organic fibers..." class="w-full bg-stone-50 border border-stone-200 rounded-xl px-3 sm:px-3.5 py-2 sm:py-2.5 text-xs sm:text-sm font-semibold text-stone-800 focus:bg-white focus:outline-none focus:ring-2 focus:ring-red-500"></textarea>
                     </div>
 
                     <!-- Icon Selector -->
@@ -1360,79 +1380,79 @@
                         <label class="block text-xs font-bold text-stone-600 uppercase tracking-wider">Choose Botanical / Luxury Icon</label>
                         
                         <!-- Visual Icon Preset Grid -->
-                        <div class="grid grid-cols-4 sm:grid-cols-6 gap-2 p-3 bg-stone-50 rounded-2xl border border-stone-200" id="pillarIconPickerGrid">
-                            <button type="button" onclick="selectPillarIcon('Leaf')" data-icon="Leaf" class="pillar-icon-btn p-2.5 rounded-xl border border-stone-200 bg-white hover:border-red-400 flex flex-col items-center gap-1 transition-all cursor-pointer">
-                                <i class="fas fa-leaf text-base text-red-600"></i>
+                        <div class="grid grid-cols-4 sm:grid-cols-6 gap-2 p-2.5 sm:p-3 bg-stone-50 rounded-2xl border border-stone-200" id="pillarIconPickerGrid">
+                            <button type="button" onclick="selectPillarIcon('Leaf')" data-icon="Leaf" class="pillar-icon-btn p-2 sm:p-2.5 rounded-xl border border-stone-200 bg-white hover:border-red-400 flex flex-col items-center gap-1 transition-all cursor-pointer">
+                                <i class="fas fa-leaf text-sm sm:text-base text-red-600"></i>
                                 <span class="text-[10px] font-bold text-stone-700">Leaf</span>
                             </button>
-                            <button type="button" onclick="selectPillarIcon('Sparkles')" data-icon="Sparkles" class="pillar-icon-btn p-2.5 rounded-xl border border-stone-200 bg-white hover:border-red-400 flex flex-col items-center gap-1 transition-all cursor-pointer">
-                                <i class="fas fa-magic text-base text-red-600"></i>
+                            <button type="button" onclick="selectPillarIcon('Sparkles')" data-icon="Sparkles" class="pillar-icon-btn p-2 sm:p-2.5 rounded-xl border border-stone-200 bg-white hover:border-red-400 flex flex-col items-center gap-1 transition-all cursor-pointer">
+                                <i class="fas fa-magic text-sm sm:text-base text-red-600"></i>
                                 <span class="text-[10px] font-bold text-stone-700">Sparkles</span>
                             </button>
-                            <button type="button" onclick="selectPillarIcon('Heart')" data-icon="Heart" class="pillar-icon-btn p-2.5 rounded-xl border border-stone-200 bg-white hover:border-red-400 flex flex-col items-center gap-1 transition-all cursor-pointer">
-                                <i class="fas fa-heart text-base text-red-600"></i>
+                            <button type="button" onclick="selectPillarIcon('Heart')" data-icon="Heart" class="pillar-icon-btn p-2 sm:p-2.5 rounded-xl border border-stone-200 bg-white hover:border-red-400 flex flex-col items-center gap-1 transition-all cursor-pointer">
+                                <i class="fas fa-heart text-sm sm:text-base text-red-600"></i>
                                 <span class="text-[10px] font-bold text-stone-700">Heart</span>
                             </button>
-                            <button type="button" onclick="selectPillarIcon('Flower2')" data-icon="Flower2" class="pillar-icon-btn p-2.5 rounded-xl border border-stone-200 bg-white hover:border-red-400 flex flex-col items-center gap-1 transition-all cursor-pointer">
-                                <i class="fas fa-spa text-base text-red-600"></i>
+                            <button type="button" onclick="selectPillarIcon('Flower2')" data-icon="Flower2" class="pillar-icon-btn p-2 sm:p-2.5 rounded-xl border border-stone-200 bg-white hover:border-red-400 flex flex-col items-center gap-1 transition-all cursor-pointer">
+                                <i class="fas fa-spa text-sm sm:text-base text-red-600"></i>
                                 <span class="text-[10px] font-bold text-stone-700">Flower</span>
                             </button>
-                            <button type="button" onclick="selectPillarIcon('ShieldCheck')" data-icon="ShieldCheck" class="pillar-icon-btn p-2.5 rounded-xl border border-stone-200 bg-white hover:border-red-400 flex flex-col items-center gap-1 transition-all cursor-pointer">
-                                <i class="fas fa-shield-alt text-base text-red-600"></i>
+                            <button type="button" onclick="selectPillarIcon('ShieldCheck')" data-icon="ShieldCheck" class="pillar-icon-btn p-2 sm:p-2.5 rounded-xl border border-stone-200 bg-white hover:border-red-400 flex flex-col items-center gap-1 transition-all cursor-pointer">
+                                <i class="fas fa-shield-alt text-sm sm:text-base text-red-600"></i>
                                 <span class="text-[10px] font-bold text-stone-700">Shield</span>
                             </button>
-                            <button type="button" onclick="selectPillarIcon('Sun')" data-icon="Sun" class="pillar-icon-btn p-2.5 rounded-xl border border-stone-200 bg-white hover:border-red-400 flex flex-col items-center gap-1 transition-all cursor-pointer">
-                                <i class="fas fa-sun text-base text-red-600"></i>
+                            <button type="button" onclick="selectPillarIcon('Sun')" data-icon="Sun" class="pillar-icon-btn p-2 sm:p-2.5 rounded-xl border border-stone-200 bg-white hover:border-red-400 flex flex-col items-center gap-1 transition-all cursor-pointer">
+                                <i class="fas fa-sun text-sm sm:text-base text-red-600"></i>
                                 <span class="text-[10px] font-bold text-stone-700">Sun</span>
                             </button>
-                            <button type="button" onclick="selectPillarIcon('Star')" data-icon="Star" class="pillar-icon-btn p-2.5 rounded-xl border border-stone-200 bg-white hover:border-red-400 flex flex-col items-center gap-1 transition-all cursor-pointer">
-                                <i class="fas fa-star text-base text-red-600"></i>
+                            <button type="button" onclick="selectPillarIcon('Star')" data-icon="Star" class="pillar-icon-btn p-2 sm:p-2.5 rounded-xl border border-stone-200 bg-white hover:border-red-400 flex flex-col items-center gap-1 transition-all cursor-pointer">
+                                <i class="fas fa-star text-sm sm:text-base text-red-600"></i>
                                 <span class="text-[10px] font-bold text-stone-700">Star</span>
                             </button>
-                            <button type="button" onclick="selectPillarIcon('Award')" data-icon="Award" class="pillar-icon-btn p-2.5 rounded-xl border border-stone-200 bg-white hover:border-red-400 flex flex-col items-center gap-1 transition-all cursor-pointer">
-                                <i class="fas fa-award text-base text-red-600"></i>
+                            <button type="button" onclick="selectPillarIcon('Award')" data-icon="Award" class="pillar-icon-btn p-2 sm:p-2.5 rounded-xl border border-stone-200 bg-white hover:border-red-400 flex flex-col items-center gap-1 transition-all cursor-pointer">
+                                <i class="fas fa-award text-sm sm:text-base text-red-600"></i>
                                 <span class="text-[10px] font-bold text-stone-700">Award</span>
                             </button>
-                            <button type="button" onclick="selectPillarIcon('Gem')" data-icon="Gem" class="pillar-icon-btn p-2.5 rounded-xl border border-stone-200 bg-white hover:border-red-400 flex flex-col items-center gap-1 transition-all cursor-pointer">
-                                <i class="fas fa-gem text-base text-red-600"></i>
+                            <button type="button" onclick="selectPillarIcon('Gem')" data-icon="Gem" class="pillar-icon-btn p-2 sm:p-2.5 rounded-xl border border-stone-200 bg-white hover:border-red-400 flex flex-col items-center gap-1 transition-all cursor-pointer">
+                                <i class="fas fa-gem text-sm sm:text-base text-red-600"></i>
                                 <span class="text-[10px] font-bold text-stone-700">Gem</span>
                             </button>
-                            <button type="button" onclick="selectPillarIcon('Feather')" data-icon="Feather" class="pillar-icon-btn p-2.5 rounded-xl border border-stone-200 bg-white hover:border-red-400 flex flex-col items-center gap-1 transition-all cursor-pointer">
-                                <i class="fas fa-feather-alt text-base text-red-600"></i>
+                            <button type="button" onclick="selectPillarIcon('Feather')" data-icon="Feather" class="pillar-icon-btn p-2 sm:p-2.5 rounded-xl border border-stone-200 bg-white hover:border-red-400 flex flex-col items-center gap-1 transition-all cursor-pointer">
+                                <i class="fas fa-feather-alt text-sm sm:text-base text-red-600"></i>
                                 <span class="text-[10px] font-bold text-stone-700">Feather</span>
                             </button>
-                            <button type="button" onclick="selectPillarIcon('Gift')" data-icon="Gift" class="pillar-icon-btn p-2.5 rounded-xl border border-stone-200 bg-white hover:border-red-400 flex flex-col items-center gap-1 transition-all cursor-pointer">
-                                <i class="fas fa-gift text-base text-red-600"></i>
+                            <button type="button" onclick="selectPillarIcon('Gift')" data-icon="Gift" class="pillar-icon-btn p-2 sm:p-2.5 rounded-xl border border-stone-200 bg-white hover:border-red-400 flex flex-col items-center gap-1 transition-all cursor-pointer">
+                                <i class="fas fa-gift text-sm sm:text-base text-red-600"></i>
                                 <span class="text-[10px] font-bold text-stone-700">Gift</span>
                             </button>
-                            <button type="button" onclick="selectPillarIcon('Smile')" data-icon="Smile" class="pillar-icon-btn p-2.5 rounded-xl border border-stone-200 bg-white hover:border-red-400 flex flex-col items-center gap-1 transition-all cursor-pointer">
-                                <i class="fas fa-smile text-base text-red-600"></i>
+                            <button type="button" onclick="selectPillarIcon('Smile')" data-icon="Smile" class="pillar-icon-btn p-2 sm:p-2.5 rounded-xl border border-stone-200 bg-white hover:border-red-400 flex flex-col items-center gap-1 transition-all cursor-pointer">
+                                <i class="fas fa-smile text-sm sm:text-base text-red-600"></i>
                                 <span class="text-[10px] font-bold text-stone-700">Smile</span>
                             </button>
                         </div>
                     </div>
 
-                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5 pt-1">
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5 sm:gap-3.5 pt-1">
                         <div>
                             <label class="block text-xs font-bold text-stone-600 uppercase tracking-wider mb-1">Sort Order (Sequence)</label>
-                            <input type="number" id="craftPillarSortOrder" name="sort_order" min="1" placeholder="e.g. 1" class="w-full bg-stone-50 border border-stone-200 rounded-xl px-3.5 py-2.5 text-sm font-semibold text-stone-800 focus:bg-white focus:outline-none focus:ring-2 focus:ring-red-500">
+                            <input type="number" id="craftPillarSortOrder" name="sort_order" min="1" placeholder="e.g. 1" class="w-full bg-stone-50 border border-stone-200 rounded-xl px-3 sm:px-3.5 py-2 sm:py-2.5 text-xs sm:text-sm font-semibold text-stone-800 focus:bg-white focus:outline-none focus:ring-2 focus:ring-red-500">
                         </div>
                         <div>
                             <label class="block text-xs font-bold text-stone-600 uppercase tracking-wider mb-1">Status</label>
-                            <div class="flex items-center gap-2 pt-2.5">
+                            <div class="flex items-center gap-2 pt-2 sm:pt-2.5">
                                 <input type="checkbox" id="craftPillarActive" name="is_active" checked class="w-4 h-4 rounded text-red-600 focus:ring-red-500">
-                                <label for="craftPillarActive" class="text-xs font-bold text-stone-700">Active (Visible on About Page)</label>
+                                <label for="craftPillarActive" class="text-xs font-bold text-stone-700">Active on About Page</label>
                             </div>
                         </div>
                     </div>
                 </div>
 
                 <!-- Sticky Footer with Action Buttons -->
-                <div class="p-4 px-6 bg-stone-50 border-t border-stone-100 shrink-0 flex items-center justify-end gap-3">
-                    <button type="button" onclick="closeCraftPillarModal()" class="btn-secondary text-xs px-5 py-2.5 cursor-pointer">Cancel</button>
-                    <button type="submit" id="craftPillarSubmitBtn" class="btn-primary text-xs px-6 py-2.5 flex items-center gap-2 shadow-sm cursor-pointer">
+                <div class="p-3 sm:p-4 px-4 sm:px-6 bg-stone-50 border-t border-stone-100 shrink-0 flex flex-wrap items-center justify-end gap-2 sm:gap-3">
+                    <button type="button" onclick="closeCraftPillarModal()" class="btn-secondary text-xs px-4 sm:px-5 py-2 sm:py-2.5 cursor-pointer">Cancel</button>
+                    <button type="submit" id="craftPillarSubmitBtn" class="btn-primary text-xs px-5 sm:px-6 py-2 sm:py-2.5 flex items-center gap-2 shadow-sm cursor-pointer">
                         <i class="fas fa-save"></i>
-                        <span id="craftPillarSubmitBtnText">Save Craft Pillar</span>
+                        <span id="craftPillarSubmitBtnText">Save Pillar</span>
                     </button>
                 </div>
             </form>
@@ -1440,20 +1460,20 @@
     </div>
 
     <!-- MODAL: CUSTOM ORDER ITEM / CATEGORY MODAL -->
-    <div id="customOrderItemModal" onclick="if(event.target === this) closeCustomOrderItemModal()" class="fixed inset-0 bg-stone-900/60 backdrop-blur-xs hidden items-center justify-center z-[9999] p-4 overflow-y-auto" style="display: none;">
-        <div class="bg-white rounded-3xl max-w-lg w-full max-h-[90vh] flex flex-col overflow-hidden shadow-2xl border border-stone-100 animate-fadeIn" onclick="event.stopPropagation()">
+    <div id="customOrderItemModal" onclick="if(event.target === this) closeCustomOrderItemModal()" class="fixed inset-0 bg-stone-900/60 backdrop-blur-xs hidden items-center justify-center z-[9999] p-2 sm:p-4 overflow-y-auto" style="display: none;">
+        <div class="bg-white rounded-2xl sm:rounded-3xl max-w-lg w-full max-h-[94vh] sm:max-h-[90vh] flex flex-col overflow-hidden shadow-2xl border border-stone-100 animate-fadeIn" onclick="event.stopPropagation()">
             <!-- Pinned Header -->
-            <div class="p-5 px-6 border-b border-stone-100 flex items-center justify-between bg-stone-50/80 shrink-0">
-                <div class="flex items-center gap-3">
-                    <div class="w-10 h-10 rounded-2xl bg-red-50 text-red-600 flex items-center justify-center font-bold text-base shadow-2xs">
+            <div class="p-3.5 sm:p-5 px-4 sm:px-6 border-b border-stone-100 flex items-center justify-between bg-stone-50/80 shrink-0">
+                <div class="flex items-center gap-2.5 sm:gap-3 min-w-0 pr-2">
+                    <div class="w-8 h-8 sm:w-10 sm:h-10 rounded-xl sm:rounded-2xl bg-red-50 text-red-600 flex items-center justify-center font-bold text-xs sm:text-base shadow-2xs shrink-0">
                         <i class="fas fa-seedling"></i>
                     </div>
-                    <div>
-                        <h3 class="text-base font-bold text-stone-800" id="customOrderItemModalTitle">Add Custom Order Category</h3>
-                        <p class="text-xs text-stone-500 font-medium">Bespoke creation product type for Step 1</p>
+                    <div class="min-w-0">
+                        <h3 class="text-sm sm:text-base font-bold text-stone-800 truncate" id="customOrderItemModalTitle">Add Custom Order Category</h3>
+                        <p class="hidden sm:block text-xs text-stone-500 font-medium truncate">Bespoke creation product type for Step 1</p>
                     </div>
                 </div>
-                <button type="button" onclick="closeCustomOrderItemModal()" class="w-8 h-8 rounded-full bg-stone-100 hover:bg-stone-200 text-stone-500 flex items-center justify-center transition-colors cursor-pointer">
+                <button type="button" onclick="closeCustomOrderItemModal()" class="w-8 h-8 rounded-full bg-stone-100 hover:bg-stone-200 text-stone-500 flex items-center justify-center transition-colors cursor-pointer shrink-0">
                     <i class="fas fa-times text-xs"></i>
                 </button>
             </div>
@@ -1462,15 +1482,15 @@
             <form id="customOrderItemForm" onsubmit="handleCustomOrderItemSubmit(event)" class="flex flex-col flex-1 min-h-0 overflow-hidden">
                 <input type="hidden" id="customOrderItemId" name="id">
 
-                <div class="p-6 space-y-4 overflow-y-auto flex-1">
+                <div class="p-3.5 sm:p-6 space-y-3 sm:space-y-4 overflow-y-auto overflow-x-hidden flex-1">
                     <div>
                         <label class="block text-xs font-bold text-stone-600 uppercase tracking-wider mb-1">Item Name / Category <span class="text-red-500">*</span></label>
-                        <input type="text" id="customOrderItemTitle" name="title" required placeholder="e.g. Bouquet, Soft Toys, Keychain" class="w-full bg-stone-50 border border-stone-200 rounded-xl px-3.5 py-2.5 text-sm font-semibold text-stone-800 focus:bg-white focus:outline-none focus:ring-2 focus:ring-red-500">
+                        <input type="text" id="customOrderItemTitle" name="title" required placeholder="e.g. Bouquet, Soft Toys, Keychain" class="w-full bg-stone-50 border border-stone-200 rounded-xl px-3 sm:px-3.5 py-2 sm:py-2.5 text-xs sm:text-sm font-semibold text-stone-800 focus:bg-white focus:outline-none focus:ring-2 focus:ring-red-500">
                     </div>
 
                     <div>
                         <label class="block text-xs font-bold text-stone-600 uppercase tracking-wider mb-1">Subtitle / Note</label>
-                        <input type="text" id="customOrderItemSubtitle" name="subtitle" placeholder="e.g. Custom pattern, Hand-tied florals" class="w-full bg-stone-50 border border-stone-200 rounded-xl px-3.5 py-2.5 text-sm font-semibold text-stone-800 focus:bg-white focus:outline-none focus:ring-2 focus:ring-red-500">
+                        <input type="text" id="customOrderItemSubtitle" name="subtitle" placeholder="e.g. Custom pattern, Hand-tied florals" class="w-full bg-stone-50 border border-stone-200 rounded-xl px-3 sm:px-3.5 py-2 sm:py-2.5 text-xs sm:text-sm font-semibold text-stone-800 focus:bg-white focus:outline-none focus:ring-2 focus:ring-red-500">
                     </div>
 
                     <div>
@@ -1479,31 +1499,31 @@
                             <span id="selectedIconLabel" class="text-xs font-bold text-red-600">Flower</span>
                         </div>
                         <input type="hidden" id="customOrderItemIcon" name="icon" value="flower">
-                        <div class="grid grid-cols-3 sm:grid-cols-6 gap-2 p-2.5 bg-stone-50 border border-stone-200 rounded-2xl max-h-48 overflow-y-auto" id="customOrderItemIconGrid">
+                        <div class="grid grid-cols-3 sm:grid-cols-6 gap-2 p-2 sm:p-2.5 bg-stone-50 border border-stone-200 rounded-2xl max-h-40 sm:max-h-48 overflow-y-auto" id="customOrderItemIconGrid">
                             <!-- Populated by renderCustomOrderItemIconGrid() -->
                         </div>
-                        <p class="text-[11px] text-stone-400 mt-1">Select an icon to display for this item type on the website Custom Order page.</p>
+                        <p class="text-[10px] sm:text-[11px] text-stone-400 mt-1">Select an icon to display for this item type on the website Custom Order page.</p>
                     </div>
 
-                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5 pt-1">
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5 sm:gap-3.5 pt-1">
                         <div>
                             <label class="block text-xs font-bold text-stone-600 uppercase tracking-wider mb-1">Sort Order (Sequence)</label>
-                            <input type="number" id="customOrderItemSortOrder" name="sort_order" min="1" placeholder="e.g. 1" class="w-full bg-stone-50 border border-stone-200 rounded-xl px-3.5 py-2.5 text-sm font-semibold text-stone-800 focus:bg-white focus:outline-none focus:ring-2 focus:ring-red-500">
+                            <input type="number" id="customOrderItemSortOrder" name="sort_order" min="1" placeholder="e.g. 1" class="w-full bg-stone-50 border border-stone-200 rounded-xl px-3 sm:px-3.5 py-2 sm:py-2.5 text-xs sm:text-sm font-semibold text-stone-800 focus:bg-white focus:outline-none focus:ring-2 focus:ring-red-500">
                         </div>
                         <div>
                             <label class="block text-xs font-bold text-stone-600 uppercase tracking-wider mb-1">Status</label>
-                            <div class="flex items-center gap-2 pt-2.5">
+                            <div class="flex items-center gap-2 pt-2 sm:pt-2.5">
                                 <input type="checkbox" id="customOrderItemActive" name="is_active" checked class="w-4 h-4 rounded text-red-600 focus:ring-red-500">
-                                <label for="customOrderItemActive" class="text-xs font-bold text-stone-700">Active (Visible on Website)</label>
+                                <label for="customOrderItemActive" class="text-xs font-bold text-stone-700">Active (Visible)</label>
                             </div>
                         </div>
                     </div>
                 </div>
 
                 <!-- Sticky Footer with Action Buttons -->
-                <div class="p-4 px-6 bg-stone-50 border-t border-stone-100 shrink-0 flex items-center justify-end gap-3">
-                    <button type="button" onclick="closeCustomOrderItemModal()" class="btn-secondary text-xs px-5 py-2.5 cursor-pointer">Cancel</button>
-                    <button type="submit" id="customOrderItemSubmitBtn" class="btn-primary text-xs px-6 py-2.5 flex items-center gap-2 shadow-sm cursor-pointer">
+                <div class="p-3 sm:p-4 px-4 sm:px-6 bg-stone-50 border-t border-stone-100 shrink-0 flex flex-wrap items-center justify-end gap-2 sm:gap-3">
+                    <button type="button" onclick="closeCustomOrderItemModal()" class="btn-secondary text-xs px-4 sm:px-5 py-2 sm:py-2.5 cursor-pointer">Cancel</button>
+                    <button type="submit" id="customOrderItemSubmitBtn" class="btn-primary text-xs px-5 sm:px-6 py-2 sm:py-2.5 flex items-center gap-2 shadow-sm cursor-pointer">
                         <i class="fas fa-save"></i>
                         <span id="customOrderItemSubmitBtnText">Save Category</span>
                     </button>
@@ -1513,20 +1533,20 @@
     </div>
 
     <!-- MODAL 12: CONTACT INTRO MODAL -->
-    <div id="contactIntroModal" onclick="if(event.target === this) closeContactIntroModal()" class="fixed inset-0 bg-stone-900/60 backdrop-blur-xs hidden items-center justify-center z-[9999] p-4 overflow-y-auto" style="display: none;">
-        <div class="bg-white rounded-3xl max-w-3xl w-full max-h-[92vh] flex flex-col overflow-hidden shadow-2xl border border-stone-100 animate-fadeIn" onclick="event.stopPropagation()">
+    <div id="contactIntroModal" onclick="if(event.target === this) closeContactIntroModal()" class="fixed inset-0 bg-stone-900/60 backdrop-blur-xs hidden items-center justify-center z-[9999] p-2 sm:p-4 overflow-y-auto" style="display: none;">
+        <div class="bg-white rounded-2xl sm:rounded-3xl max-w-3xl w-full max-h-[94vh] sm:max-h-[92vh] flex flex-col overflow-hidden shadow-2xl border border-stone-100 animate-fadeIn" onclick="event.stopPropagation()">
             <!-- Pinned Header -->
-            <div class="p-5 px-6 border-b border-stone-100 flex items-center justify-between bg-stone-50/80 shrink-0">
-                <div class="flex items-center gap-3">
-                    <div class="w-10 h-10 rounded-2xl bg-red-50 text-red-600 flex items-center justify-center font-bold text-base shadow-2xs">
+            <div class="p-3.5 sm:p-5 px-4 sm:px-6 border-b border-stone-100 flex items-center justify-between bg-stone-50/80 shrink-0">
+                <div class="flex items-center gap-2.5 sm:gap-3 min-w-0 pr-2">
+                    <div class="w-8 h-8 sm:w-10 sm:h-10 rounded-xl sm:rounded-2xl bg-red-50 text-red-600 flex items-center justify-center font-bold text-xs sm:text-base shadow-2xs shrink-0">
                         <i class="fas fa-handshake"></i>
                     </div>
-                    <div>
-                        <h3 class="text-base font-bold text-stone-800">Edit Contact Introduction / Hero</h3>
-                        <p class="text-xs text-stone-500 font-medium">Manage main title, badge, tagline, introductory text, and banner artwork</p>
+                    <div class="min-w-0">
+                        <h3 class="text-sm sm:text-base font-bold text-stone-800 truncate">Edit Contact Intro</h3>
+                        <p class="hidden sm:block text-xs text-stone-500 font-medium truncate">Manage main title, badge, tagline, introductory text, and banner artwork</p>
                     </div>
                 </div>
-                <button type="button" onclick="closeContactIntroModal()" class="w-8 h-8 rounded-full bg-stone-100 text-stone-400 hover:text-stone-700 flex items-center justify-center transition-colors cursor-pointer">
+                <button type="button" onclick="closeContactIntroModal()" class="w-8 h-8 rounded-full bg-stone-100 text-stone-400 hover:text-stone-700 flex items-center justify-center transition-colors cursor-pointer shrink-0">
                     <i class="fas fa-times text-sm"></i>
                 </button>
             </div>
@@ -1535,44 +1555,44 @@
             <form id="contactIntroForm" onsubmit="handleContactIntroSubmit(event)" class="flex flex-col flex-1 min-h-0 overflow-hidden">
                 <input type="hidden" id="contactIntroImageUrl" name="image_url" value="">
 
-                <div class="p-6 space-y-5 overflow-y-auto flex-1 overscroll-contain">
+                <div class="p-3.5 sm:p-6 space-y-3.5 sm:space-y-5 overflow-y-auto overflow-x-hidden flex-1 overscroll-contain">
                     <!-- Headings Group -->
-                    <div class="space-y-3">
+                    <div class="space-y-2.5 sm:space-y-3">
                         <div class="flex items-center gap-2 border-b border-stone-100 pb-1.5">
                             <i class="fas fa-heading text-red-600 text-xs"></i>
                             <span class="text-xs font-bold text-stone-700 uppercase tracking-wider">Headings & Badge</span>
                         </div>
 
-                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5 sm:gap-3.5">
                             <div>
                                 <label class="block text-xs font-bold text-stone-600 uppercase tracking-wider mb-1">Eyebrow Badge <span class="text-red-500">*</span></label>
-                                <input type="text" id="contactIntroBadge" name="badge" required placeholder="e.g. Let's Connect" class="w-full bg-stone-50 border border-stone-200 rounded-xl px-3.5 py-2.5 text-sm font-semibold text-stone-800 focus:bg-white focus:outline-none focus:ring-2 focus:ring-red-500">
+                                <input type="text" id="contactIntroBadge" name="badge" required placeholder="e.g. Let's Connect" class="w-full bg-stone-50 border border-stone-200 rounded-xl px-3 sm:px-3.5 py-2 sm:py-2.5 text-xs sm:text-sm font-semibold text-stone-800 focus:bg-white focus:outline-none focus:ring-2 focus:ring-red-500">
                             </div>
                             <div>
                                 <label class="block text-xs font-bold text-stone-600 uppercase tracking-wider mb-1">Main Headline Title <span class="text-red-500">*</span></label>
-                                <input type="text" id="contactIntroTitle" name="title" required placeholder="e.g. Let's Connect" class="w-full bg-stone-50 border border-stone-200 rounded-xl px-3.5 py-2.5 text-sm font-semibold text-stone-800 focus:bg-white focus:outline-none focus:ring-2 focus:ring-red-500">
+                                <input type="text" id="contactIntroTitle" name="title" required placeholder="e.g. Let's Connect" class="w-full bg-stone-50 border border-stone-200 rounded-xl px-3 sm:px-3.5 py-2 sm:py-2.5 text-xs sm:text-sm font-semibold text-stone-800 focus:bg-white focus:outline-none focus:ring-2 focus:ring-red-500">
                             </div>
                         </div>
 
                         <div>
                             <label class="block text-xs font-bold text-stone-600 uppercase tracking-wider mb-1">Tagline / Subtitle <span class="text-red-500">*</span></label>
-                            <input type="text" id="contactIntroSubtitle" name="subtitle" required placeholder="e.g. Have a question about a product, custom order, or collaboration? We'd love to hear from you." class="w-full bg-stone-50 border border-stone-200 rounded-xl px-3.5 py-2.5 text-sm font-semibold text-stone-800 focus:bg-white focus:outline-none focus:ring-2 focus:ring-red-500">
+                            <input type="text" id="contactIntroSubtitle" name="subtitle" required placeholder="e.g. Have a question about a product, custom order, or collaboration? We'd love to hear from you." class="w-full bg-stone-50 border border-stone-200 rounded-xl px-3 sm:px-3.5 py-2 sm:py-2.5 text-xs sm:text-sm font-semibold text-stone-800 focus:bg-white focus:outline-none focus:ring-2 focus:ring-red-500">
                         </div>
 
                         <div>
                             <label class="block text-xs font-bold text-stone-600 uppercase tracking-wider mb-1">Introductory Narrative / Description</label>
-                            <textarea id="contactIntroDescription" name="description" rows="2" placeholder="e.g. We're here to help bring your handcrafted crochet dreams to life..." class="w-full bg-stone-50 border border-stone-200 rounded-xl px-3.5 py-2.5 text-sm font-semibold text-stone-800 focus:bg-white focus:outline-none focus:ring-2 focus:ring-red-500"></textarea>
+                            <textarea id="contactIntroDescription" name="description" rows="2" placeholder="e.g. We're here to help bring your handcrafted crochet dreams to life..." class="w-full bg-stone-50 border border-stone-200 rounded-xl px-3 sm:px-3.5 py-2 sm:py-2.5 text-xs sm:text-sm font-semibold text-stone-800 focus:bg-white focus:outline-none focus:ring-2 focus:ring-red-500"></textarea>
                         </div>
                     </div>
 
                     <!-- Visual Imagery -->
-                    <div class="space-y-3 pt-1">
+                    <div class="space-y-2.5 sm:space-y-3 pt-1">
                         <div class="flex items-center gap-2 border-b border-stone-100 pb-1.5">
                             <i class="fas fa-image text-red-600 text-xs"></i>
                             <span class="text-xs font-bold text-stone-700 uppercase tracking-wider">Contact Banner Artwork</span>
                         </div>
 
-                        <div class="bg-stone-50/80 border border-stone-200/90 rounded-2xl p-4 space-y-3">
+                        <div class="bg-stone-50/80 border border-stone-200/90 rounded-2xl p-3 sm:p-4 space-y-2.5 sm:space-y-3">
                             <div class="flex items-center justify-between">
                                 <span class="text-xs font-bold text-stone-800">Banner Photo Visual</span>
                                 <button type="button" onclick="openMediaPicker('contact_intro')" class="px-2.5 py-1 rounded-lg bg-white hover:bg-stone-100 border border-stone-200 text-stone-700 text-[11px] font-bold transition-all flex items-center gap-1 cursor-pointer">
@@ -1581,59 +1601,59 @@
                             </div>
 
                             <div class="border-2 border-dashed border-stone-200 rounded-xl p-3 text-center hover:border-red-400 hover:bg-red-50/20 transition-all cursor-pointer" onclick="document.getElementById('contactIntroFileInput').click()">
-                                <i class="fas fa-cloud-upload-alt text-red-500 text-lg mb-1"></i>
+                                <i class="fas fa-cloud-upload-alt text-red-500 text-base sm:text-lg mb-1"></i>
                                 <p class="text-xs font-bold text-stone-700" id="contactIntroFileLabel">Upload Banner Image</p>
                                 <p class="text-[10px] text-stone-400">1200 × 800 px (JPG/PNG/WEBP)</p>
                                 <input type="file" id="contactIntroFileInput" name="image_file" class="hidden" accept=".jpg,.jpeg,.png,.webp" onchange="handleContactIntroFileChange(this)">
                             </div>
 
                             <div id="contactIntroPreviewContainer" class="bg-white rounded-xl p-2.5 border border-stone-200 flex items-center gap-3">
-                                <img id="contactIntroPreviewImg" src="" class="w-14 h-14 rounded-lg object-cover border border-stone-200">
+                                <img id="contactIntroPreviewImg" src="" class="w-12 h-12 sm:w-14 sm:h-14 rounded-lg object-cover border border-stone-200 shrink-0">
                                 <div class="flex-1 min-w-0">
                                     <p class="text-xs font-bold text-stone-800 truncate" id="contactIntroFileName">Contact Banner Active</p>
                                     <p class="text-[10px] text-emerald-600 font-semibold" id="contactIntroFileSize">Ready</p>
                                 </div>
-                                <button type="button" onclick="clearContactIntroFileInput()" class="text-stone-400 hover:text-red-600 p-1.5 cursor-pointer"><i class="fas fa-times"></i></button>
+                                <button type="button" onclick="clearContactIntroFileInput()" class="text-stone-400 hover:text-red-600 p-1.5 cursor-pointer shrink-0"><i class="fas fa-times"></i></button>
                             </div>
 
                             <div>
                                 <label class="block text-xs font-bold text-stone-600 uppercase tracking-wider mb-1">Alt Text (SEO & Accessibility)</label>
-                                <input type="text" id="contactIntroAlt" name="alt_text" placeholder="e.g. KNOTELLE Artisan Studio Contact" class="w-full bg-white border border-stone-200 rounded-xl px-3.5 py-2 text-sm font-semibold text-stone-800 focus:outline-none focus:ring-2 focus:ring-red-500">
+                                <input type="text" id="contactIntroAlt" name="alt_text" placeholder="e.g. KNOTELLE Artisan Studio Contact" class="w-full bg-white border border-stone-200 rounded-xl px-3 sm:px-3.5 py-2 text-xs sm:text-sm font-semibold text-stone-800 focus:outline-none focus:ring-2 focus:ring-red-500">
                             </div>
                         </div>
                     </div>
 
                     <!-- Call To Action & Status -->
-                    <div class="space-y-3 pt-1">
+                    <div class="space-y-2.5 sm:space-y-3 pt-1">
                         <div class="flex items-center gap-2 border-b border-stone-100 pb-1.5">
                             <i class="fas fa-sliders-h text-red-600 text-xs"></i>
                             <span class="text-xs font-bold text-stone-700 uppercase tracking-wider">CTA & Status</span>
                         </div>
 
-                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5 sm:gap-3.5">
                             <div>
                                 <label class="block text-xs font-bold text-stone-600 uppercase tracking-wider mb-1">CTA Button Text</label>
-                                <input type="text" id="contactIntroCtaText" name="cta_text" placeholder="e.g. Send Us a Message" class="w-full bg-stone-50 border border-stone-200 rounded-xl px-3.5 py-2 text-sm font-semibold text-stone-800 focus:bg-white focus:outline-none focus:ring-2 focus:ring-red-500">
+                                <input type="text" id="contactIntroCtaText" name="cta_text" placeholder="e.g. Send Us a Message" class="w-full bg-stone-50 border border-stone-200 rounded-xl px-3 sm:px-3.5 py-2 text-xs sm:text-sm font-semibold text-stone-800 focus:bg-white focus:outline-none focus:ring-2 focus:ring-red-500">
                             </div>
                             <div>
                                 <label class="block text-xs font-bold text-stone-600 uppercase tracking-wider mb-1">CTA Button Link</label>
-                                <input type="text" id="contactIntroCtaLink" name="cta_link" placeholder="e.g. #contact-form" class="w-full bg-stone-50 border border-stone-200 rounded-xl px-3.5 py-2 text-sm font-semibold text-stone-800 focus:bg-white focus:outline-none focus:ring-2 focus:ring-red-500">
+                                <input type="text" id="contactIntroCtaLink" name="cta_link" placeholder="e.g. #contact-form" class="w-full bg-stone-50 border border-stone-200 rounded-xl px-3 sm:px-3.5 py-2 text-xs sm:text-sm font-semibold text-stone-800 focus:bg-white focus:outline-none focus:ring-2 focus:ring-red-500">
                             </div>
                         </div>
 
-                        <div class="flex items-center gap-2 pt-2">
+                        <div class="flex items-center gap-2 pt-1 sm:pt-2">
                             <input type="checkbox" id="contactIntroActive" name="is_active" checked class="w-4 h-4 rounded text-red-600 focus:ring-red-500">
-                            <label for="contactIntroActive" class="text-xs font-bold text-stone-700">Intro Section Active on /contact page</label>
+                            <label for="contactIntroActive" class="text-xs font-bold text-stone-700">Intro Section Active on Contact Page</label>
                         </div>
                     </div>
                 </div>
 
                 <!-- Sticky Footer with Action Buttons -->
-                <div class="p-4 px-6 bg-stone-50 border-t border-stone-100 shrink-0 flex items-center justify-end gap-3">
-                    <button type="button" onclick="closeContactIntroModal()" class="btn-secondary text-xs px-5 py-2.5 cursor-pointer">Cancel</button>
-                    <button type="submit" id="contactIntroSubmitBtn" class="btn-primary text-xs px-6 py-2.5 flex items-center gap-2 shadow-sm cursor-pointer">
+                <div class="p-3 sm:p-4 px-4 sm:px-6 bg-stone-50 border-t border-stone-100 shrink-0 flex flex-wrap items-center justify-end gap-2 sm:gap-3">
+                    <button type="button" onclick="closeContactIntroModal()" class="btn-secondary text-xs px-4 sm:px-5 py-2 sm:py-2.5 cursor-pointer">Cancel</button>
+                    <button type="submit" id="contactIntroSubmitBtn" class="btn-primary text-xs px-5 sm:px-6 py-2 sm:py-2.5 flex items-center gap-2 shadow-sm cursor-pointer">
                         <i class="fas fa-save"></i>
-                        <span>Save Contact Intro</span>
+                        <span>Save Intro</span>
                     </button>
                 </div>
             </form>
@@ -1641,44 +1661,44 @@
     </div>
 
     <!-- MODAL 13: CONTACT INFO HEADER & CUSTOM ORDER BOX MODAL -->
-    <div id="contactInfoHeaderModal" onclick="if(event.target === this) closeContactInfoHeaderModal()" class="fixed inset-0 bg-stone-900/60 backdrop-blur-xs hidden items-center justify-center z-[9999] p-4 overflow-y-auto" style="display: none;">
-        <div class="bg-white rounded-3xl max-w-xl w-full max-h-[92vh] flex flex-col overflow-hidden shadow-2xl border border-stone-100 animate-fadeIn" onclick="event.stopPropagation()">
+    <div id="contactInfoHeaderModal" onclick="if(event.target === this) closeContactInfoHeaderModal()" class="fixed inset-0 bg-stone-900/60 backdrop-blur-xs hidden items-center justify-center z-[9999] p-2 sm:p-4 overflow-y-auto" style="display: none;">
+        <div class="bg-white rounded-2xl sm:rounded-3xl max-w-xl w-full max-h-[94vh] sm:max-h-[92vh] flex flex-col overflow-hidden shadow-2xl border border-stone-100 animate-fadeIn" onclick="event.stopPropagation()">
             <!-- Pinned Header -->
-            <div class="p-5 px-6 border-b border-stone-100 flex items-center justify-between bg-stone-50/80 shrink-0">
-                <div class="flex items-center gap-3">
-                    <div class="w-10 h-10 rounded-2xl bg-red-50 text-red-600 flex items-center justify-center font-bold text-base shadow-2xs">
+            <div class="p-3.5 sm:p-5 px-4 sm:px-6 border-b border-stone-100 flex items-center justify-between bg-stone-50/80 shrink-0">
+                <div class="flex items-center gap-2.5 sm:gap-3 min-w-0 pr-2">
+                    <div class="w-8 h-8 sm:w-10 sm:h-10 rounded-xl sm:rounded-2xl bg-red-50 text-red-600 flex items-center justify-center font-bold text-xs sm:text-base shadow-2xs shrink-0">
                         <i class="fas fa-store"></i>
                     </div>
-                    <div>
-                        <h3 class="text-base font-bold text-stone-800">Edit Studio Header & Custom Order Note</h3>
-                        <p class="text-xs text-stone-500 font-medium">Customize studio title, badge, subtitle, and custom order callout box</p>
+                    <div class="min-w-0">
+                        <h3 class="text-sm sm:text-base font-bold text-stone-800 truncate">Studio Header & Box</h3>
+                        <p class="hidden sm:block text-xs text-stone-500 font-medium truncate">Customize studio title, badge, subtitle, and custom order callout box</p>
                     </div>
                 </div>
-                <button type="button" onclick="closeContactInfoHeaderModal()" class="w-8 h-8 rounded-full bg-stone-100 text-stone-400 hover:text-stone-700 flex items-center justify-center transition-colors cursor-pointer">
+                <button type="button" onclick="closeContactInfoHeaderModal()" class="w-8 h-8 rounded-full bg-stone-100 text-stone-400 hover:text-stone-700 flex items-center justify-center transition-colors cursor-pointer shrink-0">
                     <i class="fas fa-times text-sm"></i>
                 </button>
             </div>
 
             <!-- Form Wrapper -->
             <form id="contactInfoHeaderForm" novalidate onsubmit="handleContactInfoHeaderSubmit(event)" class="flex flex-col flex-1 min-h-0 overflow-hidden">
-                <div class="p-6 space-y-4 overflow-y-auto flex-1 overscroll-contain">
+                <div class="p-3.5 sm:p-6 space-y-3 sm:space-y-4 overflow-y-auto overflow-x-hidden flex-1 overscroll-contain">
                     <div>
                         <label class="block text-xs font-bold text-stone-600 uppercase tracking-wider mb-1">Studio Eyebrow Badge</label>
-                        <input type="text" id="contactInfoBadgeInput" name="badge" value="Atelier Studio" placeholder="e.g. Atelier Studio" class="w-full bg-stone-50 border border-stone-200 rounded-xl px-3.5 py-2.5 text-sm font-semibold text-stone-800 focus:bg-white focus:outline-none focus:ring-2 focus:ring-red-500">
+                        <input type="text" id="contactInfoBadgeInput" name="badge" value="Atelier Studio" placeholder="e.g. Atelier Studio" class="w-full bg-stone-50 border border-stone-200 rounded-xl px-3 sm:px-3.5 py-2 sm:py-2.5 text-xs sm:text-sm font-semibold text-stone-800 focus:bg-white focus:outline-none focus:ring-2 focus:ring-red-500">
                     </div>
 
                     <div>
                         <label class="block text-xs font-bold text-stone-600 uppercase tracking-wider mb-1">Studio Name / Headline <span class="text-red-500">*</span></label>
-                        <input type="text" id="contactInfoTitleInput" name="title" value="KNOTELLE Studio" placeholder="e.g. KNOTELLE Studio" class="w-full bg-stone-50 border border-stone-200 rounded-xl px-3.5 py-2.5 text-sm font-semibold text-stone-800 focus:bg-white focus:outline-none focus:ring-2 focus:ring-red-500">
+                        <input type="text" id="contactInfoTitleInput" name="title" value="KNOTELLE Studio" placeholder="e.g. KNOTELLE Studio" class="w-full bg-stone-50 border border-stone-200 rounded-xl px-3 sm:px-3.5 py-2 sm:py-2.5 text-xs sm:text-sm font-semibold text-stone-800 focus:bg-white focus:outline-none focus:ring-2 focus:ring-red-500">
                     </div>
 
                     <div>
                         <label class="block text-xs font-bold text-stone-600 uppercase tracking-wider mb-1">Studio Subtitle</label>
-                        <input type="text" id="contactInfoSubtitleInput" name="subtitle" value="Handmade with love in Bengaluru, India" placeholder="e.g. Handmade with love in Bengaluru, India" class="w-full bg-stone-50 border border-stone-200 rounded-xl px-3.5 py-2.5 text-sm font-semibold text-stone-800 focus:bg-white focus:outline-none focus:ring-2 focus:ring-red-500">
+                        <input type="text" id="contactInfoSubtitleInput" name="subtitle" value="Handmade with love in Bengaluru, India" placeholder="e.g. Handmade with love in Bengaluru, India" class="w-full bg-stone-50 border border-stone-200 rounded-xl px-3 sm:px-3.5 py-2 sm:py-2.5 text-xs sm:text-sm font-semibold text-stone-800 focus:bg-white focus:outline-none focus:ring-2 focus:ring-red-500">
                     </div>
 
                     <!-- Custom Order Note Box -->
-                    <div class="p-4 bg-amber-50/70 border border-amber-200/80 rounded-2xl space-y-3">
+                    <div class="p-3 sm:p-4 bg-amber-50/70 border border-amber-200/80 rounded-2xl space-y-2.5 sm:space-y-3">
                         <div class="flex items-center gap-2">
                             <i class="fas fa-gift text-amber-700 text-xs"></i>
                             <span class="text-xs font-bold text-amber-900 uppercase tracking-wider">Custom Order Helper Box</span>
@@ -1686,20 +1706,20 @@
 
                         <div>
                             <label class="block text-xs font-bold text-stone-700 mb-1">Box Title</label>
-                            <input type="text" id="contactInfoCustomBoxTitle" name="custom_order_box_title" value="Looking for Custom Orders?" class="w-full bg-white border border-stone-200 rounded-xl px-3 py-2 text-sm font-semibold text-stone-800 focus:outline-none focus:ring-2 focus:ring-red-500">
+                            <input type="text" id="contactInfoCustomBoxTitle" name="custom_order_box_title" value="Looking for Custom Orders?" class="w-full bg-white border border-stone-200 rounded-xl px-3 py-2 text-xs sm:text-sm font-semibold text-stone-800 focus:outline-none focus:ring-2 focus:ring-red-500">
                         </div>
 
                         <div>
                             <label class="block text-xs font-bold text-stone-700 mb-1">Box Description Text</label>
-                            <textarea id="contactInfoCustomBoxText" name="custom_order_box_text" rows="2" class="w-full bg-white border border-stone-200 rounded-xl px-3 py-2 text-sm font-semibold text-stone-800 focus:outline-none focus:ring-2 focus:ring-red-500">Have a specific design, color palette, or bouquet arrangement in mind? Request a bespoke piece directly.</textarea>
+                            <textarea id="contactInfoCustomBoxText" name="custom_order_box_text" rows="2" class="w-full bg-white border border-stone-200 rounded-xl px-3 py-2 text-xs sm:text-sm font-semibold text-stone-800 focus:outline-none focus:ring-2 focus:ring-red-500">Have a specific design, color palette, or bouquet arrangement in mind? Request a bespoke piece directly.</textarea>
                         </div>
 
-                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5 sm:gap-3">
                             <div>
                                 <label class="block text-xs font-bold text-stone-700 mb-1">Box Link URL</label>
-                                <input type="text" id="contactInfoCustomBoxLink" name="custom_order_box_link" value="/custom-order" class="w-full bg-white border border-stone-200 rounded-xl px-3 py-2 text-sm font-semibold text-stone-800 focus:outline-none focus:ring-2 focus:ring-red-500">
+                                <input type="text" id="contactInfoCustomBoxLink" name="custom_order_box_link" value="/custom-order" class="w-full bg-white border border-stone-200 rounded-xl px-3 py-2 text-xs sm:text-sm font-semibold text-stone-800 focus:outline-none focus:ring-2 focus:ring-red-500">
                             </div>
-                            <div class="flex items-center pt-5">
+                            <div class="flex items-center pt-2 sm:pt-5">
                                 <label class="flex items-center gap-2 cursor-pointer">
                                     <input type="checkbox" id="contactInfoCustomBoxActive" name="custom_order_box_active" checked class="w-4 h-4 rounded text-red-600 focus:ring-red-500">
                                     <span class="text-xs font-bold text-stone-700">Display Helper Box</span>
@@ -1715,11 +1735,11 @@
                 </div>
 
                 <!-- Sticky Footer with Action Buttons -->
-                <div class="p-4 px-6 bg-stone-50 border-t border-stone-100 shrink-0 flex items-center justify-end gap-3">
-                    <button type="button" onclick="closeContactInfoHeaderModal()" class="btn-secondary text-xs px-5 py-2.5 cursor-pointer">Cancel</button>
-                    <button type="submit" id="contactInfoHeaderSubmitBtn" class="btn-primary text-xs px-6 py-2.5 flex items-center gap-2 shadow-sm cursor-pointer">
+                <div class="p-3 sm:p-4 px-4 sm:px-6 bg-stone-50 border-t border-stone-100 shrink-0 flex flex-wrap items-center justify-end gap-2 sm:gap-3">
+                    <button type="button" onclick="closeContactInfoHeaderModal()" class="btn-secondary text-xs px-4 sm:px-5 py-2 sm:py-2.5 cursor-pointer">Cancel</button>
+                    <button type="submit" id="contactInfoHeaderSubmitBtn" class="btn-primary text-xs px-5 sm:px-6 py-2 sm:py-2.5 flex items-center gap-2 shadow-sm cursor-pointer">
                         <i class="fas fa-save"></i>
-                        <span>Save Studio Header</span>
+                        <span>Save Header</span>
                     </button>
                 </div>
             </form>
@@ -1727,20 +1747,20 @@
     </div>
 
     <!-- MODAL 14: ADD / EDIT CONTACT DETAIL ITEM MODAL -->
-    <div id="contactInfoItemModal" onclick="if(event.target === this) closeContactInfoItemModal()" class="fixed inset-0 bg-stone-900/60 backdrop-blur-xs hidden items-center justify-center z-[9999] p-4 overflow-y-auto" style="display: none;">
-        <div class="bg-white rounded-3xl max-w-xl w-full max-h-[92vh] flex flex-col overflow-hidden shadow-2xl border border-stone-100 animate-fadeIn" onclick="event.stopPropagation()">
+    <div id="contactInfoItemModal" onclick="if(event.target === this) closeContactInfoItemModal()" class="fixed inset-0 bg-stone-900/60 backdrop-blur-xs hidden items-center justify-center z-[9999] p-2 sm:p-4 overflow-y-auto" style="display: none;">
+        <div class="bg-white rounded-2xl sm:rounded-3xl max-w-xl w-full max-h-[94vh] sm:max-h-[92vh] flex flex-col overflow-hidden shadow-2xl border border-stone-100 animate-fadeIn" onclick="event.stopPropagation()">
             <!-- Pinned Header -->
-            <div class="p-5 px-6 border-b border-stone-100 flex items-center justify-between bg-stone-50/80 shrink-0">
-                <div class="flex items-center gap-3">
-                    <div class="w-10 h-10 rounded-2xl bg-red-50 text-red-600 flex items-center justify-center font-bold text-base shadow-2xs">
+            <div class="p-3.5 sm:p-5 px-4 sm:px-6 border-b border-stone-100 flex items-center justify-between bg-stone-50/80 shrink-0">
+                <div class="flex items-center gap-2.5 sm:gap-3 min-w-0 pr-2">
+                    <div class="w-8 h-8 sm:w-10 sm:h-10 rounded-xl sm:rounded-2xl bg-red-50 text-red-600 flex items-center justify-center font-bold text-xs sm:text-base shadow-2xs shrink-0">
                         <i class="fas fa-address-card"></i>
                     </div>
-                    <div>
-                        <h3 class="text-base font-bold text-stone-800" id="contactInfoItemModalTitle">Add Contact Detail</h3>
-                        <p class="text-xs text-stone-500 font-medium">Add or edit phone, email, studio address, hours, WhatsApp, or socials</p>
+                    <div class="min-w-0">
+                        <h3 class="text-sm sm:text-base font-bold text-stone-800 truncate" id="contactInfoItemModalTitle">Add Contact Detail</h3>
+                        <p class="hidden sm:block text-xs text-stone-500 font-medium truncate">Add or edit phone, email, studio address, hours, WhatsApp, or socials</p>
                     </div>
                 </div>
-                <button type="button" onclick="closeContactInfoItemModal()" class="w-8 h-8 rounded-full bg-stone-100 text-stone-400 hover:text-stone-700 flex items-center justify-center transition-colors cursor-pointer">
+                <button type="button" onclick="closeContactInfoItemModal()" class="w-8 h-8 rounded-full bg-stone-100 text-stone-400 hover:text-stone-700 flex items-center justify-center transition-colors cursor-pointer shrink-0">
                     <i class="fas fa-times text-sm"></i>
                 </button>
             </div>
@@ -1750,96 +1770,96 @@
                 <input type="hidden" id="contactInfoItemId" name="id" value="">
                 <input type="hidden" id="contactInfoItemIcon" name="icon" value="MapPin">
 
-                <div class="p-6 space-y-4 overflow-y-auto flex-1 overscroll-contain">
+                <div class="p-3.5 sm:p-6 space-y-3 sm:space-y-4 overflow-y-auto overflow-x-hidden flex-1 overscroll-contain">
                     <div>
                         <label class="block text-xs font-bold text-stone-600 uppercase tracking-wider mb-1">Title / Label <span class="text-red-500">*</span></label>
-                        <input type="text" id="contactInfoItemTitle" name="title" placeholder="e.g. Visit Our Studio, Call / WhatsApp Us, Write to Us" class="w-full bg-stone-50 border border-stone-200 rounded-xl px-3.5 py-2.5 text-sm font-semibold text-stone-800 focus:bg-white focus:outline-none focus:ring-2 focus:ring-red-500">
+                        <input type="text" id="contactInfoItemTitle" name="title" placeholder="e.g. Visit Our Studio, Call / WhatsApp Us, Write to Us" class="w-full bg-stone-50 border border-stone-200 rounded-xl px-3 sm:px-3.5 py-2 sm:py-2.5 text-xs sm:text-sm font-semibold text-stone-800 focus:bg-white focus:outline-none focus:ring-2 focus:ring-red-500">
                     </div>
 
                     <div>
                         <label class="block text-xs font-bold text-stone-600 uppercase tracking-wider mb-1">Primary Value / Line 1 <span class="text-red-500">*</span></label>
-                        <input type="text" id="contactInfoItemValue" name="value" placeholder="e.g. +91 98765 43210, hello@knotelle.com, 12th Main Road" class="w-full bg-stone-50 border border-stone-200 rounded-xl px-3.5 py-2.5 text-sm font-semibold text-stone-800 focus:bg-white focus:outline-none focus:ring-2 focus:ring-red-500">
+                        <input type="text" id="contactInfoItemValue" name="value" placeholder="e.g. +91 98765 43210, hello@knotelle.com" class="w-full bg-stone-50 border border-stone-200 rounded-xl px-3 sm:px-3.5 py-2 sm:py-2.5 text-xs sm:text-sm font-semibold text-stone-800 focus:bg-white focus:outline-none focus:ring-2 focus:ring-red-500">
                     </div>
 
                     <div>
                         <label class="block text-xs font-bold text-stone-600 uppercase tracking-wider mb-1">Secondary Address / Hours / Note Line</label>
-                        <input type="text" id="contactInfoItemAddressLine2" name="address_line_2" placeholder="e.g. Bengaluru, Karnataka 560038, India or Mon – Sat, 10 AM – 7 PM" class="w-full bg-stone-50 border border-stone-200 rounded-xl px-3.5 py-2.5 text-sm font-semibold text-stone-800 focus:bg-white focus:outline-none focus:ring-2 focus:ring-red-500">
+                        <input type="text" id="contactInfoItemAddressLine2" name="address_line_2" placeholder="e.g. Bengaluru, Karnataka 560038, India" class="w-full bg-stone-50 border border-stone-200 rounded-xl px-3 sm:px-3.5 py-2 sm:py-2.5 text-xs sm:text-sm font-semibold text-stone-800 focus:bg-white focus:outline-none focus:ring-2 focus:ring-red-500">
                     </div>
 
                     <div>
                         <label class="block text-xs font-bold text-stone-600 uppercase tracking-wider mb-1">Clickable Action Link (tel:, mailto:, URL)</label>
-                        <input type="text" id="contactInfoItemLink" name="link" placeholder="e.g. tel:+919876543210, mailto:hello@knotelle.com, https://maps.google.com/..." class="w-full bg-stone-50 border border-stone-200 rounded-xl px-3.5 py-2.5 text-sm font-semibold text-stone-800 focus:bg-white focus:outline-none focus:ring-2 focus:ring-red-500">
+                        <input type="text" id="contactInfoItemLink" name="link" placeholder="e.g. tel:+919876543210, mailto:hello@knotelle.com" class="w-full bg-stone-50 border border-stone-200 rounded-xl px-3 sm:px-3.5 py-2 sm:py-2.5 text-xs sm:text-sm font-semibold text-stone-800 focus:bg-white focus:outline-none focus:ring-2 focus:ring-red-500">
                     </div>
 
                     <!-- Icon Preset Selector -->
                     <div class="space-y-2 pt-1">
                         <label class="block text-xs font-bold text-stone-600 uppercase tracking-wider">Choose Contact Detail Icon</label>
                         
-                        <div class="grid grid-cols-5 sm:grid-cols-5 gap-2 p-3 bg-stone-50 rounded-2xl border border-stone-200" id="contactInfoIconGrid">
+                        <div class="grid grid-cols-5 sm:grid-cols-5 gap-2 p-2.5 sm:p-3 bg-stone-50 rounded-2xl border border-stone-200" id="contactInfoIconGrid">
                             <button type="button" onclick="selectContactInfoIcon('MapPin')" data-icon="MapPin" class="contact-info-icon-btn p-2 rounded-xl border border-stone-200 bg-white hover:border-red-400 flex flex-col items-center gap-1 transition-all cursor-pointer">
-                                <i class="fas fa-map-marker-alt text-base text-red-600"></i>
+                                <i class="fas fa-map-marker-alt text-sm sm:text-base text-red-600"></i>
                                 <span class="text-[10px] font-bold text-stone-700">MapPin</span>
                             </button>
                             <button type="button" onclick="selectContactInfoIcon('Phone')" data-icon="Phone" class="contact-info-icon-btn p-2 rounded-xl border border-stone-200 bg-white hover:border-red-400 flex flex-col items-center gap-1 transition-all cursor-pointer">
-                                <i class="fas fa-phone text-base text-red-600"></i>
+                                <i class="fas fa-phone text-sm sm:text-base text-red-600"></i>
                                 <span class="text-[10px] font-bold text-stone-700">Phone</span>
                             </button>
                             <button type="button" onclick="selectContactInfoIcon('Mail')" data-icon="Mail" class="contact-info-icon-btn p-2 rounded-xl border border-stone-200 bg-white hover:border-red-400 flex flex-col items-center gap-1 transition-all cursor-pointer">
-                                <i class="fas fa-envelope text-base text-red-600"></i>
+                                <i class="fas fa-envelope text-sm sm:text-base text-red-600"></i>
                                 <span class="text-[10px] font-bold text-stone-700">Mail</span>
                             </button>
                             <button type="button" onclick="selectContactInfoIcon('Clock')" data-icon="Clock" class="contact-info-icon-btn p-2 rounded-xl border border-stone-200 bg-white hover:border-red-400 flex flex-col items-center gap-1 transition-all cursor-pointer">
-                                <i class="fas fa-clock text-base text-red-600"></i>
+                                <i class="fas fa-clock text-sm sm:text-base text-red-600"></i>
                                 <span class="text-[10px] font-bold text-stone-700">Clock</span>
                             </button>
                             <button type="button" onclick="selectContactInfoIcon('MessageCircle')" data-icon="MessageCircle" class="contact-info-icon-btn p-2 rounded-xl border border-stone-200 bg-white hover:border-red-400 flex flex-col items-center gap-1 transition-all cursor-pointer">
-                                <i class="fab fa-whatsapp text-base text-red-600"></i>
+                                <i class="fab fa-whatsapp text-sm sm:text-base text-red-600"></i>
                                 <span class="text-[10px] font-bold text-stone-700">WhatsApp</span>
                             </button>
                             <button type="button" onclick="selectContactInfoIcon('Instagram')" data-icon="Instagram" class="contact-info-icon-btn p-2 rounded-xl border border-stone-200 bg-white hover:border-red-400 flex flex-col items-center gap-1 transition-all cursor-pointer">
-                                <i class="fab fa-instagram text-base text-red-600"></i>
+                                <i class="fab fa-instagram text-sm sm:text-base text-red-600"></i>
                                 <span class="text-[10px] font-bold text-stone-700">Instagram</span>
                             </button>
                             <button type="button" onclick="selectContactInfoIcon('Facebook')" data-icon="Facebook" class="contact-info-icon-btn p-2 rounded-xl border border-stone-200 bg-white hover:border-red-400 flex flex-col items-center gap-1 transition-all cursor-pointer">
-                                <i class="fab fa-facebook-f text-base text-red-600"></i>
+                                <i class="fab fa-facebook-f text-sm sm:text-base text-red-600"></i>
                                 <span class="text-[10px] font-bold text-stone-700">Facebook</span>
                             </button>
                             <button type="button" onclick="selectContactInfoIcon('Globe')" data-icon="Globe" class="contact-info-icon-btn p-2 rounded-xl border border-stone-200 bg-white hover:border-red-400 flex flex-col items-center gap-1 transition-all cursor-pointer">
-                                <i class="fas fa-globe text-base text-red-600"></i>
+                                <i class="fas fa-globe text-sm sm:text-base text-red-600"></i>
                                 <span class="text-[10px] font-bold text-stone-700">Globe</span>
                             </button>
                             <button type="button" onclick="selectContactInfoIcon('Sparkles')" data-icon="Sparkles" class="contact-info-icon-btn p-2 rounded-xl border border-stone-200 bg-white hover:border-red-400 flex flex-col items-center gap-1 transition-all cursor-pointer">
-                                <i class="fas fa-magic text-base text-red-600"></i>
+                                <i class="fas fa-magic text-sm sm:text-base text-red-600"></i>
                                 <span class="text-[10px] font-bold text-stone-700">Sparkles</span>
                             </button>
                             <button type="button" onclick="selectContactInfoIcon('Heart')" data-icon="Heart" class="contact-info-icon-btn p-2 rounded-xl border border-stone-200 bg-white hover:border-red-400 flex flex-col items-center gap-1 transition-all cursor-pointer">
-                                <i class="fas fa-heart text-base text-red-600"></i>
+                                <i class="fas fa-heart text-sm sm:text-base text-red-600"></i>
                                 <span class="text-[10px] font-bold text-stone-700">Heart</span>
                             </button>
                         </div>
                     </div>
 
-                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5 pt-1">
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5 sm:gap-3.5 pt-1">
                         <div>
                             <label class="block text-xs font-bold text-stone-600 uppercase tracking-wider mb-1">Sort Order (Sequence)</label>
-                            <input type="number" id="contactInfoItemSortOrder" name="sort_order" min="1" placeholder="e.g. 1" class="w-full bg-stone-50 border border-stone-200 rounded-xl px-3.5 py-2.5 text-sm font-semibold text-stone-800 focus:bg-white focus:outline-none focus:ring-2 focus:ring-red-500">
+                            <input type="number" id="contactInfoItemSortOrder" name="sort_order" min="1" placeholder="e.g. 1" class="w-full bg-stone-50 border border-stone-200 rounded-xl px-3 sm:px-3.5 py-2 sm:py-2.5 text-xs sm:text-sm font-semibold text-stone-800 focus:bg-white focus:outline-none focus:ring-2 focus:ring-red-500">
                         </div>
                         <div>
                             <label class="block text-xs font-bold text-stone-600 uppercase tracking-wider mb-1">Status</label>
-                            <div class="flex items-center gap-2 pt-2.5">
+                            <div class="flex items-center gap-2 pt-2 sm:pt-2.5">
                                 <input type="checkbox" id="contactInfoItemActive" name="is_active" checked class="w-4 h-4 rounded text-red-600 focus:ring-red-500">
-                                <label for="contactInfoItemActive" class="text-xs font-bold text-stone-700">Active (Visible on Contact Page)</label>
+                                <label for="contactInfoItemActive" class="text-xs font-bold text-stone-700">Active on Contact Page</label>
                             </div>
                         </div>
                     </div>
                 </div>
 
                 <!-- Sticky Footer with Action Buttons -->
-                <div class="p-4 px-6 bg-stone-50 border-t border-stone-100 shrink-0 flex items-center justify-end gap-3">
-                    <button type="button" onclick="closeContactInfoItemModal()" class="btn-secondary text-xs px-5 py-2.5 cursor-pointer">Cancel</button>
-                    <button type="submit" id="contactInfoItemSubmitBtn" class="btn-primary text-xs px-6 py-2.5 flex items-center gap-2 shadow-sm cursor-pointer">
+                <div class="p-3 sm:p-4 px-4 sm:px-6 bg-stone-50 border-t border-stone-100 shrink-0 flex flex-wrap items-center justify-end gap-2 sm:gap-3">
+                    <button type="button" onclick="closeContactInfoItemModal()" class="btn-secondary text-xs px-4 sm:px-5 py-2 sm:py-2.5 cursor-pointer">Cancel</button>
+                    <button type="submit" id="contactInfoItemSubmitBtn" class="btn-primary text-xs px-5 sm:px-6 py-2 sm:py-2.5 flex items-center gap-2 shadow-sm cursor-pointer">
                         <i class="fas fa-save"></i>
-                        <span id="contactInfoItemSubmitBtnText">Save Contact Detail</span>
+                        <span id="contactInfoItemSubmitBtnText">Save Detail</span>
                     </button>
                 </div>
             </form>
@@ -1847,91 +1867,91 @@
     </div>
 
     <!-- MODAL 15: SEND US A MESSAGE / CONTACT FORM SETTINGS MODAL -->
-    <div id="contactFormModal" onclick="if(event.target === this) closeContactFormModal()" class="fixed inset-0 bg-stone-900/60 backdrop-blur-xs hidden items-center justify-center z-[9999] p-4 overflow-y-auto" style="display: none;">
-        <div class="bg-white rounded-3xl max-w-2xl w-full max-h-[92vh] flex flex-col overflow-hidden shadow-2xl border border-stone-100 animate-fadeIn" onclick="event.stopPropagation()">
+    <div id="contactFormModal" onclick="if(event.target === this) closeContactFormModal()" class="fixed inset-0 bg-stone-900/60 backdrop-blur-xs hidden items-center justify-center z-[9999] p-2 sm:p-4 overflow-y-auto" style="display: none;">
+        <div class="bg-white rounded-2xl sm:rounded-3xl max-w-2xl w-full max-h-[94vh] sm:max-h-[92vh] flex flex-col overflow-hidden shadow-2xl border border-stone-100 animate-fadeIn" onclick="event.stopPropagation()">
             <!-- Pinned Header -->
-            <div class="p-5 px-6 border-b border-stone-100 flex items-center justify-between bg-stone-50/80 shrink-0">
-                <div class="flex items-center gap-3">
-                    <div class="w-10 h-10 rounded-2xl bg-red-50 text-red-600 flex items-center justify-center font-bold text-base shadow-2xs">
+            <div class="p-3.5 sm:p-5 px-4 sm:px-6 border-b border-stone-100 flex items-center justify-between bg-stone-50/80 shrink-0">
+                <div class="flex items-center gap-2.5 sm:gap-3 min-w-0 pr-2">
+                    <div class="w-8 h-8 sm:w-10 sm:h-10 rounded-xl sm:rounded-2xl bg-red-50 text-red-600 flex items-center justify-center font-bold text-xs sm:text-base shadow-2xs shrink-0">
                         <i class="fas fa-envelope-open-text"></i>
                     </div>
-                    <div>
-                        <h3 class="text-base font-bold text-stone-800">Edit Send Us a Message (Contact Form)</h3>
-                        <p class="text-xs text-stone-500 font-medium">Configure form headings, button label, success message, and input field labels</p>
+                    <div class="min-w-0">
+                        <h3 class="text-sm sm:text-base font-bold text-stone-800 truncate">Edit Contact Form</h3>
+                        <p class="hidden sm:block text-xs text-stone-500 font-medium truncate">Configure form headings, button label, success message, and input field labels</p>
                     </div>
                 </div>
-                <button type="button" onclick="closeContactFormModal()" class="w-8 h-8 rounded-full bg-stone-100 text-stone-400 hover:text-stone-700 flex items-center justify-center transition-colors cursor-pointer">
+                <button type="button" onclick="closeContactFormModal()" class="w-8 h-8 rounded-full bg-stone-100 text-stone-400 hover:text-stone-700 flex items-center justify-center transition-colors cursor-pointer shrink-0">
                     <i class="fas fa-times text-sm"></i>
                 </button>
             </div>
 
             <!-- Form Wrapper -->
             <form id="contactFormSettingsForm" novalidate onsubmit="handleContactFormSubmit(event)" class="flex flex-col flex-1 min-h-0 overflow-hidden">
-                <div class="p-6 space-y-5 overflow-y-auto flex-1 overscroll-contain">
+                <div class="p-3.5 sm:p-6 space-y-3.5 sm:space-y-5 overflow-y-auto overflow-x-hidden flex-1 overscroll-contain">
                     <!-- Headings Group -->
-                    <div class="space-y-3">
+                    <div class="space-y-2.5 sm:space-y-3">
                         <div class="flex items-center gap-2 border-b border-stone-100 pb-1.5">
                             <i class="fas fa-heading text-red-600 text-xs"></i>
                             <span class="text-xs font-bold text-stone-700 uppercase tracking-wider">Form Headings & Button</span>
                         </div>
 
-                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5 sm:gap-3.5">
                             <div>
                                 <label class="block text-xs font-bold text-stone-600 uppercase tracking-wider mb-1">Eyebrow Badge</label>
-                                <input type="text" id="contactFormBadge" name="badge" value="Get In Touch" placeholder="e.g. Get In Touch" class="w-full bg-stone-50 border border-stone-200 rounded-xl px-3.5 py-2.5 text-sm font-semibold text-stone-800 focus:bg-white focus:outline-none focus:ring-2 focus:ring-red-500">
+                                <input type="text" id="contactFormBadge" name="badge" value="Get In Touch" placeholder="e.g. Get In Touch" class="w-full bg-stone-50 border border-stone-200 rounded-xl px-3 sm:px-3.5 py-2 sm:py-2.5 text-xs sm:text-sm font-semibold text-stone-800 focus:bg-white focus:outline-none focus:ring-2 focus:ring-red-500">
                             </div>
                             <div>
                                 <label class="block text-xs font-bold text-stone-600 uppercase tracking-wider mb-1">Section Title <span class="text-red-500">*</span></label>
-                                <input type="text" id="contactFormTitle" name="title" value="Send Us a Message" placeholder="e.g. Send Us a Message" class="w-full bg-stone-50 border border-stone-200 rounded-xl px-3.5 py-2.5 text-sm font-semibold text-stone-800 focus:bg-white focus:outline-none focus:ring-2 focus:ring-red-500">
+                                <input type="text" id="contactFormTitle" name="title" value="Send Us a Message" placeholder="e.g. Send Us a Message" class="w-full bg-stone-50 border border-stone-200 rounded-xl px-3 sm:px-3.5 py-2 sm:py-2.5 text-xs sm:text-sm font-semibold text-stone-800 focus:bg-white focus:outline-none focus:ring-2 focus:ring-red-500">
                             </div>
                         </div>
 
-                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5 sm:gap-3.5">
                             <div>
                                 <label class="block text-xs font-bold text-stone-600 uppercase tracking-wider mb-1">Subtitle / Help Text</label>
-                                <input type="text" id="contactFormSubtitle" name="subtitle" value="Fill in your details and our team will get back to you promptly." placeholder="e.g. Fill in your details..." class="w-full bg-stone-50 border border-stone-200 rounded-xl px-3.5 py-2.5 text-sm font-semibold text-stone-800 focus:bg-white focus:outline-none focus:ring-2 focus:ring-red-500">
+                                <input type="text" id="contactFormSubtitle" name="subtitle" value="Fill in your details and our team will get back to you promptly." placeholder="e.g. Fill in your details..." class="w-full bg-stone-50 border border-stone-200 rounded-xl px-3 sm:px-3.5 py-2 sm:py-2.5 text-xs sm:text-sm font-semibold text-stone-800 focus:bg-white focus:outline-none focus:ring-2 focus:ring-red-500">
                             </div>
                             <div>
                                 <label class="block text-xs font-bold text-stone-600 uppercase tracking-wider mb-1">Submit Button Text <span class="text-red-500">*</span></label>
-                                <input type="text" id="contactFormCtaText" name="cta_text" value="Send Message" placeholder="e.g. Send Message" class="w-full bg-stone-50 border border-stone-200 rounded-xl px-3.5 py-2.5 text-sm font-semibold text-stone-800 focus:bg-white focus:outline-none focus:ring-2 focus:ring-red-500">
+                                <input type="text" id="contactFormCtaText" name="cta_text" value="Send Message" placeholder="e.g. Send Message" class="w-full bg-stone-50 border border-stone-200 rounded-xl px-3 sm:px-3.5 py-2 sm:py-2.5 text-xs sm:text-sm font-semibold text-stone-800 focus:bg-white focus:outline-none focus:ring-2 focus:ring-red-500">
                             </div>
                         </div>
                     </div>
 
                     <!-- Feedback Messages Group -->
-                    <div class="space-y-3 pt-1">
+                    <div class="space-y-2.5 sm:space-y-3 pt-1">
                         <div class="flex items-center gap-2 border-b border-stone-100 pb-1.5">
                             <i class="fas fa-check-circle text-emerald-600 text-xs"></i>
                             <span class="text-xs font-bold text-stone-700 uppercase tracking-wider">Success & Error Notification Messages</span>
                         </div>
 
-                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5 sm:gap-3.5">
                             <div>
                                 <label class="block text-xs font-bold text-stone-600 uppercase tracking-wider mb-1">Success Title</label>
-                                <input type="text" id="contactFormSuccessTitle" name="success_title" value="Message Sent!" placeholder="e.g. Message Sent!" class="w-full bg-stone-50 border border-stone-200 rounded-xl px-3.5 py-2 text-sm font-semibold text-stone-800 focus:bg-white focus:outline-none focus:ring-2 focus:ring-red-500">
+                                <input type="text" id="contactFormSuccessTitle" name="success_title" value="Message Sent!" placeholder="e.g. Message Sent!" class="w-full bg-stone-50 border border-stone-200 rounded-xl px-3 sm:px-3.5 py-2 text-xs sm:text-sm font-semibold text-stone-800 focus:bg-white focus:outline-none focus:ring-2 focus:ring-red-500">
                             </div>
                             <div>
                                 <label class="block text-xs font-bold text-stone-600 uppercase tracking-wider mb-1">Success Message Description</label>
-                                <input type="text" id="contactFormSuccessMessage" name="success_message" value="Thank you! Your message has been sent successfully. We will get back to you shortly." class="w-full bg-stone-50 border border-stone-200 rounded-xl px-3.5 py-2 text-sm font-semibold text-stone-800 focus:bg-white focus:outline-none focus:ring-2 focus:ring-red-500">
+                                <input type="text" id="contactFormSuccessMessage" name="success_message" value="Thank you! Your message has been sent successfully. We will get back to you shortly." class="w-full bg-stone-50 border border-stone-200 rounded-xl px-3 sm:px-3.5 py-2 text-xs sm:text-sm font-semibold text-stone-800 focus:bg-white focus:outline-none focus:ring-2 focus:ring-red-500">
                             </div>
                         </div>
 
                         <div>
                             <label class="block text-xs font-bold text-stone-600 uppercase tracking-wider mb-1">Error Message (Submission Failed)</label>
-                            <input type="text" id="contactFormErrorMessage" name="error_message" value="Something went wrong while sending your message. Please check the form and try again." class="w-full bg-stone-50 border border-stone-200 rounded-xl px-3.5 py-2 text-sm font-semibold text-stone-800 focus:bg-white focus:outline-none focus:ring-2 focus:ring-red-500">
+                            <input type="text" id="contactFormErrorMessage" name="error_message" value="Something went wrong while sending your message. Please check the form and try again." class="w-full bg-stone-50 border border-stone-200 rounded-xl px-3 sm:px-3.5 py-2 text-xs sm:text-sm font-semibold text-stone-800 focus:bg-white focus:outline-none focus:ring-2 focus:ring-red-500">
                         </div>
                     </div>
 
                     <!-- Form Fields Configuration -->
-                    <div class="space-y-3 pt-1">
+                    <div class="space-y-2.5 sm:space-y-3 pt-1">
                         <div class="flex items-center gap-2 border-b border-stone-100 pb-1.5">
                             <i class="fas fa-list text-red-600 text-xs"></i>
                             <span class="text-xs font-bold text-stone-700 uppercase tracking-wider">Input Field Labels & Placeholders</span>
                         </div>
 
-                        <div class="space-y-3" id="contactFormFieldsContainer">
+                        <div class="space-y-2.5 sm:space-y-3" id="contactFormFieldsContainer">
                             <!-- Name Field Config -->
-                            <div class="bg-stone-50 p-3.5 rounded-2xl border border-stone-200 grid grid-cols-1 sm:grid-cols-12 gap-3 items-center">
+                            <div class="bg-stone-50 p-2.5 sm:p-3.5 rounded-2xl border border-stone-200 grid grid-cols-1 sm:grid-cols-12 gap-2 sm:gap-3 items-center">
                                 <div class="sm:col-span-3 font-bold text-xs text-stone-800 flex items-center gap-1.5">
                                     <i class="fas fa-user text-stone-400"></i> Name Field
                                 </div>
@@ -1947,7 +1967,7 @@
                             </div>
 
                             <!-- Email Field Config -->
-                            <div class="bg-stone-50 p-3.5 rounded-2xl border border-stone-200 grid grid-cols-1 sm:grid-cols-12 gap-3 items-center">
+                            <div class="bg-stone-50 p-2.5 sm:p-3.5 rounded-2xl border border-stone-200 grid grid-cols-1 sm:grid-cols-12 gap-2 sm:gap-3 items-center">
                                 <div class="sm:col-span-3 font-bold text-xs text-stone-800 flex items-center gap-1.5">
                                     <i class="fas fa-envelope text-stone-400"></i> Email Field
                                 </div>
@@ -1963,7 +1983,7 @@
                             </div>
 
                             <!-- Phone Field Config -->
-                            <div class="bg-stone-50 p-3.5 rounded-2xl border border-stone-200 grid grid-cols-1 sm:grid-cols-12 gap-3 items-center">
+                            <div class="bg-stone-50 p-2.5 sm:p-3.5 rounded-2xl border border-stone-200 grid grid-cols-1 sm:grid-cols-12 gap-2 sm:gap-3 items-center">
                                 <div class="sm:col-span-3 font-bold text-xs text-stone-800 flex items-center gap-1.5">
                                     <i class="fas fa-phone text-stone-400"></i> Phone Field
                                 </div>
@@ -1979,7 +1999,7 @@
                             </div>
 
                             <!-- Subject Field Config -->
-                            <div class="bg-stone-50 p-3.5 rounded-2xl border border-stone-200 grid grid-cols-1 sm:grid-cols-12 gap-3 items-center">
+                            <div class="bg-stone-50 p-2.5 sm:p-3.5 rounded-2xl border border-stone-200 grid grid-cols-1 sm:grid-cols-12 gap-2 sm:gap-3 items-center">
                                 <div class="sm:col-span-3 font-bold text-xs text-stone-800 flex items-center gap-1.5">
                                     <i class="fas fa-tag text-stone-400"></i> Subject Field
                                 </div>
@@ -1995,7 +2015,7 @@
                             </div>
 
                             <!-- Message Field Config -->
-                            <div class="bg-stone-50 p-3.5 rounded-2xl border border-stone-200 grid grid-cols-1 sm:grid-cols-12 gap-3 items-center">
+                            <div class="bg-stone-50 p-2.5 sm:p-3.5 rounded-2xl border border-stone-200 grid grid-cols-1 sm:grid-cols-12 gap-2 sm:gap-3 items-center">
                                 <div class="sm:col-span-3 font-bold text-xs text-stone-800 flex items-center gap-1.5">
                                     <i class="fas fa-comment-alt text-stone-400"></i> Message Field
                                 </div>
@@ -2019,11 +2039,11 @@
                 </div>
 
                 <!-- Sticky Footer with Action Buttons -->
-                <div class="p-4 px-6 bg-stone-50 border-t border-stone-100 shrink-0 flex items-center justify-end gap-3">
-                    <button type="button" onclick="closeContactFormModal()" class="btn-secondary text-xs px-5 py-2.5 cursor-pointer">Cancel</button>
-                    <button type="submit" id="contactFormSubmitBtn" class="btn-primary text-xs px-6 py-2.5 flex items-center gap-2 shadow-sm cursor-pointer">
+                <div class="p-3 sm:p-4 px-4 sm:px-6 bg-stone-50 border-t border-stone-100 shrink-0 flex flex-wrap items-center justify-end gap-2 sm:gap-3">
+                    <button type="button" onclick="closeContactFormModal()" class="btn-secondary text-xs px-4 sm:px-5 py-2 sm:py-2.5 cursor-pointer">Cancel</button>
+                    <button type="submit" id="contactFormSubmitBtn" class="btn-primary text-xs px-5 sm:px-6 py-2 sm:py-2.5 flex items-center gap-2 shadow-sm cursor-pointer">
                         <i class="fas fa-save"></i>
-                        <span>Save Form Configuration</span>
+                        <span>Save Config</span>
                     </button>
                 </div>
             </form>
@@ -2031,27 +2051,27 @@
     </div>
 
     <!-- MODAL 16: FAQ SECTION HEADER SETTINGS MODAL -->
-    <div id="contactFaqsHeaderModal" onclick="if(event.target === this) closeContactFaqsHeaderModal()" class="fixed inset-0 bg-stone-900/60 backdrop-blur-xs hidden items-center justify-center z-[9999] p-4 overflow-y-auto" style="display: none;">
-        <div class="bg-white rounded-3xl max-w-lg w-full max-h-[90vh] flex flex-col overflow-hidden shadow-2xl border border-stone-100 animate-fadeIn" onclick="event.stopPropagation()">
+    <div id="contactFaqsHeaderModal" onclick="if(event.target === this) closeContactFaqsHeaderModal()" class="fixed inset-0 bg-stone-900/60 backdrop-blur-xs hidden items-center justify-center z-[9999] p-2 sm:p-4 overflow-y-auto" style="display: none;">
+        <div class="bg-white rounded-2xl sm:rounded-3xl max-w-lg w-full max-h-[94vh] sm:max-h-[90vh] flex flex-col overflow-hidden shadow-2xl border border-stone-100 animate-fadeIn" onclick="event.stopPropagation()">
             <!-- Pinned Header -->
-            <div class="p-5 px-6 border-b border-stone-100 flex items-center justify-between bg-stone-50/80 shrink-0">
-                <div class="flex items-center gap-3">
-                    <div class="w-10 h-10 rounded-2xl bg-red-50 text-red-600 flex items-center justify-center font-bold text-base shadow-2xs">
+            <div class="p-3.5 sm:p-5 px-4 sm:px-6 border-b border-stone-100 flex items-center justify-between bg-stone-50/80 shrink-0">
+                <div class="flex items-center gap-2.5 sm:gap-3 min-w-0">
+                    <div class="w-8 h-8 sm:w-10 sm:h-10 rounded-xl sm:rounded-2xl bg-red-50 border border-red-100 flex items-center justify-center text-red-600 font-bold shadow-2xs shrink-0 text-sm sm:text-base">
                         <i class="fas fa-question-circle"></i>
                     </div>
-                    <div>
-                        <h3 class="text-base font-bold text-stone-800">Frequently Asked Questions Header</h3>
-                        <p class="text-xs text-stone-500 font-medium">Customize FAQ section title, subtitle, and badge</p>
+                    <div class="min-w-0">
+                        <h3 class="text-sm sm:text-base font-bold text-stone-800 truncate">FAQ Section Header</h3>
+                        <p class="text-[11px] sm:text-xs text-stone-500 font-medium hidden sm:block truncate">Customize FAQ section title, subtitle, and badge</p>
                     </div>
                 </div>
-                <button type="button" onclick="closeContactFaqsHeaderModal()" class="w-8 h-8 rounded-full bg-stone-100 text-stone-400 hover:text-stone-700 flex items-center justify-center transition-colors cursor-pointer">
-                    <i class="fas fa-times text-sm"></i>
+                <button type="button" onclick="closeContactFaqsHeaderModal()" class="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-stone-100 text-stone-400 hover:text-stone-700 flex items-center justify-center transition-colors cursor-pointer shrink-0">
+                    <i class="fas fa-times text-xs sm:text-sm"></i>
                 </button>
             </div>
 
             <!-- Form Wrapper -->
             <form id="contactFaqsHeaderForm" novalidate onsubmit="handleContactFaqsHeaderSubmit(event)" class="flex flex-col flex-1 min-h-0 overflow-hidden">
-                <div class="p-6 space-y-4 overflow-y-auto flex-1 overscroll-contain">
+                <div class="p-3.5 sm:p-6 space-y-4 overflow-y-auto overflow-x-hidden flex-1 overscroll-contain">
                     <div>
                         <label class="block text-xs font-bold text-stone-600 uppercase tracking-wider mb-1">Eyebrow Badge</label>
                         <input type="text" id="contactFaqsHeaderTagText" name="badge" value="Help & Support" placeholder="e.g. Help & Support" class="w-full bg-stone-50 border border-stone-200 rounded-xl px-3.5 py-2.5 text-sm font-semibold text-stone-800 focus:bg-white focus:outline-none focus:ring-2 focus:ring-red-500">
@@ -2066,16 +2086,16 @@
                         <textarea id="contactFaqsHeaderSubtitle" name="subtitle" rows="3" placeholder="Quick answers about our handmade creations, custom orders, and delivery..." class="w-full bg-stone-50 border border-stone-200 rounded-xl px-3.5 py-2.5 text-sm font-semibold text-stone-800 focus:bg-white focus:outline-none focus:ring-2 focus:ring-red-500">Quick answers about our handmade creations, custom orders, and delivery.</textarea>
                     </div>
 
-                    <div class="flex items-center gap-2 pt-2">
+                    <div class="flex items-center gap-2 pt-1">
                         <input type="checkbox" id="contactFaqsHeaderActive" name="is_active" checked class="w-4 h-4 rounded text-red-600 focus:ring-red-500">
                         <label for="contactFaqsHeaderActive" class="text-xs font-bold text-stone-700">FAQ Section Active (Visible on Contact Page)</label>
                     </div>
                 </div>
 
                 <!-- Sticky Footer with Action Buttons -->
-                <div class="p-4 px-6 bg-stone-50 border-t border-stone-100 shrink-0 flex items-center justify-end gap-3">
-                    <button type="button" onclick="closeContactFaqsHeaderModal()" class="btn-secondary text-xs px-5 py-2.5 cursor-pointer">Cancel</button>
-                    <button type="submit" id="contactFaqsHeaderSubmitBtn" class="btn-primary text-xs px-6 py-2.5 flex items-center gap-2 shadow-sm cursor-pointer">
+                <div class="p-3.5 sm:p-4 px-4 sm:px-6 bg-stone-50 border-t border-stone-100 shrink-0 flex items-center justify-end gap-2 sm:gap-3">
+                    <button type="button" onclick="closeContactFaqsHeaderModal()" class="btn-secondary text-xs px-4 sm:px-5 py-2 sm:py-2.5 cursor-pointer">Cancel</button>
+                    <button type="submit" id="contactFaqsHeaderSubmitBtn" class="btn-primary text-xs px-5 sm:px-6 py-2 sm:py-2.5 flex items-center gap-2 shadow-sm cursor-pointer">
                         <i class="fas fa-save"></i>
                         <span>Save FAQ Header</span>
                     </button>
@@ -2085,21 +2105,21 @@
     </div>
 
     <!-- MODAL 17: ADD / EDIT FAQ ITEM MODAL -->
-    <div id="contactFaqModal" onclick="if(event.target === this) closeContactFaqModal()" class="fixed inset-0 bg-stone-900/60 backdrop-blur-xs hidden items-center justify-center z-[9999] p-4 overflow-y-auto" style="display: none;">
-        <div class="bg-white rounded-3xl max-w-xl w-full max-h-[92vh] flex flex-col overflow-hidden shadow-2xl border border-stone-100 animate-fadeIn" onclick="event.stopPropagation()">
+    <div id="contactFaqModal" onclick="if(event.target === this) closeContactFaqModal()" class="fixed inset-0 bg-stone-900/60 backdrop-blur-xs hidden items-center justify-center z-[9999] p-2 sm:p-4 overflow-y-auto" style="display: none;">
+        <div class="bg-white rounded-2xl sm:rounded-3xl max-w-xl w-full max-h-[94vh] sm:max-h-[90vh] flex flex-col overflow-hidden shadow-2xl border border-stone-100 animate-fadeIn" onclick="event.stopPropagation()">
             <!-- Pinned Header -->
-            <div class="p-5 px-6 border-b border-stone-100 flex items-center justify-between bg-stone-50/80 shrink-0">
-                <div class="flex items-center gap-3">
-                    <div class="w-10 h-10 rounded-2xl bg-red-50 text-red-600 flex items-center justify-center font-bold text-base shadow-2xs">
+            <div class="p-3.5 sm:p-5 px-4 sm:px-6 border-b border-stone-100 flex items-center justify-between bg-stone-50/80 shrink-0">
+                <div class="flex items-center gap-2.5 sm:gap-3 min-w-0">
+                    <div class="w-8 h-8 sm:w-10 sm:h-10 rounded-xl sm:rounded-2xl bg-red-50 border border-red-100 flex items-center justify-center text-red-600 font-bold shadow-2xs shrink-0 text-sm sm:text-base">
                         <i class="fas fa-question"></i>
                     </div>
-                    <div>
-                        <h3 class="text-base font-bold text-stone-800" id="contactFaqModalTitle">Add FAQ Item</h3>
-                        <p class="text-xs text-stone-500 font-medium">Add or edit customer questions and helpful answers</p>
+                    <div class="min-w-0">
+                        <h3 class="text-sm sm:text-base font-bold text-stone-800 truncate" id="contactFaqModalTitle">Add FAQ Item</h3>
+                        <p class="text-[11px] sm:text-xs text-stone-500 font-medium hidden sm:block truncate">Add or edit customer questions and helpful answers</p>
                     </div>
                 </div>
-                <button type="button" onclick="closeContactFaqModal()" class="w-8 h-8 rounded-full bg-stone-100 text-stone-400 hover:text-stone-700 flex items-center justify-center transition-colors cursor-pointer">
-                    <i class="fas fa-times text-sm"></i>
+                <button type="button" onclick="closeContactFaqModal()" class="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-stone-100 text-stone-400 hover:text-stone-700 flex items-center justify-center transition-colors cursor-pointer shrink-0">
+                    <i class="fas fa-times text-xs sm:text-sm"></i>
                 </button>
             </div>
 
@@ -2107,7 +2127,7 @@
             <form id="contactFaqForm" novalidate onsubmit="handleContactFaqSubmit(event)" class="flex flex-col flex-1 min-h-0 overflow-hidden">
                 <input type="hidden" id="contactFaqId" name="id" value="">
 
-                <div class="p-6 space-y-4 overflow-y-auto flex-1 overscroll-contain">
+                <div class="p-3.5 sm:p-6 space-y-4 overflow-y-auto overflow-x-hidden flex-1 overscroll-contain">
                     <div>
                         <label class="block text-xs font-bold text-stone-600 uppercase tracking-wider mb-1">Question <span class="text-red-500">*</span></label>
                         <input type="text" id="contactFaqQuestion" name="question" placeholder="e.g. How long does a custom order take?" class="w-full bg-stone-50 border border-stone-200 rounded-xl px-3.5 py-2.5 text-sm font-semibold text-stone-800 focus:bg-white focus:outline-none focus:ring-2 focus:ring-red-500">
@@ -2125,7 +2145,7 @@
                         </div>
                         <div>
                             <label class="block text-xs font-bold text-stone-600 uppercase tracking-wider mb-1">Status</label>
-                            <div class="flex items-center gap-2 pt-2.5">
+                            <div class="flex items-center gap-2 pt-2 sm:pt-2.5">
                                 <input type="checkbox" id="contactFaqActive" name="is_active" checked class="w-4 h-4 rounded text-red-600 focus:ring-red-500">
                                 <label for="contactFaqActive" class="text-xs font-bold text-stone-700">Active (Visible on Website)</label>
                             </div>
@@ -2134,9 +2154,9 @@
                 </div>
 
                 <!-- Sticky Footer with Action Buttons -->
-                <div class="p-4 px-6 bg-stone-50 border-t border-stone-100 shrink-0 flex items-center justify-end gap-3">
-                    <button type="button" onclick="closeContactFaqModal()" class="btn-secondary text-xs px-5 py-2.5 cursor-pointer">Cancel</button>
-                    <button type="submit" id="contactFaqSubmitBtn" class="btn-primary text-xs px-6 py-2.5 flex items-center gap-2 shadow-sm cursor-pointer">
+                <div class="p-3.5 sm:p-4 px-4 sm:px-6 bg-stone-50 border-t border-stone-100 shrink-0 flex items-center justify-end gap-2 sm:gap-3">
+                    <button type="button" onclick="closeContactFaqModal()" class="btn-secondary text-xs px-4 sm:px-5 py-2 sm:py-2.5 cursor-pointer">Cancel</button>
+                    <button type="submit" id="contactFaqSubmitBtn" class="btn-primary text-xs px-5 sm:px-6 py-2 sm:py-2.5 flex items-center gap-2 shadow-sm cursor-pointer">
                         <i class="fas fa-save"></i>
                         <span id="contactFaqSubmitBtnText">Save FAQ</span>
                     </button>
@@ -2146,21 +2166,21 @@
     </div>
 
     <!-- MODAL 18: CUSTOM CROCHET BANNER & HANGING TAG MODAL -->
-    <div id="customCrochetModal" onclick="if(event.target === this) closeCustomCrochetModal()" class="fixed inset-0 bg-stone-900/60 backdrop-blur-xs hidden items-center justify-center z-[9999] p-4" style="display: none;">
-        <div class="bg-white rounded-3xl max-w-3xl w-full max-h-[92vh] flex flex-col overflow-hidden shadow-2xl border border-stone-100 animate-fadeIn" onclick="event.stopPropagation()">
+    <div id="customCrochetModal" onclick="if(event.target === this) closeCustomCrochetModal()" class="fixed inset-0 bg-stone-900/60 backdrop-blur-xs hidden items-center justify-center z-[9999] p-2 sm:p-4 overflow-y-auto" style="display: none;">
+        <div class="bg-white rounded-2xl sm:rounded-3xl max-w-3xl w-full max-h-[94vh] sm:max-h-[90vh] flex flex-col overflow-hidden shadow-2xl border border-stone-100 animate-fadeIn" onclick="event.stopPropagation()">
             <!-- Pinned Header -->
-            <div class="p-5 px-6 border-b border-stone-100 flex items-center justify-between bg-stone-50/80 shrink-0">
-                <div class="flex items-center gap-3">
-                    <div class="w-10 h-10 rounded-2xl bg-red-50 text-red-600 flex items-center justify-center font-bold text-base shadow-2xs">
+            <div class="p-3.5 sm:p-5 px-4 sm:px-6 border-b border-stone-100 flex items-center justify-between bg-stone-50/80 shrink-0">
+                <div class="flex items-center gap-2.5 sm:gap-3 min-w-0">
+                    <div class="w-8 h-8 sm:w-10 sm:h-10 rounded-xl sm:rounded-2xl bg-red-50 border border-red-100 flex items-center justify-center text-red-600 font-bold shadow-2xs shrink-0 text-sm sm:text-base">
                         <i class="fas fa-cut"></i>
                     </div>
-                    <div>
-                        <h3 class="text-base font-bold text-stone-800">Edit Custom Crochet Banner & Hanging Tag</h3>
-                        <p class="text-xs text-stone-500 font-medium">Customize headline, italic highlight, narrative, button, artwork, and hanging note</p>
+                    <div class="min-w-0">
+                        <h3 class="text-sm sm:text-base font-bold text-stone-800 truncate">Custom Crochet Banner & Note</h3>
+                        <p class="text-[11px] sm:text-xs text-stone-500 font-medium hidden sm:block truncate">Headline, italic highlight, narrative, button, artwork, and hanging note</p>
                     </div>
                 </div>
-                <button type="button" onclick="closeCustomCrochetModal()" class="w-8 h-8 rounded-full bg-stone-100 text-stone-400 hover:text-stone-700 flex items-center justify-center transition-colors cursor-pointer">
-                    <i class="fas fa-times text-sm"></i>
+                <button type="button" onclick="closeCustomCrochetModal()" class="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-stone-100 text-stone-400 hover:text-stone-700 flex items-center justify-center transition-colors cursor-pointer shrink-0">
+                    <i class="fas fa-times text-xs sm:text-sm"></i>
                 </button>
             </div>
 
@@ -2168,7 +2188,7 @@
             <form id="customCrochetForm" novalidate onsubmit="handleCustomCrochetSubmit(event)" class="flex flex-col flex-1 min-h-0 overflow-hidden">
                 <input type="hidden" id="customCrochetImageUrl" name="image_url" value="">
 
-                <div class="p-6 space-y-5 overflow-y-auto flex-1 overscroll-contain">
+                <div class="p-3.5 sm:p-6 space-y-4 sm:space-y-5 overflow-y-auto overflow-x-hidden flex-1 overscroll-contain">
                     <!-- Headings Group -->
                     <div class="space-y-3">
                         <div class="flex items-center gap-2 border-b border-stone-100 pb-1.5">
@@ -2176,14 +2196,14 @@
                             <span class="text-xs font-bold text-stone-700 uppercase tracking-wider">Headings & Description</span>
                         </div>
 
-                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-3.5">
                             <div>
                                 <label class="block text-xs font-bold text-stone-600 uppercase tracking-wider mb-1">Main Headline <span class="text-red-500">*</span></label>
-                                <input type="text" id="customCrochetTitle" name="title" placeholder="e.g. Custom Crochet" class="w-full bg-stone-50 border border-stone-200 rounded-xl px-3.5 py-2.5 text-sm font-semibold text-stone-800 focus:bg-white focus:outline-none focus:ring-2 focus:ring-red-500">
+                                <input type="text" id="customCrochetTitle" name="title" placeholder="e.g. Custom Crochet" class="w-full bg-stone-50 border border-stone-200 rounded-xl px-3.5 py-2 sm:py-2.5 text-sm font-semibold text-stone-800 focus:bg-white focus:outline-none focus:ring-2 focus:ring-red-500">
                             </div>
                             <div>
                                 <label class="block text-xs font-bold text-stone-600 uppercase tracking-wider mb-1">Italic Highlight Subtitle</label>
-                                <input type="text" id="customCrochetSubtitle" name="subtitle" placeholder="e.g. Just for You" class="w-full bg-stone-50 border border-stone-200 rounded-xl px-3.5 py-2.5 text-sm font-semibold text-stone-800 focus:bg-white focus:outline-none focus:ring-2 focus:ring-red-500">
+                                <input type="text" id="customCrochetSubtitle" name="subtitle" placeholder="e.g. Just for You" class="w-full bg-stone-50 border border-stone-200 rounded-xl px-3.5 py-2 sm:py-2.5 text-sm font-semibold text-stone-800 focus:bg-white focus:outline-none focus:ring-2 focus:ring-red-500">
                             </div>
                         </div>
 
@@ -2197,13 +2217,13 @@
                     <div class="space-y-3 pt-1">
                         <div class="flex items-center gap-2 border-b border-stone-100 pb-1.5">
                             <i class="fas fa-sticky-note text-amber-600 text-xs"></i>
-                            <span class="text-xs font-bold text-amber-900 uppercase tracking-wider">Hanging Paper Note (Turn Your Ideas Section)</span>
+                            <span class="text-xs font-bold text-amber-900 uppercase tracking-wider">Hanging Paper Note</span>
                         </div>
 
-                        <div class="p-4 bg-amber-50/70 border border-amber-200/80 rounded-2xl space-y-3">
+                        <div class="p-3 sm:p-4 bg-amber-50/70 border border-amber-200/80 rounded-2xl space-y-3">
                             <div>
                                 <label class="block text-xs font-bold text-stone-700 mb-1">Hanging Note Tag Text</label>
-                                <input type="text" id="customCrochetTagText" name="tag_text" placeholder="e.g. Turn Your Ideas Into Handmade Reality" class="w-full bg-white border border-stone-200 rounded-xl px-3.5 py-2.5 text-sm font-semibold text-stone-800 focus:outline-none focus:ring-2 focus:ring-red-500">
+                                <input type="text" id="customCrochetTagText" name="tag_text" placeholder="e.g. Turn Your Ideas Into Handmade Reality" class="w-full bg-white border border-stone-200 rounded-xl px-3.5 py-2 sm:py-2.5 text-sm font-semibold text-stone-800 focus:outline-none focus:ring-2 focus:ring-red-500">
                                 <p class="text-[11px] text-stone-500 mt-1">This appears as the handcrafted paper card badge pinned over the right-side banner artwork.</p>
                             </div>
 
@@ -2221,7 +2241,7 @@
                             <span class="text-xs font-bold text-stone-700 uppercase tracking-wider">Button CTA & Banner Artwork</span>
                         </div>
 
-                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-3.5">
                             <div>
                                 <label class="block text-xs font-bold text-stone-600 uppercase tracking-wider mb-1">Button Label</label>
                                 <input type="text" id="customCrochetCtaText" name="cta_text" placeholder="e.g. Request Your Custom Order" class="w-full bg-stone-50 border border-stone-200 rounded-xl px-3.5 py-2 text-sm font-semibold text-stone-800 focus:bg-white focus:outline-none focus:ring-2 focus:ring-red-500">
@@ -2232,7 +2252,7 @@
                             </div>
                         </div>
 
-                        <div class="bg-stone-50/80 border border-stone-200/90 rounded-2xl p-4 space-y-3">
+                        <div class="bg-stone-50/80 border border-stone-200/90 rounded-2xl p-3 sm:p-4 space-y-3">
                             <div class="flex items-center justify-between">
                                 <span class="text-xs font-bold text-stone-800">Banner Photo Visual</span>
                                 <button type="button" onclick="openMediaPicker('custom_crochet')" class="px-2.5 py-1 rounded-lg bg-white hover:bg-stone-100 border border-stone-200 text-stone-700 text-[11px] font-bold transition-all flex items-center gap-1 cursor-pointer">
@@ -2248,12 +2268,12 @@
                             </div>
 
                             <div id="customCrochetPreviewContainer" class="bg-white rounded-xl p-2.5 border border-stone-200 flex items-center gap-3">
-                                <img id="customCrochetPreviewImg" src="" class="w-14 h-14 rounded-lg object-cover border border-stone-200">
+                                <img id="customCrochetPreviewImg" src="" class="w-14 h-14 rounded-lg object-cover border border-stone-200 shrink-0">
                                 <div class="flex-1 min-w-0">
                                     <p class="text-xs font-bold text-stone-800 truncate" id="customCrochetFileName">Banner Active</p>
                                     <p class="text-[10px] text-emerald-600 font-semibold">Ready</p>
                                 </div>
-                                <button type="button" onclick="clearCustomCrochetFileInput()" class="text-stone-400 hover:text-red-600 p-1.5 cursor-pointer"><i class="fas fa-times"></i></button>
+                                <button type="button" onclick="clearCustomCrochetFileInput()" class="text-stone-400 hover:text-red-600 p-1.5 cursor-pointer shrink-0"><i class="fas fa-times"></i></button>
                             </div>
 
                             <div>
@@ -2262,7 +2282,7 @@
                             </div>
                         </div>
 
-                        <div class="flex items-center gap-2 pt-2">
+                        <div class="flex items-center gap-2 pt-1">
                             <input type="checkbox" id="customCrochetActive" name="is_active" checked class="w-4 h-4 rounded text-red-600 focus:ring-red-500">
                             <label for="customCrochetActive" class="text-xs font-bold text-stone-700">Banner Section Active on Homepage</label>
                         </div>
@@ -2270,9 +2290,9 @@
                 </div>
 
                 <!-- Sticky Footer with Action Buttons -->
-                <div class="p-4 px-6 bg-stone-50 border-t border-stone-100 shrink-0 flex items-center justify-end gap-3">
-                    <button type="button" onclick="closeCustomCrochetModal()" class="btn-secondary text-xs px-5 py-2.5 cursor-pointer">Cancel</button>
-                    <button type="submit" id="customCrochetSubmitBtn" class="btn-primary text-xs px-6 py-2.5 flex items-center gap-2 shadow-sm cursor-pointer">
+                <div class="p-3.5 sm:p-4 px-4 sm:px-6 bg-stone-50 border-t border-stone-100 shrink-0 flex items-center justify-end gap-2 sm:gap-3">
+                    <button type="button" onclick="closeCustomCrochetModal()" class="btn-secondary text-xs px-4 sm:px-5 py-2 sm:py-2.5 cursor-pointer">Cancel</button>
+                    <button type="submit" id="customCrochetSubmitBtn" class="btn-primary text-xs px-5 sm:px-6 py-2 sm:py-2.5 flex items-center gap-2 shadow-sm cursor-pointer">
                         <i class="fas fa-save"></i>
                         <span>Save Custom Crochet Banner</span>
                     </button>
@@ -2282,21 +2302,21 @@
     </div>
 
     <!-- MODAL 18B: BRAND STORY SECTION MODAL -->
-    <div id="brandStoryModal" onclick="if(event.target === this) closeBrandStoryModal()" class="fixed inset-0 bg-stone-900/60 backdrop-blur-xs hidden items-center justify-center z-[9999] p-4" style="display: none;">
-        <div class="bg-white rounded-3xl max-w-3xl w-full max-h-[92vh] flex flex-col overflow-hidden shadow-2xl border border-stone-100 animate-fadeIn" onclick="event.stopPropagation()">
+    <div id="brandStoryModal" onclick="if(event.target === this) closeBrandStoryModal()" class="fixed inset-0 bg-stone-900/60 backdrop-blur-xs hidden items-center justify-center z-[9999] p-2 sm:p-4 overflow-y-auto" style="display: none;">
+        <div class="bg-white rounded-2xl sm:rounded-3xl max-w-3xl w-full max-h-[94vh] sm:max-h-[90vh] flex flex-col overflow-hidden shadow-2xl border border-stone-100 animate-fadeIn" onclick="event.stopPropagation()">
             <!-- Pinned Header -->
-            <div class="p-5 px-6 border-b border-stone-100 flex items-center justify-between bg-stone-50/80 shrink-0">
-                <div class="flex items-center gap-3">
-                    <div class="w-10 h-10 rounded-2xl bg-red-50 text-red-600 flex items-center justify-center font-bold text-base shadow-2xs">
+            <div class="p-3.5 sm:p-5 px-4 sm:px-6 border-b border-stone-100 flex items-center justify-between bg-stone-50/80 shrink-0">
+                <div class="flex items-center gap-2.5 sm:gap-3 min-w-0">
+                    <div class="w-8 h-8 sm:w-10 sm:h-10 rounded-xl sm:rounded-2xl bg-red-50 border border-red-100 flex items-center justify-center text-red-600 font-bold shadow-2xs shrink-0 text-sm sm:text-base">
                         <i class="fas fa-book-open"></i>
                     </div>
-                    <div>
-                        <h3 class="text-base font-bold text-stone-800">Edit Brand Story Section ("Every Stitch Has a Story")</h3>
-                        <p class="text-xs text-stone-500 font-medium">Customize headline, italic highlight, narrative, button, artwork, and 4 trust features</p>
+                    <div class="min-w-0">
+                        <h3 class="text-sm sm:text-base font-bold text-stone-800 truncate">Brand Story Section</h3>
+                        <p class="text-[11px] sm:text-xs text-stone-500 font-medium hidden sm:block truncate">Headline, italic highlight, narrative, button, artwork, and 4 trust features</p>
                     </div>
                 </div>
-                <button type="button" onclick="closeBrandStoryModal()" class="w-8 h-8 rounded-full bg-stone-100 text-stone-400 hover:text-stone-700 flex items-center justify-center transition-colors cursor-pointer">
-                    <i class="fas fa-times text-sm"></i>
+                <button type="button" onclick="closeBrandStoryModal()" class="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-stone-100 text-stone-400 hover:text-stone-700 flex items-center justify-center transition-colors cursor-pointer shrink-0">
+                    <i class="fas fa-times text-xs sm:text-sm"></i>
                 </button>
             </div>
 
@@ -2304,7 +2324,7 @@
             <form id="brandStoryForm" novalidate onsubmit="handleBrandStorySubmit(event)" class="flex flex-col flex-1 min-h-0 overflow-hidden">
                 <input type="hidden" id="brandStoryImageUrl" name="image_url" value="">
 
-                <div class="p-6 space-y-5 overflow-y-auto flex-1 overscroll-contain">
+                <div class="p-3.5 sm:p-6 space-y-4 sm:space-y-5 overflow-y-auto overflow-x-hidden flex-1 overscroll-contain">
                     <!-- Branding & Headings Group -->
                     <div class="space-y-3">
                         <div class="flex items-center gap-2 border-b border-stone-100 pb-1.5">
@@ -2317,14 +2337,14 @@
                             <input type="text" id="brandStoryBadge" name="badge" placeholder="e.g. KNOTELLE Artisanal Crochet Craftsmanship" class="w-full bg-stone-50 border border-stone-200 rounded-xl px-3.5 py-2.5 text-sm font-semibold text-stone-800 focus:bg-white focus:outline-none focus:ring-2 focus:ring-red-500">
                         </div>
 
-                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-3.5">
                             <div>
                                 <label class="block text-xs font-bold text-stone-600 uppercase tracking-wider mb-1">Main Headline <span class="text-red-500">*</span></label>
-                                <input type="text" id="brandStoryTitle" name="title" placeholder="e.g. Every Stitch" class="w-full bg-stone-50 border border-stone-200 rounded-xl px-3.5 py-2.5 text-sm font-semibold text-stone-800 focus:bg-white focus:outline-none focus:ring-2 focus:ring-red-500">
+                                <input type="text" id="brandStoryTitle" name="title" placeholder="e.g. Every Stitch" class="w-full bg-stone-50 border border-stone-200 rounded-xl px-3.5 py-2 sm:py-2.5 text-sm font-semibold text-stone-800 focus:bg-white focus:outline-none focus:ring-2 focus:ring-red-500">
                             </div>
                             <div>
                                 <label class="block text-xs font-bold text-stone-600 uppercase tracking-wider mb-1">Italic Highlight Accent</label>
-                                <input type="text" id="brandStorySubtitle" name="subtitle" placeholder="e.g. Has a Story" class="w-full bg-stone-50 border border-stone-200 rounded-xl px-3.5 py-2.5 text-sm font-semibold text-stone-800 focus:bg-white focus:outline-none focus:ring-2 focus:ring-red-500">
+                                <input type="text" id="brandStorySubtitle" name="subtitle" placeholder="e.g. Has a Story" class="w-full bg-stone-50 border border-stone-200 rounded-xl px-3.5 py-2 sm:py-2.5 text-sm font-semibold text-stone-800 focus:bg-white focus:outline-none focus:ring-2 focus:ring-red-500">
                             </div>
                         </div>
 
@@ -2341,7 +2361,7 @@
                             <span class="text-xs font-bold text-stone-700 uppercase tracking-wider">Button CTA Link</span>
                         </div>
 
-                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-3.5">
                             <div>
                                 <label class="block text-xs font-bold text-stone-600 uppercase tracking-wider mb-1">Button Label</label>
                                 <input type="text" id="brandStoryCtaText" name="cta_text" placeholder="e.g. Read Our Story" class="w-full bg-stone-50 border border-stone-200 rounded-xl px-3.5 py-2 text-sm font-semibold text-stone-800 focus:bg-white focus:outline-none focus:ring-2 focus:ring-red-500">
@@ -2363,7 +2383,7 @@
                         <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
                             <div class="bg-stone-50 rounded-2xl p-3 border border-stone-200/80">
                                 <div class="flex items-center gap-2 mb-1.5">
-                                    <span class="w-6 h-6 rounded-full bg-red-50 text-red-600 flex items-center justify-center text-xs"><i class="fas fa-heart"></i></span>
+                                    <span class="w-6 h-6 rounded-full bg-red-50 text-red-600 flex items-center justify-center text-xs shrink-0"><i class="fas fa-heart"></i></span>
                                     <label class="text-xs font-bold text-stone-700">Feature 1</label>
                                 </div>
                                 <input type="text" id="brandStoryFeature1" name="feature_1_title" placeholder="Handmade with Love" class="w-full bg-white border border-stone-200 rounded-xl px-3 py-2 text-xs font-semibold text-stone-800 focus:outline-none focus:ring-2 focus:ring-red-500">
@@ -2371,7 +2391,7 @@
 
                             <div class="bg-stone-50 rounded-2xl p-3 border border-stone-200/80">
                                 <div class="flex items-center gap-2 mb-1.5">
-                                    <span class="w-6 h-6 rounded-full bg-red-50 text-red-600 flex items-center justify-center text-xs"><i class="fas fa-wand-magic-sparkles"></i></span>
+                                    <span class="w-6 h-6 rounded-full bg-red-50 text-red-600 flex items-center justify-center text-xs shrink-0"><i class="fas fa-wand-magic-sparkles"></i></span>
                                     <label class="text-xs font-bold text-stone-700">Feature 2</label>
                                 </div>
                                 <input type="text" id="brandStoryFeature2" name="feature_2_title" placeholder="Premium Yarn Quality" class="w-full bg-white border border-stone-200 rounded-xl px-3 py-2 text-xs font-semibold text-stone-800 focus:outline-none focus:ring-2 focus:ring-red-500">
@@ -2379,7 +2399,7 @@
 
                             <div class="bg-stone-50 rounded-2xl p-3 border border-stone-200/80">
                                 <div class="flex items-center gap-2 mb-1.5">
-                                    <span class="w-6 h-6 rounded-full bg-red-50 text-red-600 flex items-center justify-center text-xs"><i class="fas fa-leaf"></i></span>
+                                    <span class="w-6 h-6 rounded-full bg-red-50 text-red-600 flex items-center justify-center text-xs shrink-0"><i class="fas fa-leaf"></i></span>
                                     <label class="text-xs font-bold text-stone-700">Feature 3</label>
                                 </div>
                                 <input type="text" id="brandStoryFeature3" name="feature_3_title" placeholder="100% Pure Natural Cotton" class="w-full bg-white border border-stone-200 rounded-xl px-3 py-2 text-xs font-semibold text-stone-800 focus:outline-none focus:ring-2 focus:ring-red-500">
@@ -2387,7 +2407,7 @@
 
                             <div class="bg-stone-50 rounded-2xl p-3 border border-stone-200/80">
                                 <div class="flex items-center gap-2 mb-1.5">
-                                    <span class="w-6 h-6 rounded-full bg-red-50 text-red-600 flex items-center justify-center text-xs"><i class="far fa-smile"></i></span>
+                                    <span class="w-6 h-6 rounded-full bg-red-50 text-red-600 flex items-center justify-center text-xs shrink-0"><i class="far fa-smile"></i></span>
                                     <label class="text-xs font-bold text-stone-700">Feature 4</label>
                                 </div>
                                 <input type="text" id="brandStoryFeature4" name="feature_4_title" placeholder="Happiness Guaranteed" class="w-full bg-white border border-stone-200 rounded-xl px-3 py-2 text-xs font-semibold text-stone-800 focus:outline-none focus:ring-2 focus:ring-red-500">
@@ -2402,7 +2422,7 @@
                             <span class="text-xs font-bold text-stone-700 uppercase tracking-wider">Panoramic Background Image</span>
                         </div>
 
-                        <div class="bg-stone-50/80 border border-stone-200/90 rounded-2xl p-4 space-y-3">
+                        <div class="bg-stone-50/80 border border-stone-200/90 rounded-2xl p-3 sm:p-4 space-y-3">
                             <div class="flex items-center justify-between">
                                 <span class="text-xs font-bold text-stone-800">Background Artwork</span>
                                 <button type="button" onclick="openMediaPicker('brand_story')" class="px-2.5 py-1 rounded-lg bg-white hover:bg-stone-100 border border-stone-200 text-stone-700 text-[11px] font-bold transition-all flex items-center gap-1 cursor-pointer">
@@ -2418,16 +2438,16 @@
                             </div>
 
                             <div id="brandStoryPreviewContainer" class="bg-white rounded-xl p-2.5 border border-stone-200 flex items-center gap-3">
-                                <img id="brandStoryPreviewImg" src="" class="w-14 h-14 rounded-lg object-cover border border-stone-200" onerror="this.src='/images/homepage/middleimg.png';">
+                                <img id="brandStoryPreviewImg" src="" class="w-14 h-14 rounded-lg object-cover border border-stone-200 shrink-0" onerror="this.src='/images/homepage/middleimg.png';">
                                 <div class="flex-1 min-w-0">
                                     <p class="text-xs font-bold text-stone-800 truncate" id="brandStoryFileName">Background Visual</p>
                                     <p class="text-[10px] text-emerald-600 font-semibold">Active</p>
                                 </div>
-                                <button type="button" onclick="clearBrandStoryFileInput()" class="text-stone-400 hover:text-red-600 p-1.5 cursor-pointer"><i class="fas fa-times"></i></button>
+                                <button type="button" onclick="clearBrandStoryFileInput()" class="text-stone-400 hover:text-red-600 p-1.5 cursor-pointer shrink-0"><i class="fas fa-times"></i></button>
                             </div>
                         </div>
 
-                        <div class="flex items-center gap-2 pt-2">
+                        <div class="flex items-center gap-2 pt-1">
                             <input type="checkbox" id="brandStoryActive" name="is_active" checked class="w-4 h-4 rounded text-red-600 focus:ring-red-500">
                             <label for="brandStoryActive" class="text-xs font-bold text-stone-700">Brand Story Section Active on Homepage</label>
                         </div>
@@ -2435,9 +2455,9 @@
                 </div>
 
                 <!-- Sticky Footer with Action Buttons -->
-                <div class="p-4 px-6 bg-stone-50 border-t border-stone-100 shrink-0 flex items-center justify-end gap-3">
-                    <button type="button" onclick="closeBrandStoryModal()" class="btn-secondary text-xs px-5 py-2.5 cursor-pointer">Cancel</button>
-                    <button type="submit" id="brandStorySubmitBtn" class="btn-primary text-xs px-6 py-2.5 flex items-center gap-2 shadow-sm cursor-pointer">
+                <div class="p-3.5 sm:p-4 px-4 sm:px-6 bg-stone-50 border-t border-stone-100 shrink-0 flex items-center justify-end gap-2 sm:gap-3">
+                    <button type="button" onclick="closeBrandStoryModal()" class="btn-secondary text-xs px-4 sm:px-5 py-2 sm:py-2.5 cursor-pointer">Cancel</button>
+                    <button type="submit" id="brandStorySubmitBtn" class="btn-primary text-xs px-5 sm:px-6 py-2 sm:py-2.5 flex items-center gap-2 shadow-sm cursor-pointer">
                         <i class="fas fa-save"></i>
                         <span>Save Brand Story</span>
                     </button>
@@ -2447,43 +2467,43 @@
     </div>
 
     <!-- MODAL 19: FOOTER SETTINGS & NAVIGATION MODAL -->
-    <div id="footerSettingsModal" class="fixed inset-0 bg-stone-900/60 backdrop-blur-xs hidden items-center justify-center z-[9999] p-4" style="display: none;" onclick="if(event.target === this) closeFooterSettingsModal()">
-        <div class="bg-white rounded-3xl max-w-3xl w-full max-h-[92vh] flex flex-col overflow-hidden shadow-2xl border border-stone-100 animate-fadeIn" onclick="event.stopPropagation()">
+    <div id="footerSettingsModal" class="fixed inset-0 bg-stone-900/60 backdrop-blur-xs hidden items-center justify-center z-[9999] p-2 sm:p-4 overflow-y-auto" style="display: none;" onclick="if(event.target === this) closeFooterSettingsModal()">
+        <div class="bg-white rounded-2xl sm:rounded-3xl max-w-3xl w-full max-h-[94vh] flex flex-col overflow-hidden shadow-2xl border border-stone-100 animate-fadeIn" onclick="event.stopPropagation()">
             <!-- Header -->
-            <div class="p-5 px-6 border-b border-stone-100 flex items-center justify-between bg-stone-50/80 shrink-0">
-                <div class="flex items-center gap-3">
-                    <div class="w-10 h-10 rounded-2xl bg-red-50 border border-red-100 flex items-center justify-center text-red-600 font-bold shadow-2xs">
+            <div class="p-3.5 sm:p-5 px-4 sm:px-6 border-b border-stone-100 flex items-center justify-between bg-stone-50/80 shrink-0">
+                <div class="flex items-center gap-2.5 sm:gap-3 min-w-0">
+                    <div class="w-8 h-8 sm:w-10 sm:h-10 rounded-xl sm:rounded-2xl bg-red-50 border border-red-100 flex items-center justify-center text-red-600 font-bold shadow-2xs shrink-0 text-sm">
                         <i class="fas fa-shoe-prints"></i>
                     </div>
-                    <div>
-                        <h3 class="text-lg font-bold text-stone-800">Footer Settings & Navigation</h3>
-                        <p class="text-xs text-stone-500 font-medium">Manage background image, column titles, link items, contact details, socials & copyright</p>
+                    <div class="min-w-0">
+                        <h3 class="text-sm sm:text-base font-bold text-stone-800 truncate">Footer Settings & Navigation</h3>
+                        <p class="text-[11px] sm:text-xs text-stone-500 font-medium hidden sm:block">Manage background image, column titles, link items, contact details, socials & copyright</p>
                     </div>
                 </div>
-                <button type="button" onclick="closeFooterSettingsModal()" class="w-8 h-8 rounded-full bg-stone-100 text-stone-400 hover:text-stone-700 flex items-center justify-center transition-colors">
+                <button type="button" onclick="closeFooterSettingsModal()" class="w-8 h-8 rounded-full bg-stone-100 text-stone-400 hover:text-stone-700 flex items-center justify-center transition-colors cursor-pointer shrink-0">
                     <i class="fas fa-times text-sm"></i>
                 </button>
             </div>
 
             <!-- Form -->
             <form id="footerSettingsForm" onsubmit="handleFooterSettingsSubmit(event)" class="flex flex-col flex-1 min-h-0 overflow-hidden">
-                <div class="p-6 space-y-6 overflow-y-auto flex-1 overscroll-contain">
+                <div class="p-3.5 sm:p-6 space-y-4 sm:space-y-6 overflow-y-auto overflow-x-hidden flex-1 overscroll-contain">
                     
                     <!-- 1. Panoramic Background Artwork -->
-                    <div class="bg-stone-50/80 rounded-2xl p-4 border border-stone-200/80 space-y-3">
-                        <div class="flex items-center justify-between">
-                            <label class="block text-xs font-bold text-stone-700 uppercase tracking-wider">
-                                <i class="fas fa-image mr-1 text-red-600"></i>Panoramic Footer Background Artwork
+                    <div class="bg-stone-50/80 rounded-2xl p-3.5 sm:p-4 border border-stone-200/80 space-y-3">
+                        <div class="flex items-center justify-between gap-2">
+                            <label class="block text-xs font-bold text-stone-700 uppercase tracking-wider truncate">
+                                <i class="fas fa-image mr-1 text-red-600"></i>Panoramic Footer Artwork
                             </label>
-                            <div class="flex items-center gap-2">
-                                <span class="text-[10px] text-stone-400 font-bold">1920 × 600 px (JPG/PNG/WEBP)</span>
+                            <div class="flex items-center gap-2 shrink-0">
+                                <span class="text-[10px] text-stone-400 font-bold hidden sm:inline">1920 × 600 px</span>
                                 <button type="button" onclick="openMediaPicker('footer_bg')" class="px-2.5 py-1 rounded-lg bg-white hover:bg-stone-100 border border-stone-200 text-stone-700 text-[11px] font-bold transition-all flex items-center gap-1 cursor-pointer">
                                     <i class="fas fa-photo-video text-red-500"></i> Media Library
                                 </button>
                             </div>
                         </div>
 
-                        <div class="border-2 border-dashed border-stone-200 rounded-xl p-4 text-center hover:border-red-400 hover:bg-red-50/20 transition-all cursor-pointer"
+                        <div class="border-2 border-dashed border-stone-200 rounded-xl p-3.5 sm:p-4 text-center hover:border-red-400 hover:bg-red-50/20 transition-all cursor-pointer"
                              onclick="document.getElementById('footerBgFileInput').click()"
                              ondragover="event.preventDefault(); this.classList.add('border-red-500', 'bg-red-50/30');"
                              ondragleave="this.classList.remove('border-red-500', 'bg-red-50/30');"
@@ -2494,25 +2514,25 @@
                             <input type="file" id="footerBgFileInput" name="bg_image_file" class="hidden" accept=".jpg,.jpeg,.png,.webp" onchange="handleFooterBgFileChange(this)">
                         </div>
 
-                        <div id="footerBgPreviewContainer" class="bg-white rounded-xl p-2.5 border border-stone-200 flex items-center gap-3">
-                            <img id="footerBgPreviewImg" src="" class="w-20 h-10 rounded-lg object-cover border border-stone-200">
+                        <div id="footerBgPreviewContainer" class="bg-white rounded-xl p-2 sm:p-2.5 border border-stone-200 flex items-center gap-2.5 sm:gap-3">
+                            <img id="footerBgPreviewImg" src="" class="w-16 sm:w-20 h-9 sm:h-10 rounded-lg object-cover border border-stone-200 shrink-0">
                             <div class="flex-1 min-w-0">
                                 <p class="text-xs font-bold text-stone-800 truncate" id="footerBgFileName">Current Background</p>
-                                <p class="text-[10px] text-emerald-600 font-semibold" id="footerBgStatusLabel">Active Background</p>
+                                <p class="text-[10px] text-emerald-600 font-semibold truncate" id="footerBgStatusLabel">Active Background</p>
                             </div>
-                            <button type="button" onclick="clearFooterBgFileInput()" class="text-stone-400 hover:text-red-600 p-1.5 cursor-pointer"><i class="fas fa-times"></i></button>
+                            <button type="button" onclick="clearFooterBgFileInput()" class="text-stone-400 hover:text-red-600 p-1.5 cursor-pointer shrink-0"><i class="fas fa-times"></i></button>
                         </div>
                         <input type="hidden" id="footerBgImageUrl" name="bg_image_url">
                     </div>
 
                     <!-- 2. Column 1: Quick Links Repeater -->
-                    <div class="bg-stone-50/80 rounded-2xl p-4 border border-stone-200/80 space-y-3">
-                        <div class="flex items-center justify-between">
-                            <div class="flex-1 max-w-xs">
+                    <div class="bg-stone-50/80 rounded-2xl p-3.5 sm:p-4 border border-stone-200/80 space-y-3">
+                        <div class="flex items-end justify-between gap-2.5">
+                            <div class="flex-1 min-w-0">
                                 <label class="block text-xs font-bold text-stone-700 uppercase tracking-wider mb-1">Column 1 Title</label>
                                 <input type="text" id="footerCol1Title" name="col1_title" placeholder="Quick Links" class="w-full bg-white border border-stone-200 rounded-xl px-3 py-1.5 text-xs font-bold text-stone-800 focus:ring-2 focus:ring-red-500">
                             </div>
-                            <button type="button" onclick="addFooterCol1Link()" class="px-3 py-1.5 rounded-xl bg-red-600 hover:bg-red-700 text-white text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer">
+                            <button type="button" onclick="addFooterCol1Link()" class="px-3 py-1.5 rounded-xl bg-red-600 hover:bg-red-700 text-white text-xs font-bold transition-all flex items-center gap-1.5 shrink-0 cursor-pointer">
                                 <i class="fas fa-plus-circle text-xs"></i>
                                 <span>Add Link</span>
                             </button>
@@ -2524,13 +2544,13 @@
                     </div>
 
                     <!-- 3. Column 2: Help Links Repeater -->
-                    <div class="bg-stone-50/80 rounded-2xl p-4 border border-stone-200/80 space-y-3">
-                        <div class="flex items-center justify-between">
-                            <div class="flex-1 max-w-xs">
+                    <div class="bg-stone-50/80 rounded-2xl p-3.5 sm:p-4 border border-stone-200/80 space-y-3">
+                        <div class="flex items-end justify-between gap-2.5">
+                            <div class="flex-1 min-w-0">
                                 <label class="block text-xs font-bold text-stone-700 uppercase tracking-wider mb-1">Column 2 Title</label>
                                 <input type="text" id="footerCol2Title" name="col2_title" placeholder="Help" class="w-full bg-white border border-stone-200 rounded-xl px-3 py-1.5 text-xs font-bold text-stone-800 focus:ring-2 focus:ring-red-500">
                             </div>
-                            <button type="button" onclick="addFooterCol2Link()" class="px-3 py-1.5 rounded-xl bg-red-600 hover:bg-red-700 text-white text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer">
+                            <button type="button" onclick="addFooterCol2Link()" class="px-3 py-1.5 rounded-xl bg-red-600 hover:bg-red-700 text-white text-xs font-bold transition-all flex items-center gap-1.5 shrink-0 cursor-pointer">
                                 <i class="fas fa-plus-circle text-xs"></i>
                                 <span>Add Link</span>
                             </button>
@@ -2542,50 +2562,50 @@
                     </div>
 
                     <!-- 4. Column 3: Contact Info & Support Details -->
-                    <div class="bg-stone-50/80 rounded-2xl p-4 border border-stone-200/80 space-y-3">
+                    <div class="bg-stone-50/80 rounded-2xl p-3.5 sm:p-4 border border-stone-200/80 space-y-3">
                         <label class="block text-xs font-bold text-stone-700 uppercase tracking-wider">
                             <i class="fas fa-address-card mr-1 text-red-600"></i>Column 3: Contact Information
                         </label>
-                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                            <div>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5 sm:gap-3">
+                            <div class="min-w-0">
                                 <label class="block text-[11px] font-bold text-stone-600 mb-1">Column 3 Title</label>
                                 <input type="text" id="footerCol3Title" name="col3_title" placeholder="Contact" class="w-full bg-white border border-stone-200 rounded-xl px-3 py-2 text-xs font-bold text-stone-800 focus:ring-2 focus:ring-red-500">
                             </div>
-                            <div>
+                            <div class="min-w-0">
                                 <label class="block text-[11px] font-bold text-stone-600 mb-1">Store Location / Country</label>
                                 <input type="text" id="footerContactAddress" name="contact_address" placeholder="India" class="w-full bg-white border border-stone-200 rounded-xl px-3 py-2 text-xs font-bold text-stone-800 focus:ring-2 focus:ring-red-500">
                             </div>
-                            <div>
+                            <div class="min-w-0">
                                 <label class="block text-[11px] font-bold text-stone-600 mb-1">Phone Number</label>
                                 <input type="text" id="footerContactPhone" name="contact_phone" placeholder="+91 97730 39243" class="w-full bg-white border border-stone-200 rounded-xl px-3 py-2 text-xs font-bold text-stone-800 focus:ring-2 focus:ring-red-500">
                             </div>
-                            <div>
-                                <label class="block text-[11px] font-bold text-stone-600 mb-1">Phone Link (e.g. tel:+91...)</label>
+                            <div class="min-w-0">
+                                <label class="block text-[11px] font-bold text-stone-600 mb-1">Phone Link</label>
                                 <input type="text" id="footerContactPhoneLink" name="contact_phone_link" placeholder="tel:+919773039243" class="w-full bg-white border border-stone-200 rounded-xl px-3 py-2 text-xs font-bold text-stone-800 focus:ring-2 focus:ring-red-500">
                             </div>
-                            <div>
+                            <div class="min-w-0">
                                 <label class="block text-[11px] font-bold text-stone-600 mb-1">Email Address</label>
                                 <input type="email" id="footerContactEmail" name="contact_email" placeholder="support@knotelle.in" class="w-full bg-white border border-stone-200 rounded-xl px-3 py-2 text-xs font-bold text-stone-800 focus:ring-2 focus:ring-red-500">
                             </div>
-                            <div>
-                                <label class="block text-[11px] font-bold text-stone-600 mb-1">Email Link (e.g. mailto:...)</label>
+                            <div class="min-w-0">
+                                <label class="block text-[11px] font-bold text-stone-600 mb-1">Email Link</label>
                                 <input type="text" id="footerContactEmailLink" name="contact_email_link" placeholder="mailto:support@knotelle.in" class="w-full bg-white border border-stone-200 rounded-xl px-3 py-2 text-xs font-bold text-stone-800 focus:ring-2 focus:ring-red-500">
                             </div>
                         </div>
                     </div>
 
                     <!-- 5. Social Media Channels -->
-                    <div class="bg-stone-50/80 rounded-2xl p-4 border border-stone-200/80 space-y-3">
+                    <div class="bg-stone-50/80 rounded-2xl p-3.5 sm:p-4 border border-stone-200/80 space-y-3">
                         <label class="block text-xs font-bold text-stone-700 uppercase tracking-wider">
                             <i class="fas fa-share-alt mr-1 text-red-600"></i>Social Media Channels & Visibility
                         </label>
-                        <div class="space-y-2.5">
+                        <div class="space-y-2">
                             <!-- Instagram -->
-                            <div class="flex items-center gap-3 bg-white p-2.5 rounded-xl border border-stone-200">
-                                <span class="w-8 h-8 rounded-lg bg-pink-50 text-pink-600 flex items-center justify-center text-sm font-bold shrink-0">
+                            <div class="flex items-center gap-2.5 sm:gap-3 bg-white p-2 sm:p-2.5 rounded-xl border border-stone-200 min-w-0">
+                                <span class="w-7 h-7 sm:w-8 sm:h-8 rounded-lg bg-pink-50 text-pink-600 flex items-center justify-center text-xs sm:text-sm font-bold shrink-0">
                                     <i class="fab fa-instagram"></i>
                                 </span>
-                                <input type="text" id="footerInstagramUrl" name="instagram_url" placeholder="https://instagram.com/knotelleindia" class="flex-1 bg-transparent border-0 text-xs font-semibold text-stone-800 focus:ring-0">
+                                <input type="text" id="footerInstagramUrl" name="instagram_url" placeholder="https://instagram.com/knotelleindia" class="flex-1 min-w-0 bg-transparent border-0 text-xs font-semibold text-stone-800 focus:ring-0">
                                 <label class="flex items-center gap-1.5 text-xs text-stone-600 font-bold shrink-0 cursor-pointer">
                                     <input type="checkbox" id="footerInstagramActive" name="instagram_active" class="w-4 h-4 rounded text-red-600 focus:ring-red-500">
                                     <span>Active</span>
@@ -2593,11 +2613,11 @@
                             </div>
 
                             <!-- Facebook -->
-                            <div class="flex items-center gap-3 bg-white p-2.5 rounded-xl border border-stone-200">
-                                <span class="w-8 h-8 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center text-sm font-bold shrink-0">
+                            <div class="flex items-center gap-2.5 sm:gap-3 bg-white p-2 sm:p-2.5 rounded-xl border border-stone-200 min-w-0">
+                                <span class="w-7 h-7 sm:w-8 sm:h-8 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center text-xs sm:text-sm font-bold shrink-0">
                                     <i class="fab fa-facebook-f"></i>
                                 </span>
-                                <input type="text" id="footerFacebookUrl" name="facebook_url" placeholder="https://facebook.com/knotelleindia" class="flex-1 bg-transparent border-0 text-xs font-semibold text-stone-800 focus:ring-0">
+                                <input type="text" id="footerFacebookUrl" name="facebook_url" placeholder="https://facebook.com/knotelleindia" class="flex-1 min-w-0 bg-transparent border-0 text-xs font-semibold text-stone-800 focus:ring-0">
                                 <label class="flex items-center gap-1.5 text-xs text-stone-600 font-bold shrink-0 cursor-pointer">
                                     <input type="checkbox" id="footerFacebookActive" name="facebook_active" class="w-4 h-4 rounded text-red-600 focus:ring-red-500">
                                     <span>Active</span>
@@ -2605,11 +2625,11 @@
                             </div>
 
                             <!-- Pinterest -->
-                            <div class="flex items-center gap-3 bg-white p-2.5 rounded-xl border border-stone-200">
-                                <span class="w-8 h-8 rounded-lg bg-red-50 text-red-600 flex items-center justify-center text-sm font-bold shrink-0">
+                            <div class="flex items-center gap-2.5 sm:gap-3 bg-white p-2 sm:p-2.5 rounded-xl border border-stone-200 min-w-0">
+                                <span class="w-7 h-7 sm:w-8 sm:h-8 rounded-lg bg-red-50 text-red-600 flex items-center justify-center text-xs sm:text-sm font-bold shrink-0">
                                     <i class="fab fa-pinterest-p"></i>
                                 </span>
-                                <input type="text" id="footerPinterestUrl" name="pinterest_url" placeholder="https://pinterest.com/knotelleindia" class="flex-1 bg-transparent border-0 text-xs font-semibold text-stone-800 focus:ring-0">
+                                <input type="text" id="footerPinterestUrl" name="pinterest_url" placeholder="https://pinterest.com/knotelleindia" class="flex-1 min-w-0 bg-transparent border-0 text-xs font-semibold text-stone-800 focus:ring-0">
                                 <label class="flex items-center gap-1.5 text-xs text-stone-600 font-bold shrink-0 cursor-pointer">
                                     <input type="checkbox" id="footerPinterestActive" name="pinterest_active" class="w-4 h-4 rounded text-red-600 focus:ring-red-500">
                                     <span>Active</span>
@@ -2617,11 +2637,11 @@
                             </div>
 
                             <!-- YouTube -->
-                            <div class="flex items-center gap-3 bg-white p-2.5 rounded-xl border border-stone-200">
-                                <span class="w-8 h-8 rounded-lg bg-rose-50 text-rose-600 flex items-center justify-center text-sm font-bold shrink-0">
+                            <div class="flex items-center gap-2.5 sm:gap-3 bg-white p-2 sm:p-2.5 rounded-xl border border-stone-200 min-w-0">
+                                <span class="w-7 h-7 sm:w-8 sm:h-8 rounded-lg bg-rose-50 text-rose-600 flex items-center justify-center text-xs sm:text-sm font-bold shrink-0">
                                     <i class="fab fa-youtube"></i>
                                 </span>
-                                <input type="text" id="footerYouTubeUrl" name="youtube_url" placeholder="https://youtube.com/@knotelleindia" class="flex-1 bg-transparent border-0 text-xs font-semibold text-stone-800 focus:ring-0">
+                                <input type="text" id="footerYouTubeUrl" name="youtube_url" placeholder="https://youtube.com/@knotelleindia" class="flex-1 min-w-0 bg-transparent border-0 text-xs font-semibold text-stone-800 focus:ring-0">
                                 <label class="flex items-center gap-1.5 text-xs text-stone-600 font-bold shrink-0 cursor-pointer">
                                     <input type="checkbox" id="footerYouTubeActive" name="youtube_active" class="w-4 h-4 rounded text-red-600 focus:ring-red-500">
                                     <span>Active</span>
@@ -2629,11 +2649,11 @@
                             </div>
 
                             <!-- Twitter / X -->
-                            <div class="flex items-center gap-3 bg-white p-2.5 rounded-xl border border-stone-200">
-                                <span class="w-8 h-8 rounded-lg bg-stone-100 text-stone-700 flex items-center justify-center text-sm font-bold shrink-0">
+                            <div class="flex items-center gap-2.5 sm:gap-3 bg-white p-2 sm:p-2.5 rounded-xl border border-stone-200 min-w-0">
+                                <span class="w-7 h-7 sm:w-8 sm:h-8 rounded-lg bg-stone-100 text-stone-700 flex items-center justify-center text-xs sm:text-sm font-bold shrink-0">
                                     <i class="fab fa-x-twitter"></i>
                                 </span>
-                                <input type="text" id="footerTwitterUrl" name="twitter_url" placeholder="https://twitter.com/knotelleindia" class="flex-1 bg-transparent border-0 text-xs font-semibold text-stone-800 focus:ring-0">
+                                <input type="text" id="footerTwitterUrl" name="twitter_url" placeholder="https://twitter.com/knotelleindia" class="flex-1 min-w-0 bg-transparent border-0 text-xs font-semibold text-stone-800 focus:ring-0">
                                 <label class="flex items-center gap-1.5 text-xs text-stone-600 font-bold shrink-0 cursor-pointer">
                                     <input type="checkbox" id="footerTwitterActive" name="twitter_active" class="w-4 h-4 rounded text-red-600 focus:ring-red-500">
                                     <span>Active</span>
@@ -2641,11 +2661,11 @@
                             </div>
 
                             <!-- LinkedIn -->
-                            <div class="flex items-center gap-3 bg-white p-2.5 rounded-xl border border-stone-200">
-                                <span class="w-8 h-8 rounded-lg bg-sky-50 text-sky-700 flex items-center justify-center text-sm font-bold shrink-0">
+                            <div class="flex items-center gap-2.5 sm:gap-3 bg-white p-2 sm:p-2.5 rounded-xl border border-stone-200 min-w-0">
+                                <span class="w-7 h-7 sm:w-8 sm:h-8 rounded-lg bg-sky-50 text-sky-700 flex items-center justify-center text-xs sm:text-sm font-bold shrink-0">
                                     <i class="fab fa-linkedin-in"></i>
                                 </span>
-                                <input type="text" id="footerLinkedinUrl" name="linkedin_url" placeholder="https://linkedin.com/company/knotelle" class="flex-1 bg-transparent border-0 text-xs font-semibold text-stone-800 focus:ring-0">
+                                <input type="text" id="footerLinkedinUrl" name="linkedin_url" placeholder="https://linkedin.com/company/knotelle" class="flex-1 min-w-0 bg-transparent border-0 text-xs font-semibold text-stone-800 focus:ring-0">
                                 <label class="flex items-center gap-1.5 text-xs text-stone-600 font-bold shrink-0 cursor-pointer">
                                     <input type="checkbox" id="footerLinkedinActive" name="linkedin_active" class="w-4 h-4 rounded text-red-600 focus:ring-red-500">
                                     <span>Active</span>
@@ -2655,16 +2675,16 @@
                     </div>
 
                     <!-- 6. Bottom Bar Copyright & Heart Tagline -->
-                    <div class="bg-stone-50/80 rounded-2xl p-4 border border-stone-200/80 space-y-3">
+                    <div class="bg-stone-50/80 rounded-2xl p-3.5 sm:p-4 border border-stone-200/80 space-y-3">
                         <label class="block text-xs font-bold text-stone-700 uppercase tracking-wider">
                             <i class="fas fa-copyright mr-1 text-red-600"></i>Bottom Bar & Heart Tagline
                         </label>
-                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                            <div>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5 sm:gap-3">
+                            <div class="min-w-0">
                                 <label class="block text-[11px] font-bold text-stone-600 mb-1">Copyright Text (supports {year})</label>
                                 <input type="text" id="footerCopyrightText" name="copyright_text" placeholder="© {year} Knotelle. All rights reserved." class="w-full bg-white border border-stone-200 rounded-xl px-3 py-2 text-xs font-bold text-stone-800 focus:ring-2 focus:ring-red-500">
                             </div>
-                            <div>
+                            <div class="min-w-0">
                                 <label class="block text-[11px] font-bold text-stone-600 mb-1">Heart Motto / Tagline</label>
                                 <input type="text" id="footerHeartTagline" name="heart_tagline" placeholder="Made with ♡ for a kinder, cozier world." class="w-full bg-white border border-stone-200 rounded-xl px-3 py-2 text-xs font-bold text-stone-800 focus:ring-2 focus:ring-red-500">
                             </div>
@@ -2678,10 +2698,10 @@
 
                 </div>
 
-                <!-- Footer -->
-                <div class="p-4 px-6 bg-stone-50 border-t border-stone-100 shrink-0 flex items-center justify-end gap-3">
-                    <button type="button" onclick="closeFooterSettingsModal()" class="btn-secondary text-xs px-5 py-2.5 cursor-pointer">Cancel</button>
-                    <button type="submit" id="footerSettingsSubmitBtn" class="btn-primary text-xs px-6 py-2.5 flex items-center gap-2 shadow-sm cursor-pointer">
+                <!-- Footer Actions -->
+                <div class="p-3 sm:p-4 px-4 sm:px-6 bg-stone-50 border-t border-stone-100 shrink-0 flex items-center justify-end gap-2.5">
+                    <button type="button" onclick="closeFooterSettingsModal()" class="btn-secondary text-xs px-4 py-2 cursor-pointer">Cancel</button>
+                    <button type="submit" id="footerSettingsSubmitBtn" class="btn-primary text-xs px-5 py-2 flex items-center gap-2 shadow-sm cursor-pointer">
                         <i class="fas fa-save"></i>
                         <span>Save Footer Settings</span>
                     </button>
@@ -2691,45 +2711,45 @@
     </div>
 
     <!-- MODAL 20: NAVBAR SETTINGS & NAVIGATION MODAL -->
-    <div id="navbarSettingsModal" class="fixed inset-0 bg-stone-900/60 backdrop-blur-xs hidden items-center justify-center z-[9999] p-4" style="display: none;" onclick="if(event.target === this) closeNavbarSettingsModal()">
-        <div class="bg-white rounded-3xl max-w-3xl w-full max-h-[92vh] flex flex-col overflow-hidden shadow-2xl border border-stone-100 animate-fadeIn" onclick="event.stopPropagation()">
+    <div id="navbarSettingsModal" class="fixed inset-0 bg-stone-900/60 backdrop-blur-xs hidden items-center justify-center z-[9999] p-2 sm:p-4 overflow-y-auto" style="display: none;" onclick="if(event.target === this) closeNavbarSettingsModal()">
+        <div class="bg-white rounded-2xl sm:rounded-3xl max-w-3xl w-full max-h-[94vh] flex flex-col overflow-hidden shadow-2xl border border-stone-100 animate-fadeIn" onclick="event.stopPropagation()">
             <!-- Header -->
-            <div class="p-5 px-6 border-b border-stone-100 flex items-center justify-between bg-stone-50/80 shrink-0">
-                <div class="flex items-center gap-3">
-                    <div class="w-10 h-10 rounded-2xl bg-red-50 border border-red-100 flex items-center justify-center text-red-600 font-bold shadow-2xs">
+            <div class="p-3.5 sm:p-5 px-4 sm:px-6 border-b border-stone-100 flex items-center justify-between bg-stone-50/80 shrink-0">
+                <div class="flex items-center gap-2.5 sm:gap-3 min-w-0">
+                    <div class="w-8 h-8 sm:w-10 sm:h-10 rounded-xl sm:rounded-2xl bg-red-50 border border-red-100 flex items-center justify-center text-red-600 font-bold shadow-2xs shrink-0 text-sm">
                         <i class="fas fa-compass"></i>
                     </div>
-                    <div>
-                        <h3 class="text-lg font-bold text-stone-800">Navbar & Navigation Settings</h3>
-                        <p class="text-xs text-stone-500 font-medium">Manage announcement bar banner, header links, sparkle highlight pill, and action buttons</p>
+                    <div class="min-w-0">
+                        <h3 class="text-sm sm:text-base font-bold text-stone-800 truncate">Navbar & Navigation Settings</h3>
+                        <p class="text-[11px] sm:text-xs text-stone-500 font-medium hidden sm:block">Manage announcement bar banner, header links, sparkle highlight pill, and action buttons</p>
                     </div>
                 </div>
-                <button type="button" onclick="closeNavbarSettingsModal()" class="w-8 h-8 rounded-full bg-stone-100 text-stone-400 hover:text-stone-700 flex items-center justify-center transition-colors">
+                <button type="button" onclick="closeNavbarSettingsModal()" class="w-8 h-8 rounded-full bg-stone-100 text-stone-400 hover:text-stone-700 flex items-center justify-center transition-colors cursor-pointer shrink-0">
                     <i class="fas fa-times text-sm"></i>
                 </button>
             </div>
 
             <!-- Form -->
             <form id="navbarSettingsForm" onsubmit="handleNavbarSettingsSubmit(event)" class="flex flex-col flex-1 min-h-0 overflow-hidden">
-                <div class="p-6 space-y-6 overflow-y-auto flex-1 overscroll-contain">
+                <div class="p-3.5 sm:p-6 space-y-4 sm:space-y-6 overflow-y-auto overflow-x-hidden flex-1 overscroll-contain">
                     
                     <!-- 1. Announcement Bar Banner -->
-                    <div class="bg-stone-50/80 rounded-2xl p-4 border border-stone-200/80 space-y-3">
-                        <div class="flex items-center justify-between">
-                            <label class="block text-xs font-bold text-stone-700 uppercase tracking-wider">
+                    <div class="bg-stone-50/80 rounded-2xl p-3.5 sm:p-4 border border-stone-200/80 space-y-3">
+                        <div class="flex items-center justify-between gap-2">
+                            <label class="block text-xs font-bold text-stone-700 uppercase tracking-wider truncate">
                                 <i class="fas fa-bullhorn mr-1 text-red-600"></i>Announcement Bar Banner
                             </label>
-                            <label class="flex items-center gap-1.5 text-xs text-stone-700 font-bold cursor-pointer">
+                            <label class="flex items-center gap-1.5 text-xs text-stone-700 font-bold cursor-pointer shrink-0">
                                 <input type="checkbox" id="navbarAnnouncementActive" name="announcement_active" class="w-4 h-4 rounded text-red-600 focus:ring-red-500">
                                 <span>Enable Banner</span>
                             </label>
                         </div>
-                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                            <div>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5 sm:gap-3">
+                            <div class="min-w-0">
                                 <label class="block text-[11px] font-bold text-stone-600 mb-1">Banner Text</label>
                                 <input type="text" id="navbarAnnouncementText" name="announcement_text" placeholder="✨ Free Pan-India Delivery on all Orders above ₹999" class="w-full bg-white border border-stone-200 rounded-xl px-3 py-2 text-xs font-bold text-stone-800 focus:ring-2 focus:ring-red-500">
                             </div>
-                            <div>
+                            <div class="min-w-0">
                                 <label class="block text-[11px] font-bold text-stone-600 mb-1">Banner Link URL</label>
                                 <input type="text" id="navbarAnnouncementLink" name="announcement_link" placeholder="/shop" class="w-full bg-white border border-stone-200 rounded-xl px-3 py-2 text-xs font-bold text-stone-800 focus:ring-2 focus:ring-red-500">
                             </div>
@@ -2737,15 +2757,15 @@
                     </div>
 
                     <!-- 2. Navigation Links Repeater -->
-                    <div class="bg-stone-50/80 rounded-2xl p-4 border border-stone-200/80 space-y-3">
-                        <div class="flex items-center justify-between">
-                            <div>
+                    <div class="bg-stone-50/80 rounded-2xl p-3.5 sm:p-4 border border-stone-200/80 space-y-3">
+                        <div class="flex items-center justify-between gap-2">
+                            <div class="min-w-0">
                                 <label class="block text-xs font-bold text-stone-700 uppercase tracking-wider">
                                     <i class="fas fa-link mr-1 text-red-600"></i>Navigation Links
                                 </label>
-                                <p class="text-[11px] text-stone-500">Customize labels, URLs, sparkle highlight style, and visibility</p>
+                                <p class="text-[11px] text-stone-500 hidden sm:block">Customize labels, URLs, sparkle highlight style, and visibility</p>
                             </div>
-                            <button type="button" onclick="addNavbarLinkRow()" class="px-3.5 py-1.5 rounded-xl bg-red-600 hover:bg-red-700 text-white text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer">
+                            <button type="button" onclick="addNavbarLinkRow()" class="px-3 py-1.5 rounded-xl bg-red-600 hover:bg-red-700 text-white text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer shrink-0">
                                 <i class="fas fa-plus-circle text-xs"></i>
                                 <span>Add Nav Link</span>
                             </button>
@@ -2757,30 +2777,30 @@
                     </div>
 
                     <!-- 3. Header Action Icons Visibility -->
-                    <div class="bg-stone-50/80 rounded-2xl p-4 border border-stone-200/80 space-y-3">
+                    <div class="bg-stone-50/80 rounded-2xl p-3.5 sm:p-4 border border-stone-200/80 space-y-3">
                         <label class="block text-xs font-bold text-stone-700 uppercase tracking-wider">
                             <i class="fas fa-toggle-on mr-1 text-red-600"></i>Header Action Buttons Visibility
                         </label>
-                        <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
-                            <label class="flex items-center gap-2 p-3 bg-white rounded-xl border border-stone-200 text-xs font-bold text-stone-700 cursor-pointer hover:border-red-300">
+                        <div class="grid grid-cols-2 sm:grid-cols-4 gap-2.5 sm:gap-3">
+                            <label class="flex items-center gap-2 p-2.5 sm:p-3 bg-white rounded-xl border border-stone-200 text-xs font-bold text-stone-700 cursor-pointer hover:border-red-300">
                                 <input type="checkbox" id="navbarShowSearch" name="show_search" checked class="w-4 h-4 rounded text-red-600 focus:ring-red-500">
                                 <i class="fas fa-search text-stone-500"></i>
-                                <span>Search Bar</span>
+                                <span class="truncate">Search</span>
                             </label>
-                            <label class="flex items-center gap-2 p-3 bg-white rounded-xl border border-stone-200 text-xs font-bold text-stone-700 cursor-pointer hover:border-red-300">
+                            <label class="flex items-center gap-2 p-2.5 sm:p-3 bg-white rounded-xl border border-stone-200 text-xs font-bold text-stone-700 cursor-pointer hover:border-red-300">
                                 <input type="checkbox" id="navbarShowWishlist" name="show_wishlist" checked class="w-4 h-4 rounded text-red-600 focus:ring-red-500">
                                 <i class="fas fa-heart text-stone-500"></i>
-                                <span>Wishlist</span>
+                                <span class="truncate">Wishlist</span>
                             </label>
-                            <label class="flex items-center gap-2 p-3 bg-white rounded-xl border border-stone-200 text-xs font-bold text-stone-700 cursor-pointer hover:border-red-300">
+                            <label class="flex items-center gap-2 p-2.5 sm:p-3 bg-white rounded-xl border border-stone-200 text-xs font-bold text-stone-700 cursor-pointer hover:border-red-300">
                                 <input type="checkbox" id="navbarShowAccount" name="show_account" checked class="w-4 h-4 rounded text-red-600 focus:ring-red-500">
                                 <i class="fas fa-user text-stone-500"></i>
-                                <span>Account</span>
+                                <span class="truncate">Account</span>
                             </label>
-                            <label class="flex items-center gap-2 p-3 bg-white rounded-xl border border-stone-200 text-xs font-bold text-stone-700 cursor-pointer hover:border-red-300">
+                            <label class="flex items-center gap-2 p-2.5 sm:p-3 bg-white rounded-xl border border-stone-200 text-xs font-bold text-stone-700 cursor-pointer hover:border-red-300">
                                 <input type="checkbox" id="navbarShowCart" name="show_cart" checked class="w-4 h-4 rounded text-red-600 focus:ring-red-500">
                                 <i class="fas fa-shopping-bag text-stone-500"></i>
-                                <span>Cart Bag</span>
+                                <span class="truncate">Cart Bag</span>
                             </label>
                         </div>
                     </div>
@@ -2792,10 +2812,10 @@
 
                 </div>
 
-                <!-- Footer -->
-                <div class="p-4 px-6 bg-stone-50 border-t border-stone-100 shrink-0 flex items-center justify-end gap-3">
-                    <button type="button" onclick="closeNavbarSettingsModal()" class="btn-secondary text-xs px-5 py-2.5 cursor-pointer">Cancel</button>
-                    <button type="submit" id="navbarSettingsSubmitBtn" class="btn-primary text-xs px-6 py-2.5 flex items-center gap-2 shadow-sm cursor-pointer">
+                <!-- Footer Actions -->
+                <div class="p-3 sm:p-4 px-4 sm:px-6 bg-stone-50 border-t border-stone-100 shrink-0 flex items-center justify-end gap-2.5">
+                    <button type="button" onclick="closeNavbarSettingsModal()" class="btn-secondary text-xs px-4 py-2 cursor-pointer">Cancel</button>
+                    <button type="submit" id="navbarSettingsSubmitBtn" class="btn-primary text-xs px-5 py-2 flex items-center gap-2 shadow-sm cursor-pointer">
                         <i class="fas fa-save"></i>
                         <span>Save Navbar Settings</span>
                     </button>
@@ -2886,66 +2906,174 @@
 
             // Create Section Wrapper Card
             const secCard = document.createElement('div');
-            secCard.className = 'bg-white rounded-3xl shadow-sm border border-stone-100 overflow-hidden';
+            secCard.className = 'bg-white rounded-2xl sm:rounded-3xl shadow-xs border border-stone-100 overflow-hidden';
             secCard.id = `sec-card-${section.id}`;
 
             // Section Header
             const isHero = section.id === 'hero';
             const isBlogReels = section.id === 'blog_reels' || section.is_blog_reels_section;
+
+            // Generate header action buttons per section
+            let headerActionBtn = '';
+            if (isHero) {
+                headerActionBtn = `
+                    <button type="button" onclick="openAddHeroSlideModal()" class="px-3.5 sm:px-4 py-2 rounded-xl bg-red-600 hover:bg-red-700 text-white text-xs font-bold shadow-xs transition-all flex items-center gap-1.5 active:scale-95 cursor-pointer shrink-0">
+                        <i class="fas fa-plus-circle text-xs"></i>
+                        <span>+ Add Slide</span>
+                    </button>
+                `;
+            } else if (isBlogReels) {
+                headerActionBtn = `
+                    <div class="flex items-center gap-1.5 sm:gap-2 shrink-0">
+                        <button type="button" onclick="openBlogReelsSettingsModal()" class="px-3 py-2 rounded-xl bg-white hover:bg-stone-50 text-stone-700 text-xs font-bold border border-stone-200 shadow-2xs transition-all flex items-center gap-1 cursor-pointer">
+                            <i class="fas fa-cog text-xs text-stone-500"></i>
+                            <span class="hidden sm:inline">Settings</span>
+                        </button>
+                        <button type="button" onclick="window.openAddVideoReelModal ? window.openAddVideoReelModal() : openAddVideoReelModal()" class="px-3.5 sm:px-4 py-2 rounded-xl bg-red-600 hover:bg-red-700 text-white text-xs font-bold shadow-xs transition-all flex items-center gap-1.5 active:scale-95 cursor-pointer">
+                            <i class="fas fa-plus-circle text-xs"></i>
+                            <span>+ Add Video</span>
+                        </button>
+                    </div>
+                `;
+            } else if (section.is_custom_crochet_section) {
+                headerActionBtn = `
+                    <button type="button" onclick="window.openCustomCrochetModal ? window.openCustomCrochetModal() : openCustomCrochetModal()" class="px-3.5 sm:px-4 py-2 rounded-xl bg-red-600 hover:bg-red-700 text-white text-xs font-bold shadow-xs transition-all flex items-center gap-1.5 active:scale-95 cursor-pointer shrink-0">
+                        <i class="fas fa-edit text-xs"></i>
+                        <span>Edit Banner</span>
+                    </button>
+                `;
+            } else if (section.is_brand_story_section) {
+                headerActionBtn = `
+                    <div class="flex items-center gap-1.5 sm:gap-2 shrink-0">
+                        <button type="button" onclick="openMediaPicker('brand_story')" class="px-3 py-2 rounded-xl bg-white hover:bg-stone-50 text-stone-700 text-xs font-bold border border-stone-200 shadow-2xs transition-all flex items-center gap-1 cursor-pointer">
+                            <i class="fas fa-images text-red-500 text-xs"></i>
+                            <span class="hidden sm:inline">Background</span>
+                        </button>
+                        <button type="button" onclick="window.openBrandStoryModal ? window.openBrandStoryModal() : openBrandStoryModal()" class="px-3.5 sm:px-4 py-2 rounded-xl bg-red-600 hover:bg-red-700 text-white text-xs font-bold shadow-xs transition-all flex items-center gap-1.5 active:scale-95 cursor-pointer">
+                            <i class="fas fa-edit text-xs"></i>
+                            <span>Edit Story</span>
+                        </button>
+                    </div>
+                `;
+            } else if (section.is_footer_section) {
+                headerActionBtn = `
+                    <button type="button" onclick="openFooterSettingsModal()" class="px-3.5 sm:px-4 py-2 rounded-xl bg-red-600 hover:bg-red-700 text-white text-xs font-bold shadow-xs transition-all flex items-center gap-1.5 active:scale-95 cursor-pointer shrink-0">
+                        <i class="fas fa-sliders-h text-xs"></i>
+                        <span>Edit Footer</span>
+                    </button>
+                `;
+            } else if (section.is_navbar_section) {
+                headerActionBtn = `
+                    <button type="button" onclick="openNavbarSettingsModal()" class="px-3.5 sm:px-4 py-2 rounded-xl bg-red-600 hover:bg-red-700 text-white text-xs font-bold shadow-xs transition-all flex items-center gap-1.5 active:scale-95 cursor-pointer shrink-0">
+                        <i class="fas fa-sliders-h text-xs"></i>
+                        <span>Edit Navbar</span>
+                    </button>
+                `;
+            } else if (section.is_product_section) {
+                headerActionBtn = `
+                    <a href="${window.location.pathname.startsWith('/knottele') ? '/knottele/admin/products' : '/admin/products'}" class="px-3.5 sm:px-4 py-2 rounded-xl bg-red-600 hover:bg-red-700 text-white text-xs font-bold shadow-xs transition-all flex items-center gap-1.5 active:scale-95 cursor-pointer shrink-0">
+                        <i class="fas fa-boxes text-xs"></i>
+                        <span>Manage Products</span>
+                    </a>
+                `;
+            } else if (section.is_text_only_section) {
+                headerActionBtn = `
+                    <button type="button" onclick="openTextSectionEditModal('${section.page}', '${section.id}')" class="px-3.5 sm:px-4 py-2 rounded-xl bg-red-600 hover:bg-red-700 text-white text-xs font-bold shadow-xs transition-all flex items-center gap-1.5 active:scale-95 cursor-pointer shrink-0">
+                        <i class="fas fa-sliders-h text-xs"></i>
+                        <span>Edit Content</span>
+                    </button>
+                `;
+            } else if (section.is_testimonial_section) {
+                headerActionBtn = `
+                    <button type="button" onclick="openAddTestimonialModal()" class="px-3.5 sm:px-4 py-2 rounded-xl bg-red-600 hover:bg-red-700 text-white text-xs font-bold shadow-xs transition-all flex items-center gap-1.5 active:scale-95 cursor-pointer shrink-0">
+                        <i class="fas fa-plus-circle text-xs"></i>
+                        <span>+ Add Review</span>
+                    </button>
+                `;
+            } else if (section.is_about_story_section) {
+                headerActionBtn = `
+                    <button type="button" onclick="openAboutStoryModal()" class="px-3.5 sm:px-4 py-2 rounded-xl bg-red-600 hover:bg-red-700 text-white text-xs font-bold shadow-xs transition-all flex items-center gap-1.5 active:scale-95 cursor-pointer shrink-0">
+                        <i class="fas fa-edit text-xs"></i>
+                        <span>Edit Story</span>
+                    </button>
+                `;
+            } else if (section.is_custom_order_items_section) {
+                headerActionBtn = `
+                    <button type="button" onclick="openAddCustomOrderItemModal()" class="px-3.5 sm:px-4 py-2 rounded-xl bg-red-600 hover:bg-red-700 text-white text-xs font-bold shadow-xs transition-all flex items-center gap-1.5 active:scale-95 cursor-pointer shrink-0">
+                        <i class="fas fa-plus-circle text-xs"></i>
+                        <span>+ Add Item</span>
+                    </button>
+                `;
+            } else if (section.is_craft_pillars_section) {
+                headerActionBtn = `
+                    <div class="flex items-center gap-1.5 sm:gap-2 shrink-0">
+                        <button type="button" onclick="openCraftPillarsHeaderModal()" class="px-3 py-2 rounded-xl bg-white hover:bg-stone-50 text-stone-700 text-xs font-bold border border-stone-200 shadow-2xs transition-all flex items-center gap-1 cursor-pointer">
+                            <i class="fas fa-cog text-xs text-stone-500"></i>
+                            <span class="hidden sm:inline">Header</span>
+                        </button>
+                        <button type="button" onclick="openAddCraftPillarModal()" class="px-3.5 sm:px-4 py-2 rounded-xl bg-red-600 hover:bg-red-700 text-white text-xs font-bold shadow-xs transition-all flex items-center gap-1.5 active:scale-95 cursor-pointer">
+                            <i class="fas fa-plus-circle text-xs"></i>
+                            <span>+ Add Pillar</span>
+                        </button>
+                    </div>
+                `;
+            } else if (section.is_contact_intro_section) {
+                headerActionBtn = `
+                    <button type="button" onclick="openContactIntroModal()" class="px-3.5 sm:px-4 py-2 rounded-xl bg-red-600 hover:bg-red-700 text-white text-xs font-bold shadow-xs transition-all flex items-center gap-1.5 active:scale-95 cursor-pointer shrink-0">
+                        <i class="fas fa-edit text-xs"></i>
+                        <span>Edit Intro</span>
+                    </button>
+                `;
+            } else if (section.is_contact_info_section) {
+                headerActionBtn = `
+                    <div class="flex items-center gap-1.5 sm:gap-2 shrink-0">
+                        <button type="button" onclick="openContactInfoHeaderModal()" class="px-3 py-2 rounded-xl bg-white hover:bg-stone-50 text-stone-700 text-xs font-bold border border-stone-200 shadow-2xs transition-all flex items-center gap-1 cursor-pointer">
+                            <i class="fas fa-cog text-xs text-stone-500"></i>
+                            <span class="hidden sm:inline">Header</span>
+                        </button>
+                        <button type="button" onclick="openAddContactInfoItemModal()" class="px-3.5 sm:px-4 py-2 rounded-xl bg-red-600 hover:bg-red-700 text-white text-xs font-bold shadow-xs transition-all flex items-center gap-1.5 active:scale-95 cursor-pointer">
+                            <i class="fas fa-plus-circle text-xs"></i>
+                            <span>+ Add Detail</span>
+                        </button>
+                    </div>
+                `;
+            } else if (section.is_contact_form_section) {
+                headerActionBtn = `
+                    <button type="button" onclick="openContactFormModal()" class="px-3.5 sm:px-4 py-2 rounded-xl bg-red-600 hover:bg-red-700 text-white text-xs font-bold shadow-xs transition-all flex items-center gap-1.5 active:scale-95 cursor-pointer shrink-0">
+                        <i class="fas fa-edit text-xs"></i>
+                        <span>Edit Form</span>
+                    </button>
+                `;
+            } else if (section.is_contact_faqs_section) {
+                headerActionBtn = `
+                    <div class="flex items-center gap-1.5 sm:gap-2 shrink-0">
+                        <button type="button" onclick="openContactFaqsHeaderModal()" class="px-3 py-2 rounded-xl bg-white hover:bg-stone-50 text-stone-700 text-xs font-bold border border-[#E7D1CC] transition-all flex items-center gap-1 shadow-2xs cursor-pointer">
+                            <i class="fas fa-cog text-xs text-stone-500"></i>
+                            <span class="hidden sm:inline">Header</span>
+                        </button>
+                        <button type="button" onclick="openAddContactFaqModal()" class="px-3.5 sm:px-4 py-2 rounded-xl bg-red-600 hover:bg-red-700 text-white text-xs font-bold shadow-xs transition-all flex items-center gap-1.5 active:scale-95 cursor-pointer">
+                            <i class="fas fa-plus-circle text-xs"></i>
+                            <span>+ Add FAQ</span>
+                        </button>
+                    </div>
+                `;
+            }
+
             const header = `
-                <div class="px-4 sm:px-8 py-4 sm:py-5 border-b border-stone-100 bg-stone-50/50 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-                    <div class="flex items-center gap-3">
-                        <div class="w-10 h-10 rounded-2xl bg-red-50 border border-red-100 flex items-center justify-center text-red-600 font-bold shadow-2xs shrink-0">
+                <div class="px-3.5 sm:px-6 md:px-8 py-3.5 sm:py-4 border-b border-stone-100 bg-stone-50/50 flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 sm:gap-3">
+                    <div class="flex items-center gap-2.5 sm:gap-3 min-w-0">
+                        <div class="w-9 h-9 sm:w-10 sm:h-10 rounded-xl sm:rounded-2xl bg-red-50 border border-red-100 flex items-center justify-center text-red-600 font-bold text-sm sm:text-base shadow-2xs shrink-0">
                             <i class="${getSectionIcon(section.id)}"></i>
                         </div>
-                        <div>
-                            <div class="flex items-center gap-2">
-                                <h3 class="text-lg font-bold text-stone-800">${section.title}</h3>
-                                <span class="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-stone-200/80 text-stone-700">${section.badge}</span>
+                        <div class="min-w-0 flex-1">
+                            <div class="flex items-center gap-2 flex-wrap">
+                                <h3 class="text-sm sm:text-base md:text-lg font-bold text-stone-800 truncate">${section.title}</h3>
+                                <span class="px-2 py-0.5 rounded-full text-[10px] sm:text-[11px] font-bold bg-stone-200/80 text-stone-700 shrink-0">${section.badge}</span>
                             </div>
-                            <p class="text-xs text-stone-500 font-medium">${section.description}</p>
+                            <p class="text-xs text-stone-500 font-medium hidden sm:block truncate">${section.description}</p>
                         </div>
                     </div>
-                    ${isHero ? `
-                        <div class="flex items-center gap-2">
-                            <button type="button" onclick="openAddHeroSlideModal()" class="px-5 py-2.5 rounded-xl bg-red-600 hover:bg-red-700 text-white text-xs font-bold shadow-xs hover:shadow-md transition-all flex items-center gap-2 active:scale-95 cursor-pointer">
-                                <i class="fas fa-plus-circle text-sm"></i>
-                                <span>+ Add Hero Slide</span>
-                            </button>
-                        </div>
-                    ` : (isBlogReels ? `
-                        <div class="flex items-center gap-2 flex-wrap sm:flex-nowrap">
-                            <button type="button" onclick="openBlogReelsSettingsModal()" class="btn-secondary text-xs px-4 py-2.5 flex items-center gap-1.5 cursor-pointer">
-                                <i class="fas fa-cog text-xs"></i>
-                                <span>Edit Section Settings</span>
-                            </button>
-                            <button type="button" onclick="window.openAddVideoReelModal ? window.openAddVideoReelModal() : openAddVideoReelModal()" class="px-5 py-2.5 rounded-xl bg-red-600 hover:bg-red-700 text-white text-xs font-bold shadow-xs hover:shadow-md transition-all flex items-center gap-2 active:scale-95 cursor-pointer">
-                                <i class="fas fa-plus-circle text-sm"></i>
-                                <span>+ Add Video / Reel</span>
-                            </button>
-                        </div>
-                    ` : (section.is_custom_crochet_section ? `
-                        <div class="flex items-center gap-2">
-                            <button type="button" onclick="window.openCustomCrochetModal ? window.openCustomCrochetModal() : openCustomCrochetModal()" class="px-5 py-2.5 rounded-xl bg-red-600 hover:bg-red-700 text-white text-xs font-bold shadow-xs hover:shadow-md transition-all flex items-center gap-2 active:scale-95 cursor-pointer">
-                                <i class="fas fa-edit text-xs"></i>
-                                <span>Edit Banner & Hanging Tag</span>
-                            </button>
-                        </div>
-                    ` : (section.is_brand_story_section ? `
-                        <div class="flex items-center gap-2">
-                            <button type="button" onclick="window.openBrandStoryModal ? window.openBrandStoryModal() : openBrandStoryModal()" class="px-5 py-2.5 rounded-xl bg-red-600 hover:bg-red-700 text-white text-xs font-bold shadow-xs hover:shadow-md transition-all flex items-center gap-2 active:scale-95 cursor-pointer">
-                                <i class="fas fa-edit text-xs"></i>
-                                <span>Edit Brand Story</span>
-                            </button>
-                        </div>
-                    ` : (section.is_footer_section ? `
-                        <div class="flex items-center gap-2">
-                            <button type="button" onclick="openFooterSettingsModal()" class="px-5 py-2.5 rounded-xl bg-red-600 hover:bg-red-700 text-white text-xs font-bold shadow-xs hover:shadow-md transition-all flex items-center gap-2 active:scale-95 cursor-pointer">
-                                <i class="fas fa-sliders-h text-xs"></i>
-                                <span>Edit Footer Settings & Links</span>
-                            </button>
-                        </div>
-                    ` : ''))))}
+                    ${headerActionBtn}
                 </div>
             `;
 
@@ -2955,8 +3083,8 @@
             if (section.is_category_section) {
                 // Shop by Category Dynamic Grid
                 bodyContent = `
-                    <div class="p-4 sm:p-8">
-                        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+                    <div class="p-3.5 sm:p-6 md:p-8">
+                        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6">
                             ${data.categories.map(cat => renderCategoryCard(cat)).join('')}
                         </div>
                     </div>
@@ -2966,28 +3094,28 @@
                 const reels = section.items || section.reels || [];
                 const secSettings = section.section_settings || section.metadata || {};
                 bodyContent = `
-                    <div class="p-4 sm:p-8">
-                        <div class="bg-[#FFF9F6] border border-[#E7D1CC] rounded-2xl p-4 sm:p-5 mb-6 flex flex-col md:flex-row md:items-center justify-between gap-4">
-                            <div class="flex items-center gap-3.5">
-                                <div class="w-10 h-10 rounded-xl bg-red-100 text-red-700 flex items-center justify-center font-bold text-base shadow-2xs shrink-0">
+                    <div class="p-3.5 sm:p-6 md:p-8">
+                        <div class="bg-[#FFF9F6] border border-[#E7D1CC] rounded-2xl p-3.5 sm:p-5 mb-5 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                            <div class="flex items-center gap-3">
+                                <div class="w-9 h-9 rounded-xl bg-red-100 text-red-700 flex items-center justify-center font-bold text-sm shadow-2xs shrink-0">
                                     <i class="fas fa-video"></i>
                                 </div>
-                                <div>
+                                <div class="min-w-0">
                                     <div class="flex items-center gap-2">
-                                        <h4 class="font-bold text-stone-800 text-sm">${escapeHtml(secSettings.title || 'Behind the Stitches')}</h4>
-                                        <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-red-50 text-red-700 border border-red-200">${escapeHtml(secSettings.badge || 'Watch & Learn')}</span>
+                                        <h4 class="font-bold text-stone-800 text-xs sm:text-sm truncate">${escapeHtml(secSettings.title || 'Behind the Stitches')}</h4>
+                                        <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-red-50 text-red-700 border border-red-200 shrink-0">${escapeHtml(secSettings.badge || 'Watch & Learn')}</span>
                                     </div>
-                                    <p class="text-xs text-stone-500">${escapeHtml(secSettings.description || 'Step inside our atelier. Watch the craft, hear the rhythmic click of hooks, and learn styling tips from our master crocheters.')}</p>
+                                    <p class="text-xs text-stone-500 hidden sm:block">${escapeHtml(secSettings.description || 'Step inside our atelier. Watch the craft, hear the rhythmic click of hooks, and learn styling tips from our master crocheters.')}</p>
                                 </div>
                             </div>
                         </div>
 
-                        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
                             ${reels.length > 0 ? reels.map(r => renderVideoReelCard(r)).join('') : `
-                                <div class="col-span-full py-12 text-center text-stone-400 bg-stone-50 rounded-2xl border border-dashed border-stone-200">
-                                    <i class="fas fa-film text-3xl mb-2 text-stone-300"></i>
+                                <div class="col-span-full py-10 text-center text-stone-400 bg-stone-50 rounded-2xl border border-dashed border-stone-200">
+                                    <i class="fas fa-film text-2xl sm:text-3xl mb-2 text-stone-300"></i>
                                     <p class="text-sm font-bold text-stone-600">No videos or reels added yet</p>
-                                    <p class="text-xs text-stone-400 mb-4">Click "+ Add Video / Reel" above to publish your first video.</p>
+                                    <p class="text-xs text-stone-400">Click "+ Add Video" above to publish your first video.</p>
                                 </div>
                             `}
                         </div>
@@ -2996,28 +3124,20 @@
             } else if (section.is_product_section) {
                 // Best Sellers Product-Driven Info
                 bodyContent = `
-                    <div class="p-4 sm:p-8">
-                        <div class="bg-[#FFF9F6] border border-[#E7D1CC] rounded-2xl p-6 mb-6">
-                            <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
-                                <div class="flex items-center gap-3.5">
-                                    <div class="w-10 h-10 rounded-xl bg-red-100 text-red-700 flex items-center justify-center font-bold">
-                                        <i class="fas fa-boxes"></i>
-                                    </div>
-                                    <div>
-                                        <h4 class="font-bold text-stone-800 text-sm">Product-Driven Best Sellers</h4>
-                                        <p class="text-xs text-stone-500">The Best Sellers section automatically displays products flagged as "Bestseller" or "Featured" in your Products database.</p>
-                                    </div>
-                                </div>
-                                <a href="${window.location.pathname.startsWith('/knottele') ? '/knottele/admin/products' : '/admin/products'}" class="btn-primary text-xs px-4 py-2.5 flex items-center gap-2 shrink-0">
-                                    <i class="fas fa-edit"></i>
-                                    <span>Manage Products</span>
-                                </a>
+                    <div class="p-3.5 sm:p-6 md:p-8">
+                        <div class="bg-[#FFF9F6] border border-[#E7D1CC] rounded-2xl p-4 sm:p-5 mb-5 flex items-center gap-3.5">
+                            <div class="w-9 h-9 rounded-xl bg-red-100 text-red-700 flex items-center justify-center font-bold text-sm shrink-0">
+                                <i class="fas fa-boxes"></i>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-stone-800 text-xs sm:text-sm">Product-Driven Best Sellers</h4>
+                                <p class="text-xs text-stone-500">Automatically syncs with products flagged as "Bestseller" or "Featured" in your store catalog.</p>
                             </div>
                         </div>
 
-                        <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
+                        <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3 sm:gap-4">
                             ${data.best_sellers.map(p => `
-                                <div class="bg-white border border-stone-200 rounded-2xl p-3 text-center shadow-2xs hover:shadow-xs transition-all">
+                                <div class="bg-white border border-stone-200 rounded-2xl p-2.5 sm:p-3 text-center shadow-2xs hover:shadow-xs transition-all">
                                     <img src="${p.image}" class="w-full aspect-square rounded-xl object-cover mb-2 border border-stone-100" onerror="this.onerror=null; this.src=(window.location.pathname.startsWith('/knottele') ? '/knottele' : '') + '/images/logo/Logo_1.png';">
                                     <h5 class="text-xs font-bold text-stone-800 truncate" title="${p.name}">${p.name}</h5>
                                     <span class="text-[11px] font-bold text-red-600 block">₹${p.price}</span>
@@ -3033,45 +3153,35 @@
                 // Clean Text & Option Manager (Custom Order, Newsletter)
                 const m = section.metadata || {};
                 bodyContent = `
-                    <div class="p-8">
-                        <div class="bg-[#FFF9F6] border border-[#E7D1CC] rounded-3xl p-6 sm:p-8 shadow-2xs hover:shadow-boutique transition-all">
-                            <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-center">
-                                <div class="lg:col-span-8 space-y-3">
-                                    <div class="flex flex-wrap items-center gap-2">
-                                        <span class="px-3 py-1 rounded-full text-xs font-bold bg-red-50 text-red-700 border border-red-200">
-                                            <i class="fas fa-tag mr-1 text-[10px]"></i>${escapeHtml(m.badge || m.tag_text || 'Active Section')}
-                                        </span>
-                                        <span class="px-2.5 py-0.5 rounded-full text-[11px] font-bold ${m.is_active ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' : 'bg-stone-100 text-stone-500 border border-stone-200'}">
-                                            ${m.is_active ? '● Live on Storefront' : '○ Hidden'}
-                                        </span>
-                                    </div>
+                    <div class="p-3.5 sm:p-6 md:p-8">
+                        <div class="bg-[#FFF9F6] border border-[#E7D1CC] rounded-2xl sm:rounded-3xl p-4 sm:p-6 md:p-8 shadow-2xs">
+                            <div class="space-y-3">
+                                <div class="flex flex-wrap items-center gap-2">
+                                    <span class="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-red-50 text-red-700 border border-red-200">
+                                        <i class="fas fa-tag mr-1 text-[10px]"></i>${escapeHtml(m.badge || m.tag_text || 'Active Section')}
+                                    </span>
+                                    <span class="px-2.5 py-0.5 rounded-full text-[11px] font-bold ${m.is_active ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' : 'bg-stone-100 text-stone-500 border border-stone-200'}">
+                                        ${m.is_active ? '● Live on Storefront' : '○ Hidden'}
+                                    </span>
+                                </div>
 
-                                    <div>
-                                        <h3 class="text-xl sm:text-2xl font-bold text-stone-800 tracking-tight">
-                                            ${escapeHtml(m.title || m.title_line1 || 'Headline Title')} 
-                                            ${(m.subtitle || m.title_line2) ? `<span class="text-[#913638] italic font-serif font-normal block sm:inline sm:ml-1">${escapeHtml(m.subtitle || m.title_line2)}</span>` : ''}
-                                        </h3>
-                                    </div>
+                                <div>
+                                    <h3 class="text-lg sm:text-2xl font-bold text-stone-800 tracking-tight">
+                                        ${escapeHtml(m.title || m.title_line1 || 'Headline Title')} 
+                                        ${(m.subtitle || m.title_line2) ? `<span class="text-[#913638] italic font-serif font-normal block sm:inline sm:ml-1">${escapeHtml(m.subtitle || m.title_line2)}</span>` : ''}
+                                    </h3>
+                                </div>
 
-                                    <p class="text-xs sm:text-sm text-stone-600 leading-relaxed max-w-2xl">${escapeHtml(m.description || 'No description text set.')}</p>
+                                <p class="text-xs sm:text-sm text-stone-600 leading-relaxed max-w-2xl">${escapeHtml(m.description || 'No description text set.')}</p>
 
-                                    ${m.cta_text ? `
-                                        <div class="pt-1">
-                                            <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-xl bg-white border border-[#E7D1CC] text-xs font-semibold text-stone-700 shadow-2xs">
-                                                <i class="fas fa-mouse-pointer text-red-600 text-xs"></i>
-                                                <span>Button: "<strong>${escapeHtml(m.cta_text)}</strong>" ${m.cta_link ? `→ ${escapeHtml(m.cta_link)}` : ''}</span>
-                                            </div>
+                                ${m.cta_text ? `
+                                    <div class="pt-1">
+                                        <div class="inline-flex items-center gap-2 px-3 py-1.5 rounded-xl bg-white border border-[#E7D1CC] text-xs font-semibold text-stone-700 shadow-2xs">
+                                            <i class="fas fa-mouse-pointer text-red-600 text-xs"></i>
+                                            <span>Button: "<strong>${escapeHtml(m.cta_text)}</strong>" ${m.cta_link ? `→ ${escapeHtml(m.cta_link)}` : ''}</span>
                                         </div>
-                                    ` : ''}
-                                </div>
-
-                                <div class="lg:col-span-4 flex lg:justify-end">
-                                    <button type="button" onclick="openTextSectionEditModal('${section.page}', '${section.id}')"
-                                            class="px-6 py-3.5 rounded-2xl bg-red-600 hover:bg-red-700 text-white text-xs font-bold shadow-xs hover:shadow-md transition-all flex items-center gap-2.5 active:scale-95 cursor-pointer">
-                                        <i class="fas fa-sliders-h text-sm"></i>
-                                        <span>Edit Taglines & Content</span>
-                                    </button>
-                                </div>
+                                    </div>
+                                ` : ''}
                             </div>
                         </div>
                     </div>
@@ -3080,21 +3190,10 @@
                 // Customer Reviews & Testimonials Dynamic Cards
                 const testimonials = section.testimonials || [];
                 bodyContent = `
-                    <div class="p-8">
-                        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-6 bg-stone-50 border border-stone-200/80 p-4 rounded-2xl">
-                            <div>
-                                <h4 class="font-bold text-stone-800 text-sm">Homepage Customer Reviews Carousel</h4>
-                                <p class="text-xs text-stone-500 font-medium">Add, edit, or delete customer reviews. Changes update automatically in the storefront carousel.</p>
-                            </div>
-                            <button type="button" onclick="openAddTestimonialModal()" class="px-5 py-2.5 rounded-xl bg-red-600 hover:bg-red-700 text-white text-xs font-bold shadow-xs hover:shadow-md transition-all flex items-center gap-2 shrink-0 active:scale-95 cursor-pointer">
-                                <i class="fas fa-plus-circle text-sm"></i>
-                                <span>+ Add Customer Review</span>
-                            </button>
-                        </div>
-
-                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                    <div class="p-3.5 sm:p-6 md:p-8">
+                        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6">
                             ${testimonials.length > 0 ? testimonials.map(t => `
-                                <div class="bg-white border border-stone-200 rounded-2xl p-5 shadow-2xs hover:shadow-boutique transition-all flex flex-col justify-between group">
+                                <div class="bg-white border border-stone-200 rounded-2xl p-4 sm:p-5 shadow-2xs hover:shadow-boutique transition-all flex flex-col justify-between group">
                                     <div>
                                         <div class="flex items-center justify-between gap-2 mb-3">
                                             <div class="flex items-center text-amber-400 text-xs gap-0.5">
@@ -3105,7 +3204,7 @@
                                             </span>
                                         </div>
                                         <div class="flex items-center gap-3 mb-3">
-                                            <div class="w-10 h-10 rounded-2xl bg-gradient-to-br from-red-50 to-rose-100 border border-red-200/80 text-red-700 flex items-center justify-center font-bold text-sm shadow-2xs shrink-0">
+                                            <div class="w-9 h-9 sm:w-10 sm:h-10 rounded-2xl bg-gradient-to-br from-red-50 to-rose-100 border border-red-200/80 text-red-700 flex items-center justify-center font-bold text-sm shadow-2xs shrink-0">
                                                 ${escapeHtml((t.name || 'K').charAt(0).toUpperCase())}
                                             </div>
                                             <div class="truncate">
@@ -3127,10 +3226,10 @@
                                     </div>
                                 </div>
                             `).join('') : `
-                                <div class="col-span-full py-12 text-center text-stone-400 bg-stone-50 rounded-2xl border border-dashed border-stone-200">
-                                    <i class="fas fa-star text-3xl mb-2 text-stone-300"></i>
+                                <div class="col-span-full py-10 text-center text-stone-400 bg-stone-50 rounded-2xl border border-dashed border-stone-200">
+                                    <i class="fas fa-star text-2xl sm:text-3xl mb-2 text-stone-300"></i>
                                     <p class="text-sm font-bold text-stone-600">No customer reviews yet</p>
-                                    <p class="text-xs text-stone-400 mb-4">Click "+ Add Customer Review" to add one.</p>
+                                    <p class="text-xs text-stone-400">Click "+ Add Review" above to add one.</p>
                                 </div>
                             `}
                         </div>
@@ -3141,49 +3240,41 @@
                 const m = section.metadata || {};
                 const img = m.desktop_image || m.image_url || '/images/homepage/middleimg.png';
                 bodyContent = `
-                    <div class="p-8">
-                        <div class="bg-[#FFF9F6] border border-[#E7D1CC] rounded-3xl p-6 sm:p-8 shadow-2xs hover:shadow-boutique transition-all">
-                            <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
+                    <div class="p-3.5 sm:p-6 md:p-8">
+                        <div class="bg-[#FFF9F6] border border-[#E7D1CC] rounded-2xl sm:rounded-3xl p-4 sm:p-6 md:p-8 shadow-2xs">
+                            <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8 items-center">
                                 <!-- Details & Content -->
-                                <div class="lg:col-span-7 space-y-4">
-                                    <div class="flex flex-wrap items-center justify-between gap-3">
-                                        <div class="flex items-center gap-2">
-                                            <span class="px-3 py-1 rounded-full text-xs font-bold bg-red-50 text-red-700 border border-red-200">
-                                                <i class="fas fa-cut mr-1 text-[10px]"></i>Promotional Middle Banner
-                                            </span>
-                                            <span class="px-2.5 py-0.5 rounded-full text-[11px] font-bold ${m.is_active ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' : 'bg-stone-100 text-stone-500 border border-stone-200'}">
-                                                ${m.is_active ? '● Live on Storefront' : '○ Hidden'}
-                                            </span>
-                                        </div>
-
-                                        <button type="button" onclick="window.openCustomCrochetModal ? window.openCustomCrochetModal() : openCustomCrochetModal()"
-                                                class="px-5 py-2.5 rounded-2xl bg-red-600 hover:bg-red-700 text-white text-xs font-bold shadow-xs hover:shadow-md transition-all flex items-center gap-2 active:scale-95 cursor-pointer">
-                                            <i class="fas fa-edit text-xs"></i>
-                                            <span>Edit Banner & Hanging Tag</span>
-                                        </button>
+                                <div class="lg:col-span-7 space-y-3.5">
+                                    <div class="flex items-center gap-2">
+                                        <span class="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-red-50 text-red-700 border border-red-200">
+                                            <i class="fas fa-cut mr-1 text-[10px]"></i>Promotional Middle Banner
+                                        </span>
+                                        <span class="px-2.5 py-0.5 rounded-full text-[11px] font-bold ${m.is_active ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' : 'bg-stone-100 text-stone-500 border border-stone-200'}">
+                                            ${m.is_active ? '● Live on Storefront' : '○ Hidden'}
+                                        </span>
                                     </div>
 
                                     <div>
-                                        <h3 class="text-2xl sm:text-3xl font-bold text-stone-800 tracking-tight mb-1">
+                                        <h3 class="text-xl sm:text-3xl font-bold text-stone-800 tracking-tight mb-1">
                                             ${escapeHtml(m.title || "Custom Crochet")}
                                         </h3>
-                                        ${m.subtitle ? `<p class="text-base font-serif italic text-red-600">${escapeHtml(m.subtitle)}</p>` : ''}
+                                        ${m.subtitle ? `<p class="text-sm sm:text-base font-serif italic text-red-600">${escapeHtml(m.subtitle)}</p>` : ''}
                                     </div>
 
-                                    <div class="space-y-2 bg-white/70 rounded-2xl p-4 border border-[#E7D1CC]/70">
-                                        <span class="text-[10px] font-bold text-stone-400 uppercase tracking-wider block mb-0.5">Banner Narrative</span>
+                                    <div class="space-y-1.5 bg-white/70 rounded-2xl p-3.5 border border-[#E7D1CC]/70">
+                                        <span class="text-[10px] font-bold text-stone-400 uppercase tracking-wider block">Banner Narrative</span>
                                         <p class="text-xs text-stone-700 leading-relaxed">${escapeHtml(m.description || "Your imagination, our yarn. Let's create something special together.")}</p>
                                     </div>
 
-                                    <div class="flex flex-wrap items-center gap-3 pt-1">
+                                    <div class="flex flex-wrap items-center gap-2.5 pt-1">
                                         ${m.cta_text ? `
-                                            <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-xl bg-white border border-[#E7D1CC] text-xs font-semibold text-stone-700 shadow-2xs">
+                                            <div class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white border border-[#E7D1CC] text-xs font-semibold text-stone-700 shadow-2xs">
                                                 <i class="fas fa-mouse-pointer text-red-600 text-xs"></i>
                                                 <span>Button: "<strong>${escapeHtml(m.cta_text)}</strong>" ${m.cta_link ? `→ ${escapeHtml(m.cta_link)}` : ''}</span>
                                             </div>
                                         ` : ''}
                                         ${m.tag_text ? `
-                                            <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-xl bg-amber-50 border border-amber-200 text-xs font-semibold text-amber-900 shadow-2xs">
+                                            <div class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-amber-50 border border-amber-200 text-xs font-semibold text-amber-900 shadow-2xs">
                                                 <i class="fas fa-sticky-note text-amber-600 text-xs"></i>
                                                 <span>Hanging Note: "<strong>${escapeHtml(m.tag_text)}</strong>" ${m.tag_active ? '(Active)' : '(Hidden)'}</span>
                                             </div>
@@ -3198,7 +3289,7 @@
 
                                         <!-- Hanging Paper Note Over Banner Image -->
                                         ${m.tag_active && m.tag_text ? `
-                                            <div class="absolute bottom-3 right-3 bg-[#FFF9F6] border border-[#E7D1CC] rounded-xl p-2.5 shadow-lg text-center max-w-[150px] rotate-2 animate-fadeIn select-none">
+                                            <div class="absolute bottom-3 right-3 bg-[#FFF9F6] border border-[#E7D1CC] rounded-xl p-2.5 shadow-lg text-center max-w-[140px] rotate-2 select-none">
                                                 <div class="absolute -top-2 left-1/2 -translate-x-1/2 flex flex-col items-center">
                                                     <div class="w-1.5 h-2 bg-[#C89B61]/80 rounded-t"></div>
                                                     <div class="w-2 h-2 rounded-full bg-white border border-[#E7D1CC]"></div>
@@ -3238,116 +3329,86 @@
                 };
 
                 bodyContent = `
-                    <div class="p-6 sm:p-8 space-y-6">
+                    <div class="p-3.5 sm:p-6 md:p-8 space-y-4 sm:space-y-6">
                         <!-- Top Toolbar / Meta Bar -->
-                        <div class="flex flex-wrap items-center justify-between gap-4 pb-2 border-b border-stone-100">
-                            <div class="flex items-center gap-2.5">
-                                <span class="px-3 py-1 rounded-full text-xs font-bold bg-red-50 text-red-700 border border-red-200 flex items-center gap-1.5">
-                                    <i class="fas fa-book-open text-[10px]"></i>
-                                    <span>Storefront Brand Story Narrative</span>
-                                </span>
-                                <span class="px-2.5 py-0.5 rounded-full text-[11px] font-bold ${m.is_active ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' : 'bg-stone-100 text-stone-500 border border-stone-200'}">
-                                    ${m.is_active ? '● Live on Storefront' : '○ Hidden'}
-                                </span>
-                            </div>
-
-                            <div class="flex items-center gap-2">
-                                <button type="button" onclick="openMediaPicker('brand_story')"
-                                        class="px-3.5 py-2 rounded-xl bg-white hover:bg-stone-50 text-stone-700 text-xs font-bold border border-stone-200 shadow-2xs hover:shadow-xs transition-all flex items-center gap-1.5 cursor-pointer">
-                                    <i class="fas fa-images text-red-500 text-xs"></i>
-                                    <span>Change Background</span>
-                                </button>
-                                <button type="button" onclick="window.openBrandStoryModal ? window.openBrandStoryModal() : openBrandStoryModal()"
-                                        class="px-5 py-2 rounded-xl bg-red-600 hover:bg-red-700 text-white text-xs font-bold shadow-xs hover:shadow-md transition-all flex items-center gap-2 active:scale-95 cursor-pointer">
-                                    <i class="fas fa-edit text-xs"></i>
-                                    <span>Edit Brand Story</span>
-                                </button>
-                            </div>
+                        <div class="flex items-center gap-2 pb-2 border-b border-stone-100">
+                            <span class="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-red-50 text-red-700 border border-red-200 flex items-center gap-1.5">
+                                <i class="fas fa-book-open text-[10px]"></i>
+                                <span>Storefront Brand Story Narrative</span>
+                            </span>
+                            <span class="px-2.5 py-0.5 rounded-full text-[11px] font-bold ${m.is_active ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' : 'bg-stone-100 text-stone-500 border border-stone-200'}">
+                                ${m.is_active ? '● Live on Storefront' : '○ Hidden'}
+                            </span>
                         </div>
 
                         <!-- FULL-WIDTH LIVE STOREFRONT PREVIEW BANNER -->
-                        <div class="relative w-full rounded-3xl overflow-hidden bg-[#FCE9E5] border border-[#E7D1CC]/80 shadow-sm py-10 sm:py-14 lg:py-16 px-6 sm:px-10 lg:px-14 group">
+                        <div class="relative w-full rounded-2xl sm:rounded-3xl overflow-hidden bg-[#FCE9E5] border border-[#E7D1CC]/80 shadow-sm py-8 sm:py-12 lg:py-16 px-4 sm:px-8 lg:px-14 group">
                             <!-- Background Image Layer -->
                             <div class="absolute inset-0 z-0 w-full h-full pointer-events-none">
                                 <img src="${escapeHtml(img)}" alt="Brand Story Background" class="w-full h-full object-cover object-center lg:object-right" onerror="this.onerror=null; this.src=(window.location.pathname.startsWith('/knottele') ? '/knottele' : '') + '/images/homepage/middleimg.png';">
-                                <!-- Multi-Layer Gradient Overlays for Storefront Contrast -->
                                 <div class="absolute inset-0 bg-gradient-to-r from-[#FFF5F2]/95 via-[#FFF5F2]/85 to-transparent w-full md:w-[60%]"></div>
                                 <div class="absolute inset-0 bg-gradient-to-l from-[#FFF5F2]/90 via-[#FFF5F2]/60 to-transparent w-full md:w-[45%] ml-auto hidden lg:block"></div>
                             </div>
 
                             <!-- Live Content Layer -->
                             <div class="relative z-10 w-full">
-                                <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center justify-between">
-                                    
-                                    <!-- Left Column: Branding, Heading, Narrative & CTA Button -->
-                                    <div class="lg:col-span-7 space-y-4 max-w-xl text-left">
-                                        <div class="flex items-center gap-2">
-                                            <span class="text-[11px] sm:text-xs font-semibold uppercase tracking-wider text-[#A38F8B] font-sans block">
-                                                ${escapeHtml(m.badge || "KNOTELLE Artisanal Crochet Craftsmanship")}
-                                            </span>
-                                            <button type="button" onclick="window.openBrandStoryModal ? window.openBrandStoryModal() : openBrandStoryModal()" class="text-[#A38F8B] hover:text-[#913638] text-[10px] cursor-pointer" title="Edit Brand Story">
-                                                <i class="fas fa-pencil-alt"></i>
-                                            </button>
-                                        </div>
+                                <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-12 items-center justify-between">
+                                    <!-- Left Column -->
+                                    <div class="lg:col-span-7 space-y-3 sm:space-y-4 max-w-xl text-left">
+                                        <span class="text-[11px] sm:text-xs font-semibold uppercase tracking-wider text-[#A38F8B] font-sans block">
+                                            ${escapeHtml(m.badge || "KNOTELLE Artisanal Crochet Craftsmanship")}
+                                        </span>
 
-                                        <h2 class="font-serif text-3xl sm:text-4xl lg:text-5xl font-bold text-[#2E211E] leading-[1.15] tracking-tight cursor-pointer" onclick="window.openBrandStoryModal ? window.openBrandStoryModal() : openBrandStoryModal()" title="Click to edit headline">
+                                        <h2 class="font-serif text-2xl sm:text-4xl lg:text-5xl font-bold text-[#2E211E] leading-[1.15] tracking-tight">
                                             ${escapeHtml(m.title || "Every Stitch")} <br>
                                             <span class="text-[#913638] italic font-normal font-serif">${escapeHtml(m.subtitle || "Has a Story")}</span>
                                         </h2>
 
-                                        <p class="text-xs sm:text-sm md:text-base text-[#786864] leading-relaxed whitespace-pre-line cursor-pointer" onclick="window.openBrandStoryModal ? window.openBrandStoryModal() : openBrandStoryModal()" title="Click to edit narrative">
+                                        <p class="text-xs sm:text-sm md:text-base text-[#786864] leading-relaxed whitespace-pre-line">
                                             ${escapeHtml(m.description || "More than just crochet, we create memories, happiness and a little bit of magic.")}
                                         </p>
 
                                         <div class="pt-2 flex items-center gap-3">
-                                            <button type="button" onclick="window.openBrandStoryModal ? window.openBrandStoryModal() : openBrandStoryModal()"
-                                                    class="inline-flex items-center gap-2 px-6 sm:px-7 py-3 rounded-full bg-[#913638] hover:bg-[#74292B] text-white text-xs sm:text-sm font-semibold shadow-xs hover:shadow-md transition-all cursor-pointer">
+                                            <div class="inline-flex items-center gap-2 px-5 sm:px-7 py-2.5 sm:py-3 rounded-full bg-[#913638] text-white text-xs sm:text-sm font-semibold shadow-xs">
                                                 <span>${escapeHtml(m.cta_text || "Read Our Story")}</span>
                                                 <i class="fas fa-arrow-right text-xs"></i>
-                                            </button>
+                                            </div>
                                         </div>
                                     </div>
 
                                     <!-- Right Column: 4 Feature Items Stacked -->
-                                    <div class="lg:col-span-5 space-y-3.5">
+                                    <div class="lg:col-span-5 space-y-2.5 sm:space-y-3.5">
                                         ${features.map((feat, idx) => {
                                             const iconClass = iconClassMap[feat.icon] || 'fas fa-heart';
                                             return `
-                                                <div onclick="window.openBrandStoryModal ? window.openBrandStoryModal() : openBrandStoryModal()"
-                                                     title="Click to edit feature"
-                                                     class="flex items-center gap-3.5 px-4 sm:px-5 py-3.5 rounded-2xl bg-white/95 backdrop-blur-md border border-[#E7D1CC]/80 shadow-xs hover:shadow-md hover:border-[#913638]/40 transition-all cursor-pointer group/feat">
-                                                    <div class="w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-[#FFF9F6] border border-[#E7D1CC] flex items-center justify-center text-[#913638] shrink-0 shadow-2xs group-hover/feat:scale-110 transition-transform">
-                                                        <i class="${iconClass} text-sm"></i>
+                                                <div class="flex items-center gap-3 px-3.5 sm:px-5 py-2.5 sm:py-3.5 rounded-2xl bg-white/95 backdrop-blur-md border border-[#E7D1CC]/80 shadow-xs">
+                                                    <div class="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-[#FFF9F6] border border-[#E7D1CC] flex items-center justify-center text-[#913638] shrink-0 shadow-2xs">
+                                                        <i class="${iconClass} text-xs sm:text-sm"></i>
                                                     </div>
                                                     <span class="text-xs sm:text-sm font-semibold text-[#2E211E] flex-1">
                                                         ${escapeHtml(feat.title || '')}
                                                     </span>
-                                                    <i class="fas fa-pencil-alt text-[10px] text-stone-300 group-hover/feat:text-[#913638] opacity-0 group-hover/feat:opacity-100 transition-opacity"></i>
                                                 </div>
                                             `;
                                         }).join('')}
                                     </div>
-
                                 </div>
                             </div>
                         </div>
 
                         <!-- Info Footer with Quick Details -->
-                        <div class="bg-stone-50/80 rounded-2xl p-4 border border-stone-100 flex flex-wrap items-center justify-between gap-3 text-xs text-stone-500">
-                            <div class="flex items-center gap-3">
+                        <div class="bg-stone-50/80 rounded-2xl p-3 sm:p-4 border border-stone-100 flex flex-wrap items-center justify-between gap-2 text-xs text-stone-500">
+                            <div class="flex flex-wrap items-center gap-2 sm:gap-3">
                                 <span class="inline-flex items-center gap-1.5 font-medium">
                                     <i class="fas fa-link text-stone-400"></i>
-                                    <span>Button Link: <strong class="text-stone-700">${escapeHtml(m.cta_link || '/about')}</strong></span>
+                                    <span>Link: <strong class="text-stone-700">${escapeHtml(m.cta_link || '/about')}</strong></span>
                                 </span>
-                                <span class="text-stone-300">|</span>
+                                <span class="text-stone-300 hidden sm:inline">|</span>
                                 <span class="inline-flex items-center gap-1.5 font-medium">
                                     <i class="fas fa-image text-stone-400"></i>
-                                    <span>Background: <strong class="text-stone-700">${escapeHtml(String(img).split('/').pop() || 'middleimg.png')}</strong></span>
+                                    <span>Image: <strong class="text-stone-700">${escapeHtml(String(img).split('/').pop() || 'middleimg.png')}</strong></span>
                                 </span>
                             </div>
-                            <button type="button" onclick="window.openBrandStoryModal ? window.openBrandStoryModal() : openBrandStoryModal()" class="text-red-600 hover:text-red-700 font-bold flex items-center gap-1 cursor-pointer">
-                                <i class="fas fa-edit text-xs"></i> Edit Section Content & Artwork
-                            </button>
                         </div>
                     </div>
                 `;
@@ -3356,9 +3417,9 @@
                 const m = section.metadata || {};
                 const img = m.desktop_image || '/images/logo/Logo_1.png';
                 bodyContent = `
-                    <div class="p-8">
-                        <div class="bg-[#FFF9F6] border border-[#E7D1CC] rounded-3xl p-6 sm:p-8 shadow-2xs hover:shadow-boutique transition-all">
-                            <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+                    <div class="p-3.5 sm:p-6 md:p-8">
+                        <div class="bg-[#FFF9F6] border border-[#E7D1CC] rounded-2xl sm:rounded-3xl p-4 sm:p-6 md:p-8 shadow-2xs">
+                            <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8 items-start">
                                 <!-- Image Preview Card -->
                                 <div class="lg:col-span-4">
                                     <div class="relative w-full aspect-[4/5] rounded-2xl overflow-hidden bg-stone-100 border border-[#E7D1CC] shadow-xs group">
@@ -3366,7 +3427,7 @@
                                         
                                         <!-- Floating Badge Preview on Image -->
                                         ${m.floating_badge_active ? `
-                                            <div class="absolute bottom-3 left-3 right-3 bg-white/95 backdrop-blur-md p-3 rounded-xl border border-stone-200/80 shadow-md flex items-center gap-2.5">
+                                            <div class="absolute bottom-3 left-3 right-3 bg-white/95 backdrop-blur-md p-2.5 sm:p-3 rounded-xl border border-stone-200/80 shadow-md flex items-center gap-2.5">
                                                 <div class="w-8 h-8 rounded-lg bg-red-50 text-red-600 flex items-center justify-center font-bold text-xs shrink-0">
                                                     <i class="${getPillarIconFa(m.floating_badge_icon || 'Heart')}"></i>
                                                 </div>
@@ -3386,32 +3447,24 @@
                                 </div>
 
                                 <!-- Text Details & Actions -->
-                                <div class="lg:col-span-8 space-y-4">
-                                    <div class="flex flex-wrap items-center justify-between gap-3">
-                                        <div class="flex items-center gap-2">
-                                            <span class="px-3 py-1 rounded-full text-xs font-bold bg-red-50 text-red-700 border border-red-200">
-                                                <i class="fas fa-tag mr-1 text-[10px]"></i>${escapeHtml(m.badge || m.tag_text || 'The KNOTELLE Story')}
-                                            </span>
-                                            <span class="px-2.5 py-0.5 rounded-full text-[11px] font-bold ${m.is_active ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' : 'bg-stone-100 text-stone-500 border border-stone-200'}">
-                                                ${m.is_active ? '● Live on Storefront' : '○ Hidden'}
-                                            </span>
-                                        </div>
-
-                                        <button type="button" onclick="openAboutStoryModal()"
-                                                class="px-5 py-2.5 rounded-2xl bg-red-600 hover:bg-red-700 text-white text-xs font-bold shadow-xs hover:shadow-md transition-all flex items-center gap-2 active:scale-95 cursor-pointer">
-                                            <i class="fas fa-edit text-xs"></i>
-                                            <span>Edit Story & Visuals</span>
-                                        </button>
+                                <div class="lg:col-span-8 space-y-3.5">
+                                    <div class="flex items-center gap-2">
+                                        <span class="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-red-50 text-red-700 border border-red-200">
+                                            <i class="fas fa-tag mr-1 text-[10px]"></i>${escapeHtml(m.badge || m.tag_text || 'The KNOTELLE Story')}
+                                        </span>
+                                        <span class="px-2.5 py-0.5 rounded-full text-[11px] font-bold ${m.is_active ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' : 'bg-stone-100 text-stone-500 border border-stone-200'}">
+                                            ${m.is_active ? '● Live on Storefront' : '○ Hidden'}
+                                        </span>
                                     </div>
 
                                     <div>
-                                        <h3 class="text-2xl font-bold text-stone-800 tracking-tight mb-1">
+                                        <h3 class="text-xl sm:text-2xl font-bold text-stone-800 tracking-tight mb-1">
                                             ${escapeHtml(m.title || 'Every Loop Tells a Story')}
                                         </h3>
                                         ${m.subtitle ? `<p class="text-xs font-serif italic text-red-600">${escapeHtml(m.subtitle)}</p>` : ''}
                                     </div>
 
-                                    <div class="space-y-2.5 bg-white/70 rounded-2xl p-4 border border-[#E7D1CC]/70">
+                                    <div class="space-y-2 bg-white/70 rounded-2xl p-3.5 border border-[#E7D1CC]/70">
                                         <div>
                                             <span class="text-[10px] font-bold text-stone-400 uppercase tracking-wider block mb-0.5">Paragraph 1 (Primary Narrative)</span>
                                             <p class="text-xs text-stone-700 leading-relaxed">${escapeHtml(m.paragraph_1 || m.description || 'No description text set.')}</p>
@@ -3425,16 +3478,16 @@
                                     </div>
 
                                     <!-- CTA & Floating Info Pills -->
-                                    <div class="flex flex-wrap items-center gap-3 pt-1">
+                                    <div class="flex flex-wrap items-center gap-2.5 pt-1">
                                         ${m.cta_text && m.cta_visible ? `
-                                            <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-xl bg-white border border-[#E7D1CC] text-xs font-semibold text-stone-700 shadow-2xs">
+                                            <div class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white border border-[#E7D1CC] text-xs font-semibold text-stone-700 shadow-2xs">
                                                 <i class="fas fa-mouse-pointer text-red-600 text-xs"></i>
                                                 <span>CTA: "<strong>${escapeHtml(m.cta_text)}</strong>" ${m.cta_link ? `→ ${escapeHtml(m.cta_link)}` : ''}</span>
                                             </div>
                                         ` : ''}
-                                        <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-xl bg-white border border-[#E7D1CC] text-xs font-semibold text-stone-700 shadow-2xs">
+                                        <div class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white border border-[#E7D1CC] text-xs font-semibold text-stone-700 shadow-2xs">
                                             <i class="fas fa-image text-stone-400 text-xs"></i>
-                                            <span>Alt Text: "${escapeHtml(m.alt_text || 'Artisan stitching crochet')}"</span>
+                                            <span>Alt: "${escapeHtml(m.alt_text || 'Artisan stitching crochet')}"</span>
                                         </div>
                                     </div>
                                 </div>
@@ -3446,35 +3499,25 @@
                 // Custom Order Items / Categories Dynamic Manager
                 const items = section.items || [];
                 bodyContent = `
-                    <div class="p-8">
-                        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6 bg-[#FFF9F6] border border-[#E7D1CC] p-5 rounded-2xl">
+                    <div class="p-3.5 sm:p-6 md:p-8">
+                        <div class="mb-5 bg-[#FFF9F6] border border-[#E7D1CC] p-3.5 sm:p-4 rounded-2xl flex items-center justify-between gap-3">
                             <div>
-                                <div class="flex items-center gap-2 mb-1">
-                                    <span class="px-2.5 py-0.5 rounded-md text-[10px] font-bold bg-red-100 text-red-800">
-                                        Custom Order Form
-                                    </span>
-                                    <h4 class="font-bold text-stone-800 text-base">Step 1: Item Types & Categories</h4>
-                                    <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">
-                                        ${items.length} Active Options
-                                    </span>
+                                <div class="flex items-center gap-2 mb-0.5">
+                                    <span class="px-2 py-0.5 rounded-md text-[10px] font-bold bg-red-100 text-red-800">Custom Order Form</span>
+                                    <h4 class="font-bold text-stone-800 text-sm sm:text-base">Step 1: Item Types</h4>
+                                    <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">${items.length} Active Options</span>
                                 </div>
-                                <p class="text-xs text-stone-600 font-medium">Categories and items available for customers to choose when requesting bespoke creations.</p>
-                            </div>
-                            <div class="flex items-center gap-2.5">
-                                <button type="button" onclick="openAddCustomOrderItemModal()" class="px-4 py-2 rounded-xl bg-red-600 hover:bg-red-700 text-white text-xs font-bold shadow-xs hover:shadow-md transition-all flex items-center gap-1.5 active:scale-95 cursor-pointer">
-                                    <i class="fas fa-plus-circle text-xs"></i>
-                                    <span>+ Add Item Type</span>
-                                </button>
+                                <p class="text-xs text-stone-600 font-medium hidden sm:block">Categories and items available for customers to choose when requesting bespoke creations.</p>
                             </div>
                         </div>
 
                         <!-- Items Grid -->
-                        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3.5 sm:gap-4">
                             ${items.length > 0 ? items.map(item => `
-                                <div class="bg-white border border-stone-200/90 rounded-2xl p-4 shadow-2xs hover:shadow-boutique transition-all flex flex-col justify-between group">
+                                <div class="bg-white border border-stone-200/90 rounded-2xl p-3.5 sm:p-4 shadow-2xs hover:shadow-boutique transition-all flex flex-col justify-between group">
                                     <div>
-                                        <div class="flex items-center justify-between gap-2 mb-3">
-                                            <div class="w-10 h-10 rounded-xl bg-red-50 border border-red-200 text-red-700 flex items-center justify-center font-bold text-base shadow-2xs shrink-0">
+                                        <div class="flex items-center justify-between gap-2 mb-2.5">
+                                            <div class="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-red-50 border border-red-200 text-red-700 flex items-center justify-center font-bold text-sm sm:text-base shadow-2xs shrink-0">
                                                 <i class="${getCustomOrderItemFaIcon(item.icon || item.tag_text || item.title)}"></i>
                                             </div>
                                             <div class="flex items-center gap-1.5">
@@ -3486,24 +3529,24 @@
                                                 </button>
                                             </div>
                                         </div>
-                                        <h5 class="font-bold text-stone-800 text-sm mb-0.5">${escapeHtml(item.title || item.name)}</h5>
-                                        <p class="text-xs text-stone-500 line-clamp-1 mb-3">${escapeHtml(item.subtitle || 'Custom pattern')}</p>
+                                        <h5 class="font-bold text-stone-800 text-sm mb-0.5 truncate">${escapeHtml(item.title || item.name)}</h5>
+                                        <p class="text-xs text-stone-500 line-clamp-1 mb-2.5">${escapeHtml(item.subtitle || 'Custom pattern')}</p>
                                     </div>
                                     <div class="flex items-center justify-end gap-2 pt-2 border-t border-stone-100">
-                                        <button type="button" onclick="openEditCustomOrderItemModal(${item.id})" class="text-stone-600 hover:text-stone-900 text-xs font-bold px-2.5 py-1.5 rounded-lg hover:bg-stone-100 transition-colors flex items-center gap-1 cursor-pointer">
+                                        <button type="button" onclick="openEditCustomOrderItemModal(${item.id})" class="text-stone-600 hover:text-stone-900 text-xs font-bold px-2 py-1 rounded-lg hover:bg-stone-100 transition-colors flex items-center gap-1 cursor-pointer">
                                             <i class="fas fa-edit text-xs text-stone-400"></i>
                                             <span>Edit</span>
                                         </button>
-                                        <button type="button" onclick="deleteCustomOrderItem(${item.id})" class="text-rose-600 hover:text-rose-700 text-xs font-bold px-2.5 py-1.5 rounded-lg hover:bg-rose-50 transition-colors flex items-center gap-1 cursor-pointer">
+                                        <button type="button" onclick="deleteCustomOrderItem(${item.id})" class="text-rose-600 hover:text-rose-700 text-xs font-bold px-2 py-1 rounded-lg hover:bg-rose-50 transition-colors flex items-center gap-1 cursor-pointer">
                                             <i class="fas fa-trash-alt text-xs"></i>
                                             <span>Delete</span>
                                         </button>
                                     </div>
                                 </div>
                             `).join('') : `
-                                <div class="col-span-full py-12 text-center text-stone-400 bg-stone-50 rounded-2xl border border-dashed border-stone-200">
+                                <div class="col-span-full py-10 text-center text-stone-400 bg-stone-50 rounded-2xl border border-dashed border-stone-200">
                                     <p class="text-sm font-bold text-stone-600">No custom order categories found</p>
-                                    <p class="text-xs text-stone-400 mb-4">Click "+ Add Item Type" above to add your first category.</p>
+                                    <p class="text-xs text-stone-400">Click "+ Add Item" above to add your first category.</p>
                                 </div>
                             `}
                         </div>
@@ -3514,70 +3557,56 @@
                 const meta = section.metadata || {};
                 const items = section.items || [];
                 bodyContent = `
-                    <div class="p-8">
-                        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6 bg-[#FFF9F6] border border-[#E7D1CC] p-5 rounded-2xl">
+                    <div class="p-3.5 sm:p-6 md:p-8">
+                        <div class="mb-5 bg-[#FFF9F6] border border-[#E7D1CC] p-3.5 sm:p-4 rounded-2xl flex items-center justify-between gap-3">
                             <div>
-                                <div class="flex items-center gap-2 mb-1">
-                                    <span class="px-2.5 py-0.5 rounded-md text-[10px] font-bold bg-red-100 text-red-800">
-                                        ${escapeHtml(meta.tag_text || 'Artisan Standards')}
-                                    </span>
-                                    <h4 class="font-bold text-stone-800 text-base">${escapeHtml(meta.title || 'Our Craft Pillars')}</h4>
-                                    <span class="px-2 py-0.5 rounded-full text-[10px] font-bold ${meta.is_active ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' : 'bg-stone-100 text-stone-500 border border-stone-200'}">
-                                        ${meta.is_active ? 'Active' : 'Hidden'}
-                                    </span>
+                                <div class="flex items-center gap-2 mb-0.5">
+                                    <span class="px-2 py-0.5 rounded-md text-[10px] font-bold bg-red-100 text-red-800">${escapeHtml(meta.tag_text || 'Artisan Standards')}</span>
+                                    <h4 class="font-bold text-stone-800 text-sm sm:text-base">${escapeHtml(meta.title || 'Our Craft Pillars')}</h4>
+                                    <span class="px-2 py-0.5 rounded-full text-[10px] font-bold ${meta.is_active ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' : 'bg-stone-100 text-stone-500 border border-stone-200'}">${meta.is_active ? 'Active' : 'Hidden'}</span>
                                 </div>
-                                <p class="text-xs text-stone-600 font-medium">${escapeHtml(meta.subtitle || 'Guiding principles behind every stitch we make.')}</p>
-                            </div>
-                            <div class="flex flex-wrap items-center gap-2.5">
-                                <button type="button" onclick="openCraftPillarsHeaderModal()" class="px-3.5 py-2 rounded-xl bg-white hover:bg-stone-100 border border-[#E7D1CC] text-stone-700 text-xs font-bold transition-all flex items-center gap-1.5 shadow-2xs cursor-pointer">
-                                    <i class="fas fa-cog text-xs text-stone-500"></i>
-                                    <span>Edit Header</span>
-                                </button>
-                                <button type="button" onclick="openAddCraftPillarModal()" class="px-4 py-2 rounded-xl bg-red-600 hover:bg-red-700 text-white text-xs font-bold shadow-xs hover:shadow-md transition-all flex items-center gap-1.5 active:scale-95 cursor-pointer">
-                                    <i class="fas fa-plus-circle text-xs"></i>
-                                    <span>+ Add Craft Pillar</span>
-                                </button>
+                                <p class="text-xs text-stone-600 font-medium hidden sm:block">${escapeHtml(meta.subtitle || 'Guiding principles behind every stitch we make.')}</p>
                             </div>
                         </div>
 
                         <!-- Pillars Grid -->
-                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
                             ${items.length > 0 ? items.map(p => `
-                                <div class="bg-white border border-stone-200/90 rounded-2xl p-5 shadow-2xs hover:shadow-boutique transition-all flex flex-col justify-between group">
+                                <div class="bg-white border border-stone-200/90 rounded-2xl p-4 sm:p-5 shadow-2xs hover:shadow-boutique transition-all flex flex-col justify-between group">
                                     <div>
-                                        <div class="flex items-center justify-between gap-2 mb-3.5">
-                                            <div class="w-12 h-12 rounded-2xl bg-gradient-to-br from-red-50 to-rose-100 border border-red-200 text-red-700 flex items-center justify-center font-bold text-lg shadow-2xs shrink-0">
+                                        <div class="flex items-center justify-between gap-2 mb-3">
+                                            <div class="w-10 h-10 sm:w-12 sm:h-12 rounded-2xl bg-gradient-to-br from-red-50 to-rose-100 border border-red-200 text-red-700 flex items-center justify-center font-bold text-base sm:text-lg shadow-2xs shrink-0">
                                                 <i class="${getPillarIconFa(p.icon_name || p.icon || 'Leaf')}"></i>
                                             </div>
                                             <div class="flex items-center gap-1.5">
                                                 <span class="px-2 py-0.5 rounded-md text-[10px] font-bold bg-stone-100 text-stone-600">
                                                     Order: #${p.sort_order || 1}
                                                 </span>
-                                                <button type="button" onclick="toggleCraftPillar(${p.id})" class="px-2.5 py-0.5 rounded-full text-[10px] font-bold transition-colors cursor-pointer ${p.is_active ? 'bg-emerald-50 text-emerald-700 hover:bg-emerald-100 border border-emerald-200' : 'bg-stone-100 text-stone-500 hover:bg-stone-200 border border-stone-200'}" title="Click to toggle status">
+                                                <button type="button" onclick="toggleCraftPillar(${p.id})" class="px-2 py-0.5 rounded-full text-[10px] font-bold transition-colors cursor-pointer ${p.is_active ? 'bg-emerald-50 text-emerald-700 hover:bg-emerald-100 border border-emerald-200' : 'bg-stone-100 text-stone-500 hover:bg-stone-200 border border-stone-200'}" title="Click to toggle status">
                                                     ${p.is_active ? '● Active' : '○ Hidden'}
                                                 </button>
                                             </div>
                                         </div>
 
-                                        <h4 class="font-bold text-stone-800 text-base mb-1.5">${escapeHtml(p.title)}</h4>
-                                        <p class="text-xs text-stone-600 leading-relaxed line-clamp-3 mb-4">${escapeHtml(p.description)}</p>
+                                        <h4 class="font-bold text-stone-800 text-sm sm:text-base mb-1 truncate">${escapeHtml(p.title)}</h4>
+                                        <p class="text-xs text-stone-600 leading-relaxed line-clamp-3 mb-3">${escapeHtml(p.description)}</p>
                                     </div>
 
                                     <div class="pt-3 border-t border-stone-100 flex items-center justify-between gap-2">
-                                        <button type="button" onclick="openEditCraftPillarModal(${p.id})" class="flex-1 py-2 px-3 rounded-xl bg-red-50 text-red-700 hover:bg-red-600 hover:text-white text-xs font-bold transition-all flex items-center justify-center gap-1.5 cursor-pointer">
+                                        <button type="button" onclick="openEditCraftPillarModal(${p.id})" class="flex-1 py-1.5 sm:py-2 px-3 rounded-xl bg-red-50 text-red-700 hover:bg-red-600 hover:text-white text-xs font-bold transition-all flex items-center justify-center gap-1.5 cursor-pointer">
                                             <i class="fas fa-edit text-xs"></i>
                                             <span>Edit Pillar</span>
                                         </button>
-                                        <button type="button" onclick="deleteCraftPillar(${p.id})" class="py-2 px-3 rounded-xl bg-stone-50 hover:bg-rose-50 text-stone-400 hover:text-rose-600 text-xs font-bold transition-all cursor-pointer" title="Delete Pillar">
+                                        <button type="button" onclick="deleteCraftPillar(${p.id})" class="py-1.5 sm:py-2 px-3 rounded-xl bg-stone-50 hover:bg-rose-50 text-stone-400 hover:text-rose-600 text-xs font-bold transition-all cursor-pointer" title="Delete Pillar">
                                             <i class="fas fa-trash-alt text-xs"></i>
                                         </button>
                                     </div>
                                 </div>
                             `).join('') : `
-                                <div class="col-span-full py-12 text-center text-stone-400 bg-stone-50 rounded-2xl border border-dashed border-stone-200">
-                                    <i class="fas fa-cubes text-3xl mb-2 text-stone-300"></i>
+                                <div class="col-span-full py-10 text-center text-stone-400 bg-stone-50 rounded-2xl border border-dashed border-stone-200">
+                                    <i class="fas fa-cubes text-2xl sm:text-3xl mb-2 text-stone-300"></i>
                                     <p class="text-sm font-bold text-stone-600">No craft pillars added yet</p>
-                                    <p class="text-xs text-stone-400 mb-4">Click "+ Add Craft Pillar" above to define your craft pillars.</p>
+                                    <p class="text-xs text-stone-400">Click "+ Add Pillar" above to define your craft pillars.</p>
                                 </div>
                             `}
                         </div>
@@ -3588,15 +3617,15 @@
                 const m = section.metadata || {};
                 const img = m.desktop_image || m.image || '/images/logo/Logo_1.png';
                 bodyContent = `
-                    <div class="p-8">
-                        <div class="bg-[#FFF9F6] border border-[#E7D1CC] rounded-3xl p-6 sm:p-8 shadow-2xs hover:shadow-boutique transition-all">
-                            <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+                    <div class="p-3.5 sm:p-6 md:p-8">
+                        <div class="bg-[#FFF9F6] border border-[#E7D1CC] rounded-2xl sm:rounded-3xl p-4 sm:p-6 md:p-8 shadow-2xs">
+                            <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8 items-start">
                                 <!-- Image Preview Card -->
                                 <div class="lg:col-span-4">
                                     <div class="relative w-full aspect-[4/3] rounded-2xl overflow-hidden bg-stone-100 border border-[#E7D1CC] shadow-xs group">
                                         <img src="${img}" alt="${escapeHtml(m.alt_text || m.title || 'Contact Hero')}" class="w-full h-full object-cover group-hover:scale-103 transition-transform duration-300" onerror="this.onerror=null; this.src=(window.location.pathname.startsWith('/knottele') ? '/knottele' : '') + '/images/logo/Logo_1.png';">
-                                        <div class="absolute bottom-3 left-3 right-3 bg-white/95 backdrop-blur-md p-3 rounded-xl border border-stone-200/80 shadow-md flex items-center gap-2.5">
-                                            <div class="w-8 h-8 rounded-lg bg-red-50 text-red-600 flex items-center justify-center font-bold text-xs shrink-0">
+                                        <div class="absolute bottom-3 left-3 right-3 bg-white/95 backdrop-blur-md p-2.5 rounded-xl border border-stone-200/80 shadow-md flex items-center gap-2">
+                                            <div class="w-7 h-7 rounded-lg bg-red-50 text-red-600 flex items-center justify-center font-bold text-xs shrink-0">
                                                 <i class="fas fa-handshake"></i>
                                             </div>
                                             <div class="min-w-0">
@@ -3608,46 +3637,38 @@
                                 </div>
 
                                 <!-- Details & Actions -->
-                                <div class="lg:col-span-8 space-y-4">
-                                    <div class="flex flex-wrap items-center justify-between gap-3">
-                                        <div class="flex items-center gap-2">
-                                            <span class="px-3 py-1 rounded-full text-xs font-bold bg-red-50 text-red-700 border border-red-200">
-                                                <i class="fas fa-tag mr-1 text-[10px]"></i>${escapeHtml(m.badge || m.tag_text || "Let's Connect")}
-                                            </span>
-                                            <span class="px-2.5 py-0.5 rounded-full text-[11px] font-bold ${m.is_active ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' : 'bg-stone-100 text-stone-500 border border-stone-200'}">
-                                                ${m.is_active ? '● Live on Storefront' : '○ Hidden'}
-                                            </span>
-                                        </div>
-
-                                        <button type="button" onclick="openContactIntroModal()"
-                                                class="px-5 py-2.5 rounded-2xl bg-red-600 hover:bg-red-700 text-white text-xs font-bold shadow-xs hover:shadow-md transition-all flex items-center gap-2 active:scale-95 cursor-pointer">
-                                            <i class="fas fa-edit text-xs"></i>
-                                            <span>Edit Intro & Visuals</span>
-                                        </button>
+                                <div class="lg:col-span-8 space-y-3.5">
+                                    <div class="flex items-center gap-2">
+                                        <span class="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-red-50 text-red-700 border border-red-200">
+                                            <i class="fas fa-tag mr-1 text-[10px]"></i>${escapeHtml(m.badge || m.tag_text || "Let's Connect")}
+                                        </span>
+                                        <span class="px-2.5 py-0.5 rounded-full text-[11px] font-bold ${m.is_active ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' : 'bg-stone-100 text-stone-500 border border-stone-200'}">
+                                            ${m.is_active ? '● Live on Storefront' : '○ Hidden'}
+                                        </span>
                                     </div>
 
                                     <div>
-                                        <h3 class="text-2xl font-bold text-stone-800 tracking-tight mb-1">
+                                        <h3 class="text-xl sm:text-2xl font-bold text-stone-800 tracking-tight mb-1">
                                             ${escapeHtml(m.title || "Let's Connect")}
                                         </h3>
                                         ${m.subtitle ? `<p class="text-xs font-serif italic text-red-600">${escapeHtml(m.subtitle)}</p>` : ''}
                                     </div>
 
-                                    <div class="space-y-2 bg-white/70 rounded-2xl p-4 border border-[#E7D1CC]/70">
-                                        <span class="text-[10px] font-bold text-stone-400 uppercase tracking-wider block mb-0.5">Introductory Narrative</span>
+                                    <div class="space-y-1.5 bg-white/70 rounded-2xl p-3.5 border border-[#E7D1CC]/70">
+                                        <span class="text-[10px] font-bold text-stone-400 uppercase tracking-wider block">Introductory Narrative</span>
                                         <p class="text-xs text-stone-700 leading-relaxed">${escapeHtml(m.description || "We're here to help bring your handcrafted crochet dreams to life.")}</p>
                                     </div>
 
-                                    <div class="flex flex-wrap items-center gap-3 pt-1">
+                                    <div class="flex flex-wrap items-center gap-2.5 pt-1">
                                         ${m.cta_text ? `
-                                            <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-xl bg-white border border-[#E7D1CC] text-xs font-semibold text-stone-700 shadow-2xs">
+                                            <div class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white border border-[#E7D1CC] text-xs font-semibold text-stone-700 shadow-2xs">
                                                 <i class="fas fa-mouse-pointer text-red-600 text-xs"></i>
                                                 <span>Button: "<strong>${escapeHtml(m.cta_text)}</strong>" ${m.cta_link ? `→ ${escapeHtml(m.cta_link)}` : ''}</span>
                                             </div>
                                         ` : ''}
-                                        <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-xl bg-white border border-[#E7D1CC] text-xs font-semibold text-stone-700 shadow-2xs">
+                                        <div class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white border border-[#E7D1CC] text-xs font-semibold text-stone-700 shadow-2xs">
                                             <i class="fas fa-image text-stone-400 text-xs"></i>
-                                            <span>Alt Text: "${escapeHtml(m.alt_text || 'Contact Banner')}"</span>
+                                            <span>Alt: "${escapeHtml(m.alt_text || 'Contact Banner')}"</span>
                                         </div>
                                     </div>
                                 </div>
@@ -3660,79 +3681,64 @@
                 const meta = section.metadata || {};
                 const items = section.items || [];
                 bodyContent = `
-                    <div class="p-8">
-                        <!-- Studio Header & Custom Order Box Preview -->
-                        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6 bg-[#FFF9F6] border border-[#E7D1CC] p-5 rounded-2xl">
+                    <div class="p-3.5 sm:p-6 md:p-8">
+                        <div class="mb-5 bg-[#FFF9F6] border border-[#E7D1CC] p-3.5 sm:p-4 rounded-2xl flex items-center justify-between gap-3">
                             <div>
-                                <div class="flex items-center gap-2 mb-1">
-                                    <span class="px-2.5 py-0.5 rounded-md text-[10px] font-bold bg-red-100 text-red-800">
-                                        ${escapeHtml(meta.tag_text || meta.badge || 'Atelier Studio')}
-                                    </span>
-                                    <h4 class="font-bold text-stone-800 text-base">${escapeHtml(meta.title || 'KNOTELLE Studio')}</h4>
-                                    <span class="px-2 py-0.5 rounded-full text-[10px] font-bold ${meta.is_active ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' : 'bg-stone-100 text-stone-500 border border-stone-200'}">
-                                        ${meta.is_active ? 'Active' : 'Hidden'}
-                                    </span>
+                                <div class="flex items-center gap-2 mb-0.5">
+                                    <span class="px-2 py-0.5 rounded-md text-[10px] font-bold bg-red-100 text-red-800">${escapeHtml(meta.tag_text || meta.badge || 'Atelier Studio')}</span>
+                                    <h4 class="font-bold text-stone-800 text-sm sm:text-base">${escapeHtml(meta.title || 'KNOTELLE Studio')}</h4>
+                                    <span class="px-2 py-0.5 rounded-full text-[10px] font-bold ${meta.is_active ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' : 'bg-stone-100 text-stone-500 border border-stone-200'}">${meta.is_active ? 'Active' : 'Hidden'}</span>
                                 </div>
-                                <p class="text-xs text-stone-600 font-medium">${escapeHtml(meta.subtitle || 'Handmade with love in Bengaluru, India')}</p>
+                                <p class="text-xs text-stone-600 font-medium hidden sm:block">${escapeHtml(meta.subtitle || 'Handmade with love in Bengaluru, India')}</p>
                                 ${meta.custom_order_box_active ? `
-                                    <div class="mt-2.5 inline-flex items-center gap-2 px-3 py-1 bg-amber-50 border border-amber-200 rounded-lg text-amber-900 text-[11px] font-semibold">
-                                        <i class="fas fa-gift text-amber-600"></i>
-                                        <span>Helper Box: "<strong>${escapeHtml(meta.custom_order_box_title || 'Looking for Custom Orders?')}</strong>" (${escapeHtml(meta.custom_order_box_link || '/custom-order')})</span>
+                                    <div class="mt-2 inline-flex items-center gap-2 px-2.5 py-1 bg-amber-50 border border-amber-200 rounded-lg text-amber-900 text-[11px] font-semibold">
+                                        <i class="fas fa-gift text-amber-600 text-xs"></i>
+                                        <span>Helper Box: "<strong>${escapeHtml(meta.custom_order_box_title || 'Looking for Custom Orders?')}</strong>"</span>
                                     </div>
                                 ` : ''}
-                            </div>
-                            <div class="flex flex-wrap items-center gap-2.5">
-                                <button type="button" onclick="openContactInfoHeaderModal()" class="px-3.5 py-2 rounded-xl bg-white hover:bg-stone-100 border border-[#E7D1CC] text-stone-700 text-xs font-bold transition-all flex items-center gap-1.5 shadow-2xs cursor-pointer">
-                                    <i class="fas fa-cog text-xs text-stone-500"></i>
-                                    <span>Edit Header & Box</span>
-                                </button>
-                                <button type="button" onclick="openAddContactInfoItemModal()" class="px-4 py-2 rounded-xl bg-red-600 hover:bg-red-700 text-white text-xs font-bold shadow-xs hover:shadow-md transition-all flex items-center gap-1.5 active:scale-95 cursor-pointer">
-                                    <i class="fas fa-plus-circle text-xs"></i>
-                                    <span>+ Add Contact Detail</span>
-                                </button>
                             </div>
                         </div>
 
                         <!-- Contact Details Grid -->
-                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-6">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
                             ${items.length > 0 ? items.map(d => `
-                                <div class="bg-white border border-stone-200/90 rounded-2xl p-5 shadow-2xs hover:shadow-boutique transition-all flex flex-col justify-between group">
+                                <div class="bg-white border border-stone-200/90 rounded-2xl p-4 sm:p-5 shadow-2xs hover:shadow-boutique transition-all flex flex-col justify-between group">
                                     <div>
-                                        <div class="flex items-center justify-between gap-2 mb-3.5">
-                                            <div class="w-12 h-12 rounded-2xl bg-gradient-to-br from-red-50 to-rose-100 border border-red-200 text-red-700 flex items-center justify-center font-bold text-lg shadow-2xs shrink-0">
+                                        <div class="flex items-center justify-between gap-2 mb-3">
+                                            <div class="w-10 h-10 sm:w-12 sm:h-12 rounded-2xl bg-gradient-to-br from-red-50 to-rose-100 border border-red-200 text-red-700 flex items-center justify-center font-bold text-base sm:text-lg shadow-2xs shrink-0">
                                                 <i class="${getContactIconFa(d.icon || d.icon_name || 'MapPin')}"></i>
                                             </div>
                                             <div class="flex items-center gap-1.5">
                                                 <span class="px-2 py-0.5 rounded-md text-[10px] font-bold bg-stone-100 text-stone-600">
                                                     Order: #${d.sort_order || 1}
                                                 </span>
-                                                <button type="button" onclick="toggleContactInfoItem(${d.id})" class="px-2.5 py-0.5 rounded-full text-[10px] font-bold transition-colors cursor-pointer ${d.is_active ? 'bg-emerald-50 text-emerald-700 hover:bg-emerald-100 border border-emerald-200' : 'bg-stone-100 text-stone-500 hover:bg-stone-200 border border-stone-200'}" title="Click to toggle status">
+                                                <button type="button" onclick="toggleContactInfoItem(${d.id})" class="px-2 py-0.5 rounded-full text-[10px] font-bold transition-colors cursor-pointer ${d.is_active ? 'bg-emerald-50 text-emerald-700 hover:bg-emerald-100 border border-emerald-200' : 'bg-stone-100 text-stone-500 hover:bg-stone-200 border border-stone-200'}" title="Click to toggle status">
                                                     ${d.is_active ? '● Active' : '○ Hidden'}
                                                 </button>
                                             </div>
                                         </div>
 
-                                        <h4 class="font-bold text-stone-800 text-base mb-1">${escapeHtml(d.title)}</h4>
-                                        <p class="text-sm font-semibold text-stone-900 mb-0.5">${escapeHtml(d.value || d.description || '')}</p>
+                                        <h4 class="font-bold text-stone-800 text-sm sm:text-base mb-1 truncate">${escapeHtml(d.title)}</h4>
+                                        <p class="text-xs sm:text-sm font-semibold text-stone-900 mb-0.5">${escapeHtml(d.value || d.description || '')}</p>
                                         ${d.address_line_2 ? `<p class="text-xs text-stone-500">${escapeHtml(d.address_line_2)}</p>` : ''}
                                         ${d.link || d.cta_link ? `<p class="text-[11px] font-mono text-red-600 truncate mt-2 bg-red-50/50 p-1.5 rounded-lg border border-red-100">Link: ${escapeHtml(d.link || d.cta_link)}</p>` : ''}
                                     </div>
 
-                                    <div class="pt-4 mt-3 border-t border-stone-100 flex items-center justify-between gap-2">
-                                        <button type="button" onclick="openEditContactInfoItemModal(${d.id})" class="flex-1 py-2 px-3 rounded-xl bg-red-50 text-red-700 hover:bg-red-600 hover:text-white text-xs font-bold transition-all flex items-center justify-center gap-1.5 cursor-pointer">
+                                    <div class="pt-3 mt-3 border-t border-stone-100 flex items-center justify-between gap-2">
+                                        <button type="button" onclick="openEditContactInfoItemModal(${d.id})" class="flex-1 py-1.5 sm:py-2 px-3 rounded-xl bg-red-50 text-red-700 hover:bg-red-600 hover:text-white text-xs font-bold transition-all flex items-center justify-center gap-1.5 cursor-pointer">
                                             <i class="fas fa-edit text-xs"></i>
                                             <span>Edit Detail</span>
                                         </button>
-                                        <button type="button" onclick="deleteContactInfoItem(${d.id})" class="py-2 px-3 rounded-xl bg-stone-50 hover:bg-rose-50 text-stone-400 hover:text-rose-600 text-xs font-bold transition-all cursor-pointer" title="Delete Detail">
+                                        <button type="button" onclick="deleteContactInfoItem(${d.id})" class="py-1.5 sm:py-2 px-3 rounded-xl bg-stone-50 hover:bg-rose-50 text-stone-400 hover:text-rose-600 text-xs font-bold transition-all cursor-pointer" title="Delete Detail">
                                             <i class="fas fa-trash-alt text-xs"></i>
                                         </button>
                                     </div>
                                 </div>
                             `).join('') : `
-                                <div class="col-span-full py-12 text-center text-stone-400 bg-stone-50 rounded-2xl border border-dashed border-stone-200">
-                                    <i class="fas fa-address-book text-3xl mb-2 text-stone-300"></i>
+                                <div class="col-span-full py-10 text-center text-stone-400 bg-stone-50 rounded-2xl border border-dashed border-stone-200">
+                                    <i class="fas fa-address-book text-2xl sm:text-3xl mb-2 text-stone-300"></i>
                                     <p class="text-sm font-bold text-stone-600">No contact details added yet</p>
-                                    <p class="text-xs text-stone-400 mb-4">Click "+ Add Contact Detail" to add phone, email, address, or hours.</p>
+                                    <p class="text-xs text-stone-400">Click "+ Add Detail" above to add phone, email, address, or hours.</p>
                                 </div>
                             `}
                         </div>
@@ -3743,62 +3749,48 @@
                 const m = section.metadata || {};
                 const fields = m.fields || [];
                 bodyContent = `
-                    <div class="p-8">
-                        <div class="bg-[#FFF9F6] border border-[#E7D1CC] rounded-3xl p-6 sm:p-8 shadow-2xs hover:shadow-boutique transition-all">
-                            <div class="flex flex-wrap items-center justify-between gap-4 mb-6 border-b border-[#E7D1CC] pb-4">
-                                <div>
-                                    <div class="flex items-center gap-2 mb-1">
-                                        <span class="px-3 py-1 rounded-full text-xs font-bold bg-red-50 text-red-700 border border-red-200">
-                                            <i class="fas fa-tag mr-1 text-[10px]"></i>${escapeHtml(m.badge || m.tag_text || 'Get In Touch')}
-                                        </span>
-                                        <h3 class="text-xl font-bold text-stone-800">${escapeHtml(m.title || 'Send Us a Message')}</h3>
-                                        <span class="px-2.5 py-0.5 rounded-full text-[11px] font-bold ${m.is_active ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' : 'bg-stone-100 text-stone-500 border border-stone-200'}">
-                                            ${m.is_active ? '● Active' : '○ Hidden'}
-                                        </span>
-                                    </div>
-                                    <p class="text-xs text-stone-600 font-medium">${escapeHtml(m.subtitle || 'Fill in your details and our team will get back to you promptly.')}</p>
+                    <div class="p-3.5 sm:p-6 md:p-8">
+                        <div class="bg-[#FFF9F6] border border-[#E7D1CC] rounded-2xl sm:rounded-3xl p-4 sm:p-6 md:p-8 shadow-2xs">
+                            <div class="mb-5 border-b border-[#E7D1CC] pb-3.5">
+                                <div class="flex items-center gap-2 mb-1">
+                                    <span class="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-red-50 text-red-700 border border-red-200">
+                                        <i class="fas fa-tag mr-1 text-[10px]"></i>${escapeHtml(m.badge || m.tag_text || 'Get In Touch')}
+                                    </span>
+                                    <h3 class="text-base sm:text-xl font-bold text-stone-800">${escapeHtml(m.title || 'Send Us a Message')}</h3>
+                                    <span class="px-2 py-0.5 rounded-full text-[10px] sm:text-[11px] font-bold ${m.is_active ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' : 'bg-stone-100 text-stone-500 border border-stone-200'}">
+                                        ${m.is_active ? '● Active' : '○ Hidden'}
+                                    </span>
                                 </div>
-
-                                <button type="button" onclick="openContactFormModal()"
-                                        class="px-5 py-2.5 rounded-2xl bg-red-600 hover:bg-red-700 text-white text-xs font-bold shadow-xs hover:shadow-md transition-all flex items-center gap-2 active:scale-95 cursor-pointer">
-                                    <i class="fas fa-edit text-xs"></i>
-                                    <span>Edit Form Settings</span>
-                                </button>
+                                <p class="text-xs text-stone-600 font-medium hidden sm:block">${escapeHtml(m.subtitle || 'Fill in your details and our team will get back to you promptly.')}</p>
                             </div>
 
-                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-                                <!-- Button & Notification Feedback Preview -->
-                                <div class="bg-white/80 rounded-2xl p-4 border border-[#E7D1CC] space-y-3">
-                                    <div class="text-[11px] font-bold text-stone-400 uppercase tracking-wider">Button & Notifications</div>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
+                                <!-- Button & Feedback Preview -->
+                                <div class="bg-white/80 rounded-2xl p-3.5 sm:p-4 border border-[#E7D1CC] space-y-2.5">
+                                    <div class="text-[10px] sm:text-[11px] font-bold text-stone-400 uppercase tracking-wider">Button & Notifications</div>
                                     <div class="flex items-center gap-2">
                                         <span class="text-xs font-bold text-stone-700">Submit Button:</span>
-                                        <span class="px-3 py-1 bg-red-600 text-white font-bold text-xs rounded-xl">${escapeHtml(m.cta_text || m.submit_btn_text || 'Send Message')}</span>
+                                        <span class="px-2.5 py-1 bg-red-600 text-white font-bold text-xs rounded-xl">${escapeHtml(m.cta_text || m.submit_btn_text || 'Send Message')}</span>
                                     </div>
-                                    <div class="p-3 bg-emerald-50 border border-emerald-200 rounded-xl space-y-0.5">
+                                    <div class="p-2.5 bg-emerald-50 border border-emerald-200 rounded-xl space-y-0.5">
                                         <div class="text-xs font-bold text-emerald-900 flex items-center gap-1.5"><i class="fas fa-check-circle"></i> ${escapeHtml(m.success_title || 'Message Sent!')}</div>
                                         <p class="text-[11px] text-emerald-700">${escapeHtml(m.success_message || 'Thank you! Your message has been sent successfully.')}</p>
-                                    </div>
-                                    <div class="p-3 bg-rose-50 border border-rose-200 rounded-xl space-y-0.5">
-                                        <div class="text-xs font-bold text-rose-900 flex items-center gap-1.5"><i class="fas fa-exclamation-circle"></i> Submission Error Note</div>
-                                        <p class="text-[11px] text-rose-700">${escapeHtml(m.error_message || 'Something went wrong while sending your message.')}</p>
                                     </div>
                                 </div>
 
                                 <!-- Fields Configuration Summary -->
-                                <div class="bg-white/80 rounded-2xl p-4 border border-[#E7D1CC] space-y-2.5">
-                                    <div class="text-[11px] font-bold text-stone-400 uppercase tracking-wider mb-2">Configured Form Fields</div>
-                                    <div class="space-y-2">
+                                <div class="bg-white/80 rounded-2xl p-3.5 sm:p-4 border border-[#E7D1CC] space-y-2">
+                                    <div class="text-[10px] sm:text-[11px] font-bold text-stone-400 uppercase tracking-wider mb-1">Configured Form Fields</div>
+                                    <div class="space-y-1.5">
                                         ${fields.map(f => `
-                                            <div class="flex items-center justify-between p-2.5 bg-stone-50 rounded-xl border border-stone-200 text-xs">
+                                            <div class="flex items-center justify-between p-2 bg-stone-50 rounded-xl border border-stone-200 text-xs">
                                                 <div>
                                                     <span class="font-bold text-stone-800">${escapeHtml(f.label || f.key)}</span>
                                                     <span class="text-[10px] text-stone-400 ml-1">("${escapeHtml(f.placeholder || '')}")</span>
                                                 </div>
-                                                <div>
-                                                    <span class="px-2 py-0.5 rounded-md text-[10px] font-bold ${f.required ? 'bg-amber-100 text-amber-800' : 'bg-stone-200 text-stone-600'}">
-                                                        ${f.required ? '✓ Required' : '○ Optional'}
-                                                    </span>
-                                                </div>
+                                                <span class="px-2 py-0.5 rounded-md text-[10px] font-bold ${f.required ? 'bg-amber-100 text-amber-800' : 'bg-stone-200 text-stone-600'}">
+                                                    ${f.required ? '✓ Req' : '○ Opt'}
+                                                </span>
                                             </div>
                                         `).join('')}
                                     </div>
@@ -3812,67 +3804,53 @@
                 const meta = section.metadata || {};
                 const items = section.items || [];
                 bodyContent = `
-                    <div class="p-8">
-                        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6 bg-[#FFF9F6] border border-[#E7D1CC] p-5 rounded-2xl">
+                    <div class="p-3.5 sm:p-6 md:p-8">
+                        <div class="mb-5 bg-[#FFF9F6] border border-[#E7D1CC] p-3.5 sm:p-4 rounded-2xl flex items-center justify-between gap-3">
                             <div>
-                                <div class="flex items-center gap-2 mb-1">
-                                    <span class="px-2.5 py-0.5 rounded-md text-[10px] font-bold bg-red-100 text-red-800">
-                                        ${escapeHtml(meta.tag_text || meta.badge || 'Help & Support')}
-                                    </span>
-                                    <h4 class="font-bold text-stone-800 text-base">${escapeHtml(meta.title || 'Frequently Asked Questions')}</h4>
-                                    <span class="px-2 py-0.5 rounded-full text-[10px] font-bold ${meta.is_active ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' : 'bg-stone-100 text-stone-500 border border-stone-200'}">
-                                        ${meta.is_active ? 'Active' : 'Hidden'}
-                                    </span>
+                                <div class="flex items-center gap-2 mb-0.5">
+                                    <span class="px-2 py-0.5 rounded-md text-[10px] font-bold bg-red-100 text-red-800">${escapeHtml(meta.tag_text || meta.badge || 'Help & Support')}</span>
+                                    <h4 class="font-bold text-stone-800 text-sm sm:text-base">${escapeHtml(meta.title || 'Frequently Asked Questions')}</h4>
+                                    <span class="px-2 py-0.5 rounded-full text-[10px] font-bold ${meta.is_active ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' : 'bg-stone-100 text-stone-500 border border-stone-200'}">${meta.is_active ? 'Active' : 'Hidden'}</span>
                                 </div>
-                                <p class="text-xs text-stone-600 font-medium">${escapeHtml(meta.subtitle || 'Quick answers about our handmade creations, custom orders, and delivery.')}</p>
-                            </div>
-                            <div class="flex flex-wrap items-center gap-2.5">
-                                <button type="button" onclick="openContactFaqsHeaderModal()" class="px-3.5 py-2 rounded-xl bg-white hover:bg-stone-100 border border-[#E7D1CC] text-stone-700 text-xs font-bold transition-all flex items-center gap-1.5 shadow-2xs cursor-pointer">
-                                    <i class="fas fa-cog text-xs text-stone-500"></i>
-                                    <span>Edit Header</span>
-                                </button>
-                                <button type="button" onclick="openAddContactFaqModal()" class="px-4 py-2 rounded-xl bg-red-600 hover:bg-red-700 text-white text-xs font-bold shadow-xs hover:shadow-md transition-all flex items-center gap-1.5 active:scale-95 cursor-pointer">
-                                    <i class="fas fa-plus-circle text-xs"></i>
-                                    <span>+ Add FAQ Item</span>
-                                </button>
+                                <p class="text-xs text-stone-600 font-medium hidden sm:block">${escapeHtml(meta.subtitle || 'Quick answers about our handmade creations, custom orders, and delivery.')}</p>
                             </div>
                         </div>
 
-                        <!-- FAQ Items Accordion Style List -->
-                        <div class="space-y-4">
+                        <!-- FAQ Items List -->
+                        <div class="space-y-3 sm:space-y-4">
                             ${items.length > 0 ? items.map((q, idx) => `
-                                <div class="bg-white border border-stone-200/90 rounded-2xl p-5 shadow-2xs hover:shadow-boutique transition-all flex flex-col md:flex-row md:items-start justify-between gap-4 group">
-                                    <div class="flex-1 space-y-2">
+                                <div class="bg-white border border-stone-200/90 rounded-2xl p-3.5 sm:p-5 shadow-2xs hover:shadow-boutique transition-all flex flex-col md:flex-row md:items-start justify-between gap-3 sm:gap-4 group">
+                                    <div class="flex-1 space-y-1.5 sm:space-y-2">
                                         <div class="flex items-center gap-2">
                                             <span class="w-6 h-6 rounded-full bg-red-50 text-red-700 font-bold text-xs flex items-center justify-center shrink-0">
                                                 ${idx + 1}
                                             </span>
-                                            <h4 class="font-bold text-stone-800 text-base">${escapeHtml(q.question || q.title || '')}</h4>
+                                            <h4 class="font-bold text-stone-800 text-sm sm:text-base">${escapeHtml(q.question || q.title || '')}</h4>
                                         </div>
-                                        <p class="text-xs text-stone-600 leading-relaxed pl-8 bg-stone-50/50 p-3 rounded-xl border border-stone-100">${escapeHtml(q.answer || q.description || '')}</p>
+                                        <p class="text-xs text-stone-600 leading-relaxed pl-8 bg-stone-50/50 p-2.5 sm:p-3 rounded-xl border border-stone-100">${escapeHtml(q.answer || q.description || '')}</p>
                                     </div>
 
-                                    <div class="flex items-center gap-2 shrink-0 self-end md:self-start pt-2 md:pt-0">
-                                        <span class="px-2 py-1 rounded-md text-[10px] font-bold bg-stone-100 text-stone-600">
-                                            Order: #${q.sort_order || (idx + 1)}
+                                    <div class="flex items-center gap-2 shrink-0 self-end md:self-start pt-1 md:pt-0">
+                                        <span class="px-2 py-0.5 rounded-md text-[10px] font-bold bg-stone-100 text-stone-600">
+                                            #${q.sort_order || (idx + 1)}
                                         </span>
-                                        <button type="button" onclick="toggleContactFaq(${q.id})" class="px-2.5 py-1 rounded-full text-[10px] font-bold transition-colors cursor-pointer ${q.is_active ? 'bg-emerald-50 text-emerald-700 hover:bg-emerald-100 border border-emerald-200' : 'bg-stone-100 text-stone-500 hover:bg-stone-200 border border-stone-200'}" title="Click to toggle status">
+                                        <button type="button" onclick="toggleContactFaq(${q.id})" class="px-2 py-0.5 rounded-full text-[10px] font-bold transition-colors cursor-pointer ${q.is_active ? 'bg-emerald-50 text-emerald-700 hover:bg-emerald-100 border border-emerald-200' : 'bg-stone-100 text-stone-500 hover:bg-stone-200 border border-stone-200'}" title="Click to toggle status">
                                             ${q.is_active ? '● Active' : '○ Hidden'}
                                         </button>
-                                        <button type="button" onclick="openEditContactFaqModal(${q.id})" class="py-1 px-3 rounded-xl bg-red-50 text-red-700 hover:bg-red-600 hover:text-white text-xs font-bold transition-all flex items-center gap-1 cursor-pointer">
+                                        <button type="button" onclick="openEditContactFaqModal(${q.id})" class="py-1 px-2.5 rounded-xl bg-red-50 text-red-700 hover:bg-red-600 hover:text-white text-xs font-bold transition-all flex items-center gap-1 cursor-pointer">
                                             <i class="fas fa-edit text-xs"></i>
                                             <span>Edit</span>
                                         </button>
-                                        <button type="button" onclick="deleteContactFaq(${q.id})" class="py-1 px-3 rounded-xl bg-stone-50 hover:bg-rose-50 text-stone-400 hover:text-rose-600 text-xs font-bold transition-all cursor-pointer" title="Delete FAQ">
+                                        <button type="button" onclick="deleteContactFaq(${q.id})" class="py-1 px-2.5 rounded-xl bg-stone-50 hover:bg-rose-50 text-stone-400 hover:text-rose-600 text-xs font-bold transition-all cursor-pointer" title="Delete FAQ">
                                             <i class="fas fa-trash-alt text-xs"></i>
                                         </button>
                                     </div>
                                 </div>
                             `).join('') : `
-                                <div class="py-12 text-center text-stone-400 bg-stone-50 rounded-2xl border border-dashed border-stone-200">
-                                    <i class="fas fa-question-circle text-3xl mb-2 text-stone-300"></i>
+                                <div class="py-10 text-center text-stone-400 bg-stone-50 rounded-2xl border border-dashed border-stone-200">
+                                    <i class="fas fa-question-circle text-2xl sm:text-3xl mb-2 text-stone-300"></i>
                                     <p class="text-sm font-bold text-stone-600">No FAQ questions added yet</p>
-                                    <p class="text-xs text-stone-400 mb-4">Click "+ Add FAQ Item" above to add customer questions and answers.</p>
+                                    <p class="text-xs text-stone-400">Click "+ Add FAQ" above to add customer questions and answers.</p>
                                 </div>
                             `}
                         </div>
@@ -3885,128 +3863,116 @@
                 const col1Links = m.col1_links || [];
                 const col2Links = m.col2_links || [];
                 bodyContent = `
-                    <div class="p-8">
-                        <div class="bg-[#FFF9F6] border border-[#E7D1CC] rounded-3xl p-6 sm:p-8 shadow-2xs hover:shadow-boutique transition-all">
-                            <!-- Top Action Header -->
-                            <div class="flex flex-wrap items-center justify-between gap-4 mb-6 border-b border-[#E7D1CC] pb-5">
-                                <div>
-                                    <div class="flex items-center gap-2 mb-1">
-                                        <span class="px-3 py-1 rounded-full text-xs font-bold bg-red-50 text-red-700 border border-red-200">
-                                            <i class="fas fa-shoe-prints mr-1 text-[10px]"></i>Footer & Navigation
-                                        </span>
-                                        <h3 class="text-xl sm:text-2xl font-bold text-stone-800">${escapeHtml(m.title || 'KNOTELLE Boutique Footer')}</h3>
-                                        <span class="px-2.5 py-0.5 rounded-full text-[11px] font-bold ${m.is_active ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' : 'bg-stone-100 text-stone-500 border border-stone-200'}">
-                                            ${m.is_active ? '● Live on Storefront' : '○ Hidden'}
-                                        </span>
-                                    </div>
-                                    <p class="text-xs text-stone-600 font-medium">${escapeHtml(m.heart_tagline || m.subtitle || 'Made with ♡ for a kinder, cozier world.')}</p>
+                    <div class="p-3.5 sm:p-6 md:p-8">
+                        <div class="bg-[#FFF9F6] border border-[#E7D1CC] rounded-2xl sm:rounded-3xl p-4 sm:p-6 md:p-8 shadow-2xs">
+                            <div class="mb-5 border-b border-[#E7D1CC] pb-3.5">
+                                <div class="flex items-center gap-2 mb-1">
+                                    <span class="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-red-50 text-red-700 border border-red-200">
+                                        <i class="fas fa-shoe-prints mr-1 text-[10px]"></i>Footer & Navigation
+                                    </span>
+                                    <h3 class="text-base sm:text-2xl font-bold text-stone-800">${escapeHtml(m.title || 'KNOTELLE Boutique Footer')}</h3>
+                                    <span class="px-2 py-0.5 rounded-full text-[10px] sm:text-[11px] font-bold ${m.is_active ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' : 'bg-stone-100 text-stone-500 border border-stone-200'}">
+                                        ${m.is_active ? '● Live on Storefront' : '○ Hidden'}
+                                    </span>
                                 </div>
-
-                                <button type="button" onclick="window.openFooterSettingsModal ? window.openFooterSettingsModal() : openFooterSettingsModal()"
-                                        class="px-6 py-3 rounded-2xl bg-red-600 hover:bg-red-700 text-white text-xs font-bold shadow-xs hover:shadow-md transition-all flex items-center gap-2.5 active:scale-95 cursor-pointer">
-                                    <i class="fas fa-sliders-h text-sm"></i>
-                                    <span>Edit Footer Settings & Links</span>
-                                </button>
+                                <p class="text-xs text-stone-600 font-medium hidden sm:block">${escapeHtml(m.heart_tagline || m.subtitle || 'Made with ♡ for a kinder, cozier world.')}</p>
                             </div>
 
                             <!-- Panoramic Background Artwork Preview -->
-                            <div class="mb-6">
+                            <div class="mb-5">
                                 <div class="text-xs font-bold text-stone-500 uppercase tracking-wider mb-2 flex items-center justify-between">
                                     <span>Panoramic Background Artwork</span>
-                                    <span class="text-[10px] text-stone-400 font-normal">Recommended: 1920 × 600 px</span>
+                                    <span class="text-[10px] text-stone-400 font-normal hidden sm:inline">Recommended: 1920 × 600 px</span>
                                 </div>
-                                <div class="relative w-full h-32 sm:h-40 rounded-2xl overflow-hidden bg-stone-100 border border-[#E7D1CC] shadow-inner group">
+                                <div class="relative w-full h-28 sm:h-40 rounded-2xl overflow-hidden bg-stone-100 border border-[#E7D1CC] shadow-inner group">
                                     <img src="${bgImg}" alt="Footer Background" class="w-full h-full object-cover group-hover:scale-102 transition-transform duration-300" onerror="this.onerror=null; this.src=(window.location.pathname.startsWith('/knottele') ? '/knottele' : '') + '/images/logo/Logo_1.png';">
                                     <div class="absolute inset-0 bg-[#FFF9F6]/40 pointer-events-none"></div>
-                                    <div class="absolute bottom-3 left-4 bg-white/90 backdrop-blur-xs px-3 py-1 rounded-xl text-xs font-bold text-stone-800 shadow-xs border border-stone-200">
-                                        Panoramic Footer Background Visual
+                                    <div class="absolute bottom-2.5 left-3 bg-white/90 backdrop-blur-xs px-2.5 py-1 rounded-xl text-[11px] font-bold text-stone-800 shadow-xs border border-stone-200">
+                                        Panoramic Background Visual
                                     </div>
                                 </div>
                             </div>
 
                             <!-- 3 Columns Preview Grid -->
-                            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+                            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-6 mb-5">
                                 <!-- Column 1: Quick Links -->
-                                <div class="bg-white/85 rounded-2xl p-5 border border-[#E7D1CC] space-y-3">
-                                    <div class="flex items-center justify-between border-b border-stone-100 pb-2.5">
-                                        <h4 class="font-bold text-sm text-stone-800 border-b-2 border-red-700 pb-0.5 inline-block">
+                                <div class="bg-white/85 rounded-2xl p-4 sm:p-5 border border-[#E7D1CC] space-y-2.5">
+                                    <div class="flex items-center justify-between border-b border-stone-100 pb-2">
+                                        <h4 class="font-bold text-xs sm:text-sm text-stone-800 border-b-2 border-red-700 pb-0.5 inline-block">
                                             ${escapeHtml(m.col1_title || 'Quick Links')}
                                         </h4>
                                         <span class="px-2 py-0.5 rounded-md text-[10px] font-bold bg-stone-100 text-stone-600">
                                             ${col1Links.length} links
                                         </span>
                                     </div>
-                                    <ul class="space-y-1.5 text-xs text-stone-600">
+                                    <ul class="space-y-1 text-xs text-stone-600">
                                         ${col1Links.map(l => `
                                             <li class="flex items-center justify-between py-1 px-2 rounded-lg bg-stone-50/60 text-[11px]">
-                                                <span class="font-medium text-stone-800">${escapeHtml(l.label || l.name || '')}</span>
-                                                <span class="text-stone-400 font-mono text-[10px] truncate max-w-[120px]">${escapeHtml(l.url || l.href || '')}</span>
+                                                <span class="font-medium text-stone-800 truncate">${escapeHtml(l.label || l.name || '')}</span>
+                                                <span class="text-stone-400 font-mono text-[10px] truncate max-w-[100px] ml-2">${escapeHtml(l.url || l.href || '')}</span>
                                             </li>
                                         `).join('')}
                                     </ul>
                                 </div>
 
                                 <!-- Column 2: Help -->
-                                <div class="bg-white/85 rounded-2xl p-5 border border-[#E7D1CC] space-y-3">
-                                    <div class="flex items-center justify-between border-b border-stone-100 pb-2.5">
-                                        <h4 class="font-bold text-sm text-stone-800 border-b-2 border-red-700 pb-0.5 inline-block">
+                                <div class="bg-white/85 rounded-2xl p-4 sm:p-5 border border-[#E7D1CC] space-y-2.5">
+                                    <div class="flex items-center justify-between border-b border-stone-100 pb-2">
+                                        <h4 class="font-bold text-xs sm:text-sm text-stone-800 border-b-2 border-red-700 pb-0.5 inline-block">
                                             ${escapeHtml(m.col2_title || 'Help')}
                                         </h4>
                                         <span class="px-2 py-0.5 rounded-md text-[10px] font-bold bg-stone-100 text-stone-600">
                                             ${col2Links.length} links
                                         </span>
                                     </div>
-                                    <ul class="space-y-1.5 text-xs text-stone-600">
+                                    <ul class="space-y-1 text-xs text-stone-600">
                                         ${col2Links.map(l => `
                                             <li class="flex items-center justify-between py-1 px-2 rounded-lg bg-stone-50/60 text-[11px]">
-                                                <span class="font-medium text-stone-800">${escapeHtml(l.label || l.name || '')}</span>
-                                                <span class="text-stone-400 font-mono text-[10px] truncate max-w-[120px]">${escapeHtml(l.url || l.href || '')}</span>
+                                                <span class="font-medium text-stone-800 truncate">${escapeHtml(l.label || l.name || '')}</span>
+                                                <span class="text-stone-400 font-mono text-[10px] truncate max-w-[100px] ml-2">${escapeHtml(l.url || l.href || '')}</span>
                                             </li>
                                         `).join('')}
                                     </ul>
                                 </div>
 
                                 <!-- Column 3: Contact Details -->
-                                <div class="bg-white/85 rounded-2xl p-5 border border-[#E7D1CC] space-y-3">
-                                    <div class="flex items-center justify-between border-b border-stone-100 pb-2.5">
-                                        <h4 class="font-bold text-sm text-stone-800 border-b-2 border-red-700 pb-0.5 inline-block">
+                                <div class="bg-white/85 rounded-2xl p-4 sm:p-5 border border-[#E7D1CC] space-y-2.5">
+                                    <div class="flex items-center justify-between border-b border-stone-100 pb-2">
+                                        <h4 class="font-bold text-xs sm:text-sm text-stone-800 border-b-2 border-red-700 pb-0.5 inline-block">
                                             ${escapeHtml(m.col3_title || 'Contact')}
                                         </h4>
                                         <span class="px-2 py-0.5 rounded-md text-[10px] font-bold bg-emerald-50 text-emerald-700">
                                             Store Contact
                                         </span>
                                     </div>
-                                    <div class="space-y-2 text-xs text-stone-700">
+                                    <div class="space-y-1.5 text-xs text-stone-700">
                                         <p class="flex items-center gap-2"><i class="fas fa-phone-alt text-red-600 text-xs w-4"></i> <span class="font-bold">${escapeHtml(m.contact_phone || '+91 97730 39243')}</span></p>
-                                        <p class="flex items-center gap-2"><i class="fas fa-envelope text-red-600 text-xs w-4"></i> <span class="font-bold">${escapeHtml(m.contact_email || 'support@knotelle.in')}</span></p>
+                                        <p class="flex items-center gap-2"><i class="fas fa-envelope text-red-600 text-xs w-4"></i> <span class="font-bold truncate">${escapeHtml(m.contact_email || 'support@knotelle.in')}</span></p>
                                         <p class="flex items-center gap-2"><i class="fas fa-map-marker-alt text-red-600 text-xs w-4"></i> <span class="font-bold">${escapeHtml(m.contact_address || 'India')}</span></p>
                                     </div>
                                 </div>
                             </div>
 
-                            <!-- Social Channels & Copyright Preview Row -->
-                            <div class="p-4 bg-white/70 rounded-2xl border border-[#E7D1CC] flex flex-col sm:flex-row items-center justify-between gap-4 text-xs">
-                                <div class="flex items-center gap-3">
-                                    <span class="text-stone-500 font-bold">Social Channels:</span>
-                                    <div class="flex items-center gap-2">
-                                        <span class="px-2.5 py-1 rounded-lg border text-[11px] font-semibold flex items-center gap-1.5 ${m.instagram_active !== false ? 'bg-pink-50 text-pink-700 border-pink-200' : 'bg-stone-50 text-stone-400 border-stone-200'}">
-                                            <i class="fab fa-instagram"></i> Instagram
-                                        </span>
-                                        <span class="px-2.5 py-1 rounded-lg border text-[11px] font-semibold flex items-center gap-1.5 ${m.facebook_active !== false ? 'bg-blue-50 text-blue-700 border-blue-200' : 'bg-stone-50 text-stone-400 border-stone-200'}">
-                                            <i class="fab fa-facebook-f"></i> Facebook
-                                        </span>
-                                        <span class="px-2.5 py-1 rounded-lg border text-[11px] font-semibold flex items-center gap-1.5 ${m.pinterest_active !== false ? 'bg-red-50 text-red-700 border-red-200' : 'bg-stone-50 text-stone-400 border-stone-200'}">
-                                            <i class="fab fa-pinterest-p"></i> Pinterest
-                                        </span>
-                                        <span class="px-2.5 py-1 rounded-lg border text-[11px] font-semibold flex items-center gap-1.5 ${m.youtube_active !== false ? 'bg-rose-50 text-rose-700 border-rose-200' : 'bg-stone-50 text-stone-400 border-stone-200'}">
-                                            <i class="fab fa-youtube"></i> YouTube
-                                        </span>
-                                    </div>
+                            <!-- Social Channels & Copyright Row -->
+                            <div class="p-3 sm:p-4 bg-white/70 rounded-2xl border border-[#E7D1CC] flex flex-col sm:flex-row items-center justify-between gap-3 text-xs">
+                                <div class="flex flex-wrap items-center gap-2">
+                                    <span class="text-stone-500 font-bold text-[11px]">Social:</span>
+                                    <span class="px-2 py-0.5 rounded-lg border text-[10px] font-semibold flex items-center gap-1 ${m.instagram_active !== false ? 'bg-pink-50 text-pink-700 border-pink-200' : 'bg-stone-50 text-stone-400 border-stone-200'}">
+                                        <i class="fab fa-instagram"></i> IG
+                                    </span>
+                                    <span class="px-2 py-0.5 rounded-lg border text-[10px] font-semibold flex items-center gap-1 ${m.facebook_active !== false ? 'bg-blue-50 text-blue-700 border-blue-200' : 'bg-stone-50 text-stone-400 border-stone-200'}">
+                                        <i class="fab fa-facebook-f"></i> FB
+                                    </span>
+                                    <span class="px-2 py-0.5 rounded-lg border text-[10px] font-semibold flex items-center gap-1 ${m.pinterest_active !== false ? 'bg-red-50 text-red-700 border-red-200' : 'bg-stone-50 text-stone-400 border-stone-200'}">
+                                        <i class="fab fa-pinterest-p"></i> Pin
+                                    </span>
+                                    <span class="px-2 py-0.5 rounded-lg border text-[10px] font-semibold flex items-center gap-1 ${m.youtube_active !== false ? 'bg-rose-50 text-rose-700 border-rose-200' : 'bg-stone-50 text-stone-400 border-stone-200'}">
+                                        <i class="fab fa-youtube"></i> YT
+                                    </span>
                                 </div>
 
-                                <div class="text-stone-500 text-right">
-                                    <p class="font-bold text-stone-700">${escapeHtml((m.copyright_text || '© {year} Knotelle. All rights reserved.').replace('{year}', new Date().getFullYear()))}</p>
-                                    <p class="text-[10px] text-stone-400 italic">${escapeHtml(m.heart_tagline || 'Made with ♡ for a kinder, cozier world.')}</p>
+                                <div class="text-stone-500 text-center sm:text-right">
+                                    <p class="font-bold text-stone-700 text-[11px]">${escapeHtml((m.copyright_text || '© {year} Knotelle. All rights reserved.').replace('{year}', new Date().getFullYear()))}</p>
                                 </div>
                             </div>
                         </div>
@@ -4017,65 +3983,50 @@
                 const m = section.metadata || {};
                 const navLinks = m.nav_links || [];
                 bodyContent = `
-                    <div class="p-8">
-                        <div class="bg-[#FFF9F6] border border-[#E7D1CC] rounded-3xl p-6 sm:p-8 shadow-2xs hover:shadow-boutique transition-all">
-                            <!-- Top Action Header -->
-                            <div class="flex flex-wrap items-center justify-between gap-4 mb-6 border-b border-[#E7D1CC] pb-5">
-                                <div>
-                                    <div class="flex items-center gap-2 mb-1">
-                                        <span class="px-3 py-1 rounded-full text-xs font-bold bg-red-50 text-red-700 border border-red-200">
-                                            <i class="fas fa-compass mr-1 text-[10px]"></i>Header Navigation
-                                        </span>
-                                        <h3 class="text-xl sm:text-2xl font-bold text-stone-800">${escapeHtml(m.title || 'Navbar & Header Navigation')}</h3>
-                                        <span class="px-2.5 py-0.5 rounded-full text-[11px] font-bold ${m.is_active ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' : 'bg-stone-100 text-stone-500 border border-stone-200'}">
-                                            ${m.is_active ? '● Live on Storefront' : '○ Hidden'}
-                                        </span>
-                                    </div>
-                                    <p class="text-xs text-stone-600 font-medium">Manage top announcement banner, navigation links, highlight sparkle pills, and action button visibility.</p>
+                    <div class="p-3.5 sm:p-6 md:p-8">
+                        <div class="bg-[#FFF9F6] border border-[#E7D1CC] rounded-2xl sm:rounded-3xl p-4 sm:p-6 md:p-8 shadow-2xs">
+                            <div class="mb-5 border-b border-[#E7D1CC] pb-3.5">
+                                <div class="flex items-center gap-2 mb-1">
+                                    <span class="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-red-50 text-red-700 border border-red-200">
+                                        <i class="fas fa-compass mr-1 text-[10px]"></i>Header Navigation
+                                    </span>
+                                    <h3 class="text-base sm:text-2xl font-bold text-stone-800">${escapeHtml(m.title || 'Navbar & Header Navigation')}</h3>
+                                    <span class="px-2 py-0.5 rounded-full text-[10px] sm:text-[11px] font-bold ${m.is_active ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' : 'bg-stone-100 text-stone-500 border border-stone-200'}">
+                                        ${m.is_active ? '● Live on Storefront' : '○ Hidden'}
+                                    </span>
                                 </div>
-
-                                <button type="button" onclick="openNavbarSettingsModal()"
-                                        class="px-6 py-3 rounded-2xl bg-red-600 hover:bg-red-700 text-white text-xs font-bold shadow-xs hover:shadow-md transition-all flex items-center gap-2.5 active:scale-95 cursor-pointer">
-                                    <i class="fas fa-sliders-h text-sm"></i>
-                                    <span>Edit Navbar & Announcement</span>
-                                </button>
+                                <p class="text-xs text-stone-600 font-medium hidden sm:block">Manage top announcement banner, navigation links, highlight sparkle pills, and action button visibility.</p>
                             </div>
 
                             <!-- Announcement Bar Preview -->
-                            <div class="mb-6 p-4 rounded-2xl border ${m.announcement_active ? 'bg-amber-50/80 border-amber-200' : 'bg-stone-50 border-stone-200'} flex items-center justify-between gap-4">
-                                <div class="flex items-center gap-3">
-                                    <span class="w-8 h-8 rounded-xl flex items-center justify-center font-bold text-xs ${m.announcement_active ? 'bg-amber-100 text-amber-800' : 'bg-stone-200 text-stone-500'}">
-                                        <i class="fas fa-bullhorn"></i>
+                            <div class="mb-5 p-3.5 rounded-2xl border ${m.announcement_active ? 'bg-amber-50/80 border-amber-200' : 'bg-stone-50 border-stone-200'} flex items-center justify-between gap-3">
+                                <div class="flex items-center gap-2.5">
+                                    <span class="w-7 h-7 rounded-xl flex items-center justify-center font-bold text-xs ${m.announcement_active ? 'bg-amber-100 text-amber-800' : 'bg-stone-200 text-stone-500'}">
+                                        <i class="fas fa-bullhorn text-xs"></i>
                                     </span>
                                     <div>
-                                        <span class="text-[10px] font-bold uppercase tracking-wider block ${m.announcement_active ? 'text-amber-800' : 'text-stone-400'}">
-                                            Announcement Bar Banner (${m.announcement_active ? 'Active' : 'Disabled / Hidden'})
+                                        <span class="text-[9px] sm:text-[10px] font-bold uppercase tracking-wider block ${m.announcement_active ? 'text-amber-800' : 'text-stone-400'}">
+                                            Announcement (${m.announcement_active ? 'Active' : 'Off'})
                                         </span>
-                                        <p class="text-xs font-bold text-stone-800">${escapeHtml(m.announcement_text || '✨ Free Pan-India Delivery on all Orders above ₹999')}</p>
+                                        <p class="text-xs font-bold text-stone-800 line-clamp-1">${escapeHtml(m.announcement_text || '✨ Free Pan-India Delivery on all Orders above ₹999')}</p>
                                     </div>
                                 </div>
-                                ${m.announcement_link ? `
-                                    <span class="text-[11px] font-mono text-stone-500 bg-white px-2.5 py-1 rounded-lg border border-stone-200">
-                                        Link: ${escapeHtml(m.announcement_link)}
-                                    </span>
-                                ` : ''}
                             </div>
 
                             <!-- Navigation Links Preview Pills -->
-                            <div class="bg-white/85 rounded-2xl p-5 border border-[#E7D1CC] mb-6">
-                                <div class="flex items-center justify-between mb-3 border-b border-stone-100 pb-2">
-                                    <span class="text-xs font-bold text-stone-500 uppercase tracking-wider">Navigation Bar Links</span>
+                            <div class="bg-white/85 rounded-2xl p-4 sm:p-5 border border-[#E7D1CC] mb-5">
+                                <div class="flex items-center justify-between mb-2.5 border-b border-stone-100 pb-2">
+                                    <span class="text-xs font-bold text-stone-500 uppercase tracking-wider">Navigation Links</span>
                                     <span class="px-2 py-0.5 rounded-md text-[10px] font-bold bg-stone-100 text-stone-600">${navLinks.length} Items</span>
                                 </div>
-                                <div class="flex flex-wrap items-center gap-3">
+                                <div class="flex flex-wrap items-center gap-2">
                                     ${navLinks.map((l, idx) => `
-                                        <div class="flex items-center gap-2 px-3.5 py-2 rounded-2xl border text-xs font-semibold ${l.is_highlighted ? 'bg-[#FCE9E5] text-[#913638] border-[#E7D1CC] shadow-2xs' : 'bg-white text-stone-800 border-stone-200'}">
+                                        <div class="flex items-center gap-1.5 px-3 py-1.5 rounded-xl border text-xs font-semibold ${l.is_highlighted ? 'bg-[#FCE9E5] text-[#913638] border-[#E7D1CC]' : 'bg-white text-stone-800 border-stone-200'}">
                                             <span class="text-[10px] text-stone-400 font-mono">#${idx + 1}</span>
-                                            ${l.is_highlighted ? '<i class="fas fa-sparkles text-amber-500 text-xs"></i>' : ''}
+                                            ${l.is_highlighted ? '<i class="fas fa-sparkles text-amber-500 text-[10px]"></i>' : ''}
                                             <span class="font-bold">${escapeHtml(l.name)}</span>
-                                            <span class="text-[10px] text-stone-400 font-mono">(${escapeHtml(l.href)})</span>
-                                            <span class="px-1.5 py-0.5 rounded text-[9px] font-bold ${l.is_active !== false ? 'bg-emerald-100 text-emerald-800' : 'bg-stone-200 text-stone-600'}">
-                                                ${l.is_active !== false ? 'Active' : 'Off'}
+                                            <span class="px-1.5 py-0.2 rounded text-[9px] font-bold ${l.is_active !== false ? 'bg-emerald-100 text-emerald-800' : 'bg-stone-200 text-stone-600'}">
+                                                ${l.is_active !== false ? 'On' : 'Off'}
                                             </span>
                                         </div>
                                     `).join('')}
@@ -4083,20 +4034,20 @@
                             </div>
 
                             <!-- Header Action Icons Visibility Preview -->
-                            <div class="p-4 bg-white/70 rounded-2xl border border-[#E7D1CC] flex flex-wrap items-center justify-between gap-4 text-xs">
-                                <span class="text-stone-500 font-bold">Header Quick Actions Visibility:</span>
-                                <div class="flex items-center gap-3">
-                                    <span class="px-3 py-1.5 rounded-xl border text-xs font-bold flex items-center gap-1.5 ${m.show_search !== false ? 'bg-emerald-50 text-emerald-800 border-emerald-200' : 'bg-stone-100 text-stone-400 border-stone-200'}">
-                                        <i class="fas fa-search"></i> Search Bar
+                            <div class="p-3.5 bg-white/70 rounded-2xl border border-[#E7D1CC] flex flex-wrap items-center justify-between gap-3 text-xs">
+                                <span class="text-stone-500 font-bold text-[11px]">Header Quick Actions:</span>
+                                <div class="flex flex-wrap items-center gap-2">
+                                    <span class="px-2.5 py-1 rounded-xl border text-[11px] font-bold flex items-center gap-1 ${m.show_search !== false ? 'bg-emerald-50 text-emerald-800 border-emerald-200' : 'bg-stone-100 text-stone-400 border-stone-200'}">
+                                        <i class="fas fa-search text-[10px]"></i> Search
                                     </span>
-                                    <span class="px-3 py-1.5 rounded-xl border text-xs font-bold flex items-center gap-1.5 ${m.show_wishlist !== false ? 'bg-emerald-50 text-emerald-800 border-emerald-200' : 'bg-stone-100 text-stone-400 border-stone-200'}">
-                                        <i class="fas fa-heart"></i> Wishlist
+                                    <span class="px-2.5 py-1 rounded-xl border text-[11px] font-bold flex items-center gap-1 ${m.show_wishlist !== false ? 'bg-emerald-50 text-emerald-800 border-emerald-200' : 'bg-stone-100 text-stone-400 border-stone-200'}">
+                                        <i class="fas fa-heart text-[10px]"></i> Wishlist
                                     </span>
-                                    <span class="px-3 py-1.5 rounded-xl border text-xs font-bold flex items-center gap-1.5 ${m.show_account !== false ? 'bg-emerald-50 text-emerald-800 border-emerald-200' : 'bg-stone-100 text-stone-400 border-stone-200'}">
-                                        <i class="fas fa-user"></i> Account
+                                    <span class="px-2.5 py-1 rounded-xl border text-[11px] font-bold flex items-center gap-1 ${m.show_account !== false ? 'bg-emerald-50 text-emerald-800 border-emerald-200' : 'bg-stone-100 text-stone-400 border-stone-200'}">
+                                        <i class="fas fa-user text-[10px]"></i> Account
                                     </span>
-                                    <span class="px-3 py-1.5 rounded-xl border text-xs font-bold flex items-center gap-1.5 ${m.show_cart !== false ? 'bg-emerald-50 text-emerald-800 border-emerald-200' : 'bg-stone-100 text-stone-400 border-stone-200'}">
-                                        <i class="fas fa-shopping-bag"></i> Cart
+                                    <span class="px-2.5 py-1 rounded-xl border text-[11px] font-bold flex items-center gap-1 ${m.show_cart !== false ? 'bg-emerald-50 text-emerald-800 border-emerald-200' : 'bg-stone-100 text-stone-400 border-stone-200'}">
+                                        <i class="fas fa-shopping-bag text-[10px]"></i> Cart
                                     </span>
                                 </div>
                             </div>
@@ -4113,8 +4064,8 @@
                 });
 
                 bodyContent = `
-                    <div class="p-8">
-                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <div class="p-3.5 sm:p-6 md:p-8">
+                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
                             ${filteredSlots.map(s => renderSlotCard(s)).join('')}
                         </div>
                     </div>
@@ -8075,18 +8026,22 @@
         if (!container) return;
         const idx = footerCol1LinkIndex++;
         const row = document.createElement('div');
-        row.className = 'flex items-center gap-2 p-2 bg-white rounded-xl border border-stone-200 text-xs footer-col1-row';
+        row.className = 'p-2 sm:p-2.5 bg-white rounded-xl border border-stone-200 text-xs w-full min-w-0 space-y-2 footer-col1-row';
         row.id = `footer_col1_row_${idx}`;
         row.innerHTML = `
-            <input type="text" name="col1_links[${idx}][label]" value="${escapeHtml(data.label || data.name || '')}" placeholder="Link Label (e.g. Shop)" class="flex-1 bg-stone-50 border border-stone-200 rounded-lg px-2.5 py-1 text-xs font-bold text-stone-800 focus:ring-1 focus:ring-red-500">
-            <input type="text" name="col1_links[${idx}][url]" value="${escapeHtml(data.url || data.href || '')}" placeholder="URL (e.g. /shop)" class="flex-1 bg-stone-50 border border-stone-200 rounded-lg px-2.5 py-1 text-xs font-mono text-stone-700 focus:ring-1 focus:ring-red-500">
-            <label class="flex items-center gap-1 text-[11px] font-bold text-stone-600 shrink-0 cursor-pointer">
-                <input type="checkbox" name="col1_links[${idx}][is_active]" value="1" ${data.is_active !== false ? 'checked' : ''} class="w-3.5 h-3.5 rounded text-red-600 focus:ring-red-500">
-                <span>Active</span>
-            </label>
-            <button type="button" onclick="document.getElementById('footer_col1_row_${idx}')?.remove()" class="w-7 h-7 rounded-lg text-stone-400 hover:text-red-600 hover:bg-red-50 flex items-center justify-center transition-colors cursor-pointer">
-                <i class="fas fa-trash-alt text-xs"></i>
-            </button>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-1.5 sm:gap-2 w-full min-w-0">
+                <input type="text" name="col1_links[${idx}][label]" value="${escapeHtml(data.label || data.name || '')}" placeholder="Link Label (e.g. Shop)" class="w-full min-w-0 bg-stone-50 border border-stone-200 rounded-lg px-2.5 py-1.5 text-xs font-bold text-stone-800 focus:ring-1 focus:ring-red-500">
+                <input type="text" name="col1_links[${idx}][url]" value="${escapeHtml(data.url || data.href || '')}" placeholder="URL (e.g. /shop)" class="w-full min-w-0 bg-stone-50 border border-stone-200 rounded-lg px-2.5 py-1.5 text-xs font-mono text-stone-700 focus:ring-1 focus:ring-red-500">
+            </div>
+            <div class="flex items-center justify-between sm:justify-end gap-3 pt-1 border-t sm:border-t-0 border-stone-100">
+                <label class="flex items-center gap-1.5 text-xs font-bold text-stone-600 cursor-pointer">
+                    <input type="checkbox" name="col1_links[${idx}][is_active]" value="1" ${data.is_active !== false ? 'checked' : ''} class="w-4 h-4 rounded text-red-600 focus:ring-red-500">
+                    <span>Active</span>
+                </label>
+                <button type="button" onclick="document.getElementById('footer_col1_row_${idx}')?.remove()" class="text-stone-400 hover:text-red-600 hover:bg-red-50 px-2 py-1 rounded-lg flex items-center gap-1 text-xs transition-colors cursor-pointer">
+                    <i class="fas fa-trash-alt text-xs"></i> <span>Remove</span>
+                </button>
+            </div>
         `;
         container.appendChild(row);
     }
@@ -8096,18 +8051,22 @@
         if (!container) return;
         const idx = footerCol2LinkIndex++;
         const row = document.createElement('div');
-        row.className = 'flex items-center gap-2 p-2 bg-white rounded-xl border border-stone-200 text-xs footer-col2-row';
+        row.className = 'p-2 sm:p-2.5 bg-white rounded-xl border border-stone-200 text-xs w-full min-w-0 space-y-2 footer-col2-row';
         row.id = `footer_col2_row_${idx}`;
         row.innerHTML = `
-            <input type="text" name="col2_links[${idx}][label]" value="${escapeHtml(data.label || data.name || '')}" placeholder="Link Label (e.g. FAQ)" class="flex-1 bg-stone-50 border border-stone-200 rounded-lg px-2.5 py-1 text-xs font-bold text-stone-800 focus:ring-1 focus:ring-red-500">
-            <input type="text" name="col2_links[${idx}][url]" value="${escapeHtml(data.url || data.href || '')}" placeholder="URL (e.g. /contact)" class="flex-1 bg-stone-50 border border-stone-200 rounded-lg px-2.5 py-1 text-xs font-mono text-stone-700 focus:ring-1 focus:ring-red-500">
-            <label class="flex items-center gap-1 text-[11px] font-bold text-stone-600 shrink-0 cursor-pointer">
-                <input type="checkbox" name="col2_links[${idx}][is_active]" value="1" ${data.is_active !== false ? 'checked' : ''} class="w-3.5 h-3.5 rounded text-red-600 focus:ring-red-500">
-                <span>Active</span>
-            </label>
-            <button type="button" onclick="document.getElementById('footer_col2_row_${idx}')?.remove()" class="w-7 h-7 rounded-lg text-stone-400 hover:text-red-600 hover:bg-red-50 flex items-center justify-center transition-colors cursor-pointer">
-                <i class="fas fa-trash-alt text-xs"></i>
-            </button>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-1.5 sm:gap-2 w-full min-w-0">
+                <input type="text" name="col2_links[${idx}][label]" value="${escapeHtml(data.label || data.name || '')}" placeholder="Link Label (e.g. FAQ)" class="w-full min-w-0 bg-stone-50 border border-stone-200 rounded-lg px-2.5 py-1.5 text-xs font-bold text-stone-800 focus:ring-1 focus:ring-red-500">
+                <input type="text" name="col2_links[${idx}][url]" value="${escapeHtml(data.url || data.href || '')}" placeholder="URL (e.g. /contact)" class="w-full min-w-0 bg-stone-50 border border-stone-200 rounded-lg px-2.5 py-1.5 text-xs font-mono text-stone-700 focus:ring-1 focus:ring-red-500">
+            </div>
+            <div class="flex items-center justify-between sm:justify-end gap-3 pt-1 border-t sm:border-t-0 border-stone-100">
+                <label class="flex items-center gap-1.5 text-xs font-bold text-stone-600 cursor-pointer">
+                    <input type="checkbox" name="col2_links[${idx}][is_active]" value="1" ${data.is_active !== false ? 'checked' : ''} class="w-4 h-4 rounded text-red-600 focus:ring-red-500">
+                    <span>Active</span>
+                </label>
+                <button type="button" onclick="document.getElementById('footer_col2_row_${idx}')?.remove()" class="text-stone-400 hover:text-red-600 hover:bg-red-50 px-2 py-1 rounded-lg flex items-center gap-1 text-xs transition-colors cursor-pointer">
+                    <i class="fas fa-trash-alt text-xs"></i> <span>Remove</span>
+                </button>
+            </div>
         `;
         container.appendChild(row);
     }
@@ -8303,22 +8262,26 @@
         if (!container) return;
         const idx = navbarLinkIndex++;
         const row = document.createElement('div');
-        row.className = 'flex items-center gap-2 p-2.5 bg-white rounded-xl border border-stone-200 text-xs navbar-link-row';
+        row.className = 'p-2 sm:p-2.5 bg-white rounded-xl border border-stone-200 text-xs w-full min-w-0 space-y-2 navbar-link-row';
         row.id = `navbar_link_row_${idx}`;
         row.innerHTML = `
-            <input type="text" name="nav_links[${idx}][name]" value="${escapeHtml(data.name || data.label || '')}" placeholder="Nav Name (e.g. Shop)" class="flex-1 bg-stone-50 border border-stone-200 rounded-lg px-2.5 py-1 text-xs font-bold text-stone-800 focus:ring-1 focus:ring-red-500">
-            <input type="text" name="nav_links[${idx}][href]" value="${escapeHtml(data.href || data.url || '')}" placeholder="URL Href (e.g. /shop)" class="flex-1 bg-stone-50 border border-stone-200 rounded-lg px-2.5 py-1 text-xs font-mono text-stone-700 focus:ring-1 focus:ring-red-500">
-            <label class="flex items-center gap-1.5 text-[11px] font-bold text-amber-800 bg-amber-50 px-2 py-1 rounded-lg border border-amber-200 shrink-0 cursor-pointer" title="Highlight with Sparkle Pill Style">
-                <input type="checkbox" name="nav_links[${idx}][is_highlighted]" value="1" ${data.is_highlighted ? 'checked' : ''} class="w-3.5 h-3.5 rounded text-amber-600 focus:ring-amber-500">
-                <span>Sparkle Pill</span>
-            </label>
-            <label class="flex items-center gap-1 text-[11px] font-bold text-stone-600 shrink-0 cursor-pointer">
-                <input type="checkbox" name="nav_links[${idx}][is_active]" value="1" ${data.is_active !== false ? 'checked' : ''} class="w-3.5 h-3.5 rounded text-red-600 focus:ring-red-500">
-                <span>Active</span>
-            </label>
-            <button type="button" onclick="document.getElementById('navbar_link_row_${idx}')?.remove()" class="w-7 h-7 rounded-lg text-stone-400 hover:text-red-600 hover:bg-red-50 flex items-center justify-center transition-colors cursor-pointer">
-                <i class="fas fa-trash-alt text-xs"></i>
-            </button>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-1.5 sm:gap-2 w-full min-w-0">
+                <input type="text" name="nav_links[${idx}][name]" value="${escapeHtml(data.name || data.label || '')}" placeholder="Nav Name (e.g. Shop)" class="w-full min-w-0 bg-stone-50 border border-stone-200 rounded-lg px-2.5 py-1.5 text-xs font-bold text-stone-800 focus:ring-1 focus:ring-red-500">
+                <input type="text" name="nav_links[${idx}][href]" value="${escapeHtml(data.href || data.url || '')}" placeholder="URL Href (e.g. /shop)" class="w-full min-w-0 bg-stone-50 border border-stone-200 rounded-lg px-2.5 py-1.5 text-xs font-mono text-stone-700 focus:ring-1 focus:ring-red-500">
+            </div>
+            <div class="flex items-center justify-between sm:justify-end gap-2.5 pt-1 border-t sm:border-t-0 border-stone-100 flex-wrap">
+                <label class="flex items-center gap-1.5 text-[11px] font-bold text-amber-800 bg-amber-50 px-2 py-1 rounded-lg border border-amber-200 cursor-pointer" title="Highlight with Sparkle Pill Style">
+                    <input type="checkbox" name="nav_links[${idx}][is_highlighted]" value="1" ${data.is_highlighted ? 'checked' : ''} class="w-3.5 h-3.5 rounded text-amber-600 focus:ring-amber-500">
+                    <span>Sparkle Pill</span>
+                </label>
+                <label class="flex items-center gap-1.5 text-xs font-bold text-stone-600 cursor-pointer">
+                    <input type="checkbox" name="nav_links[${idx}][is_active]" value="1" ${data.is_active !== false ? 'checked' : ''} class="w-4 h-4 rounded text-red-600 focus:ring-red-500">
+                    <span>Active</span>
+                </label>
+                <button type="button" onclick="document.getElementById('navbar_link_row_${idx}')?.remove()" class="text-stone-400 hover:text-red-600 hover:bg-red-50 px-2 py-1 rounded-lg flex items-center gap-1 text-xs transition-colors cursor-pointer">
+                    <i class="fas fa-trash-alt text-xs"></i> <span>Remove</span>
+                </button>
+            </div>
         `;
         container.appendChild(row);
     }
