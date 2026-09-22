@@ -192,7 +192,8 @@ export function Footer() {
           </div>
 
           {/* Right Columns Grid: Quick Links, Help, Contact */}
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-8 sm:gap-10 lg:gap-16 w-full flex-1">
+          {/* Responsive mode: 2 columns for Quick Links & Help side-by-side, Contact below */}
+          <div className="grid grid-cols-2 sm:grid-cols-3 gap-x-6 sm:gap-x-10 gap-y-8 sm:gap-y-10 lg:gap-16 w-full flex-1">
             
             {/* Column 1: Quick Links */}
             <div className="space-y-3.5">
@@ -239,7 +240,7 @@ export function Footer() {
             </div>
 
             {/* Column 3: Contact */}
-            <div className="space-y-3.5">
+            <div className="col-span-2 sm:col-span-1 space-y-3.5 pt-1 sm:pt-0">
               <h4 className="font-bold text-sm text-[#2E211E]">
                 <span className="border-b-2 border-[#913638] pb-1 inline-block">
                   {col3Title}
