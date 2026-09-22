@@ -32,7 +32,8 @@ Route::prefix('customer')->group(function () {
     // Public product and category routes (no authentication required)
     Route::get('categories', [\App\Http\Controllers\Api\Customer\CategoryController::class, 'index']);
     
-    // Contact form route
+    // Settings & Contact form routes
+    Route::get('settings', [\App\Http\Controllers\Api\Customer\SettingController::class, 'index']);
     Route::get('contact/settings', [\App\Http\Controllers\Api\ContactController::class, 'settings']);
     Route::post('contact', [\App\Http\Controllers\Api\ContactController::class, 'submit']);
     

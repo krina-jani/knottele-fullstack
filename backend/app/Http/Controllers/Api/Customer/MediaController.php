@@ -18,6 +18,21 @@ class MediaController extends Controller
     public function index(Request $request): JsonResponse
     {
         try {
+            // 0. Live Store Settings
+            $rawSettings = Setting::all();
+            $storeSettings = [];
+            foreach ($rawSettings as $s) {
+                $val = $s->value;
+                if ($s->type === 'checkbox' || $s->type === 'boolean') {
+                    $val = filter_var($val, FILTER_VALIDATE_BOOLEAN);
+                } elseif (in_array($s->type, ['number', 'integer'])) {
+                    $val = is_numeric($val) ? (int)$val : 0;
+                } elseif (in_array($s->type, ['decimal', 'float'])) {
+                    $val = is_numeric($val) ? (float)$val : 0.0;
+                }
+                $storeSettings[$s->key] = $val;
+            }
+
             // 1. Hero Slides
             $heroMedia = Media::where('page', 'homepage')
             ->where('section', 'hero')
@@ -290,11 +305,11 @@ class MediaController extends Controller
             'heart_tagline' => $footerMeta['heart_tagline'] ?? 'Made with ♡ for a kinder, cozier world.',
             'social' => [
                 'instagram' => [
-                    'url' => $footerMeta['instagram_url'] ?? (Setting::where('key', 'social_instagram')->value('value') ?: 'https://instagram.com/knotelleindia'),
+                    'url' => !empty($storeSettings['social_instagram']) ? $storeSettings['social_instagram'] : ($footerMeta['instagram_url'] ?? 'https://instagram.com/knotelleindia'),
                     'is_active' => isset($footerMeta['instagram_active']) ? (bool)$footerMeta['instagram_active'] : true,
                 ],
                 'facebook' => [
-                    'url' => $footerMeta['facebook_url'] ?? (Setting::where('key', 'social_facebook')->value('value') ?: 'https://facebook.com/knotelleindia'),
+                    'url' => !empty($storeSettings['social_facebook']) ? $storeSettings['social_facebook'] : ($footerMeta['facebook_url'] ?? 'https://facebook.com/knotelleindia'),
                     'is_active' => isset($footerMeta['facebook_active']) ? (bool)$footerMeta['facebook_active'] : true,
                 ],
                 'pinterest' => [
@@ -304,6 +319,14 @@ class MediaController extends Controller
                 'youtube' => [
                     'url' => $footerMeta['youtube_url'] ?? 'https://youtube.com/@knotelleindia',
                     'is_active' => isset($footerMeta['youtube_active']) ? (bool)$footerMeta['youtube_active'] : true,
+                ],
+                'twitter' => [
+                    'url' => !empty($storeSettings['social_twitter']) ? $storeSettings['social_twitter'] : ($footerMeta['twitter_url'] ?? ''),
+                    'is_active' => !empty($storeSettings['social_twitter']) || !empty($footerMeta['twitter_url']),
+                ],
+                'linkedin' => [
+                    'url' => !empty($storeSettings['social_linkedin']) ? $storeSettings['social_linkedin'] : ($footerMeta['linkedin_url'] ?? ''),
+                    'is_active' => !empty($storeSettings['social_linkedin']) || !empty($footerMeta['linkedin_url']),
                 ],
             ],
             'column_1' => [
@@ -327,11 +350,11 @@ class MediaController extends Controller
             ],
             'column_3' => [
                 'title' => $footerMeta['col3_title'] ?? 'Contact',
-                'phone' => $footerMeta['contact_phone'] ?? (Setting::where('key', 'store_phone')->value('value') ?: '+91 97730 39243'),
-                'phone_link' => $footerMeta['contact_phone_link'] ?? 'tel:+919773039243',
-                'email' => $footerMeta['contact_email'] ?? (Setting::where('key', 'store_email')->value('value') ?: 'support@knotelle.in'),
-                'email_link' => $footerMeta['contact_email_link'] ?? 'mailto:support@knotelle.in',
-                'address' => $footerMeta['contact_address'] ?? 'India',
+                'phone' => !empty($storeSettings['store_phone']) ? $storeSettings['store_phone'] : ($footerMeta['contact_phone'] ?? '+91 97730 39243'),
+                'phone_link' => 'tel:' . preg_replace('/\s+/', '', (!empty($storeSettings['store_phone']) ? $storeSettings['store_phone'] : ($footerMeta['contact_phone'] ?? '+919773039243'))),
+                'email' => !empty($storeSettings['store_email']) ? $storeSettings['store_email'] : ($footerMeta['contact_email'] ?? 'support@knotelle.in'),
+                'email_link' => 'mailto:' . (!empty($storeSettings['store_email']) ? $storeSettings['store_email'] : ($footerMeta['contact_email'] ?? 'support@knotelle.in')),
+                'address' => !empty($storeSettings['store_address']) ? $storeSettings['store_address'] : ($footerMeta['contact_address'] ?? 'India'),
                 'address_link' => $footerMeta['contact_address_link'] ?? '',
             ],
             'is_active' => $footerMedia ? (bool)$footerMedia->is_active : true,
@@ -344,7 +367,7 @@ class MediaController extends Controller
             ->where('is_active', true)
             ->first();
 
-        $mainLogo = $logoMedia ? $logoMedia->url : asset('images/logo/Logo_1.png');
+        $mainLogo = !empty($storeSettings['logo_url']) ? $storeSettings['logo_url'] : ($logoMedia ? $logoMedia->url : asset('images/logo/Logo_1.png'));
 
         $navbarMedia = Media::where('page', 'global')
             ->where('section', 'navbar')
@@ -353,10 +376,13 @@ class MediaController extends Controller
 
         $navbarMeta = $navbarMedia && $navbarMedia->metadata ? $navbarMedia->metadata : [];
 
+        $freeMinThreshold = !empty($storeSettings['free_shipping_min']) ? (float)$storeSettings['free_shipping_min'] : 999;
+        $defaultAnnouncement = '✨ Free Pan-India Delivery on all Orders above ₹' . number_format($freeMinThreshold);
+
         $navbar = [
             'logo' => $mainLogo,
             'announcement' => [
-                'text' => $navbarMeta['announcement_text'] ?? '✨ Free Pan-India Delivery on all Orders above ₹999',
+                'text' => $navbarMeta['announcement_text'] ?? $defaultAnnouncement,
                 'link' => $navbarMeta['announcement_link'] ?? '/shop',
                 'is_active' => isset($navbarMeta['announcement_active']) ? (bool)$navbarMeta['announcement_active'] : false,
             ],
@@ -653,12 +679,26 @@ class MediaController extends Controller
                 'blogReels' => $blogReels,
                 'testimonials' => Testimonial::where('is_active', true)->orderBy('id', 'desc')->get(),
                 'global' => [
-                    'logo' => $mainLogo,
-                    'mobileLogo' => $mainLogo,
-                    'favicon' => asset('favicon.ico'),
+                    'logo' => !empty($storeSettings['logo_url']) ? $storeSettings['logo_url'] : $mainLogo,
+                    'mobileLogo' => !empty($storeSettings['logo_url']) ? $storeSettings['logo_url'] : $mainLogo,
+                    'favicon' => !empty($storeSettings['favicon_url']) ? $storeSettings['favicon_url'] : asset('favicon.ico'),
                     'defaultProduct' => asset('images/logo/Logo_1.png'),
                     'defaultCategory' => asset('images/logo/Logo_1.png'),
+                    'store_name' => $storeSettings['store_name'] ?? 'KNOTELLE',
+                    'store_email' => $storeSettings['store_email'] ?? 'hello@knotelle.com',
+                    'store_phone' => $storeSettings['store_phone'] ?? '+91 966048417',
+                    'store_phone_alt' => $storeSettings['store_phone_alt'] ?? '',
+                    'store_address' => $storeSettings['store_address'] ?? 'India',
+                    'currency' => $storeSettings['currency'] ?? 'INR',
+                    'theme_color' => $storeSettings['theme_color'] ?? '#913638',
+                    'default_shipping_rate' => (float)($storeSettings['default_shipping_rate'] ?? 99),
+                    'free_shipping_min' => (float)($storeSettings['free_shipping_min'] ?? 999),
+                    'tax_rate' => (float)($storeSettings['tax_rate'] ?? 0),
+                    'cod_enabled' => filter_var($storeSettings['cod_enabled'] ?? true, FILTER_VALIDATE_BOOLEAN),
+                    'razorpay_enabled' => filter_var($storeSettings['razorpay_enabled'] ?? true, FILTER_VALIDATE_BOOLEAN),
+                    'razorpay_key_id' => $storeSettings['razorpay_key_id'] ?? '',
                 ],
+                'settings' => $storeSettings,
             ]
         ]);
         } catch (\Throwable $e) {
@@ -955,10 +995,42 @@ class MediaController extends Controller
             ];
         }
 
+        // Live sync store settings into contact info items
+        $contactSettings = Setting::all()->pluck('value', 'key')->toArray();
+        foreach ($infoItems as &$item) {
+            $t = strtolower(($item['title'] ?? '') . ' ' . ($item['icon_name'] ?? ''));
+            if (str_contains($t, 'phone') || str_contains($t, 'call') || str_contains($t, 'whatsapp')) {
+                if (!empty($contactSettings['store_phone'])) {
+                    $item['value'] = $contactSettings['store_phone'];
+                    $item['description'] = $contactSettings['store_phone'];
+                    $item['link'] = 'tel:' . preg_replace('/\s+/', '', $contactSettings['store_phone']);
+                    $item['cta_link'] = $item['link'];
+                    if (!empty($contactSettings['store_phone_alt'])) {
+                        $item['address_line_2'] = 'Alt: ' . $contactSettings['store_phone_alt'] . ' • Mon – Sat, 10:00 AM – 7:00 PM IST';
+                    }
+                }
+            } elseif (str_contains($t, 'mail') || str_contains($t, 'email')) {
+                if (!empty($contactSettings['store_email'])) {
+                    $item['value'] = $contactSettings['store_email'];
+                    $item['description'] = $contactSettings['store_email'];
+                    $item['link'] = 'mailto:' . $contactSettings['store_email'];
+                    $item['cta_link'] = $item['link'];
+                }
+            } elseif (str_contains($t, 'studio') || str_contains($t, 'visit') || str_contains($t, 'address') || str_contains($t, 'mappin')) {
+                if (!empty($contactSettings['store_address'])) {
+                    $item['value'] = $contactSettings['store_address'];
+                    $item['description'] = $contactSettings['store_address'];
+                    $item['link'] = 'https://maps.google.com/?q=' . urlencode($contactSettings['store_address']);
+                    $item['cta_link'] = $item['link'];
+                }
+            }
+        }
+        unset($item);
+
         $contactDetails = [
             'badge' => $infoSettings && $infoSettings->tag_text ? $infoSettings->tag_text : 'Atelier Studio',
-            'title' => $infoSettings && $infoSettings->title ? $infoSettings->title : 'KNOTELLE Studio',
-            'subtitle' => $infoSettings && $infoSettings->subtitle ? $infoSettings->subtitle : 'Handmade with love in Bengaluru, India',
+            'title' => $infoSettings && $infoSettings->title ? $infoSettings->title : (($contactSettings['store_name'] ?? 'KNOTELLE') . ' Studio'),
+            'subtitle' => $infoSettings && $infoSettings->subtitle ? $infoSettings->subtitle : 'Handmade with love in India',
             'is_active' => $infoSettings ? (bool)$infoSettings->is_active : true,
             'items' => $infoItems,
             'custom_order_box' => [

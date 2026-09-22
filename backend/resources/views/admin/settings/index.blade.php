@@ -410,33 +410,18 @@
 
 @push('scripts')
 <script>
-// Axios Configuration
-const axiosInstance = axios.create({
-    baseURL: '{{ url('') }}/api/admin',
-    headers: {
-        'Authorization': `Bearer ${window.ADMIN_API_TOKEN || "{{ session('admin_api_token') }}"}`,
-        'Content-Type': 'application/json',
-        'Accept': 'application/json'
-    }
-});
-
-axiosInstance.interceptors.response.use(
-    response => response,
-    error => {
-        if (error.response?.status === 401) {
-            toastr.error('Session expired. Redirecting...');
-            setTimeout(() => window.location.href = '{{ url('/admin/login') }}', 1500);
-        }
-        return Promise.reject(error);
-    }
-);
+// Subpath-resilient Admin Settings Endpoint Configuration
+const adminSettingsBase = window.location.pathname.startsWith('/knottele') ? '/knottele/admin/settings' : '/admin/settings';
+const getCsrfToken = () => document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '{{ csrf_token() }}';
 
 let settingsData = {};
 let isSaving = false;
 
 document.addEventListener('DOMContentLoaded', () => {
     // Initialize Lucide
-    lucide.createIcons();
+    if (typeof lucide !== 'undefined' && lucide.createIcons) {
+        lucide.createIcons();
+    }
     
     // Initial Load
     loadSettings();
@@ -459,8 +444,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
             btn.classList.add('active');
             const targetContent = document.getElementById(target);
-            targetContent.classList.remove('hidden');
-            targetContent.classList.add('active');
+            if (targetContent) {
+                targetContent.classList.remove('hidden');
+                targetContent.classList.add('active');
+            }
         });
     });
 
@@ -468,20 +455,21 @@ document.addEventListener('DOMContentLoaded', () => {
     const colorInput = document.querySelector('input[name="theme_color"]');
     const colorText = document.querySelector('input[name="theme_color_text"]');
 
-    if(colorInput && colorText) {
+    if (colorInput && colorText) {
         colorInput.addEventListener('input', (e) => colorText.value = e.target.value.toUpperCase());
         colorText.addEventListener('change', (e) => {
-            if(/^#[0-9A-F]{6}$/i.test(e.target.value)) {
+            if (/^#[0-9A-F]{6}$/i.test(e.target.value)) {
                 colorInput.value = e.target.value;
             }
         });
     }
 
     // Payment Toggle UI
-    const razorEnabled = document.querySelector('input[name="razorpay_enabled"]');
-    if(razorEnabled) {
+    const razorEnabled = document.querySelector('input[name="razorpay_enabled"]') || document.querySelector('input[data-key="razorpay_enabled"]');
+    if (razorEnabled) {
         razorEnabled.addEventListener('change', (e) => {
-            document.getElementById('razorpayFields').classList.toggle('hidden', !e.target.checked);
+            const rf = document.getElementById('razorpayFields');
+            if (rf) rf.classList.toggle('hidden', !e.target.checked);
         });
     }
 
@@ -506,44 +494,66 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 async function loadSettings() {
-    try {
-        const response = await axiosInstance.get('/settings/groups');
+    const loadingState = document.getElementById('loadingState');
+    const settingsForm = document.getElementById('settingsForm');
 
-        if (response.data.success) {
-            const data = response.data.data;
+    try {
+        const res = await axios.get(`${adminSettingsBase}/groups`, {
+            headers: {
+                'X-CSRF-TOKEN': getCsrfToken(),
+                'Accept': 'application/json'
+            }
+        });
+
+        if (res.data && res.data.success && res.data.data) {
+            const data = res.data.data;
             populateForms(data);
             
-            document.getElementById('loadingState').classList.add('hidden');
-            document.getElementById('settingsForm').classList.remove('hidden');
+            if (loadingState) loadingState.classList.add('hidden');
+            if (settingsForm) settingsForm.classList.remove('hidden');
             
             // Sync UI states
             const razorEnabled = document.querySelector('input[data-key="razorpay_enabled"]');
-            if(razorEnabled) {
-                document.getElementById('razorpayFields').classList.toggle('hidden', !razorEnabled.checked);
+            const rf = document.getElementById('razorpayFields');
+            if (razorEnabled && rf) {
+                rf.classList.toggle('hidden', !razorEnabled.checked);
             }
 
             // Sync color text
             const colorInput = document.querySelector('input[data-key="theme_color"]');
             const colorText = document.querySelector('input[name="theme_color_text"]');
-            if(colorInput && colorText) colorText.value = colorInput.value.toUpperCase();
+            if (colorInput && colorText && colorInput.value) {
+                colorText.value = colorInput.value.toUpperCase();
+            }
 
-            updateCurrencySymbols(document.querySelector('select[data-key="currency"]')?.value);
+            const currSelect = document.querySelector('select[data-key="currency"]');
+            if (currSelect) {
+                updateCurrencySymbols(currSelect.value);
+            }
+        } else {
+            throw new Error(res.data?.message || 'Invalid settings response');
         }
     } catch (error) {
         console.error('Loader Error:', error);
-        toastr.error('Failed to load system settings');
+        if (loadingState) loadingState.classList.add('hidden');
+        if (settingsForm) settingsForm.classList.remove('hidden');
+        toastr.error('Failed to load system settings. Please refresh.');
     }
 }
 
 function populateForms(groups) {
+    if (!groups || typeof groups !== 'object') return;
+
     Object.values(groups).forEach(settings => {
+        if (!Array.isArray(settings)) return;
+
         settings.forEach(setting => {
             const inputs = document.querySelectorAll(`[data-key="${setting.key}"]`);
             inputs.forEach(input => {
                 if (input.type === 'checkbox') {
-                    input.checked = !!parseInt(setting.value);
+                    input.checked = setting.value === true || setting.value === 1 || setting.value === '1' || setting.value === 'true';
                 } else {
-                    input.value = setting.value || '';
+                    input.value = setting.value !== null && setting.value !== undefined ? setting.value : '';
                     
                     // Show preview for logo and favicon if value exists
                     if (['logo_url', 'favicon_url'].includes(setting.key) && setting.value) {
@@ -575,16 +585,18 @@ async function saveAllSettings() {
     isSaving = true;
 
     const btn = document.getElementById('saveSettingsBtn');
-    const originalContent = btn.innerHTML;
-    btn.disabled = true;
-    btn.innerHTML = `<i data-lucide="loader-2" class="w-4 h-4 animate-spin"></i> Saving...`;
-    lucide.createIcons();
+    const originalContent = btn ? btn.innerHTML : '';
+    if (btn) {
+        btn.disabled = true;
+        btn.innerHTML = `<i data-lucide="loader-2" class="w-4 h-4 animate-spin"></i> Saving...`;
+        if (typeof lucide !== 'undefined' && lucide.createIcons) lucide.createIcons();
+    }
 
     try {
         const settingsToUpdate = [];
         document.querySelectorAll('.setting-input').forEach(input => {
             const key = input.dataset.key;
-            if(!key) return;
+            if (!key) return;
 
             let value = input.value;
             if (input.type === 'checkbox') {
@@ -594,32 +606,50 @@ async function saveAllSettings() {
             settingsToUpdate.push({ key, value });
         });
 
-        const response = await axiosInstance.post('/settings/bulk-update', {
+        const res = await axios.post(`${adminSettingsBase}/bulk-update`, {
             settings: settingsToUpdate
+        }, {
+            headers: {
+                'X-CSRF-TOKEN': getCsrfToken(),
+                'Content-Type': 'application/json',
+                'Accept': 'application/json'
+            }
         });
 
-        if (response.data.success) {
+        if (res.data && res.data.success) {
             toastr.success('All settings synchronized successfully!');
+
+            // Real-time broadcast notification to any open storefront browser tab
+            try {
+                if (typeof BroadcastChannel !== 'undefined') {
+                    const bc = new BroadcastChannel('knotelle_media_sync');
+                    bc.postMessage({ type: 'KNOTELLE_SYNC', timestamp: Date.now() });
+                    bc.close();
+                }
+                localStorage.setItem('knotelle_media_updated', Date.now().toString());
+            } catch (syncErr) {}
         } else {
-            toastr.error(response.data.message || 'Synchronization failed');
+            toastr.error(res.data?.message || 'Synchronization failed');
         }
     } catch (error) {
         console.error('Save Error:', error);
-        toastr.error('Failed to save settings. Please check console for details.');
+        toastr.error(error.response?.data?.message || 'Failed to save settings. Please check console for details.');
     } finally {
-        btn.disabled = false;
-        btn.innerHTML = originalContent;
-        lucide.createIcons();
+        if (btn) {
+            btn.disabled = false;
+            btn.innerHTML = originalContent;
+            if (typeof lucide !== 'undefined' && lucide.createIcons) lucide.createIcons();
+        }
         isSaving = false;
     }
 }
 
 async function updateProfile() {
     const data = {
-        name: document.getElementById('profileName').value,
-        email: document.getElementById('profileEmail').value,
-        password: document.getElementById('profilePassword').value,
-        password_confirmation: document.getElementById('profilePasswordConfirm').value
+        name: document.getElementById('profileName')?.value,
+        email: document.getElementById('profileEmail')?.value,
+        password: document.getElementById('profilePassword')?.value,
+        password_confirmation: document.getElementById('profilePasswordConfirm')?.value
     };
 
     if (!data.name || !data.email) {
@@ -627,42 +657,58 @@ async function updateProfile() {
     }
 
     try {
-        const response = await axiosInstance.post('/profile/update', data);
-        toastr.success(response.data.message || 'Account synchronized!');
+        const res = await axios.post(`${adminSettingsBase}/profile`, data, {
+            headers: {
+                'X-CSRF-TOKEN': getCsrfToken(),
+                'Accept': 'application/json'
+            }
+        });
+        toastr.success(res.data?.message || 'Account profile synchronized!');
         
         // Clear sensitive fields
-        document.getElementById('profilePassword').value = '';
-        document.getElementById('profilePasswordConfirm').value = '';
+        if (document.getElementById('profilePassword')) document.getElementById('profilePassword').value = '';
+        if (document.getElementById('profilePasswordConfirm')) document.getElementById('profilePasswordConfirm').value = '';
     } catch (error) {
         const errors = error.response?.data?.errors;
-        if(errors) {
+        if (errors) {
             Object.values(errors).forEach(err => toastr.error(err[0]));
         } else {
-            toastr.error('Failed to update account credentials');
+            toastr.error(error.response?.data?.message || 'Failed to update account credentials');
         }
     }
 }
 
 function prefillProfile() {
-    document.getElementById('profileName').value = "{{ Auth::guard('admin')->user()->name ?? '' }}";
-    document.getElementById('profileEmail').value = "{{ Auth::guard('admin')->user()->email ?? '' }}";
+    if (document.getElementById('profileName')) {
+        document.getElementById('profileName').value = "{{ Auth::guard('admin')->user()->name ?? '' }}";
+    }
+    if (document.getElementById('profileEmail')) {
+        document.getElementById('profileEmail').value = "{{ Auth::guard('admin')->user()->email ?? '' }}";
+    }
 }
 
 async function resetSettings() {
-    const confirmed = await Swal.fire({
-        title: 'Factory Reset?',
-        text: 'This will revert all system configuration to initial defaults. Current customizations will be lost.',
-        icon: 'warning',
-        showCancelButton: true,
-        confirmButtonColor: '#ef4444',
-        cancelButtonColor: '#6b7280',
-        confirmButtonText: 'Yes, reset to defaults'
-    });
+    const confirmed = typeof Swal !== 'undefined'
+        ? await Swal.fire({
+            title: 'Factory Reset?',
+            text: 'This will revert all system configuration to initial defaults. Current customizations will be lost.',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#ef4444',
+            cancelButtonColor: '#6b7280',
+            confirmButtonText: 'Yes, reset to defaults'
+        })
+        : { isConfirmed: confirm('Revert all system configuration to initial defaults?') };
 
     if (confirmed.isConfirmed) {
         try {
-            await axiosInstance.post('/settings/reset');
-            toastr.success('System configuration restored to defaults');
+            const res = await axios.post(`${adminSettingsBase}/reset`, {}, {
+                headers: {
+                    'X-CSRF-TOKEN': getCsrfToken(),
+                    'Accept': 'application/json'
+                }
+            });
+            toastr.success(res.data?.message || 'System configuration restored to defaults');
             loadSettings();
         } catch (error) {
             toastr.error('Failed to restore defaults');
@@ -672,18 +718,18 @@ async function resetSettings() {
 
 function togglePasswordVisibility(inputId, btn) {
     const input = document.getElementById(inputId);
-    const icon = btn.querySelector('i');
+    const icon = btn?.querySelector('i');
+    if (!input) return;
     
     if (input.type === 'password') {
         input.type = 'text';
-        icon.setAttribute('data-lucide', 'eye-off');
+        if (icon) icon.setAttribute('data-lucide', 'eye-off');
     } else {
         input.type = 'password';
-        icon.setAttribute('data-lucide', 'eye');
+        if (icon) icon.setAttribute('data-lucide', 'eye');
     }
     
-    // Re-initialize only the changed icon
-    lucide.createIcons();
+    if (typeof lucide !== 'undefined' && lucide.createIcons) lucide.createIcons();
 }
 
 async function handleFileUpload(event, key) {
@@ -691,30 +737,34 @@ async function handleFileUpload(event, key) {
     if (!file) return;
 
     const formData = new FormData();
-    formData.append('files[]', file); // MediaController expects 'files[]'
+    formData.append('file', file);
+    formData.append('key', key);
 
     const container = event.target.closest('.space-y-2');
-    const uploadBtn = container.querySelector('.upload-btn');
-    const originalContent = uploadBtn.innerHTML;
+    const uploadBtn = container?.querySelector('.upload-btn');
+    const originalContent = uploadBtn ? uploadBtn.innerHTML : '';
 
-    uploadBtn.disabled = true;
-    uploadBtn.innerHTML = `<i data-lucide="loader-2" class="w-4 h-4 animate-spin"></i>`;
-    lucide.createIcons();
+    if (uploadBtn) {
+        uploadBtn.disabled = true;
+        uploadBtn.innerHTML = `<i data-lucide="loader-2" class="w-4 h-4 animate-spin"></i>`;
+        if (typeof lucide !== 'undefined' && lucide.createIcons) lucide.createIcons();
+    }
 
     try {
-        const response = await axiosInstance.post('/media/upload', formData, {
+        const res = await axios.post(`${adminSettingsBase}/upload`, formData, {
             headers: {
-                'Content-Type': 'multipart/form-data'
+                'X-CSRF-TOKEN': getCsrfToken(),
+                'Content-Type': 'multipart/form-data',
+                'Accept': 'application/json'
             }
         });
 
-        if (response.data.success && response.data.data.uploaded.length > 0) {
-            const url = response.data.data.uploaded[0].url;
+        if (res.data && res.data.success && res.data.url) {
+            const url = res.data.url;
             const input = document.getElementById(key);
             if (input) {
                 input.value = url;
             } else {
-                // Fallback to data-key selector if id not found (though we added ids)
                 const dataInput = document.querySelector(`[data-key="${key}"]`);
                 if (dataInput) dataInput.value = url;
             }
@@ -729,16 +779,17 @@ async function handleFileUpload(event, key) {
             
             toastr.success('File uploaded successfully!');
         } else {
-            toastr.error(response.data.message || 'Upload failed');
+            toastr.error(res.data?.message || 'Upload failed');
         }
     } catch (error) {
         console.error('Upload Error:', error);
-        toastr.error('Failed to upload file. Check file size or type.');
+        toastr.error(error.response?.data?.message || 'Failed to upload file. Check file size or type.');
     } finally {
-        uploadBtn.disabled = false;
-        uploadBtn.innerHTML = originalContent;
-        lucide.createIcons();
-        // Reset file input so same file can be uploaded again if needed
+        if (uploadBtn) {
+            uploadBtn.disabled = false;
+            uploadBtn.innerHTML = originalContent;
+            if (typeof lucide !== 'undefined' && lucide.createIcons) lucide.createIcons();
+        }
         event.target.value = '';
     }
 }
@@ -748,7 +799,6 @@ function clearToDefault(key, defaultPath) {
     if (input) {
         input.value = defaultPath;
         
-        // Update preview
         const previewId = key.replace('url', 'preview');
         const preview = document.getElementById(previewId);
         if (preview) {
@@ -756,7 +806,7 @@ function clearToDefault(key, defaultPath) {
             preview.classList.remove('hidden');
         }
         
-        toastr.info('Reset to default path. Save settings to apply.');
+        toastr.info('Reset to default path. Click Save All Settings to apply.');
     }
 }
 </script>

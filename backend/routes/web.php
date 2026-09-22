@@ -417,7 +417,14 @@ $adminRoutes = function () {
         | SETTINGS
         |--------------------------------------------------------------------------
         */
-        Route::get('/settings', [AdminSetting::class, 'index'])->name('admin.settings.index');
+        Route::prefix('settings')->name('admin.settings.')->group(function () {
+            Route::get('/', [AdminSetting::class, 'index'])->name('index');
+            Route::get('/groups', [AdminSetting::class, 'getGroups'])->name('groups');
+            Route::post('/bulk-update', [AdminSetting::class, 'bulkUpdate'])->name('bulk-update');
+            Route::post('/reset', [AdminSetting::class, 'resetDefaults'])->name('reset');
+            Route::post('/upload', [AdminSetting::class, 'uploadAsset'])->name('upload');
+            Route::post('/profile', [AdminSetting::class, 'updateProfile'])->name('profile');
+        });
 
         /*
         |--------------------------------------------------------------------------
