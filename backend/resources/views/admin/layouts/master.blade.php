@@ -42,6 +42,17 @@
         body {
             font-family: 'Plus Jakarta Sans', sans-serif;
         }
+
+        /* Remove native number input spin buttons / steppers globally */
+        input::-webkit-outer-spin-button,
+        input::-webkit-inner-spin-button {
+            -webkit-appearance: none !important;
+            margin: 0 !important;
+        }
+        input[type="number"] {
+            -moz-appearance: textfield !important;
+            appearance: textfield !important;
+        }
     </style>
 
 
