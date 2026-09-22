@@ -88,12 +88,31 @@ class Media extends Model
         }
 
         $cleanPath = ltrim($this->file_path, '/');
+        $resolvedPath = str_starts_with($cleanPath, 'images/') || str_starts_with($cleanPath, 'storage/')
+            ? $cleanPath
+            : 'images/' . $cleanPath;
 
-        if (str_starts_with($cleanPath, 'images/') || str_starts_with($cleanPath, 'storage/')) {
-            return asset($cleanPath);
+        // If local file exists, serve it directly
+        if (file_exists(public_path($resolvedPath))) {
+            return asset($resolvedPath);
         }
 
-        return asset('images/' . $cleanPath);
+        // Resilient fallback for missing image files to prevent storefront 404s
+        if ($this->section === 'brand_story' || str_contains($cleanPath, 'brand_story')) {
+            if (file_exists(public_path('images/homepage/middleimg.png'))) {
+                return asset('images/homepage/middleimg.png');
+            }
+        } elseif ($this->section === 'hero' || str_contains($cleanPath, 'hero')) {
+            if (file_exists(public_path('images/hero/hero-enhanced.jpg'))) {
+                return asset('images/hero/hero-enhanced.jpg');
+            }
+        } elseif ($this->section === 'custom_crochet') {
+            if (file_exists(public_path('images/homepage/middleimg.png'))) {
+                return asset('images/homepage/middleimg.png');
+            }
+        }
+
+        return asset($resolvedPath);
     }
 
     public function getDesktopImageUrlAttribute(): string
@@ -112,12 +131,15 @@ class Media extends Model
         }
 
         $cleanPath = ltrim($this->mobile_image_path, '/');
+        $resolvedPath = str_starts_with($cleanPath, 'images/') || str_starts_with($cleanPath, 'storage/')
+            ? $cleanPath
+            : 'images/' . $cleanPath;
 
-        if (str_starts_with($cleanPath, 'images/') || str_starts_with($cleanPath, 'storage/')) {
-            return asset($cleanPath);
+        if (file_exists(public_path($resolvedPath))) {
+            return asset($resolvedPath);
         }
 
-        return asset('images/' . $cleanPath);
+        return $this->getUrlAttribute();
     }
 
     public function getThumbUrlAttribute(): string

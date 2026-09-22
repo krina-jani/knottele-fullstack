@@ -18,6 +18,7 @@ const PRESERVED_ITEMS = new Set([
   'icons.svg',
   '.git',
   '.gitignore',
+  '_next',
 ]);
 
 function cleanOldFrontendArtifacts(dest) {

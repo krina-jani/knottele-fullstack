@@ -19,11 +19,11 @@
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
-    <!-- Lucide Icons -->
-    <script src="https://unpkg.com/lucide@latest"></script>
+    <!-- Lucide Icons (Self-hosted) -->
+    <script src="{{ asset('js/lucide.min.js') }}"></script>
 
-    <!-- Tabulator CSS -->
-    <link href="https://unpkg.com/tabulator-tables@5.5.2/dist/css/tabulator.min.css" rel="stylesheet">
+    <!-- Tabulator CSS (Self-hosted) -->
+    <link href="{{ asset('css/admin/tabulator.min.css') }}" rel="stylesheet">
 
     <!-- Chart.js -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -77,8 +77,8 @@
     <!-- Common Scripts -->
     <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
 
-    <!-- Tabulator JS -->
-    <script type="text/javascript" src="https://unpkg.com/tabulator-tables@5.5.2/dist/js/tabulator.min.js"></script>
+    <!-- Tabulator JS (Self-hosted) -->
+    <script type="text/javascript" src="{{ asset('js/admin/tabulator.min.js') }}"></script>
 
     <!-- Lodash -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/lodash.js/4.17.21/lodash.min.js"></script>

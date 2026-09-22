@@ -135,11 +135,16 @@ class MediaController extends Controller
             ['title' => 'Happiness Guaranteed', 'icon' => 'smile'],
         ];
 
+        $bsFallback = asset('images/homepage/middleimg.png');
+        $bsImg = ($brandStoryMedia && $brandStoryMedia->file_path && file_exists(public_path($brandStoryMedia->file_path)))
+            ? $brandStoryMedia->url
+            : ($brandStoryMedia ? $brandStoryMedia->url : $bsFallback);
+
         $brandStory = [
-            'desktop' => $brandStoryMedia ? $brandStoryMedia->url : asset('images/homepage/middleimg.png'),
-            'mobile' => $brandStoryMedia ? $brandStoryMedia->url : asset('images/homepage/middleimg.png'),
+            'desktop' => $bsImg ?: $bsFallback,
+            'mobile' => $bsImg ?: $bsFallback,
             'badge' => $brandStoryMedia && $brandStoryMedia->tag_text ? $brandStoryMedia->tag_text : 'KNOTELLE Artisanal Crochet Craftsmanship',
-            'title' => $brandStoryMedia && $brandStoryMedia->title ? $brandStoryMedia->title : 'Every Stitch',
+            'title' => $brandStoryMedia && $brandStoryMedia->title && $brandStoryMedia->title !== 'Brand Story Desktop Background' ? $brandStoryMedia->title : 'Every Stitch',
             'subtitle' => $brandStoryMedia && $brandStoryMedia->subtitle ? $brandStoryMedia->subtitle : 'Has a Story',
             'description' => $brandStoryMedia && $brandStoryMedia->description ? $brandStoryMedia->description : 'More than just crochet, we create memories, happiness and a little bit of magic.',
             'cta_text' => $brandStoryMedia && $brandStoryMedia->cta_text ? $brandStoryMedia->cta_text : 'Read Our Story',
@@ -154,15 +159,26 @@ class MediaController extends Controller
             ->where('is_active', true)
             ->first();
 
+        $rawCtaLink = $customOrderMedia && $customOrderMedia->cta_link ? trim($customOrderMedia->cta_link) : '/custom-order';
+        // Sanitize accidental typos or suffixes like /custom-orderrbtydsg -> /custom-order
+        if (str_starts_with($rawCtaLink, '/custom-order') && $rawCtaLink !== '/custom-order' && !str_starts_with($rawCtaLink, '/custom-orders')) {
+            $rawCtaLink = '/custom-order';
+        }
+
+        $customDesc = $customOrderMedia && $customOrderMedia->description ? $customOrderMedia->description : "From custom color palettes and personalized initials to unique floral bouquets and character plushies — let's create something made especially for you.";
+        if (str_contains($customDesc, 'gdsgwegbcxvsawr32b4gvqrefd')) {
+            $customDesc = "From custom color palettes and personalized initials to unique floral bouquets and character plushies — let's create something made especially for you.";
+        }
+
         $customOrder = [
             'desktop' => $customOrderMedia ? $customOrderMedia->url : null,
             'mobile' => $customOrderMedia ? $customOrderMedia->url : null,
             'badge' => $customOrderMedia && $customOrderMedia->tag_text ? $customOrderMedia->tag_text : 'Bespoke Handcrafting',
             'title_line1' => $customOrderMedia && $customOrderMedia->title ? $customOrderMedia->title : 'Your Idea.',
             'title_line2' => $customOrderMedia && $customOrderMedia->subtitle ? $customOrderMedia->subtitle : 'Our Yarn.',
-            'description' => $customOrderMedia && $customOrderMedia->description ? $customOrderMedia->description : "From custom color palettes and personalized initials to unique floral bouquets and character plushies — let's create something made especially for you.",
+            'description' => $customDesc,
             'cta_text' => $customOrderMedia && $customOrderMedia->cta_text ? $customOrderMedia->cta_text : 'Start a Custom Order',
-            'cta_link' => $customOrderMedia && $customOrderMedia->cta_link ? $customOrderMedia->cta_link : '/custom-order',
+            'cta_link' => $rawCtaLink,
             'is_active' => $customOrderMedia ? (bool)$customOrderMedia->is_active : true,
         ];
 

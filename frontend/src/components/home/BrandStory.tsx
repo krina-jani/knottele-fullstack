@@ -5,7 +5,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { ArrowRight, Heart, Sparkles, Leaf, Smile } from "lucide-react";
 import { useWebsiteMedia } from "@/context/MediaContext";
-import { normalizeImageUrl } from "@/lib/api";
+import { normalizeImageUrl, normalizeInternalLink } from "@/lib/api";
 
 const DEFAULT_STORY_BG = "/images/homepage/middleimg.png";
 
@@ -18,7 +18,13 @@ export function BrandStory() {
   const { media } = useWebsiteMedia();
   const bs = media?.brandStory;
 
-  const bgImage = normalizeImageUrl(bs?.desktop, DEFAULT_STORY_BG);
+  const rawBg = normalizeImageUrl(bs?.desktop, DEFAULT_STORY_BG);
+  const [imgSrc, setImgSrc] = React.useState<string>(rawBg);
+
+  React.useEffect(() => {
+    setImgSrc(normalizeImageUrl(bs?.desktop, DEFAULT_STORY_BG));
+  }, [bs?.desktop]);
+
   const badge = bs?.badge || "KNOTELLE Artisanal Crochet Craftsmanship";
   const title = bs?.title || "Every Stitch";
   const subtitle = bs?.subtitle || "Has a Story";
@@ -56,12 +62,17 @@ export function BrandStory() {
       {/* Full-Width Background Image Layer */}
       <div className="absolute inset-0 z-0 w-full h-full">
         <Image
-          src={bgImage}
+          src={imgSrc}
           alt="KNOTELLE Artisanal Crochet Craftsmanship"
           fill
-          quality={100}
+          quality={95}
           sizes="100vw"
           className="object-cover object-center lg:object-right"
+          onError={() => {
+            if (imgSrc !== DEFAULT_STORY_BG) {
+              setImgSrc(DEFAULT_STORY_BG);
+            }
+          }}
         />
         {/* Soft Multi-Layer Gradient Overlays for High-Contrast Text Legibility */}
         <div className="absolute inset-0 bg-gradient-to-r from-[#FFF5F2]/95 via-[#FFF5F2]/85 sm:via-[#FFF5F2]/60 to-transparent w-full md:w-[60%]" />
@@ -93,7 +104,7 @@ export function BrandStory() {
             {ctaText && ctaLink && (
               <div className="pt-2">
                 <Link
-                  href={ctaLink}
+                  href={normalizeInternalLink(ctaLink)}
                   className="inline-flex items-center gap-2 px-6 sm:px-7 py-3 rounded-full bg-[#913638] text-white text-xs sm:text-sm font-semibold hover:bg-[#74292B] shadow-xs hover:shadow-boutique-hover transition-all active:scale-[0.98]"
                 >
                   <span>{ctaText}</span>

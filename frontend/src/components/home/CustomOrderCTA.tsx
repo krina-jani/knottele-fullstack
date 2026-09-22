@@ -5,6 +5,7 @@ import Link from "next/link";
 import { ArrowRight, Sparkles } from "lucide-react";
 import { FlowerIcon, BotanicalFlourish } from "@/components/ui/BotanicalDecorations";
 import { useWebsiteMedia } from "@/context/MediaContext";
+import { normalizeInternalLink } from "@/lib/api";
 
 export function CustomOrderCTA() {
   const { media } = useWebsiteMedia();
@@ -13,8 +14,15 @@ export function CustomOrderCTA() {
 
   const custom = media?.customOrder;
   const ctaText = custom?.cta_text || "Start a Custom Order";
-  const ctaLink = custom?.cta_link || "/custom-order";
+  const rawCtaLink = custom?.cta_link || "/custom-order";
+  // Sanitize any typo suffixes (e.g. /custom-orderrbtydsg -> /custom-order)
+  const ctaLink = rawCtaLink.startsWith("/custom-order") && !rawCtaLink.startsWith("/custom-orders")
+    ? "/custom-order"
+    : normalizeInternalLink(rawCtaLink);
   const isActive = custom?.is_active !== false;
+
+  const rawDesc = custom?.description || "From custom color palettes and personalized initials to unique floral bouquets and character plushies — let's create something made especially for you.";
+  const cleanDesc = rawDesc.replace(/\s*gdsgwegbcxvsawr32b4gvqrefd\s*/g, "").trim();
 
   const rotatingTitles = useMemo(() => {
     return [
@@ -22,7 +30,7 @@ export function CustomOrderCTA() {
         badge: custom?.badge || "Bespoke Handcrafting",
         line1: custom?.title_line1 || "Your Idea.",
         line2: custom?.title_line2 || "Our Yarn.",
-        desc: custom?.description || "From custom color palettes and personalized initials to unique floral bouquets and character plushies — let's create something made especially for you.",
+        desc: cleanDesc || "From custom color palettes and personalized initials to unique floral bouquets and character plushies — let's create something made especially for you.",
       },
       {
         badge: "Handmade Just For You",
@@ -139,6 +147,7 @@ export function CustomOrderCTA() {
               <div className="pt-2">
                 <Link
                   href={ctaLink}
+                  prefetch={false}
                   className="inline-flex items-center gap-2 px-7 sm:px-8 py-3 sm:py-3.5 rounded-full bg-[#913638] text-white text-xs sm:text-sm font-semibold hover:bg-[#74292B] shadow-xs hover:shadow-boutique-hover transition-all active:scale-[0.98] group"
                 >
                   <span>{ctaText}</span>

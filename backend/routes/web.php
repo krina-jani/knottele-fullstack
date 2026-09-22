@@ -471,6 +471,14 @@ Route::match(['GET', 'HEAD'], '/{any}', function ($any = '') {
         $path = '';
     }
 
+    // 0. Handle root and /knottele/ base paths directly
+    if ($path === '' || $path === '/') {
+        if (file_exists(public_path('index.html'))) {
+            return response()->file(public_path('index.html'));
+        }
+        return view('welcome');
+    }
+
     // 1. Direct match with static asset file (e.g. /icon.png -> public/icon.png, /favicon.ico -> public/favicon.ico)
     if ($path && file_exists(public_path($path)) && !is_dir(public_path($path))) {
         return response()->file(public_path($path));
@@ -549,6 +557,13 @@ Route::match(['GET', 'HEAD'], '/{any}', function ($any = '') {
     if (str_starts_with($path, 'account/custom-orders')) {
         if (file_exists(public_path('account/custom-orders/index.html'))) {
             return response()->file(public_path('account/custom-orders/index.html'));
+        }
+    }
+
+    // 3e-2. Resilient custom-order route fallback (catches typos like /custom-orderrbtydsg)
+    if (str_starts_with($path, 'custom-order')) {
+        if (file_exists(public_path('custom-order/index.html'))) {
+            return response()->file(public_path('custom-order/index.html'));
         }
     }
 
