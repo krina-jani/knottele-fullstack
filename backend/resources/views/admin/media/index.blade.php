@@ -1473,6 +1473,18 @@
                         <input type="text" id="customOrderItemSubtitle" name="subtitle" placeholder="e.g. Custom pattern, Hand-tied florals" class="w-full bg-stone-50 border border-stone-200 rounded-xl px-3.5 py-2.5 text-sm font-semibold text-stone-800 focus:bg-white focus:outline-none focus:ring-2 focus:ring-red-500">
                     </div>
 
+                    <div>
+                        <div class="flex items-center justify-between mb-1.5">
+                            <label class="block text-xs font-bold text-stone-600 uppercase tracking-wider">Category Favicon / Icon</label>
+                            <span id="selectedIconLabel" class="text-xs font-bold text-red-600">Flower</span>
+                        </div>
+                        <input type="hidden" id="customOrderItemIcon" name="icon" value="flower">
+                        <div class="grid grid-cols-3 sm:grid-cols-6 gap-2 p-2.5 bg-stone-50 border border-stone-200 rounded-2xl max-h-48 overflow-y-auto" id="customOrderItemIconGrid">
+                            <!-- Populated by renderCustomOrderItemIconGrid() -->
+                        </div>
+                        <p class="text-[11px] text-stone-400 mt-1">Select an icon to display for this item type on the website Custom Order page.</p>
+                    </div>
+
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5 pt-1">
                         <div>
                             <label class="block text-xs font-bold text-stone-600 uppercase tracking-wider mb-1">Sort Order (Sequence)</label>
@@ -3452,7 +3464,7 @@
                                     <div>
                                         <div class="flex items-center justify-between gap-2 mb-3">
                                             <div class="w-10 h-10 rounded-xl bg-red-50 border border-red-200 text-red-700 flex items-center justify-center font-bold text-base shadow-2xs shrink-0">
-                                                <i class="fas fa-seedling"></i>
+                                                <i class="${getCustomOrderItemFaIcon(item.icon || item.tag_text || item.title)}"></i>
                                             </div>
                                             <div class="flex items-center gap-1.5">
                                                 <span class="px-2 py-0.5 rounded-md text-[10px] font-bold bg-stone-100 text-stone-600">
@@ -4629,6 +4641,79 @@
         }
     }
 
+    const CUSTOM_ORDER_ICONS = [
+        { id: 'keychain', name: 'Keychain', fa: 'fas fa-key' },
+        { id: 'flower', name: 'Flower', fa: 'fas fa-seedling' },
+        { id: 'bouquet', name: 'Bouquet', fa: 'fas fa-spa' },
+        { id: 'soft_toys', name: 'Soft Toys', fa: 'fas fa-paw' },
+        { id: 'bag', name: 'Bags', fa: 'fas fa-shopping-bag' },
+        { id: 'coin_purse', name: 'Coin Purse', fa: 'fas fa-wallet' },
+        { id: 'phone_cover', name: 'Phone Cover', fa: 'fas fa-mobile-alt' },
+        { id: 'cup', name: 'Cup', fa: 'fas fa-mug-hot' },
+        { id: 'bookmark', name: 'Bookmark', fa: 'fas fa-bookmark' },
+        { id: 'heart', name: 'Love / Heart', fa: 'fas fa-heart' },
+        { id: 'leaf', name: 'Leaf', fa: 'fas fa-leaf' },
+        { id: 'tree', name: 'Tree', fa: 'fas fa-tree' },
+        { id: 'scissors', name: 'Hair Accessories', fa: 'fas fa-cut' },
+        { id: 'clothing', name: 'Clothing', fa: 'fas fa-tshirt' },
+        { id: 'gift', name: 'Gift Box', fa: 'fas fa-gift' },
+        { id: 'sparkles', name: 'Sparkles', fa: 'fas fa-wand-magic-sparkles' },
+        { id: 'palette', name: 'Palette / Art', fa: 'fas fa-palette' },
+        { id: 'star', name: 'Star', fa: 'fas fa-star' }
+    ];
+
+    function getCustomOrderItemFaIcon(iconOrTitle) {
+        if (!iconOrTitle) return 'fas fa-seedling';
+        const key = String(iconOrTitle).toLowerCase().trim();
+        if (key.includes('keychain') || key === 'key') return 'fas fa-key';
+        if (key.includes('bouquet')) return 'fas fa-spa';
+        if (key.includes('toy') || key.includes('bear') || key.includes('plush') || key.includes('rabbit')) return 'fas fa-paw';
+        if (key.includes('bag') || key.includes('tote')) return 'fas fa-shopping-bag';
+        if (key.includes('purse') || key.includes('wallet')) return 'fas fa-wallet';
+        if (key.includes('phone')) return 'fas fa-mobile-alt';
+        if (key.includes('cup') || key.includes('mug') || key.includes('coffee') || key.includes('tea')) return 'fas fa-mug-hot';
+        if (key.includes('bookmark')) return 'fas fa-bookmark';
+        if (key.includes('heart') || key.includes('love')) return 'fas fa-heart';
+        if (key.includes('leaf') || key.includes('plant')) return 'fas fa-leaf';
+        if (key.includes('tree')) return 'fas fa-tree';
+        if (key.includes('hair') || key.includes('scrunch') || key.includes('clip') || key.includes('scissors')) return 'fas fa-cut';
+        if (key.includes('cloth') || key.includes('wear') || key.includes('cardigan') || key.includes('top')) return 'fas fa-tshirt';
+        if (key.includes('gift')) return 'fas fa-gift';
+        if (key.includes('sparkle')) return 'fas fa-wand-magic-sparkles';
+        if (key.includes('palette') || key.includes('art') || key.includes('concept')) return 'fas fa-palette';
+        if (key.includes('star')) return 'fas fa-star';
+        if (key.includes('flower') || key.includes('pot') || key.includes('flower2')) return 'fas fa-seedling';
+
+        const found = CUSTOM_ORDER_ICONS.find(i => i.id === key);
+        return found ? found.fa : 'fas fa-seedling';
+    }
+
+    function renderCustomOrderItemIconGrid(selectedId = 'flower') {
+        const grid = document.getElementById('customOrderItemIconGrid');
+        if (!grid) return;
+        grid.innerHTML = CUSTOM_ORDER_ICONS.map(i => {
+            const isSelected = (i.id.toLowerCase() === (selectedId || '').toLowerCase()) ||
+                               (i.name.toLowerCase() === (selectedId || '').toLowerCase());
+            return `
+                <button type="button" onclick="selectCustomOrderItemIcon('${i.id}', '${i.name}')" class="flex flex-col items-center justify-center p-2 rounded-xl border text-center transition-all cursor-pointer ${isSelected ? 'bg-red-50 border-red-500 text-red-700 ring-2 ring-red-300 font-bold' : 'bg-white border-stone-200 text-stone-600 hover:border-stone-300 hover:bg-stone-100'}">
+                    <i class="${i.fa} text-sm mb-1"></i>
+                    <span class="text-[9px] leading-tight line-clamp-1">${i.name}</span>
+                </button>
+            `;
+        }).join('');
+    }
+
+    function selectCustomOrderItemIcon(id, name) {
+        if (document.getElementById('customOrderItemIcon')) {
+            document.getElementById('customOrderItemIcon').value = id;
+        }
+        if (document.getElementById('selectedIconLabel')) {
+            const found = CUSTOM_ORDER_ICONS.find(i => i.id.toLowerCase() === (id || '').toLowerCase());
+            document.getElementById('selectedIconLabel').innerText = found ? found.name : (name || id);
+        }
+        renderCustomOrderItemIconGrid(id);
+    }
+
     function openAddCustomOrderItemModal() {
         const form = document.getElementById('customOrderItemForm');
         if (form) form.reset();
@@ -4636,6 +4721,7 @@
         if (document.getElementById('customOrderItemModalTitle')) document.getElementById('customOrderItemModalTitle').innerText = 'Add Custom Order Category';
         if (document.getElementById('customOrderItemSubmitBtnText')) document.getElementById('customOrderItemSubmitBtnText').innerText = 'Save Category';
         if (document.getElementById('customOrderItemActive')) document.getElementById('customOrderItemActive').checked = true;
+        selectCustomOrderItemIcon('flower', 'Flower');
 
         const modal = document.getElementById('customOrderItemModal');
         if (modal) {
@@ -4666,6 +4752,8 @@
                     if (document.getElementById('customOrderItemActive')) document.getElementById('customOrderItemActive').checked = cached.is_active !== false;
                     if (document.getElementById('customOrderItemModalTitle')) document.getElementById('customOrderItemModalTitle').innerText = `Edit: ${cached.title || cached.name}`;
                     if (document.getElementById('customOrderItemSubmitBtnText')) document.getElementById('customOrderItemSubmitBtnText').innerText = 'Update Category';
+                    const iconVal = cached.icon || cached.tag_text || 'flower';
+                    selectCustomOrderItemIcon(iconVal, iconVal);
                 }
             }
         }
@@ -4682,6 +4770,8 @@
 
                 if (document.getElementById('customOrderItemModalTitle')) document.getElementById('customOrderItemModalTitle').innerText = `Edit: ${item.title || item.name}`;
                 if (document.getElementById('customOrderItemSubmitBtnText')) document.getElementById('customOrderItemSubmitBtnText').innerText = 'Update Category';
+                const iconVal = item.icon || item.tag_text || 'flower';
+                selectCustomOrderItemIcon(iconVal, iconVal);
             }
         } catch (err) {
             console.error('Failed to load category details', err);
@@ -4702,6 +4792,7 @@
         const id = document.getElementById('customOrderItemId')?.value;
         const title = document.getElementById('customOrderItemTitle')?.value?.trim();
         const subtitle = document.getElementById('customOrderItemSubtitle')?.value?.trim() || '';
+        const icon = document.getElementById('customOrderItemIcon')?.value || 'flower';
         const sortOrder = document.getElementById('customOrderItemSortOrder')?.value || 1;
         const isActive = document.getElementById('customOrderItemActive')?.checked ? 1 : 0;
 
@@ -4720,6 +4811,8 @@
                 _token: csrfToken || '',
                 title: title,
                 subtitle: subtitle,
+                icon: icon,
+                tag_text: icon,
                 sort_order: sortOrder,
                 is_active: isActive
             }, {

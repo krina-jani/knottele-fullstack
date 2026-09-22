@@ -199,6 +199,8 @@ export interface HomepageMedia {
       facebook?: { url: string; is_active: boolean };
       pinterest?: { url: string; is_active: boolean };
       youtube?: { url: string; is_active: boolean };
+      twitter?: { url: string; is_active: boolean };
+      linkedin?: { url: string; is_active: boolean };
     };
     column_1?: {
       title: string;
@@ -247,7 +249,21 @@ export interface HomepageMedia {
     favicon: string;
     defaultProduct: string;
     defaultCategory: string;
+    store_name?: string;
+    store_email?: string;
+    store_phone?: string;
+    store_phone_alt?: string;
+    store_address?: string;
+    currency?: string;
+    theme_color?: string;
+    default_shipping_rate?: number;
+    free_shipping_min?: number;
+    tax_rate?: number;
+    cod_enabled?: boolean;
+    razorpay_enabled?: boolean;
+    razorpay_key_id?: string;
   };
+  settings?: Record<string, any>;
   shop?: {
     banner?: {
       desktop?: string | null;
@@ -352,6 +368,8 @@ export interface HomepageMedia {
     name: string;
     title?: string;
     subtitle?: string;
+    icon?: string;
+    tag_text?: string;
     sort_order?: number;
     is_active?: boolean;
   }>;

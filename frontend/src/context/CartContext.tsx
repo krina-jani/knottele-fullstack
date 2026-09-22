@@ -5,6 +5,7 @@ import { CartItem, CartItemCustomization } from "@/types/cart";
 import { Product } from "@/types/product";
 import { useToast } from "./ToastContext";
 import { validateOfferCode } from "@/lib/api";
+import { useWebsiteMedia } from "./MediaContext";
 
 interface CartContextType {
   items: CartItem[];
@@ -32,12 +33,16 @@ const FREE_SHIPPING_THRESHOLD = 999;
 const STANDARD_SHIPPING_FEE = 99;
 
 export function CartProvider({ children }: { children: React.ReactNode }) {
+  const { media } = useWebsiteMedia();
   const [items, setItems] = useState<CartItem[]>([]);
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [promoCode, setPromoCode] = useState<string>("");
   const [discountPercent, setDiscountPercent] = useState<number>(0);
   const [isInitialized, setIsInitialized] = useState(false);
   const { showToast } = useToast();
+
+  const freeShippingThreshold = Number(media?.global?.free_shipping_min ?? media?.settings?.free_shipping_min ?? 999);
+  const standardShippingFee = Number(media?.global?.default_shipping_rate ?? media?.settings?.default_shipping_rate ?? 99);
 
   // Load from localStorage on client mount
   useEffect(() => {
@@ -185,10 +190,10 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
   const totalItemsCount = items.reduce((sum, item) => sum + item.quantity, 0);
   const subtotal = items.reduce((sum, item) => sum + item.price * item.quantity, 0);
   const discount = Math.round((subtotal * discountPercent) / 100);
-  const isFreeShipping = subtotal >= FREE_SHIPPING_THRESHOLD || subtotal === 0;
-  const shipping = isFreeShipping ? 0 : STANDARD_SHIPPING_FEE;
+  const isFreeShipping = subtotal >= freeShippingThreshold || subtotal === 0;
+  const shipping = isFreeShipping ? 0 : standardShippingFee;
   const total = Math.max(0, subtotal - discount + shipping);
-  const amountToFreeShipping = Math.max(0, FREE_SHIPPING_THRESHOLD - subtotal);
+  const amountToFreeShipping = Math.max(0, freeShippingThreshold - subtotal);
 
   return (
     <CartContext.Provider
@@ -208,7 +213,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
         promoCode,
         applyPromoCode,
         removePromoCode,
-        freeShippingThreshold: FREE_SHIPPING_THRESHOLD,
+        freeShippingThreshold,
         amountToFreeShipping,
       }}
     >

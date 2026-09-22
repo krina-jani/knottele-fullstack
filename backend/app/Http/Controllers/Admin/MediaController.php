@@ -4400,13 +4400,15 @@ class MediaController extends Controller
 
         $maxSort = Media::where('page', 'custom_order')->where('section', 'custom_order_items')->max('sort_order') ?: 0;
 
+        $icon = $request->input('icon', $request->input('tag_text', 'flower'));
+
         $item = Media::create([
             'page' => 'custom_order',
             'section' => 'custom_order_items',
             'slot' => 'item_' . \Illuminate\Support\Str::slug($request->title) . '_' . time(),
             'title' => $request->title,
             'subtitle' => $request->subtitle ?: 'Custom pattern',
-            'tag_text' => 'Flower2',
+            'tag_text' => $icon,
             'sort_order' => $request->filled('sort_order') ? (int)$request->sort_order : ($maxSort + 1),
             'is_active' => true,
             'uploaded_by' => $this->getAdminId(),
@@ -4425,6 +4427,8 @@ class MediaController extends Controller
                 'name' => $item->title,
                 'title' => $item->title,
                 'subtitle' => $item->subtitle,
+                'icon' => $item->tag_text ?: 'flower',
+                'tag_text' => $item->tag_text ?: 'flower',
                 'sort_order' => (int)$item->sort_order,
                 'is_active' => (bool)$item->is_active,
             ],
@@ -4455,6 +4459,8 @@ class MediaController extends Controller
             'name' => $item->title,
             'title' => $item->title,
             'subtitle' => $item->subtitle ?: 'Custom pattern',
+            'icon' => $item->tag_text ?: 'flower',
+            'tag_text' => $item->tag_text ?: 'flower',
             'sort_order' => (int)$item->sort_order,
             'is_active' => (bool)$item->is_active,
         ];
@@ -4487,12 +4493,17 @@ class MediaController extends Controller
         $request->validate([
             'title' => 'required|string|max:100',
             'subtitle' => 'nullable|string|max:150',
+            'icon' => 'nullable|string|max:50',
+            'tag_text' => 'nullable|string|max:50',
             'sort_order' => 'nullable|integer',
         ]);
 
         $item->title = $request->title;
         if ($request->has('subtitle')) {
             $item->subtitle = $request->subtitle;
+        }
+        if ($request->filled('icon') || $request->filled('tag_text')) {
+            $item->tag_text = $request->input('icon', $request->input('tag_text'));
         }
         if ($request->filled('sort_order')) {
             $item->sort_order = (int)$request->sort_order;
@@ -4507,6 +4518,8 @@ class MediaController extends Controller
             'name' => $item->title,
             'title' => $item->title,
             'subtitle' => $item->subtitle,
+            'icon' => $item->tag_text ?: 'flower',
+            'tag_text' => $item->tag_text ?: 'flower',
             'sort_order' => (int)$item->sort_order,
             'is_active' => (bool)$item->is_active,
         ];

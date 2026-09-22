@@ -22,6 +22,16 @@ export function ProductCard({ product, priority = false }: ProductCardProps) {
   const [isHovered, setIsHovered] = useState(false);
   const isWishlisted = isInWishlist(product.id);
 
+  const initialImg = normalizeImageUrl(
+    isHovered && product.images?.[1] ? product.images[1] : product.main_image || product.images?.[0],
+    "/images/products/bunny-keychain.jpg"
+  );
+  const [imgSrc, setImgSrc] = useState<string>(initialImg);
+
+  React.useEffect(() => {
+    setImgSrc(initialImg);
+  }, [initialImg]);
+
   const handleQuickAdd = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
@@ -48,15 +58,17 @@ export function ProductCard({ product, priority = false }: ProductCardProps) {
       <div className="relative aspect-[4/4.8] w-full bg-[#FFF9F6] overflow-hidden">
         <Link href={`/product/${product.slug}`} className="block w-full h-full relative">
           <Image
-            src={normalizeImageUrl(
-              isHovered && product.images?.[1] ? product.images[1] : product.main_image || product.images?.[0],
-              "/images/products/bunny-keychain.jpg"
-            )}
+            src={imgSrc}
             alt={product.name}
             fill
             sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
             className="object-cover object-center transition-transform duration-700 ease-out group-hover:scale-105"
             priority={priority}
+            onError={() => {
+              if (imgSrc !== "/images/products/bunny-keychain.jpg") {
+                setImgSrc("/images/products/bunny-keychain.jpg");
+              }
+            }}
           />
         </Link>
 

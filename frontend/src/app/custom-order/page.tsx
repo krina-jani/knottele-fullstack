@@ -18,8 +18,47 @@ import {
   Pipette,
   Plus,
   X,
+  Key,
+  Flower,
+  Flower2,
+  Rabbit,
+  ShoppingBag,
+  Wallet,
+  Smartphone,
+  Coffee,
+  Bookmark,
+  Leaf,
+  Trees,
+  Scissors,
+  Shirt,
+  Gift,
+  Star,
 } from "lucide-react";
 import { FlowerIcon } from "@/components/ui/BotanicalDecorations";
+
+function getCustomOrderItemIcon(iconOrTitle?: string) {
+  if (!iconOrTitle) return Flower2;
+  const key = iconOrTitle.toLowerCase().trim();
+  if (key.includes("keychain") || key === "key") return Key;
+  if (key.includes("bouquet")) return Flower;
+  if (key.includes("toy") || key.includes("bear") || key.includes("plush") || key.includes("rabbit")) return Rabbit;
+  if (key.includes("bag") || key.includes("tote")) return ShoppingBag;
+  if (key.includes("purse") || key.includes("wallet")) return Wallet;
+  if (key.includes("phone")) return Smartphone;
+  if (key.includes("cup") || key.includes("mug") || key.includes("coffee") || key.includes("tea")) return Coffee;
+  if (key.includes("bookmark")) return Bookmark;
+  if (key.includes("heart") || key.includes("love")) return Heart;
+  if (key.includes("leaf") || key.includes("plant")) return Leaf;
+  if (key.includes("tree")) return Trees;
+  if (key.includes("hair") || key.includes("scrunch") || key.includes("clip") || key.includes("scissors")) return Scissors;
+  if (key.includes("cloth") || key.includes("wear") || key.includes("cardigan") || key.includes("top")) return Shirt;
+  if (key.includes("gift")) return Gift;
+  if (key.includes("sparkle")) return Sparkles;
+  if (key.includes("palette") || key.includes("art") || key.includes("concept")) return Palette;
+  if (key.includes("star")) return Star;
+  if (key.includes("flower") || key.includes("pot") || key.includes("flower2")) return Flower2;
+  return Flower2;
+}
 import { Breadcrumbs } from "@/components/ui/Breadcrumbs";
 import { useToast } from "@/context/ToastContext";
 import { useAuth } from "@/context/AuthContext";
@@ -349,6 +388,7 @@ export default function CustomOrderPage() {
                     {categories.map((cat: any) => {
                       const itemName = cat.name || cat.title || "";
                       const itemSub = cat.subtitle || "Custom pattern";
+                      const IconComponent = getCustomOrderItemIcon(cat.icon || cat.tag_text || itemName);
                       return (
                         <button
                           type="button"
@@ -360,7 +400,7 @@ export default function CustomOrderPage() {
                               : "border-[#E7D1CC] bg-[#FFF9F6] hover:bg-white text-[#2E211E]"
                           }`}
                         >
-                          <FlowerIcon className="w-5 h-5 sm:w-6 sm:h-6 text-[#913638] mb-2" />
+                          <IconComponent className="w-5 h-5 sm:w-6 sm:h-6 text-[#913638] mb-2" />
                           <span className="text-xs font-bold">{itemName}</span>
                           <span className="text-[10px] text-[#786864] mt-0.5 line-clamp-1">
                             {itemSub}
