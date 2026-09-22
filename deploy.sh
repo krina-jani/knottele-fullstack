@@ -90,13 +90,20 @@ if [ -d "$PROJECT_ROOT/backend" ]; then
     echo "🔄 Restarting Queue..."
     php artisan queue:restart || true
 
-    # 11. Folder permissions & storage/image directories
+    # 11. Folder permissions & storage/image/video directories
     echo "🔒 Updating permissions..."
-    mkdir -p storage/logs public/images/products public/images/hero public/images/categories public/images/footer public/js/admin
+    mkdir -p storage/logs public/images/products public/images/hero public/images/categories public/images/footer public/images/reels public/videos/reels public/js/admin
     touch storage/logs/laravel.log && chmod 666 storage/logs/laravel.log || true
-    chmod -R 777 storage bootstrap/cache public/images || true
-    chown -R nginx:nginx storage bootstrap/cache public/images 2>/dev/null || chown -R apache:apache storage bootstrap/cache public/images 2>/dev/null || chown -R www-data:www-data storage bootstrap/cache public/images 2>/dev/null || true
-    chcon -R -t httpd_sys_rw_content_t storage bootstrap/cache public/images 2>/dev/null || true
+    chmod -R 777 storage bootstrap/cache public/images public/videos || true
+    chown -R nginx:nginx storage bootstrap/cache public/images public/videos 2>/dev/null || chown -R apache:apache storage bootstrap/cache public/images public/videos 2>/dev/null || chown -R www-data:www-data storage bootstrap/cache public/images public/videos 2>/dev/null || true
+    chcon -R -t httpd_sys_rw_content_t storage bootstrap/cache public/images public/videos 2>/dev/null || true
+
+    # Ensure PHP upload limits support video uploads (128M)
+    if [ -d "/etc/php" ]; then
+        sed -i 's/^upload_max_filesize = .*/upload_max_filesize = 128M/' /etc/php/*/*/php.ini 2>/dev/null || true
+        sed -i 's/^post_max_size = .*/post_max_size = 128M/' /etc/php/*/*/php.ini 2>/dev/null || true
+        systemctl reload php*-fpm 2>/dev/null || systemctl restart php*-fpm 2>/dev/null || true
+    fi
 
     # 12. Bring application out of maintenance mode
     php artisan up

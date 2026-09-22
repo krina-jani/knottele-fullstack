@@ -2122,6 +2122,26 @@ class MediaController extends Controller
      */
     public function addVideoReel(Request $request): JsonResponse
     {
+        // Pre-check for PHP file upload size error before standard validation to give clear error
+        if (isset($_FILES['video_file']) && $_FILES['video_file']['error'] !== UPLOAD_ERR_OK && $_FILES['video_file']['error'] !== UPLOAD_ERR_NO_FILE) {
+            $err = $_FILES['video_file']['error'];
+            if ($err === UPLOAD_ERR_INI_SIZE || $err === UPLOAD_ERR_FORM_SIZE) {
+                if ($request->filled('video_url')) {
+                    unset($_FILES['video_file']);
+                    $request->request->remove('video_file');
+                } else {
+                    $maxPhp = ini_get('upload_max_filesize') ?: '2M';
+                    return response()->json([
+                        'success' => false,
+                        'message' => "The uploaded video exceeds server upload_max_filesize limit ({$maxPhp}). Please enter a direct video URL or upload a smaller file.",
+                        'errors' => [
+                            'video_file' => ["The uploaded video exceeds server limit ({$maxPhp}). Please enter a direct video URL or upload a smaller file."]
+                        ]
+                    ], 422);
+                }
+            }
+        }
+
         $request->validate([
             'title' => 'required|string|max:255',
             'content_type' => 'nullable|string|in:video,reel,blog_video',
@@ -2139,11 +2159,11 @@ class MediaController extends Controller
             'status' => 'nullable',
             'is_active' => 'nullable',
             'sort_order' => 'nullable|integer|min:1',
-            'video_file' => 'nullable|file|mimes:mp4,webm,mov,ogg,mkv,avi,qt|max:40960',
-            'video_url' => 'nullable|string|max:500',
+            'video_file' => 'nullable|file|mimes:mp4,webm,mov,ogg,mkv,avi,qt,m4v,3gp,flv|max:204800',
+            'video_url' => 'nullable|string|max:1000',
             'thumbnail_file' => 'nullable|file|image|max:20480',
             'thumbnail_media_id' => 'nullable',
-            'thumbnail_url' => 'nullable|string|max:500',
+            'thumbnail_url' => 'nullable|string|max:1000',
             'mobile_thumbnail_file' => 'nullable|file|image|max:20480',
         ]);
 
@@ -2175,20 +2195,27 @@ class MediaController extends Controller
 
         if ($request->hasFile('video_file')) {
             $vFile = $request->file('video_file');
-            $vOriginal = $vFile->getClientOriginalName();
-            $vExt = strtolower($vFile->getClientOriginalExtension() ?: 'mp4');
-            $vUniqueName = 'reel_' . $sortOrder . '_' . time() . '_' . Str::random(4) . '.' . $vExt;
-            
-            $targetDir = public_path('videos/reels');
-            if (!File::isDirectory($targetDir)) {
-                File::makeDirectory($targetDir, 0755, true, true);
-            }
+            if ($vFile->isValid()) {
+                $vOriginal = $vFile->getClientOriginalName();
+                $vExt = strtolower($vFile->getClientOriginalExtension() ?: 'mp4');
+                $vUniqueName = 'reel_' . $sortOrder . '_' . time() . '_' . Str::random(4) . '.' . $vExt;
+                
+                $targetDir = public_path('videos/reels');
+                if (!File::isDirectory($targetDir)) {
+                    File::makeDirectory($targetDir, 0777, true, true);
+                }
 
-            $vFile->move($targetDir, $vUniqueName);
-            $videoUrl = '/videos/reels/' . $vUniqueName;
-            $mimeType = $vFile->getClientMimeType() ?: ('video/' . ($vExt === 'mov' ? 'quicktime' : $vExt));
-            $fileSize = file_exists($targetDir . '/' . $vUniqueName) ? filesize($targetDir . '/' . $vUniqueName) : 0;
-            $originalFileName = $vOriginal;
+                $vFile->move($targetDir, $vUniqueName);
+                @chmod($targetDir . DIRECTORY_SEPARATOR . $vUniqueName, 0664);
+                $videoUrl = '/videos/reels/' . $vUniqueName;
+                $mimeType = $vFile->getClientMimeType() ?: ('video/' . ($vExt === 'mov' ? 'quicktime' : $vExt));
+                $fileSize = file_exists($targetDir . '/' . $vUniqueName) ? filesize($targetDir . '/' . $vUniqueName) : 0;
+                $originalFileName = $vOriginal;
+            }
+        }
+
+        if (empty($videoUrl) && $request->filled('video_url')) {
+            $videoUrl = $request->input('video_url');
         }
 
         // 2. Handle Thumbnail Image Upload / Media Library
@@ -2368,6 +2395,26 @@ class MediaController extends Controller
             return response()->json(['success' => false, 'message' => 'Video/Reel not found.'], 404);
         }
 
+        // Pre-check for PHP file upload size error before standard validation
+        if (isset($_FILES['video_file']) && $_FILES['video_file']['error'] !== UPLOAD_ERR_OK && $_FILES['video_file']['error'] !== UPLOAD_ERR_NO_FILE) {
+            $err = $_FILES['video_file']['error'];
+            if ($err === UPLOAD_ERR_INI_SIZE || $err === UPLOAD_ERR_FORM_SIZE) {
+                if ($request->filled('video_url')) {
+                    unset($_FILES['video_file']);
+                    $request->request->remove('video_file');
+                } else {
+                    $maxPhp = ini_get('upload_max_filesize') ?: '2M';
+                    return response()->json([
+                        'success' => false,
+                        'message' => "The uploaded video exceeds server upload_max_filesize limit ({$maxPhp}). Please enter a direct video URL or upload a smaller file.",
+                        'errors' => [
+                            'video_file' => ["The uploaded video exceeds server limit ({$maxPhp}). Please enter a direct video URL or upload a smaller file."]
+                        ]
+                    ], 422);
+                }
+            }
+        }
+
         $request->validate([
             'title' => 'required|string|max:255',
             'content_type' => 'nullable|string|in:video,reel,blog_video',
@@ -2385,36 +2432,40 @@ class MediaController extends Controller
             'status' => 'nullable',
             'is_active' => 'nullable',
             'sort_order' => 'nullable|integer|min:1',
-            'video_file' => 'nullable|file|mimes:mp4,webm,mov,ogg,mkv,avi,qt|max:40960',
-            'video_url' => 'nullable|string|max:500',
+            'video_file' => 'nullable|file|mimes:mp4,webm,mov,ogg,mkv,avi,qt,m4v,3gp,flv|max:204800',
+            'video_url' => 'nullable|string|max:1000',
             'thumbnail_file' => 'nullable|file|image|max:20480',
             'thumbnail_media_id' => 'nullable',
-            'thumbnail_url' => 'nullable|string|max:500',
+            'thumbnail_url' => 'nullable|string|max:1000',
             'mobile_thumbnail_file' => 'nullable|file|image|max:20480',
         ]);
 
         // 1. Video Replacement
         if ($request->hasFile('video_file')) {
             $vFile = $request->file('video_file');
-            $vExt = strtolower($vFile->getClientOriginalExtension() ?: 'mp4');
-            $vUniqueName = 'reel_' . ($media->sort_order ?: $media->id) . '_' . time() . '_' . Str::random(4) . '.' . $vExt;
-            
-            $targetDir = public_path('videos/reels');
-            if (!File::isDirectory($targetDir)) {
-                File::makeDirectory($targetDir, 0755, true, true);
-            }
+            if ($vFile->isValid()) {
+                $vExt = strtolower($vFile->getClientOriginalExtension() ?: 'mp4');
+                $vUniqueName = 'reel_' . ($media->sort_order ?: $media->id) . '_' . time() . '_' . Str::random(4) . '.' . $vExt;
+                
+                $targetDir = public_path('videos/reels');
+                if (!File::isDirectory($targetDir)) {
+                    File::makeDirectory($targetDir, 0777, true, true);
+                }
 
-            // Remove previous custom video if local
-            $oldPath = ltrim($media->video_url ?? '', '/');
-            if ($oldPath && str_starts_with($oldPath, 'videos/reels/') && file_exists(public_path($oldPath))) {
-                @unlink(public_path($oldPath));
-            }
+                // Remove previous custom video if local
+                $oldPath = ltrim($media->video_url ?? '', '/');
+                if ($oldPath && str_starts_with($oldPath, 'videos/reels/') && file_exists(public_path($oldPath))) {
+                    @unlink(public_path($oldPath));
+                }
 
-            $vFile->move($targetDir, $vUniqueName);
-            $media->video_url = '/videos/reels/' . $vUniqueName;
-            $media->mime_type = $vFile->getClientMimeType() ?: ('video/' . ($vExt === 'mov' ? 'quicktime' : $vExt));
-            $media->file_size = file_exists($targetDir . '/' . $vUniqueName) ? filesize($targetDir . '/' . $vUniqueName) : 0;
-            $media->file_name = $vFile->getClientOriginalName();
+                $vFile->move($targetDir, $vUniqueName);
+                @chmod($targetDir . DIRECTORY_SEPARATOR . $vUniqueName, 0664);
+
+                $media->video_url = '/videos/reels/' . $vUniqueName;
+                $media->mime_type = $vFile->getClientMimeType() ?: ('video/' . ($vExt === 'mov' ? 'quicktime' : $vExt));
+                $media->file_size = file_exists($targetDir . '/' . $vUniqueName) ? filesize($targetDir . '/' . $vUniqueName) : 0;
+                $media->file_name = $vFile->getClientOriginalName();
+            }
         } elseif ($request->filled('video_url')) {
             $media->video_url = $request->input('video_url');
         }

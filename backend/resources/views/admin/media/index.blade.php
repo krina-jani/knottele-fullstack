@@ -877,12 +877,12 @@
                                         <span id="videoPlayerStatusBadge" class="text-stone-400 font-normal">No video selected</span>
                                     </div>
                                     <div class="relative w-full aspect-video max-h-48 bg-stone-900 rounded-xl overflow-hidden flex items-center justify-center">
-                                        <video id="videoReelPreviewPlayer" controls playsinline class="w-full h-full object-contain"
+                                        <video id="videoReelPreviewPlayer" controls playsinline loop autoplay muted class="w-full h-full object-contain"
                                                oncanplay="handleVideoPlayerCanPlay()"
                                                onerror="handleVideoPlayerError()"></video>
                                         <div id="videoPlayerEmptyState" class="absolute inset-0 flex flex-col items-center justify-center text-stone-500 bg-stone-900/90 pointer-events-none">
                                             <i class="fas fa-film text-2xl mb-1 text-stone-600"></i>
-                                            <p class="text-[11px] font-medium">Select a video file or URL to preview</p>
+                                            <p class="text-[11px] font-medium">Select a video file or URL to preview (auto-loops)</p>
                                         </div>
                                     </div>
                                 </div>
@@ -960,6 +960,35 @@
                 </div>
 
             </form>
+        </div>
+    </div>
+
+    <!-- MODAL 7B: VIDEO WATCH & AUTO-REPLAY MODAL -->
+    <div id="videoWatchModal" onclick="if(event.target === this) closeVideoWatchModal()" class="fixed inset-0 bg-black/80 backdrop-blur-sm hidden items-center justify-center z-[9999] p-4" style="display: none;">
+        <div class="bg-stone-950 rounded-3xl max-w-md w-full overflow-hidden shadow-2xl border border-stone-800 animate-fadeIn flex flex-col" onclick="event.stopPropagation()">
+            <!-- Top bar -->
+            <div class="p-4 px-5 border-b border-stone-800/80 flex items-center justify-between bg-stone-900/60">
+                <div class="flex-1 min-w-0 mr-3">
+                    <span id="videoWatchCategory" class="text-[10px] font-bold text-red-400 uppercase tracking-wider block truncate">Studio Reel</span>
+                    <h3 id="videoWatchTitle" class="text-sm font-bold text-white truncate">Reel Player</h3>
+                </div>
+                <button type="button" onclick="closeVideoWatchModal()" class="w-8 h-8 rounded-full bg-stone-800 text-stone-400 hover:text-white flex items-center justify-center transition-colors cursor-pointer">
+                    <i class="fas fa-times text-sm"></i>
+                </button>
+            </div>
+            <!-- Player container with auto-replay loop -->
+            <div class="relative w-full aspect-[9/16] max-h-[70vh] bg-black flex items-center justify-center overflow-hidden">
+                <video id="videoWatchPlayer" controls playsinline loop autoplay class="w-full h-full object-contain"></video>
+            </div>
+            <!-- Bottom bar -->
+            <div class="p-3 px-5 border-t border-stone-800/80 flex items-center justify-between bg-stone-900/60 text-xs text-stone-400">
+                <span class="flex items-center gap-1.5 text-emerald-400 text-[11px] font-semibold">
+                    <i class="fas fa-redo text-[10px]"></i> Auto-replay loop active
+                </span>
+                <button type="button" id="videoWatchEditBtn" class="px-3 py-1.5 rounded-xl bg-red-600 hover:bg-red-700 text-white font-bold text-xs flex items-center gap-1 cursor-pointer">
+                    <i class="fas fa-edit text-xs"></i> Edit Details
+                </button>
+            </div>
         </div>
     </div>
 
@@ -2743,19 +2772,40 @@
         loadManagerData();
     });
 
-    // 1. Fetch and render structured manager data
-    async function loadManagerData() {
+    // 1. Fetch and render structured manager data with sticky scroll retention
+    async function loadManagerData(preserveScroll = true, targetSectionId = null) {
         const loading = document.getElementById('managerLoading');
         const list = document.getElementById('sectionsList');
         
-        if (loading) loading.classList.remove('hidden');
-        if (list) list.classList.add('hidden');
+        // Save current scroll position before any DOM updates
+        const savedScrollY = (preserveScroll && typeof window !== 'undefined')
+            ? (window.scrollY || window.pageYOffset || document.documentElement.scrollTop || 0)
+            : null;
+
+        // Only show full loading block on cold initial page load when no sections exist yet
+        const isInitial = !list || list.children.length === 0;
+        if (isInitial && loading) loading.classList.remove('hidden');
+        if (isInitial && list) list.classList.add('hidden');
 
         try {
             const res = await axios.get(`${adminMediaBase}/manager-data`);
             if (res.data && res.data.success) {
                 managerData = res.data.data;
                 renderSections(managerData);
+
+                // Instantly restore scroll position or stick to target section without jumping to top
+                requestAnimationFrame(() => {
+                    if (targetSectionId) {
+                        const targetEl = document.getElementById(targetSectionId);
+                        if (targetEl) {
+                            targetEl.scrollIntoView({ behavior: 'instant', block: 'nearest' });
+                            return;
+                        }
+                    }
+                    if (savedScrollY !== null) {
+                        window.scrollTo({ top: savedScrollY, behavior: 'instant' });
+                    }
+                });
             }
         } catch (err) {
             console.error('Failed to load manager data', err);
@@ -2763,6 +2813,11 @@
         } finally {
             if (loading) loading.classList.add('hidden');
             if (list) list.classList.remove('hidden');
+            if (savedScrollY !== null && !targetSectionId) {
+                requestAnimationFrame(() => {
+                    window.scrollTo({ top: savedScrollY, behavior: 'instant' });
+                });
+            }
         }
     }
 
@@ -5424,7 +5479,8 @@
 
                     <!-- Thumbnail with Play Overlay -->
                     <div class="relative w-full aspect-[4/5] rounded-xl overflow-hidden bg-stone-900 border border-stone-200/70 mb-3 group/thumb flex items-center justify-center cursor-pointer"
-                         onclick="openEditVideoReelModal(${reel.id})">
+                         title="Click to watch in auto-replay loop"
+                         onclick="openVideoWatchModal('${escapeHtml(reel.video_url || '')}', '${escapeHtml(reel.title)}', '${escapeHtml(reel.category_name || 'Reel')}', ${reel.id})">
                         <img src="${thumbUrl}" alt="${escapeHtml(reel.title)}" class="w-full h-full object-cover group-hover/thumb:scale-105 transition-transform duration-300" onerror="this.onerror=null; this.src=(window.location.pathname.startsWith('/knottele') ? '/knottele' : '') + '/images/logo/Logo_1.png';">
                         
                         <div class="absolute inset-0 bg-stone-900/30 group-hover/thumb:bg-stone-900/50 transition-colors flex items-center justify-center">
@@ -5539,7 +5595,7 @@
             if (scrollContainer) scrollContainer.scrollTop = 0;
             const titleInput = document.getElementById('videoReelTitle');
             if (titleInput) {
-                titleInput.focus();
+                titleInput.focus({ preventScroll: true });
             }
         }, 60);
     }
@@ -5610,7 +5666,7 @@
                 if (scrollContainer) scrollContainer.scrollTop = 0;
                 const titleInput = document.getElementById('videoReelTitle');
                 if (titleInput) {
-                    titleInput.focus();
+                    titleInput.focus({ preventScroll: true });
                 }
             }, 60);
         } catch (err) {
@@ -5629,10 +5685,75 @@
         }
     }
 
+    // Video Watch & Auto-Replay Modal
+    function openVideoWatchModal(videoSrc, title, category, id) {
+        if (!videoSrc) {
+            toastr.info('No video file or URL is attached to this reel. Click Edit to attach one.');
+            return;
+        }
+
+        let cleanSrc = videoSrc.trim();
+        if (!cleanSrc.startsWith('http://') && !cleanSrc.startsWith('https://') && !cleanSrc.startsWith('blob:') && !cleanSrc.startsWith('data:')) {
+            cleanSrc = cleanSrc.startsWith('/') ? cleanSrc : '/' + cleanSrc;
+            if (window.location.pathname.startsWith('/knottele') && !cleanSrc.startsWith('/knottele')) {
+                cleanSrc = '/knottele' + cleanSrc;
+            }
+        }
+
+        const modal = document.getElementById('videoWatchModal');
+        const player = document.getElementById('videoWatchPlayer');
+        const titleEl = document.getElementById('videoWatchTitle');
+        const catEl = document.getElementById('videoWatchCategory');
+        const editBtn = document.getElementById('videoWatchEditBtn');
+
+        if (titleEl) titleEl.innerText = title || 'Video / Reel';
+        if (catEl) catEl.innerText = category || 'STUDIO REEL';
+        if (editBtn) {
+            editBtn.onclick = function() {
+                closeVideoWatchModal();
+                if (id) openEditVideoReelModal(id);
+            };
+        }
+
+        if (player) {
+            player.loop = true;
+            player.autoplay = true;
+            player.src = cleanSrc;
+            player.load();
+            player.play().catch(e => console.log('Reel player autoplay notice:', e));
+        }
+
+        if (modal) {
+            modal.style.setProperty('display', 'flex', 'important');
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+        }
+    }
+
+    function closeVideoWatchModal() {
+        const modal = document.getElementById('videoWatchModal');
+        const player = document.getElementById('videoWatchPlayer');
+        if (player) {
+            player.pause();
+            player.removeAttribute('src');
+            player.load();
+        }
+        if (modal) {
+            modal.style.setProperty('display', 'none', 'important');
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+        }
+    }
+
     function handleVideoPlayerCanPlay() {
+        const player = document.getElementById('videoReelPreviewPlayer');
+        if (player) {
+            player.loop = true;
+            player.play().catch(e => console.log('Preview loop play notice:', e));
+        }
         const statusBadge = document.getElementById('videoPlayerStatusBadge');
         if (statusBadge) {
-            statusBadge.innerText = '✓ Video loaded & ready to play';
+            statusBadge.innerText = '✓ Video loaded & ready to play (Auto-loops)';
             statusBadge.className = 'text-emerald-400 font-semibold';
         }
     }
@@ -5653,8 +5774,8 @@
         if (input.files && input.files[0]) {
             const file = input.files[0];
             const sizeMb = (file.size / (1024 * 1024)).toFixed(1);
-            if (file.size > 40 * 1024 * 1024) {
-                toastr.warning(`Selected video is ${sizeMb} MB. Maximum recommended file size is 40 MB.`);
+            if (file.size > 150 * 1024 * 1024) {
+                toastr.warning(`Selected video is ${sizeMb} MB. Maximum recommended file size is 150 MB.`);
             }
             document.getElementById('videoReelFileLabel').innerText = `Selected: ${file.name} (${sizeMb} MB)`;
             
@@ -5700,11 +5821,15 @@
         }
 
         if (player && emptyState) {
+            player.loop = true;
+            player.autoplay = true;
+            player.muted = true;
             player.src = cleanSrc;
             player.load();
+            player.play().catch(e => console.log('Preview player autoplay notice:', e));
             emptyState.classList.add('hidden');
             if (statusBadge) {
-                statusBadge.innerText = 'Loading preview player...';
+                statusBadge.innerText = 'Loading preview player (Auto-replay loop)...';
                 statusBadge.className = 'text-amber-300 font-normal';
             }
         }
@@ -5806,7 +5931,7 @@
                 toastr.success(res.data.message || 'Video / reel saved successfully.');
                 closeVideoReelModal();
                 broadcastMediaUpdate();
-                loadManagerData();
+                loadManagerData(true, 'sec-card-blog_reels');
             } else {
                 toastr.error(res.data.message || 'Failed to save video / reel.');
             }
@@ -5839,7 +5964,7 @@
             if (res.data.success) {
                 toastr.success(res.data.message || 'Video / reel deleted successfully.');
                 broadcastMediaUpdate();
-                loadManagerData();
+                loadManagerData(true, 'sec-card-blog_reels');
             } else {
                 toastr.error(res.data.message || 'Failed to delete video / reel.');
             }
@@ -5860,7 +5985,7 @@
             if (res.data.success) {
                 toastr.success(res.data.message || 'Status updated.');
                 broadcastMediaUpdate();
-                loadManagerData();
+                loadManagerData(true, 'sec-card-blog_reels');
             } else {
                 toastr.error(res.data.message || 'Failed to toggle status.');
             }
@@ -5921,7 +6046,7 @@
                 toastr.success(res.data.message || 'Section settings updated.');
                 closeBlogReelsSettingsModal();
                 broadcastMediaUpdate();
-                loadManagerData();
+                loadManagerData(true, 'sec-card-blog_reels');
             } else {
                 toastr.error(res.data.message || 'Failed to save section settings.');
             }
@@ -8140,6 +8265,8 @@
     window.openAddVideoReelModal = openAddVideoReelModal;
     window.openEditVideoReelModal = openEditVideoReelModal;
     window.closeVideoReelModal = closeVideoReelModal;
+    window.openVideoWatchModal = openVideoWatchModal;
+    window.closeVideoWatchModal = closeVideoWatchModal;
     window.handleVideoReelSubmit = handleVideoReelSubmit;
     window.deleteVideoReel = deleteVideoReel;
     window.toggleVideoReelStatus = toggleVideoReelStatus;
