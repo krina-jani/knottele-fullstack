@@ -104,12 +104,12 @@ export function Hero() {
     return DEFAULT_HERO_SLIDES;
   }, [media?.hero?.slides]);
 
-  // Auto-play every 2.5 seconds
+  // Auto-play every 2 seconds (2000ms)
   useEffect(() => {
     if (slides.length <= 1) return;
     const timer = setInterval(() => {
       setCurrentSlide((prev) => (prev + 1) % slides.length);
-    }, 2500);
+    }, 2000);
     return () => clearInterval(timer);
   }, [slides.length]);
 
@@ -194,20 +194,6 @@ export function Hero() {
             </div>
 
           </div>
-        </div>
-
-        {/* Carousel Indicator Dots */}
-        <div className="absolute bottom-3 sm:bottom-6 left-1/2 -translate-x-1/2 z-20 flex items-center gap-2.5">
-          {slides.map((_, i) => (
-            <button
-              key={i}
-              onClick={() => setCurrentSlide(i)}
-              className={`h-2 rounded-full transition-all duration-500 cursor-pointer ${
-                currentSlide === i ? "bg-[#913638] w-8 shadow-xs" : "bg-[#E7D1CC]/90 w-2.5 hover:bg-[#EFB8B0]"
-              }`}
-              aria-label={`Go to slide ${i + 1}`}
-            />
-          ))}
         </div>
 
       </div>
