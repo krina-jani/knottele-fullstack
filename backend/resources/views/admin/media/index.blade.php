@@ -2893,9 +2893,9 @@
             const isHero = section.id === 'hero';
             const isBlogReels = section.id === 'blog_reels' || section.is_blog_reels_section;
             const header = `
-                <div class="px-8 py-5 border-b border-stone-100 bg-stone-50/50 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                <div class="px-4 sm:px-8 py-4 sm:py-5 border-b border-stone-100 bg-stone-50/50 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                     <div class="flex items-center gap-3">
-                        <div class="w-10 h-10 rounded-2xl bg-red-50 border border-red-100 flex items-center justify-center text-red-600 font-bold shadow-2xs">
+                        <div class="w-10 h-10 rounded-2xl bg-red-50 border border-red-100 flex items-center justify-center text-red-600 font-bold shadow-2xs shrink-0">
                             <i class="${getSectionIcon(section.id)}"></i>
                         </div>
                         <div>
@@ -2914,7 +2914,7 @@
                             </button>
                         </div>
                     ` : (isBlogReels ? `
-                        <div class="flex items-center gap-2">
+                        <div class="flex items-center gap-2 flex-wrap sm:flex-nowrap">
                             <button type="button" onclick="openBlogReelsSettingsModal()" class="btn-secondary text-xs px-4 py-2.5 flex items-center gap-1.5 cursor-pointer">
                                 <i class="fas fa-cog text-xs"></i>
                                 <span>Edit Section Settings</span>
@@ -2955,7 +2955,7 @@
             if (section.is_category_section) {
                 // Shop by Category Dynamic Grid
                 bodyContent = `
-                    <div class="p-8">
+                    <div class="p-4 sm:p-8">
                         <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
                             ${data.categories.map(cat => renderCategoryCard(cat)).join('')}
                         </div>
@@ -2966,10 +2966,10 @@
                 const reels = section.items || section.reels || [];
                 const secSettings = section.section_settings || section.metadata || {};
                 bodyContent = `
-                    <div class="p-8">
-                        <div class="bg-[#FFF9F6] border border-[#E7D1CC] rounded-2xl p-5 mb-6 flex flex-col md:flex-row md:items-center justify-between gap-4">
+                    <div class="p-4 sm:p-8">
+                        <div class="bg-[#FFF9F6] border border-[#E7D1CC] rounded-2xl p-4 sm:p-5 mb-6 flex flex-col md:flex-row md:items-center justify-between gap-4">
                             <div class="flex items-center gap-3.5">
-                                <div class="w-10 h-10 rounded-xl bg-red-100 text-red-700 flex items-center justify-center font-bold text-base shadow-2xs">
+                                <div class="w-10 h-10 rounded-xl bg-red-100 text-red-700 flex items-center justify-center font-bold text-base shadow-2xs shrink-0">
                                     <i class="fas fa-video"></i>
                                 </div>
                                 <div>
@@ -2979,16 +2979,6 @@
                                     </div>
                                     <p class="text-xs text-stone-500">${escapeHtml(secSettings.description || 'Step inside our atelier. Watch the craft, hear the rhythmic click of hooks, and learn styling tips from our master crocheters.')}</p>
                                 </div>
-                            </div>
-                            <div class="flex items-center gap-2 shrink-0">
-                                <button type="button" onclick="openBlogReelsSettingsModal()" class="btn-secondary text-xs px-3.5 py-2 flex items-center gap-1.5 cursor-pointer">
-                                    <i class="fas fa-cog text-xs"></i>
-                                    <span>Section Settings</span>
-                                </button>
-                                <button type="button" onclick="window.openAddVideoReelModal ? window.openAddVideoReelModal() : openAddVideoReelModal()" class="px-4 py-2 rounded-xl bg-red-600 hover:bg-red-700 text-white text-xs font-bold shadow-xs hover:shadow-md transition-all flex items-center gap-1.5 active:scale-95 cursor-pointer">
-                                    <i class="fas fa-plus-circle text-xs"></i>
-                                    <span>+ Add Video / Reel</span>
-                                </button>
                             </div>
                         </div>
 
@@ -3006,7 +2996,7 @@
             } else if (section.is_product_section) {
                 // Best Sellers Product-Driven Info
                 bodyContent = `
-                    <div class="p-8">
+                    <div class="p-4 sm:p-8">
                         <div class="bg-[#FFF9F6] border border-[#E7D1CC] rounded-2xl p-6 mb-6">
                             <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
                                 <div class="flex items-center gap-3.5">
