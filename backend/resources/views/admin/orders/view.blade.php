@@ -332,6 +332,7 @@
                             <option value="pending" {{ $order->payment_status == 'pending' ? 'selected' : '' }}>Pending</option>
                             <option value="paid" {{ $order->payment_status == 'paid' ? 'selected' : '' }}>Paid</option>
                             <option value="partially_paid" {{ $order->payment_status == 'partially_paid' ? 'selected' : '' }}>Partially Paid</option>
+                            <option value="partially_refunded" {{ $order->payment_status == 'partially_refunded' ? 'selected' : '' }}>Partially Refunded</option>
                             <option value="failed" {{ $order->payment_status == 'failed' ? 'selected' : '' }}>Failed</option>
                             <option value="refunded" {{ $order->payment_status == 'refunded' ? 'selected' : '' }}>Refunded</option>
                         </select>
@@ -366,20 +367,22 @@
                     },
                     body: JSON.stringify(result.value)
                 })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success) {
+                .then(response => {
+                    return response.json().then(data => ({ ok: response.ok, status: response.status, data }));
+                })
+                .then(({ ok, status, data }) => {
+                    if (ok && data.success) {
                         toastr.success(data.message);
                         setTimeout(() => {
                             location.reload();
                         }, 1000);
                     } else {
-                        toastr.error(data.message || 'Error updating payment status');
+                        toastr.error(data.message || data.error || 'Error updating payment status');
                     }
                 })
                 .catch(error => {
                     console.error('Error:', error);
-                    toastr.error('Error updating payment status');
+                    toastr.error(error.message || 'Error updating payment status');
                 });
             }
         });

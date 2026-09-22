@@ -169,14 +169,14 @@ class OrderController extends Controller
                 'old_status' => $oldStatus,
             ]);
 
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
             DB::rollBack();
-            Log::error('Error updating order status: ' . $e->getMessage());
+            Log::error('Error updating order status: ' . $e->getMessage() . "\n" . $e->getTraceAsString());
 
             return response()->json([
                 'success' => false,
-                'message' => 'Error updating order status. Please try again.',
-                'error' => config('app.debug') ? $e->getMessage() : null
+                'message' => 'Error updating order status: ' . $e->getMessage(),
+                'error' => $e->getMessage()
             ], 500);
         }
     }
@@ -187,7 +187,7 @@ class OrderController extends Controller
     public function updatePaymentStatus(Request $request, Order $order)
     {
         $validated = $request->validate([
-            'payment_status' => 'required|in:pending,paid,partially_paid,failed,refunded',
+            'payment_status' => 'required|string|in:pending,paid,partially_paid,partially_refunded,failed,refunded',
             'notes' => 'nullable|string|max:500',
         ]);
 
@@ -195,14 +195,53 @@ class OrderController extends Controller
             DB::beginTransaction();
 
             $oldPaymentStatus = $order->payment_status;
-            $order->payment_status = $validated['payment_status'];
+            $newPaymentStatus = $validated['payment_status'];
+            $order->payment_status = $newPaymentStatus;
 
             // Sync order status when payment is set to refunded
-            if ($validated['payment_status'] === 'refunded') {
+            if ($newPaymentStatus === 'refunded') {
                 $order->status = 'refunded';
             }
 
-            $order->save();
+            // Record notes if provided
+            if (!empty($validated['notes'])) {
+                $noteEntry = '[' . now()->format('d M Y H:i') . '] Payment changed to ' . ucfirst(str_replace('_', ' ', $newPaymentStatus)) . ': ' . trim($validated['notes']);
+                $order->admin_notes = $order->admin_notes ? ($order->admin_notes . "\n" . $noteEntry) : $noteEntry;
+            }
+
+            // Save order with fallback if MySQL enum does not yet include partially_paid
+            try {
+                $order->save();
+            } catch (\Illuminate\Database\QueryException $qe) {
+                if (str_contains($qe->getMessage(), 'payment_status')) {
+                    try {
+                        DB::statement("ALTER TABLE orders MODIFY COLUMN payment_status VARCHAR(50) NOT NULL DEFAULT 'pending'");
+                        $order->save();
+                    } catch (\Throwable $alterEx) {
+                        if ($newPaymentStatus === 'partially_paid') {
+                            $order->payment_status = 'partially_refunded';
+                            $order->save();
+                        } else {
+                            throw $qe;
+                        }
+                    }
+                } else {
+                    throw $qe;
+                }
+            }
+
+            // Record status history if refunded
+            if ($newPaymentStatus === 'refunded') {
+                try {
+                    $order->statusHistory()->create([
+                        'status' => 'refunded',
+                        'notes' => $validated['notes'] ?? 'Payment status updated to refunded',
+                        'admin_id' => auth('admin')->id(),
+                    ]);
+                } catch (\Throwable $th) {
+                    Log::warning('Could not record status history for order ' . $order->id . ': ' . $th->getMessage());
+                }
+            }
 
             DB::commit();
 
@@ -213,14 +252,14 @@ class OrderController extends Controller
                 'old_payment_status' => $oldPaymentStatus,
             ]);
 
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
             DB::rollBack();
-            Log::error('Error updating payment status: ' . $e->getMessage());
+            Log::error('Error updating payment status: ' . $e->getMessage() . "\n" . $e->getTraceAsString());
 
             return response()->json([
                 'success' => false,
-                'message' => 'Error updating payment status. Please try again.',
-                'error' => config('app.debug') ? $e->getMessage() : null
+                'message' => 'Error updating payment status: ' . $e->getMessage(),
+                'error' => $e->getMessage()
             ], 500);
         }
     }

@@ -620,6 +620,7 @@
             { val: 'pending', label: 'Pending' },
             { val: 'paid', label: 'Paid' },
             { val: 'partially_paid', label: 'Partially Paid' },
+            { val: 'partially_refunded', label: 'Partially Refunded' },
             { val: 'failed', label: 'Failed' },
             { val: 'refunded', label: 'Refunded' },
         ];
@@ -668,19 +669,21 @@
                     },
                     body: JSON.stringify(result.value)
                 })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success) {
+                .then(response => {
+                    return response.json().then(data => ({ ok: response.ok, status: response.status, data }));
+                })
+                .then(({ ok, status, data }) => {
+                    if (ok && data.success) {
                         toastr.success(data.message);
                         loadOrders();
                     } else {
-                        toastr.error(data.message || 'Error updating payment status');
+                        toastr.error(data.message || data.error || 'Error updating payment status');
                     }
                     hideLoading();
                 })
                 .catch(error => {
                     console.error('Error:', error);
-                    toastr.error('Error updating payment status');
+                    toastr.error(error.message || 'Error updating payment status');
                     hideLoading();
                 });
             }
