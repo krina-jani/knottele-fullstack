@@ -51,14 +51,56 @@ export function Footer() {
       ];
 
   const col2Title = f?.column_2?.title || "Help";
-  const col2Links = (f?.column_2?.links && f.column_2.links.length > 0)
-    ? f.column_2.links.filter((l) => l.is_active !== false)
-    : [
-        { label: "Shipping Policy", url: "/contact" },
-        { label: "Return & Refund", url: "/contact" },
-        { label: "FAQ", url: "/contact" },
-        { label: "Track Order", url: "/account/orders" },
-      ];
+  const policyRoutesMap: Record<string, string> = {
+    "shipping policy": "/contact",
+    "shipping": "/contact",
+    "return & refund": "/contact/return-refund",
+    "return and refund": "/contact/return-refund",
+    "returns": "/contact/return-refund",
+    "faq": "/contact/faq",
+    "faqs": "/contact/faq",
+    "frequently asked questions": "/contact/faq",
+    "track order": "/account/orders",
+    "track your order": "/account/orders",
+    "orders": "/account/orders",
+  };
+
+  interface PolicyLinkItem {
+    label: string;
+    url: string;
+  }
+
+  const requiredPolicies: PolicyLinkItem[] = [
+    { label: "Shipping Policy", url: "/contact" },
+    { label: "Return & Refund", url: "/contact/return-refund" },
+    { label: "FAQ", url: "/contact/faq" },
+    { label: "Track Order", url: "/account/orders" },
+  ];
+
+  let col2Links: PolicyLinkItem[] = requiredPolicies;
+  if (f?.column_2?.links && f.column_2.links.length > 0) {
+    const activeCustom: PolicyLinkItem[] = f.column_2.links
+      .filter((l) => l.is_active !== false)
+      .map((l) => {
+        const rawLabel = l.label || (l as any).name || "Help";
+        const lowerLabel = rawLabel.trim().toLowerCase();
+        const mappedRoute = policyRoutesMap[lowerLabel];
+        return {
+          label: rawLabel,
+          url: mappedRoute || l.url || (l as any).href || "/contact",
+        };
+      });
+
+    const presentKeys = new Set(
+      activeCustom.map((l) => l.label.trim().toLowerCase())
+    );
+
+    const missingPolicies = requiredPolicies.filter(
+      (rp) => !presentKeys.has(rp.label.toLowerCase())
+    );
+
+    col2Links = [...activeCustom, ...missingPolicies];
+  }
 
   const col3Title = f?.column_3?.title || "Contact";
   const contactPhone = f?.column_3?.phone || "+91 97730 39243";
@@ -226,8 +268,8 @@ export function Footer() {
               </h4>
               <ul className="space-y-2 text-xs sm:text-sm text-[#5C4D49] font-medium pt-1">
                 {col2Links.map((link, idx) => {
-                  const href = normalizeInternalLink(link.url || link.href || "/contact");
-                  const label = link.label || link.name || "Help";
+                  const href = normalizeInternalLink(link.url || "/contact");
+                  const label = link.label || "Help";
                   return (
                     <li key={idx}>
                       <Link href={href} prefetch={false} className="hover:text-[#913638] transition-colors">

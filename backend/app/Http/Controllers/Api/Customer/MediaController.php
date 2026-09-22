@@ -326,11 +326,11 @@ class MediaController extends Controller
                 ],
             ],
             'column_2' => [
-                'title' => $footerMeta['col2_title'] ?? 'Help',
+                'title' => $footerMeta['col2_title'] ?? 'Customer Care',
                 'links' => $footerMeta['col2_links'] ?? [
                     ['label' => 'Shipping Policy', 'url' => '/contact', 'is_active' => true],
-                    ['label' => 'Return & Refund', 'url' => '/contact', 'is_active' => true],
-                    ['label' => 'FAQ', 'url' => '/contact', 'is_active' => true],
+                    ['label' => 'Return & Refund', 'url' => '/contact/return-refund', 'is_active' => true],
+                    ['label' => 'FAQ', 'url' => '/contact/faq', 'is_active' => true],
                     ['label' => 'Track Order', 'url' => '/account/orders', 'is_active' => true],
                 ],
             ],

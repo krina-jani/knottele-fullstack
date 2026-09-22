@@ -32,12 +32,14 @@ export default function AccountLayout({
   const { user, isAuthLoading, logout, updateProfile } = useAuth();
   const { wishlistCount } = useWishlist();
 
+  const isOrderTrackingPath = pathname.startsWith("/account/orders");
+
   // Redirect unauthenticated guests to login only AFTER auth initialization completes
   useEffect(() => {
-    if (!isAuthLoading && !user) {
+    if (!isAuthLoading && !user && !isOrderTrackingPath) {
       router.replace(`/login?redirectTo=${encodeURIComponent(pathname)}`);
     }
-  }, [isAuthLoading, user, pathname, router]);
+  }, [isAuthLoading, user, pathname, router, isOrderTrackingPath]);
 
   // Edit Profile Modal state
   const [isEditOpen, setIsEditOpen] = useState(false);
@@ -57,6 +59,15 @@ export default function AccountLayout({
   }
 
   if (!user) {
+    if (isOrderTrackingPath) {
+      return (
+        <div className="bg-[#FFF9F6] min-h-screen py-8 lg:py-12">
+          <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+            {children}
+          </div>
+        </div>
+      );
+    }
     return (
       <div className="bg-[#FFF9F6] min-h-screen py-16 flex items-center justify-center text-center">
         <p className="text-xs text-[#786864]">Redirecting to Login...</p>
