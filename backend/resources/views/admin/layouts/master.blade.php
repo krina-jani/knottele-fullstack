@@ -161,6 +161,12 @@
     <!-- Tabulator JS (Self-hosted) -->
     <script type="text/javascript" src="{{ asset('js/admin/tabulator.min.js') }}"></script>
 
+    <!-- Export Libraries (Excel, PDF, AutoTable) -->
+    <script src="{{ asset('js/admin/xlsx.full.min.js') }}"></script>
+    <script src="{{ asset('js/admin/jspdf.umd.min.js') }}"></script>
+    <script src="{{ asset('js/admin/jspdf.plugin.autotable.min.js') }}"></script>
+    <script src="{{ asset('js/admin/html2pdf.bundle.min.js') }}"></script>
+
     <!-- Lodash -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/lodash.js/4.17.21/lodash.min.js"></script>
 

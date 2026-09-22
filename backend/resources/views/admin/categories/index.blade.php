@@ -3,7 +3,7 @@
 @section('title', 'Category Management')
 
 @section('content')
-    <div class="mb-8">
+    <div class="mb-8 no-print">
         <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
             <div>
                 <h2 class="text-xl sm:text-2xl font-bold text-stone-800 mb-2">Category Management</h2>
@@ -16,7 +16,7 @@
     </div>
 
     <!-- Statistics Cards -->
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8 no-print">
         <div class="bg-white rounded-2xl shadow-sm border border-red-100 p-6">
             <div class="flex items-center">
                 <div class="p-3 rounded-lg bg-emerald-100 text-emerald-600 mr-4">
@@ -94,10 +94,18 @@
                         <i class="fas fa-columns text-xs"></i>
                         <span>Columns</span>
                     </button>
-                    <!-- PDF Button (Small, PDF only) -->
-                    <button id="exportBtn" onclick="window.print()" class="btn-secondary btn-sm hover:text-red-600 hover:bg-stone-50" title="Export as PDF">
+                    <!-- Export Options: Excel, PDF, Print -->
+                    <button type="button" onclick="exportCategories('excel')" class="btn-secondary btn-sm hover:text-emerald-700 hover:bg-emerald-50 text-stone-700 transition-colors shadow-2xs" title="Export as Excel Sheet (.xlsx)">
+                        <i class="fas fa-file-excel text-emerald-600 text-xs"></i>
+                        <span>Excel</span>
+                    </button>
+                    <button type="button" onclick="exportCategories('pdf')" class="btn-secondary btn-sm hover:text-red-700 hover:bg-red-50 text-stone-700 transition-colors shadow-2xs" title="Export as PDF Document (.pdf)">
                         <i class="fas fa-file-pdf text-red-500 text-xs"></i>
                         <span>PDF</span>
+                    </button>
+                    <button type="button" onclick="exportCategories('print')" class="btn-secondary btn-sm hover:text-stone-900 hover:bg-stone-100 text-stone-700 transition-colors shadow-2xs" title="Print Clean Table Report">
+                        <i class="fas fa-print text-stone-600 text-xs"></i>
+                        <span>Print</span>
                     </button>
                     <!-- Add Category Button -->
                     <a href="{{ route('admin.categories.create') }}" class="btn-primary btn-sm w-full sm:w-auto shadow-sm">
@@ -1309,11 +1317,599 @@
             columnVisibilityBtn.parentElement.appendChild(columnMenu);
         }
 
-        // Export functionality (PDF only)
+        // ==========================================
+        // EXPORT SYSTEM (EXCEL, PDF, CLEAN PRINT)
+        // ==========================================
+
+        function escapeCategoryHtml(str) {
+            if (str === null || str === undefined) return '';
+            return String(str)
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#039;');
+        }
+
+        async function getCategoriesExportData() {
+            const searchInput = document.getElementById('searchInput');
+            const searchTerm = searchInput ? searchInput.value.trim() : '';
+
+            try {
+                const params = {
+                    per_page: 1000,
+                    sort: 'sort_order',
+                    direction: 'asc'
+                };
+                if (searchTerm) {
+                    params.search = searchTerm;
+                }
+                const res = await axiosInstance.get('/categories', { params });
+                if (res.data && res.data.success) {
+                    const data = res.data.data.data || res.data.data || [];
+                    if (Array.isArray(data) && data.length > 0) {
+                        return data;
+                    }
+                }
+            } catch (err) {
+                console.warn('API export fetch failed, falling back to tabulator', err);
+            }
+
+            if (categoriesTable && typeof categoriesTable.getData === 'function') {
+                const tabData = categoriesTable.getData("active");
+                if (tabData && tabData.length > 0) return tabData;
+                return categoriesTable.getData() || [];
+            }
+            return [];
+        }
+
+        function exportCategoriesToExcel(data) {
+            if (!data || data.length === 0) {
+                toastr.warning('No categories data to export');
+                return;
+            }
+
+            if (typeof XLSX === 'undefined') {
+                toastr.error('Excel library is still loading, please retry in a second.');
+                return;
+            }
+
+            const rows = data.map((item, index) => {
+                const isSub = item.parent_id !== null && item.parent_id !== 0 && item.parent_id !== '0';
+                const type = isSub ? 'Subcategory' : 'Main Category';
+                const parentName = item.parent_name || (isSub ? 'Subcategory' : 'None (Main)');
+                const isActive = (item.status === true || item.status === 1 || item.status === '1' || item.status === 'true');
+
+                return {
+                    '#': index + 1,
+                    'Category ID': item.id,
+                    'Category Name': item.name || '',
+                    'Slug': item.slug ? `/${item.slug}` : '',
+                    'Type': type,
+                    'Parent Category': parentName,
+                    'Description': item.description || '',
+                    'Products Count': item.products_count ?? 0,
+                    'Subcategories Count': item.children_count ?? 0,
+                    'Status': isActive ? 'Active' : 'Inactive',
+                    'Sort Order': item.sort_order ?? 0,
+                    'Created Date': item.created_at_formatted || item.created_at || ''
+                };
+            });
+
+            const worksheet = XLSX.utils.json_to_sheet(rows);
+
+            worksheet['!cols'] = [
+                { wch: 5 },  // #
+                { wch: 14 }, // Category ID
+                { wch: 28 }, // Category Name
+                { wch: 22 }, // Slug
+                { wch: 16 }, // Type
+                { wch: 22 }, // Parent Category
+                { wch: 32 }, // Description
+                { wch: 16 }, // Products Count
+                { wch: 20 }, // Subcategories Count
+                { wch: 12 }, // Status
+                { wch: 12 }, // Sort Order
+                { wch: 18 }  // Created Date
+            ];
+
+            const workbook = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(workbook, worksheet, 'Categories');
+
+            const dateStr = new Date().toISOString().slice(0, 10);
+            XLSX.writeFile(workbook, `KNOTELLE_Categories_${dateStr}.xlsx`);
+            toastr.success(`Exported ${data.length} categories to Excel successfully!`);
+        }
+
+        function generateCategoriesCleanHtml(data) {
+            let rowsHtml = '';
+            const activeCount = data.filter(c => c.status === true || c.status === 1 || c.status === '1' || c.status === 'true').length;
+            const inactiveCount = data.length - activeCount;
+            const mainCount = data.filter(c => !c.parent_id || c.parent_id === 0 || c.parent_id === '0').length;
+            const subCount = data.length - mainCount;
+
+            data.forEach((item, idx) => {
+                const isSub = item.parent_id !== null && item.parent_id !== 0 && item.parent_id !== '0';
+                const typeText = isSub ? 'Subcategory' : 'Main Category';
+                const isActive = (item.status === true || item.status === 1 || item.status === '1' || item.status === 'true');
+                const bg = idx % 2 === 1 ? '#fafaf9' : '#ffffff';
+
+                rowsHtml += `
+                    <tr style="background-color: ${bg};">
+                        <td style="border: 1px solid #e2e8f0; padding: 7px 8px; text-align: center; color: #64748b; font-size: 10px;">${idx + 1}</td>
+                        <td style="border: 1px solid #e2e8f0; padding: 7px 8px; text-align: center; font-weight: 700; color: #475569; font-size: 11px;">#${item.id}</td>
+                        <td style="border: 1px solid #e2e8f0; padding: 7px 10px;">
+                            <div style="font-weight: 700; color: #0f172a; font-size: 12px;">${escapeCategoryHtml(item.name || 'Untitled')}</div>
+                            <div style="font-size: 10px; color: #64748b; margin-top: 1px;">/${escapeCategoryHtml(item.slug || '')}</div>
+                            ${item.description ? `<div style="font-size: 9.5px; color: #94a3b8; margin-top: 2px;">${escapeCategoryHtml(item.description)}</div>` : ''}
+                        </td>
+                        <td style="border: 1px solid #e2e8f0; padding: 7px 10px; font-size: 11px;">
+                            <span style="font-weight: 600; color: ${isSub ? '#0369a1' : '#0f172a'};">${typeText}</span>
+                            ${isSub && item.parent_name ? `<div style="font-size: 9.5px; color: #64748b; margin-top: 2px;">Parent: <strong>${escapeCategoryHtml(item.parent_name)}</strong></div>` : ''}
+                        </td>
+                        <td style="border: 1px solid #e2e8f0; padding: 7px 8px; text-align: center;">
+                            <span style="font-weight: 700; color: #0f172a; font-size: 11px;">${item.products_count ?? 0}</span>
+                        </td>
+                        <td style="border: 1px solid #e2e8f0; padding: 7px 8px; text-align: center;">
+                            <span style="font-weight: 700; color: #0f172a; font-size: 11px;">${item.children_count ?? 0}</span>
+                        </td>
+                        <td style="border: 1px solid #e2e8f0; padding: 7px 8px; text-align: center;">
+                            ${isActive 
+                                ? '<span style="display: inline-block; padding: 2px 8px; border-radius: 9999px; font-size: 9.5px; font-weight: 700; background: #d1fae5; color: #065f46;">Active</span>'
+                                : '<span style="display: inline-block; padding: 2px 8px; border-radius: 9999px; font-size: 9.5px; font-weight: 700; background: #f1f5f9; color: #475569;">Inactive</span>'
+                            }
+                        </td>
+                        <td style="border: 1px solid #e2e8f0; padding: 7px 8px; text-align: center; font-size: 11px; color: #334155;">
+                            ${item.sort_order ?? 0}
+                        </td>
+                        <td style="border: 1px solid #e2e8f0; padding: 7px 8px; text-align: center; font-size: 10px; color: #64748b; white-space: nowrap;">
+                            ${escapeCategoryHtml(item.created_at_formatted || '-')}
+                        </td>
+                    </tr>
+                `;
+            });
+
+            if (data.length === 0) {
+                rowsHtml = `<tr><td colspan="9" style="text-align: center; padding: 24px; color: #64748b; font-size: 12px;">No categories available to display</td></tr>`;
+            }
+
+            const printDate = new Date().toLocaleDateString('en-IN', {
+                day: '2-digit',
+                month: 'short',
+                year: 'numeric'
+            }) + ' - ' + new Date().toLocaleTimeString('en-IN', {
+                hour: '2-digit',
+                minute: '2-digit',
+                hour12: true
+            });
+
+            return `
+                <!DOCTYPE html>
+                <html>
+                    <head>
+                        <meta charset="utf-8">
+                        <title>KNOTELLE - Category Management Directory Report</title>
+                        <style>
+                            @page {
+                                size: A4 landscape;
+                                margin: 10mm 10mm 10mm 10mm;
+                            }
+                            * {
+                                box-sizing: border-box;
+                            }
+                            body {
+                                font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+                                margin: 0;
+                                padding: 12px;
+                                color: #1e293b;
+                                background: #ffffff;
+                                font-size: 11px;
+                                -webkit-print-color-adjust: exact;
+                                print-color-adjust: exact;
+                            }
+                            .header {
+                                display: flex;
+                                justify-content: space-between;
+                                align-items: flex-start;
+                                border-bottom: 2px solid #dc2626;
+                                padding-bottom: 12px;
+                                margin-bottom: 12px;
+                            }
+                            .brand {
+                                display: flex;
+                                align-items: flex-start;
+                                gap: 12px;
+                            }
+                            .brand img {
+                                height: 46px;
+                                width: auto;
+                                object-fit: contain;
+                            }
+                            .brand h2 {
+                                margin: 0;
+                                font-size: 18px;
+                                color: #dc2626;
+                                font-weight: 800;
+                                letter-spacing: 0.5px;
+                            }
+                            .brand p {
+                                margin: 2px 0 0 0;
+                                font-size: 10px;
+                                color: #475569;
+                                line-height: 1.35;
+                            }
+                            .meta {
+                                text-align: right;
+                            }
+                            .badge {
+                                display: inline-block;
+                                padding: 2px 9px;
+                                font-size: 10px;
+                                font-weight: 800;
+                                background: #fee2e2;
+                                color: #dc2626;
+                                border-radius: 9999px;
+                                text-transform: uppercase;
+                                letter-spacing: 0.5px;
+                            }
+                            .report-title {
+                                margin: 4px 0 2px 0;
+                                font-size: 13px;
+                                font-weight: 700;
+                                color: #0f172a;
+                            }
+                            .meta p {
+                                margin: 2px 0 0 0;
+                                font-size: 10px;
+                                color: #64748b;
+                            }
+                            .summary-bar {
+                                display: flex;
+                                gap: 16px;
+                                background: #f8fafc;
+                                border: 1px solid #e2e8f0;
+                                border-radius: 6px;
+                                padding: 6px 12px;
+                                margin-bottom: 12px;
+                                font-size: 10.5px;
+                            }
+                            .summary-item {
+                                color: #475569;
+                            }
+                            .summary-item strong {
+                                color: #0f172a;
+                            }
+                            table {
+                                width: 100%;
+                                border-collapse: collapse;
+                                font-size: 10.5px;
+                            }
+                            th {
+                                background-color: #f1f5f9;
+                                color: #334155;
+                                font-weight: 700;
+                                text-transform: uppercase;
+                                font-size: 9.5px;
+                                letter-spacing: 0.3px;
+                                padding: 7px 8px;
+                                border: 1px solid #cbd5e1;
+                                text-align: left;
+                            }
+                            .footer {
+                                margin-top: 14px;
+                                border-top: 1px solid #e2e8f0;
+                                padding-top: 8px;
+                                display: flex;
+                                justify-content: space-between;
+                                font-size: 9.5px;
+                                color: #64748b;
+                            }
+                        </style>
+                    </head>
+                    <body>
+                        <div class="header">
+                            <div class="brand">
+                                <img src="{{ asset('images/logo/knotelle-logo.png') }}?v=2" alt="KNOTELLE" onerror="this.style.display='none'">
+                                <div>
+                                    <h2>KNOTELLE</h2>
+                                    <p>
+                                        Handcrafted with Love India<br>
+                                        support@knotelle.in &bull; +91 9773055555
+                                    </p>
+                                </div>
+                            </div>
+                            <div class="meta">
+                                <span class="badge">Category Report</span>
+                                <div class="report-title">Category Directory Management</div>
+                                <p>Generated: ${printDate}</p>
+                            </div>
+                        </div>
+
+                        <div class="summary-bar">
+                            <span class="summary-item">Total Categories: <strong>${data.length}</strong></span>
+                            <span class="summary-item">Active: <strong>${activeCount}</strong></span>
+                            <span class="summary-item">Inactive: <strong>${inactiveCount}</strong></span>
+                            <span class="summary-item">Main Categories: <strong>${mainCount}</strong></span>
+                            <span class="summary-item">Subcategories: <strong>${subCount}</strong></span>
+                        </div>
+
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th style="width: 35px; text-align: center;">#</th>
+                                    <th style="width: 50px; text-align: center;">ID</th>
+                                    <th>Category</th>
+                                    <th style="width: 160px;">Type / Parent</th>
+                                    <th style="width: 75px; text-align: center;">Products</th>
+                                    <th style="width: 75px; text-align: center;">Subcats</th>
+                                    <th style="width: 80px; text-align: center;">Status</th>
+                                    <th style="width: 60px; text-align: center;">Order</th>
+                                    <th style="width: 100px; text-align: center;">Created</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                ${rowsHtml}
+                            </tbody>
+                        </table>
+
+                        <div class="footer">
+                            <span>Total Records: ${data.length} Categories</span>
+                            <span>KNOTELLE Admin Management System &bull; Confidential</span>
+                        </div>
+                    </body>
+                </html>
+            `;
+        }
+
+        function printCategoriesReport(data) {
+            if (!data || data.length === 0) {
+                toastr.warning('No categories data to print');
+                return;
+            }
+
+            const printFrame = document.createElement('iframe');
+            printFrame.style.position = 'fixed';
+            printFrame.style.right = '0';
+            printFrame.style.bottom = '0';
+            printFrame.style.width = '0';
+            printFrame.style.height = '0';
+            printFrame.style.border = '0';
+            document.body.appendChild(printFrame);
+
+            const frameDoc = printFrame.contentWindow.document;
+            frameDoc.open();
+            frameDoc.write(generateCategoriesCleanHtml(data));
+            frameDoc.close();
+
+            printFrame.contentWindow.focus();
+            setTimeout(() => {
+                printFrame.contentWindow.print();
+                setTimeout(() => {
+                    if (document.body.contains(printFrame)) {
+                        document.body.removeChild(printFrame);
+                    }
+                }, 1500);
+            }, 350);
+        }
+
+        async function exportCategoriesToPdf(data) {
+            if (!data || data.length === 0) {
+                toastr.warning('No categories data to export');
+                return;
+            }
+
+            const dateStr = new Date().toISOString().slice(0, 10);
+            const filename = `KNOTELLE_Categories_Report_${dateStr}.pdf`;
+
+            toastr.info('Generating PDF report...');
+
+            // Method 1: Vector PDF using jsPDF + autoTable
+            if (window.jspdf && typeof window.jspdf.jsPDF === 'function') {
+                try {
+                    const { jsPDF } = window.jspdf;
+                    const doc = new jsPDF({
+                        orientation: 'landscape',
+                        unit: 'mm',
+                        format: 'a4'
+                    });
+
+                    // Red brand top border line
+                    doc.setFillColor(220, 38, 38);
+                    doc.rect(14, 10, 269, 1.5, 'F');
+
+                    // Header - Left Side (Brand)
+                    doc.setFontSize(16);
+                    doc.setFont('helvetica', 'bold');
+                    doc.setTextColor(220, 38, 38);
+                    doc.text('KNOTELLE', 14, 18);
+
+                    doc.setFontSize(8);
+                    doc.setFont('helvetica', 'normal');
+                    doc.setTextColor(71, 85, 105);
+                    doc.text('Handcrafted with Love India | support@knotelle.in | +91 9773055555', 14, 23);
+
+                    doc.setFontSize(12);
+                    doc.setFont('helvetica', 'bold');
+                    doc.setTextColor(15, 23, 42);
+                    doc.text('Category Management Directory Report', 14, 30);
+
+                    // Header - Right Side (Badge & Meta)
+                    doc.setFillColor(254, 226, 226);
+                    doc.roundedRect(243, 13, 40, 6, 1, 1, 'F');
+                    doc.setTextColor(220, 38, 38);
+                    doc.setFontSize(8);
+                    doc.setFont('helvetica', 'bold');
+                    doc.text('ADMIN REPORT', 263, 17.5, { align: 'center' });
+
+                    const printDateStr = new Date().toLocaleDateString('en-IN', {
+                        day: '2-digit',
+                        month: 'short',
+                        year: 'numeric'
+                    }) + ' - ' + new Date().toLocaleTimeString('en-IN', {
+                        hour: '2-digit',
+                        minute: '2-digit',
+                        hour12: true
+                    });
+                    doc.setFontSize(8);
+                    doc.setFont('helvetica', 'normal');
+                    doc.setTextColor(100, 116, 139);
+                    doc.text(`Generated: ${printDateStr}`, 283, 24, { align: 'right' });
+
+                    const activeCount = data.filter(c => c.status === true || c.status === 1 || c.status === '1' || c.status === 'true').length;
+                    const mainCount = data.filter(c => !c.parent_id || c.parent_id === 0 || c.parent_id === '0').length;
+                    doc.text(`Total: ${data.length} | Active: ${activeCount} | Main: ${mainCount}`, 283, 29, { align: 'right' });
+
+                    // Table Data Rows
+                    const tableRows = data.map((item, idx) => {
+                        const isSub = item.parent_id !== null && item.parent_id !== 0 && item.parent_id !== '0';
+                        const typeText = isSub ? 'Subcategory' : 'Main Category';
+                        const parentText = item.parent_name || (isSub ? 'Subcategory' : 'None');
+                        const isActive = (item.status === true || item.status === 1 || item.status === '1' || item.status === 'true');
+
+                        return [
+                            idx + 1,
+                            `#${item.id}`,
+                            item.name || '-',
+                            item.slug ? `/${item.slug}` : '-',
+                            typeText,
+                            parentText,
+                            item.products_count ?? 0,
+                            item.children_count ?? 0,
+                            isActive ? 'Active' : 'Inactive',
+                            item.sort_order ?? 0,
+                            item.created_at_formatted || '-'
+                        ];
+                    });
+
+                    doc.autoTable({
+                        startY: 34,
+                        head: [['#', 'ID', 'Category Name', 'Slug', 'Type', 'Parent', 'Products', 'Subcats', 'Status', 'Order', 'Created']],
+                        body: tableRows,
+                        theme: 'grid',
+                        headStyles: {
+                            fillColor: [241, 245, 249],
+                            textColor: [30, 41, 59],
+                            fontSize: 8.5,
+                            fontStyle: 'bold',
+                            halign: 'left',
+                            lineWidth: 0.1,
+                            lineColor: [203, 213, 225]
+                        },
+                        bodyStyles: {
+                            fontSize: 8,
+                            textColor: [30, 41, 59],
+                            lineWidth: 0.1,
+                            lineColor: [226, 232, 240]
+                        },
+                        alternateRowStyles: {
+                            fillColor: [250, 250, 249]
+                        },
+                        columnStyles: {
+                            0: { halign: 'center', cellWidth: 10 },
+                            1: { halign: 'center', cellWidth: 14, fontStyle: 'bold' },
+                            2: { fontStyle: 'bold', cellWidth: 42 },
+                            3: { textColor: [100, 116, 139], cellWidth: 32 },
+                            4: { cellWidth: 26 },
+                            5: { cellWidth: 32 },
+                            6: { halign: 'center', cellWidth: 20 },
+                            7: { halign: 'center', cellWidth: 20 },
+                            8: { halign: 'center', cellWidth: 20 },
+                            9: { halign: 'center', cellWidth: 16 },
+                            10: { halign: 'center', cellWidth: 24 }
+                        },
+                        didParseCell: function(cellData) {
+                            if (cellData.section === 'body' && cellData.column.index === 8) {
+                                if (cellData.cell.raw === 'Active') {
+                                    cellData.cell.styles.textColor = [6, 95, 70];
+                                    cellData.cell.styles.fontStyle = 'bold';
+                                } else {
+                                    cellData.cell.styles.textColor = [100, 116, 139];
+                                }
+                            }
+                        },
+                        didDrawPage: function(pageData) {
+                            const pageCount = doc.internal.getNumberOfPages();
+                            doc.setFontSize(8);
+                            doc.setTextColor(148, 163, 184);
+                            doc.text('KNOTELLE Admin Management System • Confidential', 14, 202);
+                            doc.text(`Page ${pageData.pageNumber} of ${pageCount}`, 283, 202, { align: 'right' });
+                        },
+                        margin: { left: 14, right: 14, bottom: 14 }
+                    });
+
+                    doc.save(filename);
+                    toastr.success(`Downloaded ${filename} successfully!`);
+                    return;
+                } catch (e) {
+                    console.warn('jsPDF autoTable failed, trying html2pdf', e);
+                }
+            }
+
+            // Method 2: html2pdf fallback
+            if (typeof html2pdf !== 'undefined') {
+                try {
+                    const htmlContent = generateCategoriesCleanHtml(data);
+                    const container = document.createElement('div');
+                    container.innerHTML = htmlContent;
+                    document.body.appendChild(container);
+
+                    const opt = {
+                        margin: [10, 10, 10, 10],
+                        filename: filename,
+                        image: { type: 'jpeg', quality: 0.98 },
+                        html2canvas: { scale: 2, useCORS: true, logging: false },
+                        jsPDF: { unit: 'mm', format: 'a4', orientation: 'landscape' }
+                    };
+
+                    await html2pdf().set(opt).from(container).save();
+                    document.body.removeChild(container);
+                    toastr.success(`Downloaded ${filename} successfully!`);
+                    return;
+                } catch (err) {
+                    console.error('html2pdf failed', err);
+                }
+            }
+
+            // Fallback: If libraries fail, open print dialog
+            toastr.info('Opening print dialog for PDF saving...');
+            printCategoriesReport(data);
+        }
+
+        async function exportCategories(type) {
+            toastr.info('Preparing categories data for export...');
+            try {
+                const data = await getCategoriesExportData();
+                if (!data || data.length === 0) {
+                    toastr.warning('No categories found to export');
+                    return;
+                }
+
+                if (type === 'excel') {
+                    exportCategoriesToExcel(data);
+                } else if (type === 'pdf') {
+                    await exportCategoriesToPdf(data);
+                } else if (type === 'print') {
+                    printCategoriesReport(data);
+                }
+            } catch (e) {
+                console.error('Export error:', e);
+                toastr.error('Failed to export categories');
+            }
+        }
+
+        // Export initialization & global print hooking
         function initCategoriesExport() {
-            const exportBtn = document.getElementById('exportBtn');
-            exportBtn?.addEventListener('click', function() {
-                window.print();
+            // Hook native window.print so browser print / shortcuts invoke clean table print
+            window.print = function() {
+                exportCategories('print');
+            };
+
+            // Keyboard shortcut Ctrl+P or Cmd+P
+            document.addEventListener('keydown', function(e) {
+                if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'p') {
+                    e.preventDefault();
+                    exportCategories('print');
+                }
             });
         }
 
