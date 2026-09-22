@@ -566,54 +566,14 @@ class MediaController extends Controller
                 ]
             ],
 
-            // SHOP PAGE SECTIONS
+            // SHOP PAGE SECTIONS (Replica of live Refine Collection categories & catalog showcase)
             [
-                'id' => 'shop_banner',
+                'id' => 'shop_categories',
                 'page' => 'shop',
-                'title' => 'Shop Page Header & Banner',
-                'description' => 'Main panoramic visual banner, headline, subtitle, and badge at top of the catalog.',
-                'badge' => 'Catalog Header',
-                'slots' => [
-                    [
-                        'slot' => 'shop_banner_desktop',
-                        'title' => 'Shop Catalog Desktop Banner',
-                        'description' => 'Top panoramic catalog banner with headline, tagline badge, and decorative artwork.',
-                        'recommended_dimensions' => '1920 × 400',
-                        'device' => 'desktop',
-                        'page' => 'shop',
-                        'section' => 'shop_banner',
-                        'sort_order' => 1,
-                    ],
-                    [
-                        'slot' => 'shop_banner_mobile',
-                        'title' => 'Shop Catalog Mobile Banner',
-                        'description' => 'Mobile-optimized header visual.',
-                        'recommended_dimensions' => '768 × 500',
-                        'device' => 'mobile',
-                        'page' => 'shop',
-                        'section' => 'shop_banner',
-                        'sort_order' => 1,
-                    ],
-                ]
-            ],
-            [
-                'id' => 'shop_promo',
-                'page' => 'shop',
-                'title' => 'Shop In-Catalog Promo Banner',
-                'description' => 'Mid-catalog promotional callout for custom gifts or seasonal highlights.',
-                'badge' => 'Promotional',
-                'slots' => [
-                    [
-                        'slot' => 'shop_promo_banner',
-                        'title' => 'In-Catalog Promotional Banner',
-                        'description' => 'Middle banner across the product listing.',
-                        'recommended_dimensions' => '1200 × 300',
-                        'device' => 'all',
-                        'page' => 'shop',
-                        'section' => 'shop_promo',
-                        'sort_order' => 1,
-                    ],
-                ]
+                'title' => 'Shop Page Categories & Refine Collection',
+                'description' => 'Live storefront replica of the Refine Collection categories filter and catalog items. Click any category name to manage or create new categories.',
+                'badge' => 'Refine Collection',
+                'is_shop_categories_section' => true,
             ],
 
             // CUSTOM ORDER PAGE SECTIONS
@@ -1037,6 +997,30 @@ class MediaController extends Controller
                 ];
             });
 
+        // 5. Fetch Shop Catalog Products with Categories
+        $shopProducts = Product::with(['defaultVariant.images', 'categories'])
+            ->where('status', 'active')
+            ->orderBy('sort_order', 'asc')
+            ->limit(50)
+            ->get()
+            ->map(function ($p) {
+                $img = null;
+                if ($p->defaultVariant && $p->defaultVariant->images->isNotEmpty()) {
+                    $img = $p->defaultVariant->images->first()->url;
+                }
+                return [
+                    'id' => $p->id,
+                    'name' => $p->name,
+                    'slug' => $p->slug,
+                    'price' => $p->defaultVariant ? $p->defaultVariant->price : 0,
+                    'image' => $img ?: asset('images/logo/Logo_1.png'),
+                    'is_new' => (bool)$p->is_new,
+                    'is_bestseller' => (bool)$p->is_bestseller,
+                    'is_featured' => (bool)$p->is_featured,
+                    'category_slugs' => $p->categories->pluck('slug')->toArray(),
+                ];
+            });
+
         $footerSec = collect($sections)->firstWhere('id', 'footer');
         $navbarSec = collect($sections)->firstWhere('id', 'navbar_settings');
 
@@ -1046,6 +1030,7 @@ class MediaController extends Controller
                 'sections' => $sections,
                 'categories' => $categories,
                 'best_sellers' => $bestSellers,
+                'shop_products' => $shopProducts,
                 'total_media' => $allMedia->count(),
                 'footer_settings' => $footerSec['metadata'] ?? null,
                 'navbar_settings' => $navbarSec['metadata'] ?? null,
